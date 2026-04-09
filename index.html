@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="產品設計師個人工作室 - 專注於SaaS、消費端產品與品牌設計">
-    <meta name="keywords" content="產品設計, UI/UX, 設計師, CREO機構設計">
-    <meta name="author" content="Product Designer">
-    <title>產品設計師 - 個人工作室</title>
+    <meta name="description" content="Andrew 機構與產品設計工作室 - 專注於 Creo 3D建模、機構設計與量產評估">
+    <meta name="keywords" content="產品設計, 機構設計, Creo, 3D建模, Python, 應力分析">
+    <meta name="author" content="Andrew">
+    <title>Andrew | 機構與產品設計工作室</title>
     
     <style>
         * {
@@ -76,9 +76,9 @@
         }
 
         .logo {
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: -0.5px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             text-decoration: none;
             color: var(--primary-color);
         }
@@ -86,7 +86,8 @@
         nav {
             display: flex;
             gap: var(--spacing-lg);
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
         }
 
         nav a {
@@ -103,26 +104,26 @@
 
         /* Hero Section */
         .hero {
-            padding: 5rem 5% 3rem;
+            padding: 6rem 5% 4rem;
             max-width: 900px;
             margin: 0 auto;
             animation: fadeInDown 0.8s ease;
         }
 
         .hero h1 {
-            font-size: clamp(32px, 6vw, 48px);
-            font-weight: 600;
+            font-size: clamp(36px, 6vw, 52px);
+            font-weight: 700;
             line-height: 1.2;
             margin-bottom: var(--spacing-md);
             color: var(--primary-color);
         }
 
         .hero p {
-            font-size: 16px;
+            font-size: 18px;
             color: var(--secondary-color);
             margin-bottom: var(--spacing-sm);
-            max-width: 650px;
-            line-height: 1.7;
+            max-width: 700px;
+            line-height: 1.8;
         }
 
         /* Services Section */
@@ -135,21 +136,21 @@
         }
 
         .section-title {
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 30px;
+            font-weight: 700;
             margin-bottom: var(--spacing-lg);
             color: var(--primary-color);
         }
 
         .service-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: var(--spacing-md);
             margin-bottom: var(--spacing-xl);
         }
 
         .service-card {
-            padding: var(--spacing-md);
+            padding: var(--spacing-lg);
             background-color: var(--bg-light);
             border-radius: var(--radius-md);
             border: 0.5px solid var(--border-color);
@@ -158,20 +159,21 @@
 
         .service-card:hover {
             border-color: var(--primary-color);
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
         .service-card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: var(--spacing-xs);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
             color: var(--primary-color);
         }
 
         .service-card p {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--secondary-color);
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
         /* Portfolio Section */
@@ -185,8 +187,8 @@
 
         .project-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: var(--spacing-md);
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-lg);
         }
 
         .project-card {
@@ -200,33 +202,33 @@
 
         .project-card:hover {
             border-color: var(--primary-color);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
         }
 
         @media (prefers-color-scheme: dark) {
             .project-card:hover {
-                box-shadow: 0 8px 24px rgba(255, 255, 255, 0.08);
+                box-shadow: 0 12px 30px rgba(255, 255, 255, 0.05);
             }
         }
 
         .project-image {
             width: 100%;
-            height: 220px;
-            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+            height: 240px;
+            background: linear-gradient(135deg, #e6e6e6 0%, #d4d4d4 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 56px;
-            color: #ccc;
+            font-size: 64px;
+            color: #999;
             position: relative;
             overflow: hidden;
         }
 
         @media (prefers-color-scheme: dark) {
             .project-image {
-                background: linear-gradient(135deg, #222 0%, #1a1a1a 100%);
-                color: #444;
+                background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+                color: #555;
             }
         }
 
@@ -241,36 +243,37 @@
         }
 
         .project-info {
-            padding: var(--spacing-md);
+            padding: var(--spacing-lg);
         }
 
         .project-info h3 {
-            font-size: 17px;
-            font-weight: 600;
+            font-size: 19px;
+            font-weight: 700;
             margin-bottom: var(--spacing-xs);
             color: var(--primary-color);
         }
 
         .project-info p {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--secondary-color);
-            margin: var(--spacing-xs) 0;
-            line-height: 1.6;
+            margin: var(--spacing-sm) 0;
+            line-height: 1.7;
         }
 
         .project-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: var(--spacing-xs);
-            margin-top: var(--spacing-sm);
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
         }
 
         .project-tag {
             display: inline-block;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 500;
             background-color: var(--bg-white);
             color: var(--secondary-color);
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: var(--radius-sm);
             border: 0.5px solid var(--border-color);
             transition: all 0.2s ease;
@@ -293,7 +296,7 @@
 
         .contact h2 {
             font-size: 32px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: var(--spacing-md);
             color: var(--primary-color);
         }
@@ -307,12 +310,12 @@
 
         .cta-button {
             display: inline-block;
-            padding: 14px 36px;
+            padding: 16px 40px;
             background-color: var(--primary-color);
             color: var(--bg-white);
             border: 1.5px solid var(--primary-color);
             border-radius: var(--radius-md);
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -341,26 +344,8 @@
             padding: var(--spacing-lg) 5%;
             border-top: 0.5px solid var(--border-color);
             text-align: center;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--secondary-color);
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-md);
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: var(--secondary-color);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary-color);
         }
 
         /* Contact Form Modal */
@@ -371,7 +356,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             z-index: 200;
             align-items: center;
             justify-content: center;
@@ -385,13 +371,14 @@
         .modal-content {
             background-color: var(--bg-white);
             border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
-            max-width: 500px;
+            padding: var(--spacing-xl);
+            max-width: 550px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
             animation: slideUp 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
         .modal-close {
@@ -400,7 +387,7 @@
             right: var(--spacing-md);
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             color: var(--secondary-color);
             transition: color 0.3s ease;
@@ -411,10 +398,9 @@
         }
 
         .modal h3 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: var(--spacing-md);
-            margin-top: var(--spacing-sm);
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
             color: var(--primary-color);
         }
 
@@ -424,8 +410,8 @@
 
         .form-group label {
             display: block;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: 600;
             margin-bottom: var(--spacing-xs);
             color: var(--primary-color);
         }
@@ -433,14 +419,14 @@
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 0.5px solid var(--border-color);
+            padding: 14px;
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
             font-family: inherit;
-            font-size: 14px;
+            font-size: 15px;
             color: var(--primary-color);
             background-color: var(--bg-light);
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .form-group input:focus,
@@ -448,288 +434,224 @@
             outline: none;
             border-color: var(--primary-color);
             background-color: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .form-group input:focus,
+            .form-group textarea:focus {
+                box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+            }
         }
 
         .form-group textarea {
             resize: vertical;
-            min-height: 120px;
+            min-height: 150px;
         }
 
         /* Animations */
         @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            header {
-                padding: var(--spacing-md) 5%;
-            }
-
-            .logo {
-                font-size: 14px;
-            }
-
-            nav {
-                gap: var(--spacing-md);
-                font-size: 13px;
-            }
-
-            .hero {
-                padding: 3rem 5% 2rem;
-            }
-
-            .hero h1 {
-                font-size: 32px;
-                margin-bottom: var(--spacing-sm);
-            }
-
-            .hero p {
-                font-size: 15px;
-            }
-
-            .section-title {
-                font-size: 24px;
-            }
-
+            header { padding: var(--spacing-md) 5%; }
+            nav { gap: var(--spacing-md); font-size: 14px; }
+            .hero { padding: 4rem 5% 2rem; }
+            .hero h1 { font-size: 32px; }
+            .hero p { font-size: 16px; }
             .cta-button-secondary {
                 display: block;
                 margin-left: 0;
                 margin-top: var(--spacing-md);
             }
-
-            .project-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .service-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Print Styles */
-        @media print {
-            header {
-                display: none;
-            }
-
-            .modal {
-                display: none;
-            }
+            .project-grid { grid-template-columns: 1fr; }
+            .service-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: var(--spacing-lg); }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
-        <a href="#" class="logo">Studio</a>
+        <a href="#" class="logo">Andrew Design Studio</a>
         <nav>
-            <a onclick="smoothScroll('services'); return false;">服務</a>
-            <a onclick="smoothScroll('portfolio'); return false;">作品</a>
-            <a onclick="smoothScroll('contact'); return false;">聯繫</a>
+            <a onclick="smoothScroll('services'); return false;">專業服務</a>
+            <a onclick="smoothScroll('portfolio'); return false;">工程實績</a>
+            <a onclick="smoothScroll('contact'); return false;">聯絡提案</a>
         </nav>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
-        <h1>產品設計師</h1>
-        <p>專注於 SaaS、消費端產品與品牌設計。透過用戶研究和設計思維，打造具有競爭力的產品體驗。</p>
-        <p style="color: var(--secondary-color); font-size: 14px; margin-top: var(--spacing-md);">
-            致力於解決複雜問題，創造簡潔、易用的設計方案
+        <h1>機構與產品設計工作室</h1>
+        <p>擁有紮實的機械設計背景，專注於高階曲面建構、複雜機構設計與量產可行性評估。結合 Creo 3D 建模實力與 Python 工程輔助計算，提供從概念發想到落地製造的全方位解決方案。</p>
+        <p style="color: var(--secondary-color); font-size: 15px; margin-top: var(--spacing-md); font-weight: 500;">
+            精準對接開模製造，解決研發痛點，打造具備市場競爭力的硬體產品。
         </p>
     </section>
 
-    <!-- Services Section -->
     <section class="services" id="services">
-        <h2 class="section-title">服務範疇</h2>
+        <h2 class="section-title">核心技術範疇</h2>
         <div class="service-grid">
             <div class="service-card">
                 <h3>Creo 機構設計</h3>
-                <p>用戶研究、競品分析、功能規劃、路線圖設計</p>
+                <p>執行精準的 3D 實體與高階曲面建模、內部複雜機構拆解，以及系統性的運動學分析 (Mechanism Analysis)。</p>
             </div>
             <div class="service-card">
-                <h3>交互設計</h3>
-                <p>流程設計、原型開發、設計系統建構</p>
+                <h3>量產可行性評估 (DFM)</h3>
+                <p>執行材質應力考量、干涉檢查與開模拔模角評估，確保設計圖能順利對接後端模具廠與量產製造。</p>
             </div>
             <div class="service-card">
-                <h3>視覺設計</h3>
-                <p>品牌識別、UI設計、設計規範制定</p>
+                <h3>擬真渲染與外觀提案</h3>
+                <p>從初期的產品外觀概念發想，到最終的高畫質產品擬真渲染，打造極具商業價值的視覺呈現。</p>
             </div>
             <div class="service-card">
-                <h3>可用性優化</h3>
-                <p>用戶測試、數據分析、迭代改進</p>
+                <h3>Python 工程輔助</h3>
+                <p>運用 Python 開發專屬的工程計算腳本與自動化數據處理工具，有效縮短設計驗證時間並提升開發效率。</p>
             </div>
         </div>
     </section>
 
-    <!-- Portfolio Section -->
     <section class="portfolio" id="portfolio">
-        <h2 class="section-title">精選作品</h2>
+        <h2 class="section-title">精選工程實績</h2>
         <div class="project-grid">
             <div class="project-card">
-                <div class="project-image">🎯</div>
+                <div class="project-image">⚙️</div>
                 <div class="project-info">
-                    <h3>SaaS 管理平台</h3>
-                    <p>重新設計企業數據分析平台，提升用戶操作效率 40%</p>
+                    <h3>複雜連桿機構設計</h3>
+                    <p>透過 Creo 運動學模組進行作動模擬，精確計算行程並排除干涉問題，確保機構運作順暢。</p>
                     <div class="project-tags">
-                        <span class="project-tag">UI/UX</span>
-                        <span class="project-tag">設計系統</span>
+                        <span class="project-tag">Creo</span>
+                        <span class="project-tag">運動學分析</span>
+                        <span class="project-tag">機構設計</span>
                     </div>
                 </div>
             </div>
 
             <div class="project-card">
-                <div class="project-image">📱</div>
+                <div class="project-image">🖱️</div>
                 <div class="project-info">
-                    <h3>行動應用重構</h3>
-                    <p>從零開始設計消費端應用，用戶留存率提升 65%</p>
+                    <h3>消費性電子產品外觀建模</h3>
+                    <p>利用高階曲面技巧建構符合人體工學的流線外型，並考量後續的拆件與組裝邏輯。</p>
                     <div class="project-tags">
-                        <span class="project-tag">產品設計</span>
-                        <span class="project-tag">用戶研究</span>
+                        <span class="project-tag">曲面建模</span>
+                        <span class="project-tag">產品外觀</span>
                     </div>
                 </div>
             </div>
 
             <div class="project-card">
-                <div class="project-image">🎨</div>
+                <div class="project-image">📐</div>
                 <div class="project-info">
-                    <h3>品牌視覺系統</h3>
-                    <p>建立完整的設計語言與規範，統一全產品線</p>
+                    <h3>結構應力與 DFM 優化</h3>
+                    <p>針對易斷裂的卡勾與承重件進行結構強化設計，優化壁厚均勻度，減少縮水變形等射出成型缺陷。</p>
                     <div class="project-tags">
-                        <span class="project-tag">品牌設計</span>
-                        <span class="project-tag">規範</span>
+                        <span class="project-tag">DFM</span>
+                        <span class="project-tag">應力考量</span>
+                        <span class="project-tag">塑膠射出</span>
                     </div>
                 </div>
             </div>
 
             <div class="project-card">
-                <div class="project-image">💼</div>
+                <div class="project-image">💻</div>
                 <div class="project-info">
-                    <h3>企業內部工具</h3>
-                    <p>為內部團隊設計協作工具，提升工作流效率</p>
+                    <h3>Python 自動化工程計算</h3>
+                    <p>撰寫 Python 腳本取代繁瑣的 Excel 人工計算，將參數化設計的驗證時間大幅縮短。</p>
                     <div class="project-tags">
-                        <span class="project-tag">交互設計</span>
-                        <span class="project-tag">工程配合</span>
+                        <span class="project-tag">Python</span>
+                        <span class="project-tag">工程計算</span>
+                        <span class="project-tag">自動化</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="project-image">🔩</div>
+                <div class="project-info">
+                    <h3>金屬件精密結構設計</h3>
+                    <p>針對壓鑄與板金件進行專屬的結構設計，考量加工公差與表面處理工藝要求。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">金屬加工</span>
+                        <span class="project-tag">公差分析</span>
                     </div>
                 </div>
             </div>
 
             <div class="project-card">
-                <div class="project-image">🔄</div>
+                <div class="project-image">✨</div>
                 <div class="project-info">
-                    <h3>電商平台優化</h3>
-                    <p>優化購物流程，轉換率提升 28%</p>
+                    <h3>產品商業擬真渲染</h3>
+                    <p>設定高質感的材質與光影表現，產出可用於募資平台或型錄展示的逼真產品渲染圖。</p>
                     <div class="project-tags">
-                        <span class="project-tag">可用性設計</span>
-                        <span class="project-tag">A/B測試</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image">📊</div>
-                <div class="project-info">
-                    <h3>數據可視化</h3>
-                    <p>為複雜數據設計直觀的視覺呈現方案</p>
-                    <div class="project-tags">
-                        <span class="project-tag">信息設計</span>
-                        <span class="project-tag">交互</span>
+                        <span class="project-tag">3D渲染</span>
+                        <span class="project-tag">視覺提案</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
     <section class="contact" id="contact">
-        <h2>開始合作</h2>
-        <p>有產品設計需求？歡迎聯繫討論您的項目。</p>
-        <button class="cta-button" onclick="openContactModal()">聯繫我</button>
-        <a href="mailto:hello@example.com" class="cta-button cta-button-secondary">發送郵件</a>
+        <h2>啟動設計專案</h2>
+        <p>有機構設計、3D 建模或產品開發的需求嗎？歡迎隨時聯繫討論您的構想與規格。</p>
+        <button class="cta-button" onclick="openContactModal()">專案諮詢</button>
+        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">直接發送郵件</a>
     </section>
 
-    <!-- Contact Modal -->
     <div class="modal" id="contactModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeContactModal()">&times;</button>
-            <h3>聯繫表單</h3>
+            <h3>專案諮詢表單</h3>
             <form onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
-                    <label for="name">姓名 *</label>
+                    <label for="name">姓名 / 聯絡人 *</label>
                     <input type="text" id="name" name="name" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">郵件地址 *</label>
+                    <label for="email">電子郵件 *</label>
                     <input type="email" id="email" name="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="company">公司/機構</label>
+                    <label for="company">公司 / 單位名稱</label>
                     <input type="text" id="company" name="company">
                 </div>
 
                 <div class="form-group">
-                    <label for="phone">聯繫電話</label>
+                    <label for="phone">聯絡電話</label>
                     <input type="tel" id="phone" name="phone">
                 </div>
 
                 <div class="form-group">
-                    <label for="message">項目描述 *</label>
-                    <textarea id="message" name="message" required placeholder="請簡述您的項目需求..."></textarea>
+                    <label for="message">專案需求描述 *</label>
+                    <textarea id="message" name="message" required placeholder="請簡述您的專案需求（例如：需要機構設計、既有圖面優化、或是新產品外觀建模等）..."></textarea>
                 </div>
 
-                <button type="submit" class="cta-button" style="width: 100%; border: none;">提交</button>
+                <button type="submit" class="cta-button" style="width: 100%; border: none;">送出諮詢</button>
             </form>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
-        <div class="footer-links">
-            <a href="#" onclick="alert('LinkedIn: linkedin.com/in/yourprofile'); return false;">LinkedIn</a>
-            <a href="#" onclick="alert('Dribbble: dribbble.com/yourprofile'); return false;">Dribbble</a>
-            <a href="#" onclick="alert('Behance: behance.net/yourprofile'); return false;">Behance</a>
-        </div>
-        <p>&copy; 2024 Product Designer Studio. All rights reserved.</p>
+        <p>&copy; 2026 Andrew Mechanical & Product Design Studio. All rights reserved.</p>
     </footer>
 
     <script>
@@ -772,8 +694,8 @@
                 message: document.getElementById('message').value
             };
 
-            // Create mailto link with form data
-            const mailtoLink = `mailto:hello@example.com?subject=新的設計諮詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名: ${formData.name}\n郵件: ${formData.email}\n公司: ${formData.company}\n電話: ${formData.phone}\n\n項目描述:\n${formData.message}`)}`;
+            // Create mailto link with form data (請將 andrew@example.com 替換成您的真實信箱)
+            const mailtoLink = `mailto:andrew@example.com?subject=設計專案諮詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名: ${formData.name}\n郵件: ${formData.email}\n公司: ${formData.company}\n電話: ${formData.phone}\n\n需求描述:\n${formData.message}`)}`;
             
             // Open email client
             window.location.href = mailtoLink;
@@ -804,7 +726,6 @@
             });
         }, observerOptions);
 
-        // Optional: Add scroll animations
         document.querySelectorAll('section').forEach(section => {
             section.style.opacity = '0.95';
         });
