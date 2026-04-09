@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="產品設計師個人工作室 - 專注於SaaS、消費端產品與品牌設計">
+    <meta name="keywords" content="產品設計, UI/UX, 設計師, 產品策略">
+    <meta name="author" content="Product Designer">
+    <title>產品設計師 - 個人工作室</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #000;
+            --secondary-color: #666;
+            --border-color: #e0e0e0;
+            --bg-light: #f9f9f9;
+            --bg-white: #ffffff;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #fff;
+                --secondary-color: #aaa;
+                --border-color: #333;
+                --bg-light: #1a1a1a;
+                --bg-white: #0d0d0d;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            color: var(--primary-color);
+            background-color: var(--bg-white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg) 5%;
+            border-bottom: 0.5px solid var(--border-color);
+            background-color: var(--bg-white);
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            header {
+                background-color: rgba(13, 13, 13, 0.9);
+            }
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        nav {
+            display: flex;
+            gap: var(--spacing-lg);
+            font-size: 14px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            opacity: 0.6;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 5rem 5% 3rem;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 48px);
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-sm);
+            max-width: 650px;
+            line-height: 1.7;
+        }
+
+        /* Services Section */
+        .services {
+            padding: var(--spacing-xl) 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .service-card {
+            padding: var(--spacing-md);
+            background-color: var(--bg-light);
+            border-radius: var(--radius-md);
+            border: 0.5px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .service-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+
+        .service-card p {
+            font-size: 14px;
+            color: var(--secondary-color);
+            line-height: 1.6;
+        }
+
+        /* Portfolio Section */
+        .portfolio {
+            padding: var(--spacing-xl) 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .project-card {
+            background-color: var(--bg-light);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 0.5px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .project-card:hover {
+                box-shadow: 0 8px 24px rgba(255, 255, 255, 0.08);
+            }
+        }
+
+        .project-image {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            color: #ccc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .project-image {
+                background: linear-gradient(135deg, #222 0%, #1a1a1a 100%);
+                color: #444;
+            }
+        }
+
+        .project-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(0, 0, 0, 0.05) 100%);
+        }
+
+        .project-info {
+            padding: var(--spacing-md);
+        }
+
+        .project-info h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+
+        .project-info p {
+            font-size: 14px;
+            color: var(--secondary-color);
+            margin: var(--spacing-xs) 0;
+            line-height: 1.6;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+        }
+
+        .project-tag {
+            display: inline-block;
+            font-size: 12px;
+            background-color: var(--bg-white);
+            color: var(--secondary-color);
+            padding: 4px 12px;
+            border-radius: var(--radius-sm);
+            border: 0.5px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .project-tag:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: var(--spacing-xl) 5%;
+            max-width: 900px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .contact h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+
+        .contact p {
+            font-size: 16px;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.7;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 14px 36px;
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            border: 1.5px solid var(--primary-color);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .cta-button:hover {
+            background-color: transparent;
+            color: var(--primary-color);
+        }
+
+        .cta-button-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            margin-left: var(--spacing-md);
+        }
+
+        .cta-button-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+        }
+
+        /* Footer */
+        footer {
+            padding: var(--spacing-lg) 5%;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+            color: var(--secondary-color);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Contact Form Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--secondary-color);
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+
+        .modal h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            margin-top: var(--spacing-sm);
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--primary-color);
+            background-color: var(--bg-light);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--bg-white);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: var(--spacing-md) 5%;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+
+            nav {
+                gap: var(--spacing-md);
+                font-size: 13px;
+            }
+
+            .hero {
+                padding: 3rem 5% 2rem;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .cta-button-secondary {
+                display: block;
+                margin-left: 0;
+                margin-top: var(--spacing-md);
+            }
+
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            header {
+                display: none;
+            }
+
+            .modal {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <a href="#" class="logo">Studio</a>
+        <nav>
+            <a onclick="smoothScroll('services'); return false;">服務</a>
+            <a onclick="smoothScroll('portfolio'); return false;">作品</a>
+            <a onclick="smoothScroll('contact'); return false;">聯繫</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>產品設計師</h1>
+        <p>專注於 SaaS、消費端產品與品牌設計。透過用戶研究和設計思維，打造具有競爭力的產品體驗。</p>
+        <p style="color: var(--secondary-color); font-size: 14px; margin-top: var(--spacing-md);">
+            致力於解決複雜問題，創造簡潔、易用的設計方案
+        </p>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <h2 class="section-title">服務範疇</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>產品策略</h3>
+                <p>用戶研究、競品分析、功能規劃、路線圖設計</p>
+            </div>
+            <div class="service-card">
+                <h3>交互設計</h3>
+                <p>流程設計、原型開發、設計系統建構</p>
+            </div>
+            <div class="service-card">
+                <h3>視覺設計</h3>
+                <p>品牌識別、UI設計、設計規範制定</p>
+            </div>
+            <div class="service-card">
+                <h3>可用性優化</h3>
+                <p>用戶測試、數據分析、迭代改進</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="portfolio" id="portfolio">
+        <h2 class="section-title">精選作品</h2>
+        <div class="project-grid">
+            <div class="project-card">
+                <div class="project-image">🎯</div>
+                <div class="project-info">
+                    <h3>SaaS 管理平台</h3>
+                    <p>重新設計企業數據分析平台，提升用戶操作效率 40%</p>
+                    <div class="project-tags">
+                        <span class="project-tag">UI/UX</span>
+                        <span class="project-tag">設計系統</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">📱</div>
+                <div class="project-info">
+                    <h3>行動應用重構</h3>
+                    <p>從零開始設計消費端應用，用戶留存率提升 65%</p>
+                    <div class="project-tags">
+                        <span class="project-tag">產品設計</span>
+                        <span class="project-tag">用戶研究</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">🎨</div>
+                <div class="project-info">
+                    <h3>品牌視覺系統</h3>
+                    <p>建立完整的設計語言與規範，統一全產品線</p>
+                    <div class="project-tags">
+                        <span class="project-tag">品牌設計</span>
+                        <span class="project-tag">規範</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">💼</div>
+                <div class="project-info">
+                    <h3>企業內部工具</h3>
+                    <p>為內部團隊設計協作工具，提升工作流效率</p>
+                    <div class="project-tags">
+                        <span class="project-tag">交互設計</span>
+                        <span class="project-tag">工程配合</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">🔄</div>
+                <div class="project-info">
+                    <h3>電商平台優化</h3>
+                    <p>優化購物流程，轉換率提升 28%</p>
+                    <div class="project-tags">
+                        <span class="project-tag">可用性設計</span>
+                        <span class="project-tag">A/B測試</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">📊</div>
+                <div class="project-info">
+                    <h3>數據可視化</h3>
+                    <p>為複雜數據設計直觀的視覺呈現方案</p>
+                    <div class="project-tags">
+                        <span class="project-tag">信息設計</span>
+                        <span class="project-tag">交互</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <h2>開始合作</h2>
+        <p>有產品設計需求？歡迎聯繫討論您的項目。</p>
+        <button class="cta-button" onclick="openContactModal()">聯繫我</button>
+        <a href="mailto:hello@example.com" class="cta-button cta-button-secondary">發送郵件</a>
+    </section>
+
+    <!-- Contact Modal -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeContactModal()">&times;</button>
+            <h3>聯繫表單</h3>
+            <form onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">姓名 *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">郵件地址 *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="company">公司/機構</label>
+                    <input type="text" id="company" name="company">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">聯繫電話</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">項目描述 *</label>
+                    <textarea id="message" name="message" required placeholder="請簡述您的項目需求..."></textarea>
+                </div>
+
+                <button type="submit" class="cta-button" style="width: 100%; border: none;">提交</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="#" onclick="alert('LinkedIn: linkedin.com/in/yourprofile'); return false;">LinkedIn</a>
+            <a href="#" onclick="alert('Dribbble: dribbble.com/yourprofile'); return false;">Dribbble</a>
+            <a href="#" onclick="alert('Behance: behance.net/yourprofile'); return false;">Behance</a>
+        </div>
+        <p>&copy; 2024 Product Designer Studio. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Smooth scroll navigation
+        function smoothScroll(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Contact modal functions
+        function openContactModal() {
+            document.getElementById('contactModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('contactModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeContactModal();
+            }
+        });
+
+        // Form submission
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // Collect form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                company: document.getElementById('company').value,
+                phone: document.getElementById('phone').value,
+                message: document.getElementById('message').value
+            };
+
+            // Create mailto link with form data
+            const mailtoLink = `mailto:hello@example.com?subject=新的設計諮詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名: ${formData.name}\n郵件: ${formData.email}\n公司: ${formData.company}\n電話: ${formData.phone}\n\n項目描述:\n${formData.message}`)}`;
+            
+            // Open email client
+            window.location.href = mailtoLink;
+            
+            // Reset form and close modal
+            document.querySelector('form').reset();
+            setTimeout(closeContactModal, 500);
+        }
+
+        // Keyboard: Close modal on ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeContactModal();
+            }
+        });
+
+        // Scroll animation trigger
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                }
+            });
+        }, observerOptions);
+
+        // Optional: Add scroll animations
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0.95';
+        });
+    </script>
+</body>
+</html>
