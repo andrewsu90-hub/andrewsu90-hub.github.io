@@ -1,730 +1,1450 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>碳鋼螺絲強度計算工具 | Andrew Design Studio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --primary-color: #000;
-            --secondary-color: #666;
-            --border-color: #e0e0e0;
-            --bg-light: #f9f9f9;
-            --bg-white: #ffffff;
-            --input-bg: #dbeafe;   /* 淺藍底 = 輸入欄位 */
-            --locked-bg: #f3f3f3;  /* 鎖定欄位背景 */
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --green: #16a34a;
-            --red: #dc2626;
-            --orange: #d97706;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --primary-color: #fff;
-                --secondary-color: #aaa;
-                --border-color: #333;
-                --bg-light: #1a1a1a;
-                --bg-white: #0d0d0d;
-                --input-bg: #1e3a5f;
-                --locked-bg: #1f1f1f;
-            }
-        }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--primary-color);
-            background-color: var(--bg-white);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        header {
-            position: sticky; top: 0; z-index: 100;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1.25rem 5%;
-            border-bottom: 0.5px solid var(--border-color);
-            background-color: rgba(255,255,255,0.92);
-            backdrop-filter: blur(8px);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            header { background-color: rgba(13,13,13,0.92); }
-        }
-
-        .logo {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px; font-weight: 800;
-            text-decoration: none; color: var(--primary-color);
-        }
-
-        .back-link {
-            font-size: 14px; color: var(--secondary-color);
-            text-decoration: none; display: flex; align-items: center; gap: 5px;
-            transition: color 0.2s;
-        }
-        .back-link:hover { color: var(--primary-color); }
-
-        .page-hero {
-            padding: 3rem 5% 1.5rem;
-            max-width: 960px; margin: 0 auto;
-            animation: fadeInDown 0.6s ease;
-        }
-
-        .hero-label {
-            font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
-            text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.5rem;
-        }
-
-        .page-hero h1 {
-            font-size: clamp(22px, 3.5vw, 32px);
-            font-weight: 700; margin-bottom: 0.75rem;
-        }
-
-        .page-hero p {
-            font-size: 15px; color: var(--secondary-color); line-height: 1.75;
-        }
-
-        /* ─── Main Layout ─── */
-        .main-wrap {
-            max-width: 960px; margin: 0 auto;
-            padding: 1.5rem 5% 4rem;
-            animation: fadeInUp 0.7s ease;
-        }
-
-        .calc-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 720px) {
-            .calc-grid { grid-template-columns: 1fr; }
-        }
-
-        /* ─── Cards ─── */
-        .card {
-            background-color: var(--bg-light);
-            border: 0.5px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.75rem;
-        }
-
-        .card-full { grid-column: 1 / -1; }
-
-        .card-title {
-            font-size: 15px; font-weight: 700;
-            margin-bottom: 1.25rem;
-            display: flex; align-items: center; gap: 8px;
-            color: var(--primary-color);
-        }
-
-        .card-title .badge {
-            font-size: 11px; font-weight: 600; padding: 2px 8px;
-            border-radius: 99px; letter-spacing: 0.5px;
-        }
-
-        .badge-input { background: #dbeafe; color: #1d4ed8; }
-        .badge-output { background: #dcfce7; color: #15803d; }
-
-        @media (prefers-color-scheme: dark) {
-            .badge-input { background: #1e3a5f; color: #60a5fa; }
-            .badge-output { background: #14532d; color: #4ade80; }
-        }
-
-        /* ─── Input Rows ─── */
-        .input-row {
-            display: flex; align-items: center;
-            gap: 0.75rem; margin-bottom: 1rem;
-        }
-
-        .input-row:last-child { margin-bottom: 0; }
-
-        .input-label {
-            font-size: 13px; color: var(--secondary-color);
-            min-width: 140px; flex-shrink: 0;
-            line-height: 1.4;
-        }
-
-        .input-label small {
-            display: block; font-size: 11px; color: #999; margin-top: 1px;
-        }
-
-        /* Dropdown (淺藍底 = 可輸入) */
-        select.input-field {
-            flex: 1; padding: 9px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-family: inherit; font-size: 14px;
-            color: var(--primary-color);
-            background-color: var(--input-bg);
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            transition: border-color 0.2s;
-        }
-
-        select.input-field:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-        }
-
-        /* ─── Output Table ─── */
-        .result-table {
-            width: 100%; border-collapse: collapse; font-size: 14px;
-        }
-
-        .result-table tr { border-bottom: 0.5px solid var(--border-color); }
-        .result-table tr:last-child { border-bottom: none; }
-
-        .result-table th {
-            text-align: left; font-size: 12px; font-weight: 600;
-            color: var(--secondary-color); padding: 7px 8px;
-            letter-spacing: 0.3px;
-        }
-
-        .result-table td {
-            padding: 9px 8px;
-            vertical-align: middle;
-        }
-
-        .result-table td.label-cell {
-            color: var(--secondary-color); font-size: 13px; width: 48%;
-        }
-
-        .result-table td.label-cell small {
-            display: block; font-size: 11px; color: #aaa; margin-top: 1px;
-        }
-
-        .result-table td.value-cell {
-            font-weight: 700; font-size: 15px;
-            text-align: right; white-space: nowrap;
-        }
-
-        .result-table td.unit-cell {
-            font-size: 12px; color: var(--secondary-color);
-            padding-left: 4px; width: 70px;
-        }
-
-        /* locked field style */
-        .locked-value {
-            display: inline-block; padding: 5px 10px;
-            background: var(--locked-bg);
-            border: 0.5px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-size: 14px; font-weight: 700;
-            min-width: 80px; text-align: center;
-        }
-
-        /* Status badge */
-        .status-badge {
-            display: inline-block; padding: 4px 10px;
-            border-radius: 99px; font-size: 12px; font-weight: 600;
-        }
-
-        .status-safe { background: #dcfce7; color: #15803d; }
-        .status-warn { background: #fef3c7; color: #92400e; }
-        .status-over { background: #fee2e2; color: #991b1b; }
-
-        @media (prefers-color-scheme: dark) {
-            .status-safe { background: #14532d; color: #4ade80; }
-            .status-warn { background: #451a03; color: #fbbf24; }
-            .status-over { background: #450a0a; color: #f87171; }
-        }
-
-        /* Section divider */
-        .section-divider {
-            font-size: 12px; font-weight: 600; letter-spacing: 1px;
-            text-transform: uppercase; color: var(--secondary-color);
-            padding: 10px 8px 6px; border-top: 0.5px solid var(--border-color);
-            margin-top: 4px;
-        }
-
-        /* Rule chip */
-        .rule-chip {
-            display: inline-block; font-size: 11px; font-weight: 600;
-            padding: 3px 8px; border-radius: 99px;
-            background: #e0e7ff; color: #3730a3;
-            margin-bottom: 10px;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .rule-chip { background: #1e1b4b; color: #a5b4fc; }
-        }
-
-        /* Note box */
-        .note-box {
-            background: var(--bg-white);
-            border: 0.5px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.25rem 1.5rem;
-            font-size: 13px; color: var(--secondary-color);
-            line-height: 1.8; margin-top: 1.5rem;
-        }
-
-        .note-box strong {
-            color: var(--primary-color); font-size: 13px;
-        }
-
-        .note-box ul { padding-left: 1.2rem; }
-        .note-box ul li { margin-bottom: 4px; }
-
-        /* Animations */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-14px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>碳鋼螺絲強度計算工具 | Andrew Design Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#2563EB;--brand-600:#1D4ED8;--brand-50:#EFF6FF;--brand-100:#DBEAFE;
+  --bg:#F8FAFC;--card:#FFFFFF;--border:#E5E7EB;--border-2:#D1D5DB;
+  --text:#0F172A;--muted:#64748B;--muted-2:#94A3B8;
+  --warn-bg:#FFFBEB;--warn-bd:#FDE68A;--warn-tx:#92400E;
+  --danger:#DC2626;--ok:#16A34A;--chip:#EEF2FF;--chip-tx:#3730A3;
+  --shadow:0 1px 2px rgba(15,23,42,.04),0 1px 1px rgba(15,23,42,.03);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  background:var(--bg);color:var(--text);
+  font-family:'Noto Sans TC','Microsoft JhengHei',-apple-system,sans-serif;
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+/* ── Appbar ── */
+.appbar{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:13px 28px;display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:100;
+}
+.logo-box{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,#3B82F6,#2563EB);
+  display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:800;font-size:15px;text-decoration:none;font-family:'Montserrat',sans-serif;
+  box-shadow:0 2px 6px rgba(37,99,235,.35);
+}
+.appbar-info{flex:1;min-width:0}
+.appbar-title{font-size:16px;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar-sub{color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back-link{
+  margin-left:auto;font-size:13px;color:var(--muted);
+  text-decoration:none;display:flex;align-items:center;gap:4px;flex-shrink:0;
+  transition:color .15s;
+}
+.back-link:hover{color:var(--brand)}
+/* ── Tabs ── */
+.tabs{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:0 28px;display:flex;gap:2px;overflow-x:auto;
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  padding:11px 14px;color:var(--muted);font-size:13px;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;user-select:none;
+}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:700}
+/* ── Main ── */
+main{max-width:1180px;margin:0 auto;padding:20px 28px 60px}
+@media(max-width:640px){main{padding:16px 16px 60px}.appbar{padding:12px 16px}.tabs{padding:0 16px}}
+/* ── Tab panels ── */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+/* ── Page title ── */
+.page-title{display:flex;align-items:center;gap:10px;margin:4px 0 18px}
+.page-title h2{font-size:17px;font-weight:700;margin:0}
+/* ── Card ── */
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;
+}
+.card-head{
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.card-head h3{margin:0;font-size:14px;font-weight:700}
+.card-head .meta{color:var(--muted);font-size:12px}
+.card-body{padding:16px 18px}
+/* ── Grid ── */
+.grid{display:grid;gap:12px}
+.g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g-5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.g-6{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media(max-width:900px){
+  .g-4,.g-5,.g-6{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:540px){
+  .g-2,.g-3,.g-4,.g-5,.g-6{grid-template-columns:1fr}
+}
+/* ── Fields ── */
+.field label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:5px;font-weight:600;letter-spacing:.2px}
+.field select,.field input{
+  width:100%;padding:8px 12px;
+  border:1px solid var(--border-2);border-radius:8px;
+  background:#fff;font:inherit;color:var(--text);
+  transition:border-color .15s,box-shadow .15s;appearance:none;
+}
+.field select{
+  padding-right:28px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20' fill='%23475569'><path d='M5 8l5 5 5-5z'/></svg>");
+  background-repeat:no-repeat;background-position:right 9px center;background-size:13px;
+}
+.field select:focus,.field input:focus{
+  outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+/* ── Stat box ── */
+.stat{
+  background:#F8FAFC;border:1px solid var(--border);border-radius:10px;
+  padding:11px 13px;min-height:68px;display:flex;flex-direction:column;justify-content:center;
+}
+.stat.accent{background:var(--brand-50);border-color:var(--brand-100)}
+.stat.final{background:#ECFDF5;border-color:#A7F3D0}
+.stat.warn-s{background:var(--warn-bg);border-color:var(--warn-bd)}
+.stat.dim{background:#F8FAFC}
+.stat .k{color:var(--muted);font-size:11.5px;margin-bottom:3px;letter-spacing:.2px}
+.stat .v{font-size:21px;font-weight:700;color:var(--brand);line-height:1.1}
+.stat .v .u{font-size:11px;color:var(--muted);margin-left:3px;font-weight:500}
+.stat.final .v{color:#047857}
+.stat.dim .v{color:var(--text);font-size:18px}
+/* ── Badge ── */
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:999px;
+  background:var(--chip);color:var(--chip-tx);font-size:11px;font-weight:700;
+}
+.badge-ok{background:#DCFCE7;color:#15803D}
+.badge-warn{background:#FEF3C7;color:#92400E}
+.badge-danger{background:#FEE2E2;color:#991B1B}
+/* ── Banner ── */
+.banner{
+  display:flex;gap:9px;align-items:flex-start;
+  background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:9px;
+  padding:10px 13px;color:var(--warn-tx);font-size:12.5px;margin-bottom:14px;
+}
+.banner-info{
+  background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF;
+}
+/* ── Rule chip ── */
+.rule-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;
+  background:#EEF2FF;color:#3730A3;
+}
+/* ── Formula ── */
+.formula{
+  display:inline-block;background:#F1F5F9;border:1px dashed var(--border-2);
+  border-radius:6px;padding:4px 10px;
+  font-family:'Consolas','Menlo',monospace;color:#334155;font-size:12.5px;
+}
+/* ── Reference table ── */
+.ref-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.ref-table th{
+  background:#F1F5F9;padding:7px 10px;text-align:center;
+  font-weight:700;font-size:11.5px;border-bottom:2px solid var(--border-2);
+  color:var(--muted);white-space:nowrap;letter-spacing:.2px;
+}
+.ref-table td{
+  padding:7px 10px;border-bottom:1px solid var(--border);
+  text-align:center;white-space:nowrap;
+}
+.ref-table tr:last-child td{border-bottom:none}
+.ref-table tr:hover td{background:var(--brand-50)}
+.ref-table td.hl{font-weight:700;color:var(--brand)}
+.ref-table td.ok{color:var(--ok);font-weight:700}
+.ref-table td.dim{color:var(--muted-2)}
+.ref-table td.left{text-align:left}
+/* ── Scrollable table container ── */
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+/* ── Section label ── */
+.slabel{
+  font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--muted);
+  text-transform:uppercase;margin:14px 0 8px;
+}
+/* ── Divider ── */
+.divider{height:1px;background:var(--border);margin:14px 0}
+/* ── Status badge ── */
+.s-badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700}
+.s-ok{background:#DCFCE7;color:#15803D}
+.s-warn{background:#FEF3C7;color:#92400E}
+.s-over{background:#FEE2E2;color:#991B1B}
+/* ── Usage compare ── */
+.usage-box{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:22px 24px;margin-top:28px;font-size:13px;
+}
+.usage-box h4{font-size:15px;font-weight:700;margin-bottom:14px}
+.usage-compare{display:grid;gap:14px}
+.cmp-row{
+  display:grid;grid-template-columns:160px 1fr 1fr;gap:0;
+  border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:12.5px;
+}
+.cmp-row .cmp-lbl{
+  padding:10px 12px;background:#F1F5F9;font-weight:700;
+  border-right:1px solid var(--border);display:flex;align-items:center;
+}
+.cmp-row .cmp-a{padding:10px 12px;border-right:1px solid var(--border)}
+.cmp-row .cmp-b{padding:10px 12px}
+.cmp-head .cmp-lbl{background:var(--brand);color:#fff}
+.cmp-head .cmp-a,.cmp-head .cmp-b{background:var(--brand);color:#fff;font-weight:700;text-align:center}
+@media(max-width:640px){
+  .cmp-row{grid-template-columns:1fr}
+  .cmp-row .cmp-lbl{border-right:none;border-bottom:1px solid var(--border)}
+  .cmp-row .cmp-a{border-right:none;border-bottom:1px solid var(--border)}
+}
+</style>
 </head>
 <body>
 
-<header>
-    <a href="../index.html" class="logo">Andrew Design Studio</a>
-    <a href="engineering-calculators.html" class="back-link">← 工程計算工具</a>
-</header>
+<!-- ===== Appbar ===== -->
+<div class="appbar">
+  <a href="../index.html" class="logo-box" title="首頁">A</a>
+  <div class="appbar-info">
+    <div class="appbar-title">碳鋼螺絲強度計算工具</div>
+    <div class="appbar-sub">ISO 898-1 &middot; CNS 3934 &middot; GB/T 16823.2 &middot; CNS 15590-7</div>
+  </div>
+  <a href="engineering-calculators.html" class="back-link">← 工程計算工具</a>
+</div>
 
-<section class="page-hero">
-    <div class="hero-label">工程計算 / Carbon Steel Screw</div>
-    <h1>碳鋼螺絲強度計算工具</h1>
-    <p>依強度等級（3.6～12.9）、規格（M1～M18）與螺絲長度，自動判斷 HV max / Rm min 計算路徑，輸出扭力、軸向力與所需螺牙數。參照 CNS 3934、GB/T 16823.2 標準。</p>
-</section>
+<!-- ===== Tab bar ===== -->
+<div class="tabs">
+  <div class="tab active" data-tab="t1">① 一般算法</div>
+  <div class="tab" data-tab="t2">② 安全負載 SP</div>
+  <div class="tab" data-tab="t3">③ 三柱扭力公式</div>
+  <div class="tab" data-tab="t4">④ 東日 T 系列</div>
+  <div class="tab" data-tab="t5">⑤ 破壞扭矩牙數</div>
+  <div class="tab" data-tab="t6">⑥ 板金抽牙</div>
+  <div class="tab" data-tab="t7">⑦ 盤頭承載面積</div>
+  <div class="tab" data-tab="t8">⑧ 六角頭承載面積</div>
+</div>
 
-<div class="main-wrap">
-    <div class="calc-grid">
+<main>
 
-        <!-- ① 輸入卡 -->
-        <div class="card">
-            <div class="card-title">
-                <span>⚙️ 輸入參數</span>
-                <span class="badge badge-input">INPUT</span>
-            </div>
+<!-- =====================================================
+     TAB 1 · 一般算法（HV max / Rm min 判斷）
+===================================================== -->
+<div id="t1" class="tab-panel active">
+<div class="page-title">
+  <h2>一般算法</h2>
+  <span class="badge">HV max / Rm min 自動判斷</span>
+</div>
 
-            <div class="input-row">
-                <div class="input-label">
-                    螺絲規格
-                    <small>M1 ～ M18</small>
-                </div>
-                <select class="input-field" id="sel-spec" onchange="calculate()">
-                    <option value="M1">M1</option>
-                    <option value="M1.2">M1.2</option>
-                    <option value="M1.4">M1.4</option>
-                    <option value="M1.6">M1.6</option>
-                    <option value="M2">M2</option>
-                    <option value="M2.5">M2.5</option>
-                    <option value="M3" selected>M3</option>
-                    <option value="M3.5">M3.5</option>
-                    <option value="M4">M4</option>
-                    <option value="M5">M5</option>
-                    <option value="M6">M6</option>
-                    <option value="M7">M7</option>
-                    <option value="M8">M8</option>
-                    <option value="M10">M10</option>
-                    <option value="M12">M12</option>
-                    <option value="M16">M16</option>
-                    <option value="M18">M18</option>
-                </select>
-            </div>
+<div class="banner">
+  ⚠ <span><strong>Rm 判斷規則：</strong>d ≤ M4 或 L &lt; 2.5d → HV max = 320 N/mm²；否則使用強度等級 Rm min。</span>
+</div>
 
-            <div class="input-row">
-                <div class="input-label">
-                    螺絲長度 L
-                    <small>mm</small>
-                </div>
-                <select class="input-field" id="sel-length" onchange="calculate()">
-                    <option value="3">3</option>
-                    <option value="4" selected>4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                    <option value="13">13</option>
-                    <option value="14">14</option>
-                    <option value="15">15</option>
-                    <option value="16">16</option>
-                    <option value="17">17</option>
-                    <option value="18">18</option>
-                    <option value="19">19</option>
-                    <option value="20">20</option>
-                </select>
-            </div>
+<!-- Inputs -->
+<div class="card">
+  <div class="card-head"><h3>輸入參數</h3><div class="meta">規格 / 長度 / 等級</div></div>
+  <div class="card-body">
+    <div class="grid g-5">
+      <div class="field">
+        <label>螺絲規格</label>
+        <select id="t1-spec" onchange="calcT1()">
+          <option>M1</option><option>M1.2</option><option>M1.4</option><option>M1.6</option>
+          <option>M2</option><option>M2.5</option><option selected>M3</option><option>M3.5</option>
+          <option>M4</option><option>M5</option><option>M6</option><option>M7</option>
+          <option>M8</option><option>M10</option><option>M12</option><option>M14</option>
+          <option>M16</option><option>M18</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>螺絲長度 L (mm)</label>
+        <input id="t1-len" type="number" value="8" min="1" max="200" oninput="calcT1()">
+      </div>
+      <div class="field">
+        <label>強度等級</label>
+        <select id="t1-grade" onchange="calcT1()">
+          <option>3.6</option><option>4.6</option><option>4.8</option><option>5.6</option>
+          <option>5.8</option><option>6.8</option><option selected>8.8</option><option>9.8</option>
+          <option>10.9</option><option>12.9</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>軸力係數</label>
+        <select id="t1-ac" onchange="calcT1()">
+          <option value="0.7" selected>0.70（一般）</option>
+          <option value="0.65">0.65</option>
+          <option value="0.60">0.60（保守）</option>
+          <option value="0.75">0.75</option>
+          <option value="0.80">0.80</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>K 力矩係數</label>
+        <select id="t1-k" onchange="calcT1()">
+          <option value="0.20" selected>0.20（一般鋼）</option>
+          <option value="0.16">0.16（鍍鋅/不鏽鋼）</option>
+          <option value="0.18">0.18</option>
+          <option value="0.22">0.22</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
 
-            <div class="input-row">
-                <div class="input-label">
-                    強度等級
-                    <small>3.6 ～ 12.9</small>
-                </div>
-                <select class="input-field" id="sel-grade" onchange="calculate()">
-                    <option value="3.6">3.6</option>
-                    <option value="4.6">4.6</option>
-                    <option value="4.8">4.8</option>
-                    <option value="5.6">5.6</option>
-                    <option value="5.8">5.8</option>
-                    <option value="6.8">6.8</option>
-                    <option value="8.8" selected>8.8</option>
-                    <option value="9.8">9.8</option>
-                    <option value="10.9">10.9</option>
-                    <option value="12.9">12.9</option>
-                </select>
-            </div>
+<!-- Rule chip -->
+<div style="margin-bottom:12px"><span id="t1-rule" class="rule-chip">—</span></div>
 
-            <div class="input-row">
-                <div class="input-label">
-                    軸力係數
-                    <small>Ff = 係數 × δy × As</small>
-                </div>
-                <select class="input-field" id="sel-axial-coeff" onchange="calculate()">
-                    <option value="0.7" selected>0.7（一般）</option>
-                    <option value="0.65">0.65</option>
-                    <option value="0.6">0.6</option>
-                </select>
-            </div>
+<!-- Outputs -->
+<div class="grid g-4" style="margin-bottom:16px">
+  <div class="stat dim"><div class="k">公稱直徑 d</div><div class="v" id="t1-d">—<span class="u">mm</span></div></div>
+  <div class="stat dim"><div class="k">螺距 P</div><div class="v" id="t1-p">—<span class="u">mm</span></div></div>
+  <div class="stat dim"><div class="k">有效截面積 As</div><div class="v" id="t1-As">—<span class="u">mm²</span></div></div>
+  <div class="stat dim"><div class="k">2.5×d 基準</div><div class="v" id="t1-25d">—<span class="u">mm</span></div></div>
+  <div class="stat dim"><div class="k">Rm（採用）</div><div class="v" id="t1-Rm">—<span class="u">N/mm²</span></div></div>
+  <div class="stat dim"><div class="k">δyp = Rm × 屈服比</div><div class="v" id="t1-dyp">—<span class="u">N/mm²</span></div></div>
+  <div class="stat dim"><div class="k">τyp = δyp / 2</div><div class="v" id="t1-typ">—<span class="u">N/mm²</span></div></div>
+  <div class="stat dim"><div class="k">安全負載 Sp×As</div><div class="v" id="t1-sp">—<span class="u">N</span></div></div>
+</div>
 
-            <div class="input-row">
-                <div class="input-label">
-                    K 力矩係數
-                    <small>T = K·F·D(m)</small>
-                </div>
-                <select class="input-field" id="sel-k" onchange="calculate()">
-                    <option value="0.2" selected>0.2（一般）</option>
-                    <option value="0.16">0.16（鍍鋅 / 不銹鋼）</option>
-                </select>
-            </div>
+<div class="grid g-4">
+  <div class="stat accent"><div class="k">軸向力 Ff</div><div class="v" id="t1-Ff">—<span class="u">N</span></div></div>
+  <div class="stat accent"><div class="k">軸向力 Ff</div><div class="v" id="t1-Ffk">—<span class="u">kgf</span></div></div>
+  <div class="stat final"><div class="k">扭力 T = K·Ff·d</div><div class="v" id="t1-T">—<span class="u">N·m</span></div></div>
+  <div class="stat final"><div class="k">扭力 T</div><div class="v" id="t1-Tc">—<span class="u">kgf·cm</span></div></div>
+  <div class="stat dim"><div class="k">最小抗拉負載 As×Rm</div><div class="v" id="t1-minload">—<span class="u">N</span></div></div>
+  <div class="stat dim"><div class="k">單牙剪力強度</div><div class="v" id="t1-tooth">—<span class="u">kgf</span></div></div>
+  <div class="stat dim"><div class="k">所需螺牙數 ⌈Ff/單牙⌉</div><div class="v" id="t1-nc">—<span class="u">牙</span></div></div>
+  <div class="stat"><div class="k">扭矩 vs SP</div><div class="v" style="font-size:14px" id="t1-status">—</div></div>
+</div>
+</div><!-- /t1 -->
+
+
+<!-- =====================================================
+     TAB 2 · 安全負載 SP 算法（不受 HV max 影響）
+===================================================== -->
+<div id="t2" class="tab-panel">
+<div class="page-title">
+  <h2>安全負載 SP 算法</h2>
+  <span class="badge badge-ok">不受 HV max 影響</span>
+</div>
+
+<div class="banner banner-info">
+  ℹ <span>直接使用 ISO 898-1 <strong>proof load（Sp）</strong>計算軸向力，不套用 HV max 上限規則。Sp 為試驗負載應力，已含安全係數，為業界最常用計算依據。</span>
+</div>
+
+<div class="card">
+  <div class="card-head"><h3>輸入參數</h3></div>
+  <div class="card-body">
+    <div class="grid g-4">
+      <div class="field">
+        <label>螺絲規格</label>
+        <select id="t2-spec" onchange="calcT2()">
+          <option>M1</option><option>M1.2</option><option>M1.4</option><option>M1.6</option>
+          <option>M2</option><option>M2.5</option><option selected>M3</option><option>M3.5</option>
+          <option>M4</option><option>M5</option><option>M6</option><option>M7</option>
+          <option>M8</option><option>M10</option><option>M12</option><option>M14</option>
+          <option>M16</option><option>M18</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>強度等級</label>
+        <select id="t2-grade" onchange="calcT2()">
+          <option>3.6</option><option>4.6</option><option>4.8</option><option>5.6</option>
+          <option>5.8</option><option>6.8</option><option selected>8.8</option><option>9.8</option>
+          <option>10.9</option><option>12.9</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>軸力係數</label>
+        <select id="t2-ac" onchange="calcT2()">
+          <option value="1.0">1.00（全 Sp）</option>
+          <option value="0.9">0.90</option>
+          <option value="0.8">0.80</option>
+          <option value="0.7" selected>0.70（一般）</option>
+          <option value="0.6">0.60</option>
+          <option value="0.5">0.50</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>K 力矩係數</label>
+        <select id="t2-k" onchange="calcT2()">
+          <option value="0.20" selected>0.20</option>
+          <option value="0.16">0.16</option>
+          <option value="0.18">0.18</option>
+          <option value="0.22">0.22</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid g-4" style="margin-bottom:14px">
+  <div class="stat dim"><div class="k">公稱直徑 d</div><div class="v" id="t2-d">—<span class="u">mm</span></div></div>
+  <div class="stat dim"><div class="k">As</div><div class="v" id="t2-As">—<span class="u">mm²</span></div></div>
+  <div class="stat dim"><div class="k">Sp（Proof Load）</div><div class="v" id="t2-Sp">—<span class="u">N/mm²</span></div></div>
+  <div class="stat dim"><div class="k">Rm min（等級）</div><div class="v" id="t2-Rm">—<span class="u">N/mm²</span></div></div>
+</div>
+<div class="grid g-4">
+  <div class="stat accent"><div class="k">Ff = 係數 × Sp × As</div><div class="v" id="t2-Ff">—<span class="u">N</span></div></div>
+  <div class="stat accent"><div class="k">Ff</div><div class="v" id="t2-Ffk">—<span class="u">kgf</span></div></div>
+  <div class="stat final"><div class="k">T = K · Ff · d</div><div class="v" id="t2-T">—<span class="u">N·m</span></div></div>
+  <div class="stat final"><div class="k">T</div><div class="v" id="t2-Tc">—<span class="u">kgf·cm</span></div></div>
+  <div class="stat dim"><div class="k">單牙強度（τ=Sp/√3）</div><div class="v" id="t2-tooth">—<span class="u">N</span></div></div>
+  <div class="stat dim"><div class="k">所需螺牙數</div><div class="v" id="t2-nc">—<span class="u">牙</span></div></div>
+  <div class="stat dim"><div class="k">最小抗拉負載</div><div class="v" id="t2-minload">—<span class="u">N</span></div></div>
+  <div class="stat"><div class="k">Ff vs 最小抗拉負載</div><div class="v" style="font-size:14px" id="t2-status">—</div></div>
+</div>
+
+</div><!-- /t2 -->
+
+
+<!-- =====================================================
+     TAB 3 · 三柱扭力公式  T = 0.35K(1+1/Q)δy·As·d(cm)
+===================================================== -->
+<div id="t3" class="tab-panel">
+<div class="page-title">
+  <h2>三柱扭力公式</h2>
+  <span class="badge">T = 0.35K·(1+1/Q)·δy·As·d(cm)</span>
+</div>
+
+<div class="banner">
+  ⚠ <span>M3(含)以下結果供參考，誤差較大。計算不受軸力係數影響，K 值由材料配對決定。δy 為強度等級之降伏應力（Rp0.2）。</span>
+</div>
+
+<div class="grid g-2" style="gap:16px">
+  <div class="card">
+    <div class="card-head"><h3>輸入參數</h3></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="field">
+        <label>螺絲規格</label>
+        <select id="t3-spec" onchange="calcT3()">
+          <option>M1</option><option>M1.2</option><option>M1.4</option><option>M1.6</option>
+          <option>M2</option><option>M2.5</option><option selected>M3</option><option>M3.5</option>
+          <option>M4</option><option>M5</option><option>M6</option><option>M7</option>
+          <option>M8</option><option>M10</option><option>M12</option><option>M14</option>
+          <option>M16</option><option>M18</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>強度等級（取 δy = Rm×屈服比）</label>
+        <select id="t3-grade" onchange="calcT3()">
+          <option>3.6</option><option>4.6</option><option>4.8</option><option>5.6</option>
+          <option>5.8</option><option>6.8</option><option selected>8.8</option><option>9.8</option>
+          <option>10.9</option><option>12.9</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Q 值（旋合圈數比）</label>
+        <select id="t3-Q" onchange="calcT3()">
+          <option value="1.25">1.25</option>
+          <option value="1.4" selected>1.40</option>
+          <option value="1.6">1.60</option>
+          <option value="1.8">1.80</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>潤滑條件</label>
+        <select id="t3-lube" onchange="t3UpdateK()">
+          <option value="oil">油潤滑（Oil）</option>
+          <option value="dry">乾式（Dry）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>K 摩擦係數（材料配對）</label>
+        <select id="t3-K" onchange="calcT3()"></select>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="grid g-2" style="margin-bottom:12px">
+      <div class="stat dim"><div class="k">d</div><div class="v" id="t3-d">—<span class="u">mm</span></div></div>
+      <div class="stat dim"><div class="k">As</div><div class="v" id="t3-As">—<span class="u">mm²</span></div></div>
+      <div class="stat dim"><div class="k">δy = Rm×屈服比</div><div class="v" id="t3-dy">—<span class="u">N/mm²</span></div></div>
+      <div class="stat dim"><div class="k">δy</div><div class="v" id="t3-dyk">—<span class="u">kgf/mm²</span></div></div>
+    </div>
+    <div class="grid g-2">
+      <div class="stat accent"><div class="k">K (選定)</div><div class="v" id="t3-Kv">—</div></div>
+      <div class="stat accent"><div class="k">Q (選定)</div><div class="v" id="t3-Qv">—</div></div>
+      <div class="stat final"><div class="k">T 扭力</div><div class="v" id="t3-T">—<span class="u">N·m</span></div></div>
+      <div class="stat final"><div class="k">T 扭力</div><div class="v" id="t3-Tc">—<span class="u">kgf·cm</span></div></div>
+    </div>
+    <div style="margin-top:12px;padding:10px 14px;background:#F1F5F9;border-radius:8px;font-size:12.5px;color:var(--muted)">
+      <strong style="color:var(--text)">公式：</strong>
+      <span class="formula">T = 0.35 × K × (1 + 1/Q) × δy(kgf/mm²) × As(mm²) × d(cm)</span><br>
+      <span style="margin-top:6px;display:block">結果單位：kgf·cm；轉換：× 0.0981 → N·m</span>
+    </div>
+  </div>
+</div>
+
+<!-- K 值參照表 -->
+<div class="card" style="margin-top:16px">
+  <div class="card-head"><h3>K 值參照表（依潤滑條件）</h3><div class="meta">數值越小摩擦越低</div></div>
+  <div class="card-body">
+    <div class="slabel">油潤滑 (Oil)</div>
+    <div class="tbl-wrap">
+    <table class="ref-table">
+      <thead><tr><th>K</th><th>材料配對（螺絲材質 - 被鎖材質）</th></tr></thead>
+      <tbody>
+        <tr><td class="hl">0.145</td><td class="left">SCM-FC &nbsp;/&nbsp; FC-FC &nbsp;/&nbsp; SUS-FC</td></tr>
+        <tr><td class="hl">0.155</td><td class="left">S10C-FC &nbsp;/&nbsp; SCM-S10C &nbsp;/&nbsp; SCM-SCM &nbsp;/&nbsp; FC-S10C &nbsp;/&nbsp; FC-SCM</td></tr>
+        <tr><td class="hl">0.165</td><td class="left">SCM-SUS &nbsp;/&nbsp; FC-SUS &nbsp;/&nbsp; AL-FC &nbsp;/&nbsp; SUS-S10C &nbsp;/&nbsp; SUS-SCM &nbsp;/&nbsp; SUS-SUS</td></tr>
+        <tr><td class="hl">0.175</td><td class="left">S10C-S10C &nbsp;/&nbsp; S10C-SCM &nbsp;/&nbsp; S10C-SUS &nbsp;/&nbsp; AL-S10C &nbsp;/&nbsp; AL-SCM</td></tr>
+        <tr><td class="hl">0.185</td><td class="left">SCM-AL &nbsp;/&nbsp; FC-AL &nbsp;/&nbsp; AL-SUS</td></tr>
+        <tr><td class="hl">0.195</td><td class="left">S10C-AL &nbsp;/&nbsp; SUS-AL</td></tr>
+        <tr><td class="hl">0.215</td><td class="left">AL-AL</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="slabel" style="margin-top:14px">乾式 (Dry)</div>
+    <div class="tbl-wrap">
+    <table class="ref-table">
+      <thead><tr><th>K</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td class="hl">0.25</td><td class="left">低摩擦乾式（表面光滑加工）</td></tr>
+        <tr><td class="hl">0.35</td><td class="left">中低摩擦乾式</td></tr>
+        <tr><td class="hl">0.45</td><td class="left">中高摩擦乾式</td></tr>
+        <tr><td class="hl">0.55</td><td class="left">高摩擦乾式（粗糙表面）</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /t3 -->
+
+
+<!-- =====================================================
+     TAB 4 · 東日 T 系列軸向力
+===================================================== -->
+<div id="t4" class="tab-panel">
+<div class="page-title">
+  <h2>東日 T 系列軸向力計算</h2>
+  <span class="badge">Tohnichi 軸向力系列</span>
+</div>
+
+<div class="banner banner-info">
+  ℹ <span>依螺絲規格與系列（0.5T / 基準T / 1.8T / 2.4T），計算對應之軸向力 F 及推薦扭力 T = 0.2 × F × d。</span>
+</div>
+
+<div class="card">
+  <div class="card-head"><h3>輸入參數</h3></div>
+  <div class="card-body">
+    <div class="grid g-3">
+      <div class="field">
+        <label>螺絲規格</label>
+        <select id="t4-spec" onchange="calcT4()">
+          <option>M1</option><option>M1.2</option><option>M1.4</option><option>M1.6</option>
+          <option>M2</option><option>M2.5</option><option selected>M3</option><option>M3.5</option>
+          <option>M4</option><option>M5</option><option>M6</option><option>M7</option>
+          <option>M8</option><option>M10</option><option>M12</option><option>M14</option>
+          <option>M16</option><option>M18</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>強度等級</label>
+        <select id="t4-grade" onchange="calcT4()">
+          <option>3.6</option><option>4.6</option><option>4.8</option><option>5.6</option>
+          <option>5.8</option><option>6.8</option><option selected>8.8</option><option>9.8</option>
+          <option>10.9</option><option>12.9</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>規格參數</label>
+        <div style="padding:8px 12px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px;font-size:13px">
+          d = <strong id="t4-d-show">—</strong> mm &nbsp;|&nbsp; As = <strong id="t4-As-show">—</strong> mm²
         </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <!-- ② 螺絲規格參數 -->
-        <div class="card">
-            <div class="card-title">
-                <span>📐 螺絲規格參數</span>
-                <span class="badge badge-output">LOCKED</span>
-            </div>
-            <div id="rule-chip-wrap" style="margin-bottom:10px;"></div>
-            <table class="result-table">
-                <tr>
-                    <td class="label-cell">公稱直徑 d</td>
-                    <td class="value-cell"><span class="locked-value" id="out-d">—</span></td>
-                    <td class="unit-cell">mm</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">螺距 P</td>
-                    <td class="value-cell"><span class="locked-value" id="out-pitch">—</span></td>
-                    <td class="unit-cell">mm</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">有效截面積 As</td>
-                    <td class="value-cell"><span class="locked-value" id="out-As">—</span></td>
-                    <td class="unit-cell">mm²</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">節圓徑 d₂ ≈ d - 0.7P</td>
-                    <td class="value-cell"><span class="locked-value" id="out-d2">—</span></td>
-                    <td class="unit-cell">mm</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">2.5 × d（判斷基準）</td>
-                    <td class="value-cell"><span class="locked-value" id="out-25d">—</span></td>
-                    <td class="unit-cell">mm</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">抗拉強度 Rm<small id="rm-source">（使用中）</small></td>
-                    <td class="value-cell"><span class="locked-value" id="out-Rm">—</span></td>
-                    <td class="unit-cell">N/mm²</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">降伏應力 δyp（× 屈服比）</td>
-                    <td class="value-cell"><span class="locked-value" id="out-dyp">—</span></td>
-                    <td class="unit-cell">N/mm²</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">剪降伏應力 τyp = δyp / 2</td>
-                    <td class="value-cell"><span class="locked-value" id="out-typ">—</span></td>
-                    <td class="unit-cell">N/mm²</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">τyp</td>
-                    <td class="value-cell"><span class="locked-value" id="out-typ-kgf">—</span></td>
-                    <td class="unit-cell">kgf/mm²</td>
-                </tr>
-            </table>
-        </div>
+<!-- T series table -->
+<div class="card">
+  <div class="card-head"><h3>各系列計算結果</h3><div class="meta">N/mm² × As → F(N) → T = 0.2·F·d(m)</div></div>
+  <div class="card-body">
+    <div class="tbl-wrap">
+    <table class="ref-table" id="t4-table">
+      <thead>
+        <tr>
+          <th>系列</th><th>適用等級</th><th>最小 N/mm²</th><th>標準 N/mm²</th><th>最大 N/mm²</th>
+          <th>F min (N)</th><th>F std (N)</th><th>F max (N)</th>
+          <th>T min (N·m)</th><th>T std (N·m)</th><th>T max (N·m)</th>
+          <th>適用</th>
+        </tr>
+      </thead>
+      <tbody id="t4-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
 
-        <!-- ③ 螺牙強度 -->
-        <div class="card">
-            <div class="card-title">
-                <span>🔗 螺牙（單牙）強度</span>
-                <span class="badge badge-output">OUTPUT</span>
-            </div>
-            <table class="result-table">
-                <tr>
-                    <td class="label-cell">公式<small>π × d × nc × P × τyp / 2</small></td>
-                    <td class="value-cell"><span class="locked-value" id="out-single-tooth">—</span></td>
-                    <td class="unit-cell">kgf</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">最小抗拉負載<small>As × Rm</small></td>
-                    <td class="value-cell"><span class="locked-value" id="out-min-load">—</span></td>
-                    <td class="unit-cell">N</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">安全負載 SP<small>Sp × As（試驗負載）</small></td>
-                    <td class="value-cell"><span class="locked-value" id="out-sp">—</span></td>
-                    <td class="unit-cell">N</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">所需牙數<small>Ff_kgf ÷ 單牙強度，⌈取整⌉</small></td>
-                    <td class="value-cell"><span class="locked-value" id="out-nc-required">—</span></td>
-                    <td class="unit-cell">牙</td>
-                </tr>
-            </table>
-        </div>
+</div><!-- /t4 -->
 
-        <!-- ④ 軸向力 & 扭力 -->
-        <div class="card">
-            <div class="card-title">
-                <span>⚡ 軸向力 &amp; 扭力</span>
-                <span class="badge badge-output">OUTPUT</span>
-            </div>
-            <table class="result-table">
-                <thead>
-                    <tr>
-                        <th colspan="3" style="padding-bottom:4px;">軸向力　Ff = 軸力係數 × δy × As</th>
-                    </tr>
-                </thead>
-                <tr>
-                    <td class="label-cell">Ff</td>
-                    <td class="value-cell"><span class="locked-value" id="out-Ff-N">—</span></td>
-                    <td class="unit-cell">N</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">Ff</td>
-                    <td class="value-cell"><span class="locked-value" id="out-Ff-kgf">—</span></td>
-                    <td class="unit-cell">kgf</td>
-                </tr>
-                <tr>
-                    <td class="label-cell" colspan="3">
-                        <div class="section-divider">扭力　T = K · Ff · D(m)</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-cell">T 扭力</td>
-                    <td class="value-cell"><span class="locked-value" id="out-T-Nm">—</span></td>
-                    <td class="unit-cell">N·m</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">T 扭力</td>
-                    <td class="value-cell"><span class="locked-value" id="out-T-kgfcm">—</span></td>
-                    <td class="unit-cell">kgf·cm</td>
-                </tr>
-                <tr>
-                    <td class="label-cell">扭矩值 vs SP</td>
-                    <td class="value-cell" colspan="2">
-                        <span id="out-status" class="status-badge">—</span>
-                    </td>
-                </tr>
-            </table>
-        </div>
 
-    </div><!-- end calc-grid -->
+<!-- =====================================================
+     TAB 5 · 破壞扭矩推算所需牙數（8.8/9.8/10.9/12.9）
+===================================================== -->
+<div id="t5" class="tab-panel">
+<div class="page-title">
+  <h2>破壞扭矩推算所需牙數</h2>
+  <span class="badge badge-ok">不受 HV max 影響</span>
+</div>
 
-    <!-- 備注 -->
-    <div class="note-box">
-        <strong>計算說明</strong>
-        <ul style="margin-top:8px;">
-            <li><strong>Rm 判斷規則：</strong>M4(含)以下 → 使用 HV max 值 320 N/mm²（強度最大 8.8）；M5～M18，L &lt; 2.5d → HV max；L ≥ 2.5d → 使用強度等級 Rm min。</li>
-            <li><strong>δyp</strong> = δy × 屈服比（3.6/4.6: 0.60；4.8: 0.85；5.6: 0.60；5.8/6.8/8.8/9.8: 0.80；10.9/12.9: 0.90）</li>
-            <li><strong>安全負載 SP</strong>（試驗負載）= Sp × As，Sp 值參照 ISO 898-1 proof load。</li>
-            <li><strong>所需牙數</strong>主要用於板金抽牙孔計算，螺紋旋合長度建議不少於 5 倍螺距。</li>
-            <li>M2(含)以下螺絲以公式推算誤差較大，僅供參考。M12 以上 HV max 最小裂斷扭矩無標準值。</li>
-        </ul>
+<div class="banner banner-info">
+  ℹ <span>以 <strong>Rm min（等級）</strong> 計算最小破壞扭矩 MB。由安全扭矩推回軸向力，計算最少旋合牙數。適用強度 8.8、9.8、10.9、12.9。</span>
+</div>
+
+<div class="card">
+  <div class="card-head"><h3>輸入參數</h3></div>
+  <div class="card-body">
+    <div class="grid g-4">
+      <div class="field">
+        <label>螺絲規格</label>
+        <select id="t5-spec" onchange="calcT5()">
+          <option>M1</option><option>M1.2</option><option>M1.4</option><option>M1.6</option>
+          <option>M2</option><option>M2.5</option><option selected>M3</option><option>M3.5</option>
+          <option>M4</option><option>M5</option><option>M6</option><option>M7</option>
+          <option>M8</option><option>M10</option><option>M12</option><option>M14</option>
+          <option>M16</option><option>M18</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>強度等級</label>
+        <select id="t5-grade" onchange="calcT5()">
+          <option selected>8.8</option><option>9.8</option><option>10.9</option><option>12.9</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>安全係數（對 MB）</label>
+        <select id="t5-sf" onchange="calcT5()">
+          <option value="0.5" selected>0.50（推薦設計扭矩）</option>
+          <option value="0.6">0.60</option>
+          <option value="0.7">0.70</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>K 力矩係數</label>
+        <select id="t5-k" onchange="calcT5()">
+          <option value="0.20" selected>0.20</option>
+          <option value="0.16">0.16</option>
+          <option value="0.18">0.18</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid g-4" style="margin-bottom:14px">
+  <div class="stat dim"><div class="k">d</div><div class="v" id="t5-d">—<span class="u">mm</span></div></div>
+  <div class="stat dim"><div class="k">As</div><div class="v" id="t5-As">—<span class="u">mm²</span></div></div>
+  <div class="stat dim"><div class="k">Rm min（等級）</div><div class="v" id="t5-Rm">—<span class="u">N/mm²</span></div></div>
+  <div class="stat dim"><div class="k">d₂ ≈ d − 0.6495P</div><div class="v" id="t5-d2">—<span class="u">mm</span></div></div>
+</div>
+<div class="grid g-4">
+  <div class="stat warn-s"><div class="k">MB min = 0.2·Rm·As·d</div><div class="v" id="t5-MB">—<span class="u">N·m</span></div></div>
+  <div class="stat accent"><div class="k">安全扭矩 = MB × 安全係數</div><div class="v" id="t5-ST">—<span class="u">N·m</span></div></div>
+  <div class="stat accent"><div class="k">Ff 推回 = T/(K·d)</div><div class="v" id="t5-Ff">—<span class="u">N</span></div></div>
+  <div class="stat final"><div class="k">所需牙數 ⌈Ff/單牙⌉</div><div class="v" id="t5-nc">—<span class="u">牙</span></div></div>
+</div>
+
+<!-- Reference table for 8.8-12.9 -->
+<div class="card" style="margin-top:16px">
+  <div class="card-head"><h3>各規格破壞扭矩參照（計算值，MB = 0.2 × Rm × As × d）</h3><div class="meta">CNS 15590-7 適用等級 8.8–12.9</div></div>
+  <div class="card-body">
+    <div class="tbl-wrap">
+    <table class="ref-table" id="t5-ref-table">
+      <thead>
+        <tr>
+          <th>規格</th><th>As (mm²)</th>
+          <th>8.8<br>MB(N·m)</th><th>8.8<br>安全T</th>
+          <th>9.8<br>MB(N·m)</th><th>9.8<br>安全T</th>
+          <th>10.9<br>MB(N·m)</th><th>10.9<br>安全T</th>
+          <th>12.9<br>MB(N·m)</th><th>12.9<br>安全T</th>
+        </tr>
+      </thead>
+      <tbody id="t5-ref-tbody"></tbody>
+    </table>
+    </div>
+    <div style="margin-top:8px;font-size:11.5px;color:var(--muted)">* 安全T = MB × 0.5。計算值可能與 CNS 15590-7 實測值有差異，以標準表為準。</div>
+  </div>
+</div>
+
+</div><!-- /t5 -->
+
+
+<!-- =====================================================
+     TAB 6 · 板金抽牙計算表
+===================================================== -->
+<div id="t6" class="tab-panel">
+<div class="page-title">
+  <h2>板金抽牙計算表</h2>
+  <span class="badge">M3 (Trifast 參考資料)</span>
+</div>
+
+<div class="banner banner-info">
+  ℹ <span>板金抽牙（Sheet Metal Clinch / Draw Tapping）尺寸參照。依板厚選取合適的預沖孔直徑與凸緣高度。M3 以上可依比例推算，但應以各廠家規格為準。</span>
+</div>
+
+<!-- Trifast M3 data -->
+<div class="card">
+  <div class="card-head"><h3>M3 × 0.5 抽牙規格</h3><div class="meta">來源：Trifast / 鈑金手冊</div></div>
+  <div class="card-body">
+    <div class="tbl-wrap">
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>來源</th><th>板厚 t (mm)</th><th>預沖孔徑 d孔 (mm)</th>
+          <th>凸緣高度 h (mm)</th><th>牙數 nc</th>
+          <th>內圓角 r (mm)</th><th>外圓角 R (mm)</th><th>備注</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="hl">Trifast</td><td>1.10</td><td>2.755</td>
+          <td>2.29</td><td class="ok">4</td>
+          <td>0.13</td><td>1.23</td><td class="left dim">SPC/SPCC</td>
+        </tr>
+        <tr>
+          <td class="hl">鈑金手冊</td><td>1.00</td><td>2.8</td>
+          <td>2.00</td><td class="ok">3~4</td>
+          <td>—</td><td>—</td><td class="left dim">參考值</td>
+        </tr>
+      </tbody>
+    </table>
     </div>
 
-</div><!-- end main-wrap -->
+    <div class="divider"></div>
+    <div class="slabel">抽牙有效旋合深度計算</div>
+    <div style="padding:12px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.8">
+      <strong>有效螺紋深度</strong> ≈ h − r − R<br>
+      Trifast M3：2.29 − 0.13 − 1.23 = <strong>0.93 mm</strong>（有效螺紋段）<br>
+      <span style="color:var(--muted)">螺距 P = 0.5 mm，有效牙數 ≈ 0.93 / 0.5 ≈ 1.86 牙（底部完整牙略少）</span><br>
+      <span style="color:var(--muted)">Trifast 規格 nc = 4 牙包含起始不完整牙。設計建議旋合牙數 ≥ 3 牙（實際承力牙）。</span>
+    </div>
+  </div>
+</div>
 
-<footer style="border-top:0.5px solid var(--border-color); padding:1.5rem 5%; text-align:center; font-size:13px; color:var(--secondary-color);">
-    <p>&copy; 2026 Andrew Mechanical &amp; Product Design Studio. CNS 3934 / ISO 898-1 / GB/T 16823.2</p>
-</footer>
+<!-- Calculator -->
+<div class="card">
+  <div class="card-head"><h3>預沖孔尺寸簡易計算</h3><div class="meta">M3 × 0.5</div></div>
+  <div class="card-body">
+    <div class="grid g-3">
+      <div class="field">
+        <label>板厚 t (mm)</label>
+        <input id="t6-t" type="number" value="1.0" min="0.5" max="3.0" step="0.1" oninput="calcT6()">
+      </div>
+      <div class="field">
+        <label>凸緣高度 h (mm)（抽牙後）</label>
+        <input id="t6-h" type="number" value="2.0" min="0.5" max="5.0" step="0.1" oninput="calcT6()">
+      </div>
+      <div class="field">
+        <label>螺距 P</label>
+        <select id="t6-p" onchange="calcT6()">
+          <option value="0.5" selected>0.5 (M3)</option>
+          <option value="0.7">0.7 (M4)</option>
+          <option value="0.8">0.8 (M5)</option>
+          <option value="1.0">1.0 (M6)</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid g-3" style="margin-top:12px">
+      <div class="stat dim"><div class="k">估算有效牙數（h/P）</div><div class="v" id="t6-nc">—<span class="u">牙</span></div></div>
+      <div class="stat dim"><div class="k">旋合長度</div><div class="v" id="t6-len">—<span class="u">mm</span></div></div>
+      <div class="stat"><div class="k">建議</div><div class="v" style="font-size:13px;font-weight:700" id="t6-rec">—</div></div>
+    </div>
+  </div>
+</div>
 
+</div><!-- /t6 -->
+
+
+<!-- =====================================================
+     TAB 7 · 盤頭螺釘承載面積與應力面積之比
+===================================================== -->
+<div id="t7" class="tab-panel">
+<div class="page-title">
+  <h2>盤頭螺釘 · 承載面積比</h2>
+  <span class="badge">Ab / As</span>
+</div>
+
+<div class="banner banner-info">
+  ℹ <span>Ab₁ = π/4 × (dw² − dh²)。dw 為頭部外徑（含支承面直徑），dh 為過孔直徑。依 GB/T 16823.1 Table 5。</span>
+</div>
+
+<div class="grid g-2" style="gap:16px">
+  <div class="card">
+    <div class="card-head"><h3>輸入</h3></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="field">
+        <label>螺絲規格</label>
+        <select id="t7-spec" onchange="calcT7()">
+          <option>M1.6</option><option>M2</option><option>M2.5</option>
+          <option selected>M3</option><option>M4</option><option>M5</option>
+          <option>M6</option><option>M8</option><option>M10</option>
+          <option>M12</option><option>M14</option><option>M16</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>過孔類型（ISO 273）</label>
+        <select id="t7-hole" onchange="calcT7()">
+          <option value="H12">H12（緊配）</option>
+          <option value="H13" selected>H13（中配）</option>
+          <option value="H14">H14（鬆配）</option>
+          <option value="custom">自訂 dh</option>
+        </select>
+      </div>
+      <div class="field" id="t7-custom-wrap" style="display:none">
+        <label>自訂過孔直徑 dh (mm)</label>
+        <input id="t7-dh-custom" type="number" value="3.6" step="0.1" oninput="calcT7()">
+      </div>
+      <div style="padding:10px 12px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px;font-size:12.5px;line-height:1.8">
+        dw（頭外徑）= <strong id="t7-dw-show">—</strong> mm<br>
+        dh（過孔）= <strong id="t7-dh-show">—</strong> mm<br>
+        As = <strong id="t7-As-show">—</strong> mm²
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="grid g-2" style="margin-bottom:12px">
+      <div class="stat accent"><div class="k">Ab₁ = π/4·(dw²−dh²)</div><div class="v" id="t7-Ab">—<span class="u">mm²</span></div></div>
+      <div class="stat final"><div class="k">Ab₁ / As</div><div class="v" id="t7-ratio">—</div></div>
+      <div class="stat dim"><div class="k">dw²</div><div class="v" id="t7-dw2">—<span class="u">mm²</span></div></div>
+      <div class="stat dim"><div class="k">dh²</div><div class="v" id="t7-dh2">—<span class="u">mm²</span></div></div>
+    </div>
+    <div class="banner banner-info" style="font-size:12px">
+      ℹ Ab₁ &gt; As → 接觸面積 &gt; 截面積（理想），比值應 &gt; 1。<br>
+      若 Ab₁ &lt; As，支承面積不足，需加大墊圈或換大頭螺絲。
+    </div>
+  </div>
+</div>
+
+<!-- Reference table -->
+<div class="card" style="margin-top:4px">
+  <div class="card-head"><h3>盤頭螺釘 dw 參照（ISO 7045 / GB/T 818）</h3><div class="meta">過孔採 H13</div></div>
+  <div class="card-body">
+    <div class="tbl-wrap">
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>規格</th><th>As (mm²)</th><th>dw (mm)</th>
+          <th>dh H12</th><th>dh H13</th><th>dh H14</th>
+          <th>Ab H13 (mm²)</th><th>Ab/As H13</th>
+        </tr>
+      </thead>
+      <tbody id="t7-ref-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /t7 -->
+
+
+<!-- =====================================================
+     TAB 8 · 六角頭標準系列承載面積與應力面積之比
+===================================================== -->
+<div id="t8" class="tab-panel">
+<div class="page-title">
+  <h2>六角頭標準系列 · 承載面積比</h2>
+  <span class="badge">Ab / As</span>
+</div>
+
+<div class="banner banner-info">
+  ℹ <span>Ab₁ = (√3/2) × S² − π/4 × dh²。S 為螺帽對邊距（across-flats），dh 為過孔直徑。依 GB/T 16823.1 Table 4（M3–M33）。</span>
+</div>
+
+<div class="grid g-2" style="gap:16px">
+  <div class="card">
+    <div class="card-head"><h3>輸入</h3></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="field">
+        <label>螺絲規格</label>
+        <select id="t8-spec" onchange="calcT8()">
+          <option selected>M3</option><option>M4</option><option>M5</option><option>M6</option>
+          <option>M8</option><option>M10</option><option>M12</option><option>M14</option>
+          <option>M16</option><option>M18</option><option>M20</option><option>M22</option>
+          <option>M24</option><option>M27</option><option>M30</option><option>M33</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>過孔類型（ISO 273）</label>
+        <select id="t8-hole" onchange="calcT8()">
+          <option value="H12">H12（緊配）</option>
+          <option value="H13" selected>H13（中配）</option>
+          <option value="H14">H14（鬆配）</option>
+          <option value="custom">自訂 dh</option>
+        </select>
+      </div>
+      <div class="field" id="t8-custom-wrap" style="display:none">
+        <label>自訂過孔直徑 dh (mm)</label>
+        <input id="t8-dh-custom" type="number" value="3.6" step="0.1" oninput="calcT8()">
+      </div>
+      <div style="padding:10px 12px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px;font-size:12.5px;line-height:1.8">
+        S（對邊距）= <strong id="t8-S-show">—</strong> mm<br>
+        dh（過孔）= <strong id="t8-dh-show">—</strong> mm<br>
+        As = <strong id="t8-As-show">—</strong> mm²
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="grid g-2" style="margin-bottom:12px">
+      <div class="stat accent"><div class="k">Ab₁ = (√3/2)·S² − π/4·dh²</div><div class="v" id="t8-Ab">—<span class="u">mm²</span></div></div>
+      <div class="stat final"><div class="k">Ab₁ / As</div><div class="v" id="t8-ratio">—</div></div>
+      <div class="stat dim"><div class="k">(√3/2) × S²</div><div class="v" id="t8-hex">—<span class="u">mm²</span></div></div>
+      <div class="stat dim"><div class="k">π/4 × dh²</div><div class="v" id="t8-hole-area">—<span class="u">mm²</span></div></div>
+    </div>
+    <div class="banner banner-info" style="font-size:12px">
+      ℹ 六角頭承載面積 = 六邊形投影面積 − 過孔圓面積。<br>
+      S 為螺帽對邊距（wrench size），非對角距。
+    </div>
+  </div>
+</div>
+
+<!-- Reference table M3-M33 -->
+<div class="card" style="margin-top:4px">
+  <div class="card-head"><h3>六角頭 Ab 參照表（M3–M33）</h3><div class="meta">GB/T 16823.1 Table 4 · 過孔採 H13</div></div>
+  <div class="card-body">
+    <div class="tbl-wrap">
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>規格</th><th>As (mm²)</th><th>S 對邊距</th>
+          <th>dh H12</th><th>dh H13</th><th>dh H14</th>
+          <th>Ab H13 (mm²)</th><th>Ab/As H13</th>
+        </tr>
+      </thead>
+      <tbody id="t8-ref-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /t8 -->
+
+
+<!-- =====================================================
+     使用說明（比較表）
+===================================================== -->
+<div class="usage-box">
+  <h4>📋 各計算表使用說明與差異比較</h4>
+  <div class="usage-compare">
+
+    <div class="cmp-row cmp-head">
+      <div class="cmp-lbl">計算表</div>
+      <div class="cmp-a">計算依據 / 特點</div>
+      <div class="cmp-b">適用場合</div>
+    </div>
+
+    <div class="cmp-row">
+      <div class="cmp-lbl">① 一般算法</div>
+      <div class="cmp-a">受 HV max 限制。d ≤ M4 或 L &lt; 2.5d → Rm = 320 N/mm²</div>
+      <div class="cmp-b">標準鎖付扭力規劃；CNS 3934 / GB/T 16823.2 常規計算</div>
+    </div>
+
+    <div class="cmp-row">
+      <div class="cmp-lbl">② 安全負載 SP</div>
+      <div class="cmp-a">使用 ISO 898-1 proof load（Sp），<strong>不受 HV max 影響</strong></div>
+      <div class="cmp-b">需準確評估鎖緊力，或螺絲等級能充分發揮時</div>
+    </div>
+
+    <div class="cmp-row">
+      <div class="cmp-lbl">③ 三柱扭力</div>
+      <div class="cmp-a">T = 0.35K(1+1/Q)δy·As·d(cm)；K 由材料配對決定</div>
+      <div class="cmp-b">需考慮材料摩擦特性的精確扭矩規劃；M3 以下參考用</div>
+    </div>
+
+    <div class="cmp-row">
+      <div class="cmp-lbl">④ 東日 T 系列</div>
+      <div class="cmp-a">0.5T / 基準T（3.6–6.8）；1.8T / 2.4T（8.8–12.9）</div>
+      <div class="cmp-b">使用東日扭力計時，依產品系列選取對應軸向力範圍</div>
+    </div>
+
+    <div class="cmp-row">
+      <div class="cmp-lbl">⑤ 破壞扭矩牙數</div>
+      <div class="cmp-a">MB = 0.2·Rm·As·d；使用 Rm min，<strong>不受 HV max 影響</strong></div>
+      <div class="cmp-b">板金/塑膠件抽牙旋合設計；確認旋合牙數是否足夠</div>
+    </div>
+
+    <div class="cmp-row">
+      <div class="cmp-lbl">⑥ 板金抽牙</div>
+      <div class="cmp-a">M3 Trifast / 鈑金手冊參考數據；預沖孔 + 凸緣高度</div>
+      <div class="cmp-b">SPC/SPCC 板金件 M3 抽牙孔規格設計</div>
+    </div>
+
+    <div class="cmp-row">
+      <div class="cmp-lbl">⑦ 盤頭承載面積</div>
+      <div class="cmp-a">Ab = π/4·(dw²−dh²)；GB/T 16823.1 Table 5（M1.6–M16）</div>
+      <div class="cmp-b">驗證盤頭螺絲支承面積是否足夠（Ab/As ≥ 1 建議）</div>
+    </div>
+
+    <div class="cmp-row">
+      <div class="cmp-lbl">⑧ 六角頭承載面積</div>
+      <div class="cmp-a">Ab = (√3/2)·S²−π/4·dh²；GB/T 16823.1 Table 4（M3–M33）</div>
+      <div class="cmp-b">驗證六角頭螺絲支承面積（大螺絲 M12+ 尤其需要確認）</div>
+    </div>
+
+  </div>
+  <div style="margin-top:14px;font-size:12px;color:var(--muted)">
+    參照標準：ISO 898-1 · CNS 3934 · GB/T 16823.1 · GB/T 16823.2 · CNS 15590-7<br>
+    &copy; 2026 Andrew Mechanical &amp; Product Design Studio
+  </div>
+</div>
+
+</main>
+
+<!-- =====================================================
+     JavaScript
+===================================================== -->
 <script>
-/* ================================================================
-   螺絲規格資料表（AH75:AM91）
-   { d: mm, pitch: mm, As: mm² }
-================================================================ */
+'use strict';
+
+/* ── Global Data ── */
 const SCREW_DB = {
-    'M1':   { d: 1,    pitch: 0.25, As: 0.46  },
-    'M1.2': { d: 1.2,  pitch: 0.25, As: 0.732 },
-    'M1.4': { d: 1.4,  pitch: 0.3,  As: 0.983 },
-    'M1.6': { d: 1.6,  pitch: 0.35, As: 1.27  },
-    'M2':   { d: 2,    pitch: 0.4,  As: 2.07  },
-    'M2.5': { d: 2.5,  pitch: 0.45, As: 3.39  },
-    'M3':   { d: 3,    pitch: 0.5,  As: 5.03  },
-    'M3.5': { d: 3.5,  pitch: 0.6,  As: 6.78  },
-    'M4':   { d: 4,    pitch: 0.7,  As: 8.78  },
-    'M5':   { d: 5,    pitch: 0.8,  As: 14.2  },
-    'M6':   { d: 6,    pitch: 1.0,  As: 20.1  },
-    'M7':   { d: 7,    pitch: 1.0,  As: 28.9  },
-    'M8':   { d: 8,    pitch: 1.25, As: 36.6  },
-    'M10':  { d: 10,   pitch: 1.5,  As: 58    },
-    'M12':  { d: 12,   pitch: 1.75, As: 84.3  },
-    'M16':  { d: 16,   pitch: 2.0,  As: 157   },
-    'M18':  { d: 18,   pitch: 2.5,  As: 192   }
+  'M1':   {d:1,    p:0.25,  As:0.46},
+  'M1.2': {d:1.2,  p:0.25,  As:0.732},
+  'M1.4': {d:1.4,  p:0.3,   As:0.983},
+  'M1.6': {d:1.6,  p:0.35,  As:1.27},
+  'M2':   {d:2,    p:0.4,   As:2.07},
+  'M2.5': {d:2.5,  p:0.45,  As:3.39},
+  'M3':   {d:3,    p:0.5,   As:5.03},
+  'M3.5': {d:3.5,  p:0.6,   As:6.78},
+  'M4':   {d:4,    p:0.7,   As:8.78},
+  'M5':   {d:5,    p:0.8,   As:14.2},
+  'M6':   {d:6,    p:1.0,   As:20.1},
+  'M7':   {d:7,    p:1.0,   As:28.9},
+  'M8':   {d:8,    p:1.25,  As:36.6},
+  'M10':  {d:10,   p:1.5,   As:58.0},
+  'M12':  {d:12,   p:1.75,  As:84.3},
+  'M14':  {d:14,   p:2.0,   As:115},
+  'M16':  {d:16,   p:2.0,   As:157},
+  'M18':  {d:18,   p:2.5,   As:192}
 };
 
-/* ================================================================
-   強度等級資料
-   Rm_min (N/mm²)：依強度等級標準最小抗拉強度
-   Sp (N/mm²)：proof load（試驗負載應力）ISO 898-1
-   yieldRatio：屈服比 (δyp = δy × ratio)
-================================================================ */
 const GRADE_DB = {
-    '3.6':  { Rm: 300,  Sp: 180, yieldRatio: 0.60 },
-    '4.6':  { Rm: 400,  Sp: 225, yieldRatio: 0.60 },
-    '4.8':  { Rm: 400,  Sp: 310, yieldRatio: 0.85 },
-    '5.6':  { Rm: 500,  Sp: 280, yieldRatio: 0.60 },
-    '5.8':  { Rm: 500,  Sp: 380, yieldRatio: 0.80 },
-    '6.8':  { Rm: 600,  Sp: 440, yieldRatio: 0.80 },
-    '8.8':  { Rm: 800,  Sp: 580, yieldRatio: 0.80 },
-    '9.8':  { Rm: 900,  Sp: 650, yieldRatio: 0.80 },
-    '10.9': { Rm: 1000, Sp: 830, yieldRatio: 0.90 },
-    '12.9': { Rm: 1200, Sp: 970, yieldRatio: 0.90 }
+  '3.6':  {Rm:300,  Sp:180,  yr:0.60},
+  '4.6':  {Rm:400,  Sp:225,  yr:0.60},
+  '4.8':  {Rm:420,  Sp:310,  yr:0.80},
+  '5.6':  {Rm:500,  Sp:280,  yr:0.60},
+  '5.8':  {Rm:520,  Sp:380,  yr:0.80},
+  '6.8':  {Rm:600,  Sp:440,  yr:0.80},
+  '8.8':  {Rm:800,  Sp:580,  yr:0.80},
+  '9.8':  {Rm:900,  Sp:650,  yr:0.80},
+  '10.9': {Rm:1040, Sp:830,  yr:0.90},
+  '12.9': {Rm:1220, Sp:970,  yr:0.90}
 };
 
-const HV_MAX_RM = 320; /* HV max → Rm = 320 N/mm² (對應 8.8 等級) */
+const HV_MAX = 320;
+const G = 9.80665;
 const PI = Math.PI;
-const G = 9.80665; /* N/kgf */
 
-function fmt(v, dec = 2) {
-    if (v === null || v === undefined || isNaN(v)) return '—';
-    return v.toFixed(dec);
+/* ISO 273 clearance holes */
+const CLEARANCE_DB = {
+  'M1.6': {H12:1.8,  H13:1.8,  H14:2.0},
+  'M2':   {H12:2.4,  H13:2.6,  H14:2.9},
+  'M2.5': {H12:2.9,  H13:3.1,  H14:3.5},
+  'M3':   {H12:3.4,  H13:3.6,  H14:4.0},
+  'M4':   {H12:4.5,  H13:4.8,  H14:5.3},
+  'M5':   {H12:5.5,  H13:5.8,  H14:6.4},
+  'M6':   {H12:6.6,  H13:7.0,  H14:7.6},
+  'M7':   {H12:7.6,  H13:8.0,  H14:8.6},
+  'M8':   {H12:9.0,  H13:9.5,  H14:10.5},
+  'M10':  {H12:11.0, H13:11.5, H14:13.0},
+  'M12':  {H12:13.5, H13:14.0, H14:15.5},
+  'M14':  {H12:15.5, H13:16.0, H14:17.5},
+  'M16':  {H12:17.5, H13:18.0, H14:20.0},
+  'M18':  {H12:20.0, H13:21.0, H14:22.5},
+  'M20':  {H12:22.0, H13:23.0, H14:25.0},
+  'M22':  {H12:24.0, H13:25.0, H14:27.0},
+  'M24':  {H12:26.0, H13:27.0, H14:30.0},
+  'M27':  {H12:30.0, H13:31.0, H14:34.0},
+  'M30':  {H12:33.0, H13:34.0, H14:37.0},
+  'M33':  {H12:36.0, H13:37.0, H14:41.0}
+};
+
+/* Pan head dw (ISO 7045 / GB/T 818) */
+const PAN_HEAD_DB = {
+  'M1.6': {dw:3.2},
+  'M2':   {dw:4.0},
+  'M2.5': {dw:5.0},
+  'M3':   {dw:5.6},
+  'M4':   {dw:8.0},
+  'M5':   {dw:9.5},
+  'M6':   {dw:12.0},
+  'M8':   {dw:16.0},
+  'M10':  {dw:20.0},
+  'M12':  {dw:24.0},
+  'M14':  {dw:27.0},
+  'M16':  {dw:30.0}
+};
+
+/* Hex head S (across flats, ISO 4014) */
+const HEX_HEAD_DB = {
+  'M3':  {S:5.5,  As:5.03},
+  'M4':  {S:7.0,  As:8.78},
+  'M5':  {S:8.0,  As:14.2},
+  'M6':  {S:10.0, As:20.1},
+  'M8':  {S:13.0, As:36.6},
+  'M10': {S:16.0, As:58.0},
+  'M12': {S:18.0, As:84.3},
+  'M14': {S:21.0, As:115},
+  'M16': {S:24.0, As:157},
+  'M18': {S:27.0, As:192},
+  'M20': {S:30.0, As:245},
+  'M22': {S:32.0, As:303},
+  'M24': {S:36.0, As:353},
+  'M27': {S:41.0, As:459},
+  'M30': {S:46.0, As:561},
+  'M33': {S:50.0, As:694}
+};
+
+/* Tohnichi series */
+const TOHNICHI = [
+  {name:'0.5T',  grades:['3.6','4.6','4.8','5.6','5.8','6.8'], min:80,  std:105, max:150},
+  {name:'基準T', grades:['3.6','4.6','4.8','5.6','5.8','6.8'], min:160, std:210, max:300},
+  {name:'1.8T',  grades:['8.8','9.8','10.9','12.9'],           min:290, std:380, max:540},
+  {name:'2.4T',  grades:['10.9','12.9'],                        min:380, std:500, max:710}
+];
+
+/* K pairs (三柱) */
+const K_OIL = [
+  {k:0.145, desc:'SCM-FC / FC-FC / SUS-FC'},
+  {k:0.155, desc:'S10C-FC / SCM-S10C / SCM-SCM / FC-S10C / FC-SCM'},
+  {k:0.165, desc:'SCM-SUS / FC-SUS / AL-FC / SUS-S10C / SUS-SCM / SUS-SUS'},
+  {k:0.175, desc:'S10C-S10C / S10C-SCM / S10C-SUS / AL-S10C / AL-SCM'},
+  {k:0.185, desc:'SCM-AL / FC-AL / AL-SUS'},
+  {k:0.195, desc:'S10C-AL / SUS-AL'},
+  {k:0.215, desc:'AL-AL'}
+];
+const K_DRY = [
+  {k:0.25, desc:'0.25 – 低摩擦乾式'},
+  {k:0.35, desc:'0.35 – 中低摩擦乾式'},
+  {k:0.45, desc:'0.45 – 中高摩擦乾式'},
+  {k:0.55, desc:'0.55 – 高摩擦乾式'}
+];
+
+/* ── Helpers ── */
+function f(v, dec=2){ return (v==null||isNaN(v)) ? '—' : v.toFixed(dec); }
+function set(id, val, dec=2){ const e=document.getElementById(id); if(e) e.textContent=f(val,dec); }
+function setHtml(id, html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
+function val(id){ const e=document.getElementById(id); return e?e.value:null; }
+function nval(id){ return parseFloat(val(id)); }
+
+/* ── TAB SWITCHING ── */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const id = tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  });
+});
+
+/* ════════════════════════════════════════
+   TAB 1 · 一般算法
+════════════════════════════════════════ */
+function calcT1(){
+  const spec = val('t1-spec'), grade = val('t1-grade');
+  const L = nval('t1-len'), ac = nval('t1-ac'), K = nval('t1-k');
+  const s = SCREW_DB[spec], g = GRADE_DB[grade];
+  if(!s||!g) return;
+  const {d,p,As} = s;
+  const {Rm:Rm_g, Sp, yr} = g;
+  /* Rm rule */
+  const t25 = 2.5*d;
+  let Rm, rl;
+  if(d<=4){ Rm=HV_MAX; rl=`HV max (d ≤ M4) = ${HV_MAX} N/mm²`; }
+  else if(L<t25){ Rm=HV_MAX; rl=`HV max (L < 2.5d) = ${HV_MAX} N/mm²`; }
+  else { Rm=Rm_g; rl=`Rm min ${grade} 級 = ${Rm_g} N/mm²`; }
+  const dyp = Rm * yr;
+  const typ = dyp / 2;
+  const d2 = d - 0.7*p;
+  const tooth_kgf = (PI*d*1*p*(typ/G)) / 2;
+  const SP_N = Sp * As;
+  const Ff_N = ac * Rm * As;
+  const Ff_kgf = Ff_N / G;
+  const nc = Math.ceil(Ff_kgf / tooth_kgf);
+  const T_Nm = K * Ff_N * (d/1000);
+  const T_kgfcm = T_Nm * 100 / G;
+  /* rule chip */
+  document.getElementById('t1-rule').textContent = 'Rm 採用：' + rl;
+  set('t1-d', d, 1); set('t1-p', p, 2); set('t1-As', As, 3);
+  set('t1-25d', t25, 1); set('t1-Rm', Rm, 0); set('t1-dyp', dyp, 1);
+  set('t1-typ', typ, 1); set('t1-sp', SP_N, 1);
+  set('t1-Ff', Ff_N, 1); set('t1-Ffk', Ff_kgf, 2);
+  set('t1-T', T_Nm, 3); set('t1-Tc', T_kgfcm, 2);
+  set('t1-minload', As*Rm, 1); set('t1-tooth', tooth_kgf, 2); set('t1-nc', nc, 0);
+  const se = document.getElementById('t1-status');
+  if(Ff_N < SP_N){ se.textContent='✓ 低於安全負載 SP'; se.className='s-badge s-ok'; }
+  else if(Ff_N < SP_N*1.1){ se.textContent='⚠ 接近安全負載'; se.className='s-badge s-warn'; }
+  else{ se.textContent='✕ 超過安全負載'; se.className='s-badge s-over'; }
 }
 
-function calculate() {
-    const spec        = document.getElementById('sel-spec').value;
-    const L           = parseFloat(document.getElementById('sel-length').value);
-    const grade       = document.getElementById('sel-grade').value;
-    const axialCoeff  = parseFloat(document.getElementById('sel-axial-coeff').value);
-    const K           = parseFloat(document.getElementById('sel-k').value);
-
-    const screw = SCREW_DB[spec];
-    const gdata = GRADE_DB[grade];
-
-    if (!screw || !gdata) return;
-
-    const { d, pitch, As } = screw;
-    const { Rm: Rm_grade, Sp, yieldRatio } = gdata;
-
-    /* ── 判斷使用哪個 Rm ── */
-    const threshold_25d = 2.5 * d;
-    let Rm, ruleLabel;
-
-    if (d <= 4) {
-        /* M4(含)以下：一律使用 HV max */
-        Rm = HV_MAX_RM;
-        ruleLabel = 'HV max (d ≤ M4)';
-    } else if (L < threshold_25d) {
-        /* M5+，L < 2.5d：使用 HV max */
-        Rm = HV_MAX_RM;
-        ruleLabel = `HV max (L < 2.5d)`;
-    } else {
-        /* M5+，L ≥ 2.5d：使用等級 Rm min */
-        Rm = Rm_grade;
-        ruleLabel = `Rm min ${grade} 級`;
-    }
-
-    /* ── 強度計算 ── */
-    const dy     = Rm;              // δy ≈ Rm（此計算法）
-    const dyp    = dy * yieldRatio; // 降伏應力
-    const typ    = dyp / 2;         // 剪降伏應力 N/mm²
-    const typ_kgf = typ / G;        // kgf/mm²
-
-    /* 節圓徑 d₂ ≈ d - 0.7P（近似） */
-    const d2 = d - 0.7 * pitch;
-
-    /* ── 螺牙強度 ── */
-    const single_tooth_kgf = (PI * d * 1 * pitch * typ_kgf) / 2;
-    const min_load = As * Rm;       // 最小抗拉負載
-    const SP_load  = Sp * As;       // 安全負載
-
-    /* ── 軸向力 ── */
-    const Ff_N   = axialCoeff * dy * As;
-    const Ff_kgf = Ff_N / G;
-
-    /* 所需牙數 */
-    const nc_required = Math.ceil(Ff_kgf / single_tooth_kgf);
-
-    /* ── 扭力 ── */
-    const T_Nm     = K * Ff_N * (d / 1000);
-    const T_kgfcm  = T_Nm * 100 / G;
-
-    /* ── 狀態判斷 ── */
-    let statusText, statusClass;
-    if (Ff_N < SP_load) {
-        statusText = '✓ 低於安全負載';
-        statusClass = 'status-safe';
-    } else if (Ff_N < SP_load * 1.1) {
-        statusText = '⚠ 接近安全負載';
-        statusClass = 'status-warn';
-    } else {
-        statusText = '✕ 超過安全負載';
-        statusClass = 'status-over';
-    }
-
-    /* ── 寫入 DOM ── */
-    document.getElementById('rule-chip-wrap').innerHTML =
-        `<span class="rule-chip">Rm 採用：${ruleLabel} = ${Rm} N/mm²</span>`;
-
-    document.getElementById('rm-source').textContent = `(${ruleLabel})`;
-
-    function set(id, val, dec = 2) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = fmt(val, dec);
-    }
-
-    set('out-d',           d,             2);
-    set('out-pitch',       pitch,         2);
-    set('out-As',          As,            3);
-    set('out-d2',          d2,            3);
-    set('out-25d',         threshold_25d, 1);
-    set('out-Rm',          Rm,            0);
-    set('out-dyp',         dyp,           1);
-    set('out-typ',         typ,           1);
-    set('out-typ-kgf',     typ_kgf,       3);
-    set('out-single-tooth',single_tooth_kgf, 2);
-    set('out-min-load',    min_load,      1);
-    set('out-sp',          SP_load,       1);
-    set('out-nc-required', nc_required,   0);
-    set('out-Ff-N',        Ff_N,          2);
-    set('out-Ff-kgf',      Ff_kgf,        2);
-    set('out-T-Nm',        T_Nm,          3);
-    set('out-T-kgfcm',     T_kgfcm,       2);
-
-    const statusEl = document.getElementById('out-status');
-    statusEl.textContent  = statusText;
-    statusEl.className    = 'status-badge ' + statusClass;
+/* ════════════════════════════════════════
+   TAB 2 · 安全負載 SP
+════════════════════════════════════════ */
+function calcT2(){
+  const spec=val('t2-spec'), grade=val('t2-grade');
+  const ac=nval('t2-ac'), K=nval('t2-k');
+  const s=SCREW_DB[spec], g=GRADE_DB[grade];
+  if(!s||!g) return;
+  const {d,p,As}=s, {Rm,Sp}=g;
+  const d2=d-0.6495*p;
+  const Ff_N=ac*Sp*As;
+  const Ff_kgf=Ff_N/G;
+  const T_Nm=K*Ff_N*(d/1000);
+  const T_kgfcm=T_Nm*100/G;
+  /* single tooth shear: τ = Sp/√3, area = π*d2*p */
+  const tau=Sp/Math.sqrt(3);
+  const tooth_N=PI*d2*p*tau;
+  const nc=Math.ceil(Ff_N/tooth_N);
+  const minload=Rm*As;
+  set('t2-d',d,1); set('t2-As',As,3); set('t2-Sp',Sp,0); set('t2-Rm',Rm,0);
+  set('t2-Ff',Ff_N,1); set('t2-Ffk',Ff_kgf,2);
+  set('t2-T',T_Nm,3); set('t2-Tc',T_kgfcm,2);
+  set('t2-tooth',tooth_N,1); set('t2-nc',nc,0); set('t2-minload',minload,1);
+  const se=document.getElementById('t2-status');
+  if(Ff_N<minload*0.9){ se.textContent='✓ Ff < 90% 最小抗拉負載'; se.className='s-badge s-ok'; }
+  else if(Ff_N<minload){ se.textContent='⚠ 接近最小抗拉負載'; se.className='s-badge s-warn'; }
+  else{ se.textContent='✕ 超過最小抗拉負載'; se.className='s-badge s-over'; }
 }
 
-/* 初始化 */
-calculate();
+/* ════════════════════════════════════════
+   TAB 3 · 三柱扭力公式
+════════════════════════════════════════ */
+function t3UpdateK(){
+  const lube=val('t3-lube');
+  const sel=document.getElementById('t3-K');
+  sel.innerHTML='';
+  const list=(lube==='oil')?K_OIL:K_DRY;
+  list.forEach((kp,i)=>{
+    const o=document.createElement('option');
+    o.value=kp.k;
+    o.textContent=`K=${kp.k} — ${kp.desc}`;
+    if(i===1) o.selected=true;
+    sel.appendChild(o);
+  });
+  calcT3();
+}
+function calcT3(){
+  const spec=val('t3-spec'), grade=val('t3-grade');
+  const Q=nval('t3-Q'), K=nval('t3-K');
+  const s=SCREW_DB[spec], g=GRADE_DB[grade];
+  if(!s||!g||isNaN(Q)||isNaN(K)) return;
+  const {d,As}=s;
+  const dy_N=g.Rm*g.yr;           /* δy (N/mm²) = Rp0.2 */
+  const dy_k=dy_N/G;               /* δy (kgf/mm²) */
+  const d_cm=d/10;
+  /* T = 0.35 × K × (1+1/Q) × δy(kgf/mm²) × As × d(cm) */
+  const T_kgfcm=0.35*K*(1+1/Q)*dy_k*As*d_cm;
+  const T_Nm=T_kgfcm*G/100;
+  set('t3-d',d,1); set('t3-As',As,3);
+  set('t3-dy',dy_N,1); set('t3-dyk',dy_k,3);
+  set('t3-Kv',K,3); set('t3-Qv',Q,2);
+  set('t3-T',T_Nm,3); set('t3-Tc',T_kgfcm,2);
+}
+
+/* ════════════════════════════════════════
+   TAB 4 · 東日 T 系列
+════════════════════════════════════════ */
+function calcT4(){
+  const spec=val('t4-spec'), grade=val('t4-grade');
+  const s=SCREW_DB[spec]; if(!s) return;
+  const {d,As}=s;
+  document.getElementById('t4-d-show').textContent=d;
+  document.getElementById('t4-As-show').textContent=As;
+  const tbody=document.getElementById('t4-tbody');
+  tbody.innerHTML='';
+  TOHNICHI.forEach(ser=>{
+    const ok=ser.grades.includes(grade);
+    const fMin=ser.min*As, fStd=ser.std*As, fMax=ser.max*As;
+    const dm=d/1000;
+    const tMin=0.2*fMin*dm, tStd=0.2*fStd*dm, tMax=0.2*fMax*dm;
+    const cls=ok?'':'dim';
+    tbody.innerHTML+=`<tr>
+      <td class="${ok?'hl':'dim'}">${ser.name}</td>
+      <td class="${cls}">${ser.grades.join('/')}</td>
+      <td class="${cls}">${ser.min}</td><td class="${cls}">${ser.std}</td><td class="${cls}">${ser.max}</td>
+      <td class="${cls}">${f(fMin,0)}</td><td class="${cls}">${f(fStd,0)}</td><td class="${cls}">${f(fMax,0)}</td>
+      <td class="${cls}">${f(tMin,3)}</td><td class="${cls}">${f(tStd,3)}</td><td class="${cls}">${f(tMax,3)}</td>
+      <td>${ok?'<span class="badge badge-ok">✓ 適用</span>':'<span class="badge" style="background:#F1F5F9;color:var(--muted)">—</span>'}</td>
+    </tr>`;
+  });
+}
+
+/* ════════════════════════════════════════
+   TAB 5 · 破壞扭矩推算牙數
+════════════════════════════════════════ */
+function calcT5(){
+  const spec=val('t5-spec'), grade=val('t5-grade');
+  const sf=nval('t5-sf'), K=nval('t5-k');
+  const s=SCREW_DB[spec], g=GRADE_DB[grade];
+  if(!s||!g) return;
+  const {d,p,As}=s, {Rm}=g;
+  const d2=d-0.6495*p;
+  const MB_Nmm=0.2*Rm*As*d;    /* N·mm */
+  const MB_Nm=MB_Nmm/1000;
+  const ST_Nm=MB_Nm*sf;
+  const Ff_N=ST_Nm/(K*(d/1000));
+  const tau=Rm/Math.sqrt(3)/2;
+  const tooth_N=PI*d2*p*tau;
+  const nc=Math.ceil(Ff_N/tooth_N);
+  set('t5-d',d,1); set('t5-As',As,3); set('t5-Rm',Rm,0);
+  set('t5-d2',d2,3); set('t5-MB',MB_Nm,3); set('t5-ST',ST_Nm,3);
+  set('t5-Ff',Ff_N,1); set('t5-nc',nc,0);
+}
+
+function buildT5RefTable(){
+  const grades88=['8.8','9.8','10.9','12.9'];
+  const specs=['M1','M1.2','M1.4','M1.6','M2','M2.5','M3','M3.5','M4','M5','M6','M8','M10','M12','M14','M16'];
+  const tbody=document.getElementById('t5-ref-tbody');
+  specs.forEach(sp=>{
+    const s=SCREW_DB[sp]; if(!s) return;
+    const {d,As}=s;
+    let row=`<td class="hl">${sp}</td><td>${As}</td>`;
+    grades88.forEach(gr=>{
+      const g=GRADE_DB[gr];
+      const MB=(0.2*g.Rm*As*d/1000);
+      row+=`<td>${f(MB,3)}</td><td class="dim">${f(MB*0.5,3)}</td>`;
+    });
+    tbody.innerHTML+=`<tr>${row}</tr>`;
+  });
+}
+
+/* ════════════════════════════════════════
+   TAB 6 · 板金抽牙
+════════════════════════════════════════ */
+function calcT6(){
+  const t=nval('t6-t'), h=nval('t6-h'), p=nval('t6-p');
+  if(isNaN(t)||isNaN(h)||isNaN(p)) return;
+  const eff=h/p;
+  const rec=eff>=3?'✓ 牙數足夠（≥3）':'⚠ 牙數不足，考慮增加板厚';
+  set('t6-nc',eff,1); set('t6-len',h,2);
+  const re=document.getElementById('t6-rec');
+  if(re){ re.textContent=rec; re.style.color=eff>=3?'var(--ok)':'var(--danger)'; }
+}
+
+/* ════════════════════════════════════════
+   TAB 7 · 盤頭承載面積
+════════════════════════════════════════ */
+function calcT7(){
+  const spec=val('t7-spec'), htype=val('t7-hole');
+  const ph=PAN_HEAD_DB[spec], sd=SCREW_DB[spec];
+  if(!ph||!sd) return;
+  const dw=ph.dw, As=sd.As;
+  let dh;
+  if(htype==='custom'){
+    dh=nval('t7-dh-custom');
+    document.getElementById('t7-custom-wrap').style.display='';
+  } else {
+    document.getElementById('t7-custom-wrap').style.display='none';
+    dh=CLEARANCE_DB[spec]?CLEARANCE_DB[spec][htype]:null;
+    if(!dh) dh=CLEARANCE_DB[spec]?CLEARANCE_DB[spec]['H13']:null;
+  }
+  if(!dh||isNaN(dh)) return;
+  const Ab=PI/4*(dw*dw-dh*dh);
+  const ratio=Ab/As;
+  document.getElementById('t7-dw-show').textContent=dw;
+  document.getElementById('t7-dh-show').textContent=f(dh,2);
+  document.getElementById('t7-As-show').textContent=As;
+  set('t7-Ab',Ab,2); set('t7-ratio',ratio,2);
+  set('t7-dw2',dw*dw,2); set('t7-dh2',dh*dh,2);
+}
+
+function buildT7RefTable(){
+  const tbody=document.getElementById('t7-ref-tbody');
+  Object.keys(PAN_HEAD_DB).forEach(sp=>{
+    const ph=PAN_HEAD_DB[sp], sd=SCREW_DB[sp];
+    if(!ph||!sd) return;
+    const dw=ph.dw, As=sd.As;
+    const cl=CLEARANCE_DB[sp];
+    const dh12=cl?cl.H12:'—', dh13=cl?cl.H13:'—', dh14=cl?cl.H14:'—';
+    const Ab13=cl?(PI/4*(dw*dw-cl.H13*cl.H13)):null;
+    const ratio13=Ab13?Ab13/As:null;
+    const rClass=ratio13&&ratio13>=1?'ok':ratio13?'':'dim';
+    tbody.innerHTML+=`<tr>
+      <td class="hl">${sp}</td><td>${As}</td><td>${dw}</td>
+      <td>${dh12}</td><td>${dh13}</td><td>${dh14}</td>
+      <td class="${rClass}">${Ab13?f(Ab13,2):'—'}</td>
+      <td class="${rClass}">${ratio13?f(ratio13,2):'—'}</td>
+    </tr>`;
+  });
+}
+
+/* ════════════════════════════════════════
+   TAB 8 · 六角頭承載面積
+════════════════════════════════════════ */
+function calcT8(){
+  const spec=val('t8-spec'), htype=val('t8-hole');
+  const hh=HEX_HEAD_DB[spec];
+  if(!hh) return;
+  const S=hh.S, As=hh.As;
+  let dh;
+  if(htype==='custom'){
+    dh=nval('t8-dh-custom');
+    document.getElementById('t8-custom-wrap').style.display='';
+  } else {
+    document.getElementById('t8-custom-wrap').style.display='none';
+    dh=CLEARANCE_DB[spec]?CLEARANCE_DB[spec][htype]:null;
+  }
+  if(!dh||isNaN(dh)) return;
+  const hexArea=Math.sqrt(3)/2*S*S;
+  const holeArea=PI/4*dh*dh;
+  const Ab=hexArea-holeArea;
+  const ratio=Ab/As;
+  document.getElementById('t8-S-show').textContent=S;
+  document.getElementById('t8-dh-show').textContent=f(dh,2);
+  document.getElementById('t8-As-show').textContent=As;
+  set('t8-Ab',Ab,2); set('t8-ratio',ratio,2);
+  set('t8-hex',hexArea,2); set('t8-hole-area',holeArea,2);
+}
+
+function buildT8RefTable(){
+  const tbody=document.getElementById('t8-ref-tbody');
+  Object.keys(HEX_HEAD_DB).forEach(sp=>{
+    const hh=HEX_HEAD_DB[sp];
+    const S=hh.S, As=hh.As;
+    const cl=CLEARANCE_DB[sp];
+    const dh12=cl?cl.H12:'—', dh13=cl?cl.H13:'—', dh14=cl?cl.H14:'—';
+    let Ab13=null, ratio13=null;
+    if(cl){
+      const hexArea=Math.sqrt(3)/2*S*S;
+      Ab13=hexArea-PI/4*cl.H13*cl.H13;
+      ratio13=Ab13/As;
+    }
+    const rClass=ratio13&&ratio13>=1?'ok':'';
+    tbody.innerHTML+=`<tr>
+      <td class="hl">${sp}</td><td>${As}</td><td>${S}</td>
+      <td>${dh12}</td><td>${dh13}</td><td>${dh14}</td>
+      <td class="${rClass}">${Ab13?f(Ab13,1):'—'}</td>
+      <td class="${rClass}">${ratio13?f(ratio13,2):'—'}</td>
+    </tr>`;
+  });
+}
+
+/* ════════════════════════════════════════
+   Init
+════════════════════════════════════════ */
+t3UpdateK();
+buildT5RefTable();
+buildT7RefTable();
+buildT8RefTable();
+calcT1();
+calcT2();
+calcT3();
+calcT4();
+calcT5();
+calcT6();
+
 </script>
-
 </body>
 </html>
