@@ -283,11 +283,32 @@
             border-radius: var(--radius-sm);
             border: 0.5px solid var(--border-color);
             transition: all 0.2s ease;
+            text-decoration: none;
         }
 
         .project-tag:hover {
             background-color: var(--primary-color);
             color: var(--bg-white);
+        }
+
+        a.project-tag {
+            cursor: pointer;
+            position: relative;
+            padding-right: 24px;
+        }
+
+        a.project-tag::after {
+            content: "\2197";
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        a.project-tag:hover::after {
+            opacity: 1;
         }
 
         /* Contact Section */
@@ -582,7 +603,7 @@
                     <p>撰寫 Python 腳本取代繁瑣的 Excel 人工計算，將參數化設計的驗證時間大幅縮短。</p>
                     <div class="project-tags">
                         <span class="project-tag">Python</span>
-                        <span class="project-tag">工程計算</span>
+                        <a class="project-tag" href="tools/screw-strength-calculator.html" target="_blank" rel="noopener" title="開啟不銹鋼螺絲強度計算工具">工程計算</a>
                         <span class="project-tag">自動化</span>
                     </div>
                 </div>
