@@ -141,9 +141,123 @@
   /* ---------- Misc ---------- */
   .row-line{height:1px;background:var(--border);margin:12px 0}
   .section-label{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.4px;margin:6px 2px 10px;text-transform:uppercase}
+
+  /* ---------- Password Gate ---------- */
+  .pw-gate{
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(15,23,42,.65);backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;
+    animation:pwFade .25s ease;padding:20px;
+  }
+  .pw-gate.hidden{display:none}
+  .pw-card{
+    background:#fff;border-radius:14px;padding:32px 36px;
+    width:100%;max-width:380px;text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.3);
+  }
+  .pw-icon{
+    width:56px;height:56px;border-radius:50%;margin:0 auto 14px;
+    background:linear-gradient(135deg,#3B82F6,#2563EB);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:26px;box-shadow:0 4px 12px rgba(37,99,235,.35);
+  }
+  .pw-card h3{margin:0 0 6px;font-size:18px;color:#0F172A;font-weight:700}
+  .pw-card .pw-desc{margin:0 0 20px;font-size:13px;color:#64748B}
+  .pw-card input{
+    width:100%;padding:12px 14px;
+    border:1px solid #D1D5DB;border-radius:8px;
+    font:inherit;font-size:17px;text-align:center;letter-spacing:6px;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  .pw-card input:focus{
+    outline:none;border-color:#2563EB;
+    box-shadow:0 0 0 3px rgba(37,99,235,.15);
+  }
+  .pw-msg{
+    min-height:18px;font-size:12.5px;color:#DC2626;margin:8px 0 0;
+  }
+  .pw-btns{display:flex;gap:10px;margin-top:14px}
+  .pw-btn{
+    flex:1;padding:11px 14px;border-radius:8px;border:1px solid transparent;
+    font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;
+  }
+  .pw-btn.primary{background:#2563EB;color:#fff;border-color:#2563EB}
+  .pw-btn.primary:hover{background:#1D4ED8}
+  .pw-btn.secondary{background:#fff;color:#475569;border-color:#D1D5DB}
+  .pw-btn.secondary:hover{background:#F1F5F9}
+  .pw-shake{animation:pwShake .4s}
+  body.locked{overflow:hidden}
+  body.locked main,body.locked .appbar,body.locked .tabs{filter:blur(4px);pointer-events:none;user-select:none}
+  @keyframes pwFade{from{opacity:0}to{opacity:1}}
+  @keyframes pwShake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-6px)}
+    75%{transform:translateX(6px)}
+  }
 </style>
 </head>
 <body>
+<div id="pwGate" class="pw-gate">
+  <div class="pw-card">
+    <div class="pw-icon">🔒</div>
+    <h3>此工具需要密碼</h3>
+    <p class="pw-desc">請輸入密碼以開啟不銹鋼螺絲強度計算工具</p>
+    <input id="pwInput" type="password" inputmode="numeric" autocomplete="off" placeholder="••••">
+    <div class="pw-msg" id="pwMsg"></div>
+    <div class="pw-btns">
+      <button class="pw-btn secondary" type="button" onclick="pwBack()">返回</button>
+      <button class="pw-btn primary" type="button" onclick="pwCheck()">確認</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY="screwCalcUnlocked", PW="0000";
+  function lock(){
+    document.body.classList.add("locked");
+  }
+  function unlock(){
+    document.body.classList.remove("locked");
+    var g=document.getElementById("pwGate"); if(g) g.classList.add("hidden");
+  }
+  // 若已解鎖過（同 tab），略過
+  try{
+    if(sessionStorage.getItem(KEY)==="1"){
+      document.addEventListener("DOMContentLoaded", unlock);
+      return;
+    }
+  }catch(e){}
+  document.addEventListener("DOMContentLoaded", function(){
+    lock();
+    var input=document.getElementById("pwInput");
+    if(input){
+      setTimeout(function(){input.focus()}, 50);
+      input.addEventListener("keydown", function(e){ if(e.key==="Enter") pwCheck(); });
+    }
+  });
+  window.pwCheck=function(){
+    var input=document.getElementById("pwInput");
+    var msg=document.getElementById("pwMsg");
+    var card=document.querySelector(".pw-card");
+    if(input.value===PW){
+      try{ sessionStorage.setItem(KEY,"1"); }catch(e){}
+      unlock();
+    }else{
+      msg.textContent="密碼錯誤，請重新輸入";
+      card.classList.remove("pw-shake");
+      void card.offsetWidth;
+      card.classList.add("pw-shake");
+      input.value="";
+      input.focus();
+    }
+  };
+  window.pwBack=function(){
+    if(history.length>1) history.back();
+    else location.href="/";
+  };
+})();
+</script>
+
 
 <!-- =================== Header =================== -->
 <div class="appbar">
@@ -579,4 +693,3 @@ calc();
 </script>
 </body>
 </html>
-
