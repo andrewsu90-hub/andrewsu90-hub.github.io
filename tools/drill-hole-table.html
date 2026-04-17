@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鑽孔 / 攻牙深度查詢工具 | Andrew Design Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary-color: #000;
+            --secondary-color: #666;
+            --border-color: #e0e0e0;
+            --bg-light: #f9f9f9;
+            --bg-white: #ffffff;
+            --input-bg: #dbeafe;
+            --locked-bg: #f3f3f3;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --highlight: #fff9c4;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #fff;
+                --secondary-color: #aaa;
+                --border-color: #333;
+                --bg-light: #1a1a1a;
+                --bg-white: #0d0d0d;
+                --input-bg: #1e3a5f;
+                --locked-bg: #1f1f1f;
+                --highlight: #2d2b00;
+            }
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--primary-color);
+            background-color: var(--bg-white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.25rem 5%;
+            border-bottom: 0.5px solid var(--border-color);
+            background-color: rgba(255,255,255,0.92);
+            backdrop-filter: blur(8px);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            header { background-color: rgba(13,13,13,0.92); }
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px; font-weight: 800;
+            text-decoration: none; color: var(--primary-color);
+        }
+
+        .back-link {
+            font-size: 14px; color: var(--secondary-color);
+            text-decoration: none; display: flex; align-items: center; gap: 5px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--primary-color); }
+
+        .page-hero {
+            padding: 3rem 5% 1.5rem;
+            max-width: 960px; margin: 0 auto;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .hero-label {
+            font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.5rem;
+        }
+
+        .page-hero h1 {
+            font-size: clamp(22px, 3.5vw, 32px);
+            font-weight: 700; margin-bottom: 0.75rem;
+        }
+
+        .page-hero p {
+            font-size: 15px; color: var(--secondary-color); line-height: 1.75;
+        }
+
+        .main-wrap {
+            max-width: 960px; margin: 0 auto;
+            padding: 1.5rem 5% 4rem;
+            animation: fadeInUp 0.7s ease;
+        }
+
+        /* ─── Cards ─── */
+        .card {
+            background-color: var(--bg-light);
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 15px; font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .badge {
+            font-size: 11px; font-weight: 600; padding: 2px 8px;
+            border-radius: 99px; letter-spacing: 0.5px;
+        }
+
+        .badge-input { background: #dbeafe; color: #1d4ed8; }
+        .badge-output { background: #dcfce7; color: #15803d; }
+        .badge-ref { background: #fef3c7; color: #92400e; }
+
+        @media (prefers-color-scheme: dark) {
+            .badge-input { background: #1e3a5f; color: #60a5fa; }
+            .badge-output { background: #14532d; color: #4ade80; }
+            .badge-ref { background: #451a03; color: #fbbf24; }
+        }
+
+        /* Input rows */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .input-group label {
+            display: block; font-size: 12px; font-weight: 600;
+            color: var(--secondary-color); margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        select.input-field {
+            width: 100%; padding: 9px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: inherit; font-size: 14px;
+            color: var(--primary-color);
+            background-color: var(--input-bg);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            transition: border-color 0.2s;
+        }
+
+        select.input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+
+        /* ─── Result Blocks ─── */
+        .result-blocks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .result-block {
+            background: var(--bg-white);
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .result-block.highlight {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+        }
+
+        .result-block .rb-label {
+            font-size: 12px; color: var(--secondary-color);
+            margin-bottom: 8px; line-height: 1.4;
+        }
+
+        .result-block .rb-value {
+            font-size: 28px; font-weight: 700;
+            color: var(--primary-color); line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .result-block .rb-value.na {
+            font-size: 18px; color: var(--secondary-color);
+        }
+
+        .result-block .rb-unit {
+            font-size: 13px; color: var(--secondary-color);
+        }
+
+        /* ─── Reference Table ─── */
+        .ref-table-wrap { overflow-x: auto; margin-top: 0; }
+
+        .ref-table {
+            width: 100%; border-collapse: collapse; font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .ref-table th {
+            background: var(--bg-light);
+            padding: 8px 12px; text-align: center;
+            border: 0.5px solid var(--border-color);
+            font-size: 12px; font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .ref-table td {
+            padding: 8px 12px; text-align: center;
+            border: 0.5px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .ref-table tr.active-row td {
+            background: var(--highlight);
+            font-weight: 700;
+        }
+
+        .ref-table td.spec-col {
+            font-weight: 700; text-align: left;
+        }
+
+        /* Tab system */
+        .tabs {
+            display: flex; gap: 0; margin-bottom: -1px;
+        }
+
+        .tab-btn {
+            padding: 9px 18px; font-family: inherit;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; border: 0.5px solid var(--border-color);
+            border-bottom: none;
+            background: var(--bg-light); color: var(--secondary-color);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            transition: all 0.2s; margin-right: 4px;
+        }
+
+        .tab-btn.active {
+            background: var(--bg-white); color: var(--primary-color);
+            border-color: var(--border-color);
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Second calculator section */
+        .sub-section {
+            border-top: 0.5px solid var(--border-color);
+            margin-top: 1.5rem; padding-top: 1.5rem;
+        }
+
+        .sub-title {
+            font-size: 14px; font-weight: 700;
+            margin-bottom: 1rem; color: var(--primary-color);
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .source-label {
+            font-size: 11px; font-weight: 400;
+            color: var(--secondary-color);
+            background: var(--bg-white);
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 2px 8px;
+        }
+
+        .note-box {
+            background: var(--bg-white);
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            font-size: 13px; color: var(--secondary-color);
+            line-height: 1.8; margin-top: 1.5rem;
+        }
+
+        .note-box ul { padding-left: 1.2rem; }
+        .note-box ul li { margin-bottom: 4px; }
+        .note-box strong { color: var(--primary-color); }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="../index.html" class="logo">Andrew Design Studio</a>
+    <a href="engineering-calculators.html" class="back-link">← 工程計算工具</a>
+</header>
+
+<section class="page-hero">
+    <div class="hero-label">工程計算 / Drill Hole Table</div>
+    <h1>鑽孔 / 攻牙深度查詢工具</h1>
+    <p>依規格、材質、孔型快速查詢旋入深度、攻牙深度與鑽孔深度。第二區段提供攻牙底孔直徑（鑽頭直徑）參考。參照《現代機械設計手冊》及《機械設計製造手冊》。</p>
+</section>
+
+<div class="main-wrap">
+
+    <!-- ====================================================
+         計算器 ①：深度查詢（現代機械設計手冊）
+    ==================================================== -->
+    <div class="card">
+        <div class="card-title">
+            <span>🪛 旋入 / 攻牙 / 鑽孔深度查詢</span>
+            <span class="badge badge-ref">現代機械設計手冊</span>
+        </div>
+
+        <!-- Inputs -->
+        <div class="input-grid">
+            <div class="input-group">
+                <label>公稱直徑 d</label>
+                <select class="input-field" id="d1-spec" onchange="lookupDepth()">
+                    <option value="M3" selected>M3</option>
+                    <option value="M4">M4</option>
+                    <option value="M5">M5</option>
+                    <option value="M6">M6</option>
+                    <option value="M8">M8</option>
+                    <option value="M10">M10</option>
+                    <option value="M12">M12</option>
+                    <option value="M16">M16</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>材質</label>
+                <select class="input-field" id="d1-mat" onchange="lookupDepth()">
+                    <option value="鋼" selected>鋼（含青銅 / 鑄鋼）</option>
+                    <option value="鑄鐵">鑄鐵</option>
+                    <option value="鋁">鋁</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>孔型</label>
+                <select class="input-field" id="d1-type" onchange="lookupDepth()">
+                    <option value="盲孔" selected>盲孔</option>
+                    <option value="通孔">通孔</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Result blocks -->
+        <div class="result-blocks" id="depth-results">
+            <!-- JS populated -->
+        </div>
+
+        <!-- Reference note -->
+        <div id="depth-note" style="margin-top:1rem; font-size:12px; color:var(--secondary-color); line-height:1.6;"></div>
+
+        <!-- Reference table (tab view) -->
+        <div class="sub-section">
+            <div style="margin-bottom:12px;">
+                <button class="tab-btn active" onclick="switchTab('tab-steel',   this)">鋼</button>
+                <button class="tab-btn"        onclick="switchTab('tab-ci',      this)">鑄鐵</button>
+                <button class="tab-btn"        onclick="switchTab('tab-al',      this)">鋁</button>
+            </div>
+
+            <div class="ref-table-wrap">
+                <!-- Tab: 鋼 -->
+                <div id="tab-steel" class="tab-panel active">
+                    <table class="ref-table" id="tbl-steel">
+                        <thead>
+                            <tr>
+                                <th>規格</th>
+                                <th>通孔<br>旋入深度</th>
+                                <th>盲孔<br>旋入深度</th>
+                                <th>盲孔<br>攻牙深度</th>
+                                <th>盲孔<br>鑽孔深度</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-steel"></tbody>
+                    </table>
+                </div>
+                <!-- Tab: 鑄鐵 -->
+                <div id="tab-ci" class="tab-panel">
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>規格</th>
+                                <th>通孔<br>旋入深度</th>
+                                <th>盲孔<br>旋入深度</th>
+                                <th>盲孔<br>攻牙深度</th>
+                                <th>盲孔<br>鑽孔深度</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ci"></tbody>
+                    </table>
+                </div>
+                <!-- Tab: 鋁 -->
+                <div id="tab-al" class="tab-panel">
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>規格</th>
+                                <th>通孔<br>旋入深度</th>
+                                <th>盲孔<br>旋入深度</th>
+                                <th>盲孔<br>攻牙深度</th>
+                                <th>盲孔<br>鑽孔深度</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-al"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================
+         計算器 ②：攻牙底孔直徑（機械設計製造手冊）
+    ==================================================== -->
+    <div class="card">
+        <div class="card-title">
+            <span>🔧 攻牙底孔直徑查詢</span>
+            <span class="badge badge-ref">機械設計製造手冊</span>
+        </div>
+
+        <div class="input-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="input-group">
+                <label>公稱直徑 d</label>
+                <select class="input-field" id="d2-spec" onchange="lookupTapDrill()">
+                    <option value="M3" selected>M3</option>
+                    <option value="M3.5">M3.5</option>
+                    <option value="M4">M4</option>
+                    <option value="M4.5">M4.5</option>
+                    <option value="M5">M5</option>
+                    <option value="M5.5">M5.5</option>
+                    <option value="M6">M6</option>
+                    <option value="M7">M7</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>材質</label>
+                <select class="input-field" id="d2-mat" onchange="lookupTapDrill()">
+                    <option value="鋼" selected>鋼</option>
+                    <option value="鑄鐵">鑄鐵</option>
+                    <option value="鋁">鋁</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="result-blocks" id="tap-results" style="margin-top:1.25rem;">
+            <!-- JS populated -->
+        </div>
+
+        <!-- Reference table -->
+        <div class="sub-section">
+            <div class="ref-table-wrap">
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th>規格</th>
+                            <th>鑽頭直徑 d</th>
+                            <th>鋼 攻牙深</th>
+                            <th>鋼 鑽孔深</th>
+                            <th>鑄鐵 攻牙深</th>
+                            <th>鑄鐵 鑽孔深</th>
+                            <th>鋁 攻牙深</th>
+                            <th>鋁 鑽孔深</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-tap"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 說明 -->
+    <div class="note-box">
+        <strong>查詢說明</strong>
+        <ul style="margin-top:8px;">
+            <li><strong>旋入深度：</strong>螺絲進入螺孔的有效嚙合長度。螺絲長度 ＝ 旋入深度 ＋ 機構（夾持件）厚度。</li>
+            <li><strong>通孔：</strong>整段攻牙，無需標示攻牙深度與鑽孔深度。</li>
+            <li><strong>旋入深度推算：</strong>鋼 × 1.0d、鑄鐵 × 1.67d、鋁 × 2.0d（現代機械設計手冊）</li>
+            <li><strong>攻牙底孔鑽頭直徑</strong>參照《機械設計製造手冊》，適用 M3～M7（該手冊收錄範圍）。</li>
+            <li>青銅、鑄鋼、青銅鑄件等同鋼材質處理。</li>
+        </ul>
+    </div>
+
+</div><!-- end main-wrap -->
+
+<footer style="border-top:0.5px solid var(--border-color); padding:1.5rem 5%; text-align:center; font-size:13px; color:var(--secondary-color);">
+    <p>&copy; 2026 Andrew Mechanical &amp; Product Design Studio. 現代機械設計手冊 / 機械設計製造手冊</p>
+</footer>
+
+<script>
+/* ================================================================
+   資料表一：旋入 / 攻牙 / 鑽孔深度
+   來源：現代機械設計手冊_第一卷_連接件與緊固件_第五篇_P-145
+
+   格式：
+   { 通孔旋入, 盲孔旋入, 盲孔攻牙, 盲孔鑽孔 }
+   ─ 鋁盲孔鑽孔深度 = 攻牙深度 + (鋼鑽孔 - 鋼攻牙)（推算）
+================================================================ */
+const DEPTH_DB = {
+    鋼: {
+        M3:  { 通孔旋入: 4,    盲孔旋入: 3,    盲孔攻牙: 4,    盲孔鑽孔: 7  },
+        M4:  { 通孔旋入: 5.5,  盲孔旋入: 4,    盲孔攻牙: 5.5,  盲孔鑽孔: 9  },
+        M5:  { 通孔旋入: 7,    盲孔旋入: 5,    盲孔攻牙: 7,    盲孔鑽孔: 11 },
+        M6:  { 通孔旋入: 8,    盲孔旋入: 6,    盲孔攻牙: 8,    盲孔鑽孔: 13 },
+        M8:  { 通孔旋入: 10,   盲孔旋入: 8,    盲孔攻牙: 10,   盲孔鑽孔: 16 },
+        M10: { 通孔旋入: 12,   盲孔旋入: 10,   盲孔攻牙: 13,   盲孔鑽孔: 20 },
+        M12: { 通孔旋入: 15,   盲孔旋入: 12,   盲孔攻牙: 15,   盲孔鑽孔: 24 },
+        M16: { 通孔旋入: 20,   盲孔旋入: 16,   盲孔攻牙: 20,   盲孔鑽孔: 30 },
+    },
+    鑄鐵: {
+        M3:  { 通孔旋入: 6,    盲孔旋入: 5,    盲孔攻牙: 6,    盲孔鑽孔: 9  },
+        M4:  { 通孔旋入: 8,    盲孔旋入: 6,    盲孔攻牙: 7.5,  盲孔鑽孔: 11 },
+        M5:  { 通孔旋入: 10,   盲孔旋入: 8,    盲孔攻牙: 10,   盲孔鑽孔: 14 },
+        M6:  { 通孔旋入: 12,   盲孔旋入: 10,   盲孔攻牙: 12,   盲孔鑽孔: 17 },
+        M8:  { 通孔旋入: 15,   盲孔旋入: 12,   盲孔攻牙: 14,   盲孔鑽孔: 20 },
+        M10: { 通孔旋入: 18,   盲孔旋入: 15,   盲孔攻牙: 18,   盲孔鑽孔: 25 },
+        M12: { 通孔旋入: 22,   盲孔旋入: 18,   盲孔攻牙: 21,   盲孔鑽孔: 30 },
+        M16: { 通孔旋入: 28,   盲孔旋入: 24,   盲孔攻牙: 28,   盲孔鑽孔: 33 },
+    },
+    鋁: {
+        M3:  { 通孔旋入: 8,    盲孔旋入: 6,    盲孔攻牙: 7,    盲孔鑽孔: 10 },
+        M4:  { 通孔旋入: 10,   盲孔旋入: 8,    盲孔攻牙: 10,   盲孔鑽孔: 13 },
+        M5:  { 通孔旋入: 12,   盲孔旋入: 10,   盲孔攻牙: 12,   盲孔鑽孔: 16 },
+        M6:  { 通孔旋入: 15,   盲孔旋入: 12,   盲孔攻牙: 15,   盲孔鑽孔: 20 },
+        M8:  { 通孔旋入: 20,   盲孔旋入: 16,   盲孔攻牙: 18,   盲孔鑽孔: 24 },
+        M10: { 通孔旋入: 24,   盲孔旋入: 20,   盲孔攻牙: 23,   盲孔鑽孔: 30 },
+        M12: { 通孔旋入: 28,   盲孔旋入: 24,   盲孔攻牙: 27,   盲孔鑽孔: 36 },
+        M16: { 通孔旋入: 36,   盲孔旋入: 32,   盲孔攻牙: 36,   盲孔鑽孔: 46 },
+    }
+};
+
+const SPECS_1 = ['M3','M4','M5','M6','M8','M10','M12','M16'];
+
+/* ================================================================
+   資料表二：攻牙底孔直徑
+   來源：機械設計製造手冊_P-10~15，表10-2.19
+================================================================ */
+const TAP_DRILL_DB = {
+    M3:   { drill: 2.4,  鋼攻: 3,   鋼鑽: 6,   鑄鐵攻: 4.5,  鑄鐵鑽: 7.5,  鋁攻: 5.5,  鋁鑽: 8.5  },
+    M3.5: { drill: 2.9,  鋼攻: 3.5, 鋼鑽: 6.5, 鑄鐵攻: 5.5,  鑄鐵鑽: 8.5,  鋁攻: 6.5,  鋁鑽: 9.5  },
+    M4:   { drill: 3.25, 鋼攻: 4,   鋼鑽: 7,   鑄鐵攻: 6,    鑄鐵鑽: 9,    鋁攻: 7,    鋁鑽: 10   },
+    M4.5: { drill: 3.75, 鋼攻: 4.5, 鋼鑽: 7.5, 鑄鐵攻: 7,    鑄鐵鑽: 10,   鋁攻: 8,    鋁鑽: 11   },
+    M5:   { drill: 4.1,  鋼攻: 5,   鋼鑽: 8.5, 鑄鐵攻: 8,    鑄鐵鑽: 11.5, 鋁攻: 9,    鋁鑽: 12.5 },
+    M5.5: { drill: 4.6,  鋼攻: 5.5, 鋼鑽: 9,   鑄鐵攻: 8,    鑄鐵鑽: 11.5, 鋁攻: 10,   鋁鑽: 13.5 },
+    M6:   { drill: 5.0,  鋼攻: 6,   鋼鑽: 10,  鑄鐵攻: 9,    鑄鐵鑽: 13,   鋁攻: 11,   鋁鑽: 15   },
+    M7:   { drill: 6.0,  鋼攻: 7,   鋼鑽: 11,  鑄鐵攻: 11,   鑄鐵鑽: 15,   鋁攻: 13,   鋁鑽: 17   },
+};
+
+const SPECS_2 = ['M3','M3.5','M4','M4.5','M5','M5.5','M6','M7'];
+
+/* ================================================================
+   Init reference tables
+================================================================ */
+function buildRefTables() {
+    /* Table 1 */
+    ['steel','ci','al'].forEach((key, idx) => {
+        const mat = ['鋼','鑄鐵','鋁'][idx];
+        const tbody = document.getElementById(`tbody-${key}`);
+        tbody.innerHTML = SPECS_1.map(spec => {
+            const d = DEPTH_DB[mat][spec];
+            return `<tr id="row1-${key}-${spec}">
+                <td class="spec-col">${spec}</td>
+                <td>${d.通孔旋入}</td>
+                <td>${d.盲孔旋入}</td>
+                <td>${d.盲孔攻牙}</td>
+                <td>${d.盲孔鑽孔}</td>
+            </tr>`;
+        }).join('');
+    });
+
+    /* Table 2 */
+    const tbody2 = document.getElementById('tbody-tap');
+    tbody2.innerHTML = SPECS_2.map(spec => {
+        const d = TAP_DRILL_DB[spec];
+        return `<tr id="row2-${spec}">
+            <td class="spec-col">${spec}</td>
+            <td>${d.drill}</td>
+            <td>${d.鋼攻}</td>
+            <td>${d.鋼鑽}</td>
+            <td>${d.鑄鐵攻}</td>
+            <td>${d.鑄鐵鑽}</td>
+            <td>${d.鋁攻}</td>
+            <td>${d.鋁鑽}</td>
+        </tr>`;
+    }).join('');
+}
+
+/* ================================================================
+   Depth Lookup
+================================================================ */
+function lookupDepth() {
+    const spec = document.getElementById('d1-spec').value;
+    const mat  = document.getElementById('d1-mat').value.split('（')[0];  // strip "(含...)"
+    const type = document.getElementById('d1-type').value;
+
+    /* normalize material key */
+    const matKey = mat.includes('鋼') ? '鋼' : mat;
+
+    const row = DEPTH_DB[matKey]?.[spec];
+    const container = document.getElementById('depth-results');
+
+    /* Highlight active rows in all tables */
+    document.querySelectorAll('[id^="row1-"]').forEach(el => el.classList.remove('active-row'));
+    ['steel','ci','al'].forEach((key, idx) => {
+        const mat2 = ['鋼','鑄鐵','鋁'][idx];
+        const activeEl = document.getElementById(`row1-${key}-${spec}`);
+        if (activeEl) activeEl.classList.add('active-row');
+    });
+
+    if (!row) {
+        container.innerHTML = '<div style="color:var(--secondary-color);font-size:14px;">查無資料</div>';
+        return;
+    }
+
+    const isBlind = type === '盲孔';
+
+    if (isBlind) {
+        container.innerHTML = `
+            <div class="result-block highlight">
+                <div class="rb-label">旋入深度</div>
+                <div class="rb-value">${row.盲孔旋入}</div>
+                <div class="rb-unit">mm</div>
+            </div>
+            <div class="result-block">
+                <div class="rb-label">攻牙深度</div>
+                <div class="rb-value">${row.盲孔攻牙}</div>
+                <div class="rb-unit">mm</div>
+            </div>
+            <div class="result-block">
+                <div class="rb-label">鑽孔深度</div>
+                <div class="rb-value">${row.盲孔鑽孔}</div>
+                <div class="rb-unit">mm</div>
+            </div>
+        `;
+        document.getElementById('depth-note').innerHTML =
+            `螺絲長度 ＝ <strong>${row.盲孔旋入} mm（旋入）</strong>＋ 機構夾持件厚度`;
+    } else {
+        container.innerHTML = `
+            <div class="result-block highlight">
+                <div class="rb-label">旋入深度（整段攻牙）</div>
+                <div class="rb-value">${row.通孔旋入}</div>
+                <div class="rb-unit">mm</div>
+            </div>
+            <div class="result-block">
+                <div class="rb-label">攻牙深度</div>
+                <div class="rb-value na">整段攻牙</div>
+                <div class="rb-unit">—</div>
+            </div>
+            <div class="result-block">
+                <div class="rb-label">鑽孔深度</div>
+                <div class="rb-value na">通孔貫穿</div>
+                <div class="rb-unit">—</div>
+            </div>
+        `;
+        document.getElementById('depth-note').innerHTML =
+            `通孔整段攻牙。螺絲長度 ＝ <strong>${row.通孔旋入} mm（旋入）</strong>＋ 機構夾持件厚度`;
+    }
+}
+
+/* ================================================================
+   Tap Drill Lookup
+================================================================ */
+function lookupTapDrill() {
+    const spec = document.getElementById('d2-spec').value;
+    const mat  = document.getElementById('d2-mat').value;
+
+    const row = TAP_DRILL_DB[spec];
+    const container = document.getElementById('tap-results');
+
+    /* Highlight active row */
+    document.querySelectorAll('[id^="row2-"]').forEach(el => el.classList.remove('active-row'));
+    const activeEl = document.getElementById(`row2-${spec}`);
+    if (activeEl) activeEl.classList.add('active-row');
+
+    if (!row) {
+        container.innerHTML = '<div style="color:var(--secondary-color);font-size:14px;">查無資料</div>';
+        return;
+    }
+
+    let tapKey, drillKey;
+    if (mat === '鋼') { tapKey = '鋼攻'; drillKey = '鋼鑽'; }
+    else if (mat === '鑄鐵') { tapKey = '鑄鐵攻'; drillKey = '鑄鐵鑽'; }
+    else { tapKey = '鋁攻'; drillKey = '鋁鑽'; }
+
+    container.innerHTML = `
+        <div class="result-block highlight">
+            <div class="rb-label">鑽頭直徑（攻牙底孔）</div>
+            <div class="rb-value">${row.drill}</div>
+            <div class="rb-unit">mm</div>
+        </div>
+        <div class="result-block">
+            <div class="rb-label">攻牙深度（${mat}）</div>
+            <div class="rb-value">${row[tapKey]}</div>
+            <div class="rb-unit">mm</div>
+        </div>
+        <div class="result-block">
+            <div class="rb-label">鑽孔深度（${mat}）</div>
+            <div class="rb-value">${row[drillKey]}</div>
+            <div class="rb-unit">mm</div>
+        </div>
+    `;
+}
+
+/* ================================================================
+   Tab switcher
+================================================================ */
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+/* ── Init ── */
+buildRefTables();
+lookupDepth();
+lookupTapDrill();
+</script>
+
+</body>
+</html>
