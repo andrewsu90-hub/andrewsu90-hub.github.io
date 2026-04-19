@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鑽孔 / 攻牙深度查詢 | Andrew Design Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary-color: #000;
+            --secondary-color: #666;
+            --border-color: #e0e0e0;
+            --bg-light: #f9f9f9;
+            --bg-white: #ffffff;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --accent: #1a1a2e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #fff;
+                --secondary-color: #aaa;
+                --border-color: #333;
+                --bg-light: #1a1a1a;
+                --bg-white: #0d0d0d;
+            }
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--primary-color);
+            background-color: var(--bg-white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            border-bottom: 0.5px solid var(--border-color);
+            background-color: rgba(255,255,255,0.92);
+            backdrop-filter: blur(8px);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            header { background-color: rgba(13,13,13,0.92); }
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .back-link {
+            font-size: 14px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--primary-color); }
+
+        .hero {
+            padding: 4rem 5% 2.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .hero-label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--secondary-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(26px, 4vw, 38px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 15px;
+            color: var(--secondary-color);
+            line-height: 1.8;
+        }
+
+        .source-note {
+            display: inline-block;
+            margin-top: 0.75rem;
+            font-size: 12px;
+            color: var(--secondary-color);
+            background-color: var(--bg-light);
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 4px 12px;
+        }
+
+        /* Calculator Section */
+        .calc-section {
+            padding: 1.5rem 5% 5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: fadeInUp 0.7s ease;
+        }
+
+        .selector-card {
+            background-color: var(--bg-light);
+            border-radius: var(--radius-lg);
+            border: 0.5px solid var(--border-color);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .selector-card h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .field-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            letter-spacing: 0.5px;
+        }
+
+        .field-group select {
+            padding: 10px 14px;
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--primary-color);
+            background-color: var(--bg-white);
+            cursor: pointer;
+            transition: border-color 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .field-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Result Card */
+        .result-card {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            border: 0.5px solid var(--border-color);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .result-card.visible { display: block; }
+
+        .result-card h2 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-item {
+            background-color: var(--bg-light);
+            border-radius: var(--radius-md);
+            border: 0.5px solid var(--border-color);
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .result-item .label {
+            font-size: 12px;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .result-item .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .result-item .unit {
+            font-size: 13px;
+            color: var(--secondary-color);
+            margin-top: 4px;
+        }
+
+        .result-item.highlight {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+        }
+
+        .result-item.highlight .label,
+        .result-item.highlight .value,
+        .result-item.highlight .unit {
+            color: var(--bg-white);
+        }
+
+        /* Tip box */
+        .tip-box {
+            background-color: var(--bg-light);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--primary-color);
+            padding: 1rem 1.25rem;
+            font-size: 13px;
+            color: var(--secondary-color);
+            line-height: 1.8;
+        }
+
+        .tip-box strong { color: var(--primary-color); }
+
+        /* Full table */
+        .table-section {
+            margin-top: 2rem;
+        }
+
+        .table-section h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 0.5px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead th {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            padding: 10px 14px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        thead th.group-header {
+            background-color: #333;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            thead th { background-color: #222; }
+            thead th.group-header { background-color: #444; }
+        }
+
+        tbody tr {
+            border-bottom: 0.5px solid var(--border-color);
+            transition: background-color 0.15s;
+        }
+
+        tbody tr:hover { background-color: var(--bg-light); }
+
+        tbody tr.highlighted {
+            background-color: rgba(0,0,0,0.06) !important;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            tbody tr.highlighted { background-color: rgba(255,255,255,0.08) !important; }
+        }
+
+        tbody td {
+            padding: 10px 14px;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        tbody td:first-child {
+            font-weight: 700;
+        }
+
+        footer {
+            padding: 1.5rem 5%;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+            color: var(--secondary-color);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .selector-grid { grid-template-columns: 1fr 1fr; }
+            .result-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../index.html" class="logo">Andrew Design Studio</a>
+        <a href="engineering-calculators.html" class="back-link">← 返回工具選單</a>
+    </header>
+
+    <section class="hero">
+        <div class="hero-label">工程查詢工具</div>
+        <h1>🪛 鑽孔 / 攻牙深度查詢</h1>
+        <p>依規格與材質快速查詢攻牙深度、鑽孔深度與旋入深度，並提供攻牙底孔直徑參考。</p>
+        <span class="source-note">資料來源：機械設計圖表便覽 P-10~15，表10-2.19 一般攻牙允許孔徑尺度</span>
+    </section>
+
+    <section class="calc-section">
+
+        <div class="selector-card">
+            <h2>選擇查詢條件</h2>
+            <div class="selector-grid">
+                <div class="field-group">
+                    <label>螺紋規格</label>
+                    <select id="sel-spec" onchange="query()">
+                        <option value="">— 選擇規格 —</option>
+                        <option value="M3">M3</option>
+                        <option value="M3.5">M3.5</option>
+                        <option value="M4">M4</option>
+                        <option value="M4.5">M4.5</option>
+                        <option value="M5">M5</option>
+                        <option value="M5.5">M5.5</option>
+                        <option value="M6">M6</option>
+                        <option value="M7">M7</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>材質</label>
+                    <select id="sel-mat" onchange="query()">
+                        <option value="鋼">鋼（含青銅、鑄鋼）</option>
+                        <option value="鑄鐵">鑄鐵</option>
+                        <option value="鋁">鋁</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card" id="result-card">
+            <h2>查詢結果</h2>
+            <div class="result-grid" id="result-grid"></div>
+            <div class="tip-box" id="tip-box"></div>
+        </div>
+
+        <div class="table-section">
+            <h2>完整規格對照表</h2>
+            <div class="table-wrapper">
+                <table id="full-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">規格</th>
+                            <th rowspan="2">底孔直徑 (mm)</th>
+                            <th colspan="2" class="group-header">鋼</th>
+                            <th colspan="2" class="group-header">鑄鐵</th>
+                            <th colspan="2" class="group-header">鋁</th>
+                        </tr>
+                        <tr>
+                            <th>攻牙深度</th>
+                            <th>鑽孔深度</th>
+                            <th>攻牙深度</th>
+                            <th>鑽孔深度</th>
+                            <th>攻牙深度</th>
+                            <th>鑽孔深度</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+            <p style="font-size:12px; color:var(--secondary-color); margin-top:0.75rem;">※ 旋入深度推算：鋼 = 公稱直徑 × 1；鑄鐵 = × 1.5；鋁 = × 1.83　　螺絲長度 = 旋入深度 + 機構厚度</p>
+        </div>
+
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Andrew Mechanical & Product Design Studio. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const data = [
+            { spec: 'M3',   hole: 2.4,  steel_tap: 3,   steel_drill: 6,   ci_tap: 4.5, ci_drill: 7.5,  al_tap: 5.5, al_drill: 8.5  },
+            { spec: 'M3.5', hole: 2.9,  steel_tap: 3.5, steel_drill: 6.5, ci_tap: 5.5, ci_drill: 8.5,  al_tap: 6.5, al_drill: 9.5  },
+            { spec: 'M4',   hole: 3.25, steel_tap: 4,   steel_drill: 7,   ci_tap: 6,   ci_drill: 9,    al_tap: 7,   al_drill: 10   },
+            { spec: 'M4.5', hole: 3.75, steel_tap: 4.5, steel_drill: 7.5, ci_tap: 7,   ci_drill: 10,   al_tap: 8,   al_drill: 11   },
+            { spec: 'M5',   hole: 4.1,  steel_tap: 5,   steel_drill: 8.5, ci_tap: 8,   ci_drill: 11.5, al_tap: 9,   al_drill: 12.5 },
+            { spec: 'M5.5', hole: 4.6,  steel_tap: 5.5, steel_drill: 9,   ci_tap: 8,   ci_drill: 11.5, al_tap: 10,  al_drill: 13.5 },
+            { spec: 'M6',   hole: 5,    steel_tap: 6,   steel_drill: 10,  ci_tap: 9,   ci_drill: 13,   al_tap: 11,  al_drill: 15   },
+            { spec: 'M7',   hole: 6,    steel_tap: 7,   steel_drill: 11,  ci_tap: 11,  ci_drill: 15,   al_tap: 13,  al_drill: 17   },
+        ];
+
+        const matMultiplier = { '鋼': 1, '鑄鐵': 1.5, '鋁': 1.83 };
+
+        // Build full table
+        const tbody = document.getElementById('table-body');
+        data.forEach(row => {
+            const d = parseFloat(row.spec.replace('M', ''));
+            const tr = document.createElement('tr');
+            tr.id = 'row-' + row.spec;
+            tr.innerHTML = `
+                <td>${row.spec}</td>
+                <td>${row.hole}</td>
+                <td>${row.steel_tap}</td>
+                <td>${row.steel_drill}</td>
+                <td>${row.ci_tap}</td>
+                <td>${row.ci_drill}</td>
+                <td>${row.al_tap}</td>
+                <td>${row.al_drill}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        function query() {
+            const spec = document.getElementById('sel-spec').value;
+            const mat  = document.getElementById('sel-mat').value;
+
+            // Clear highlight
+            document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('highlighted'));
+
+            if (!spec) {
+                document.getElementById('result-card').classList.remove('visible');
+                return;
+            }
+
+            const row = data.find(d => d.spec === spec);
+            if (!row) return;
+
+            const d = parseFloat(spec.replace('M', ''));
+            const engageDepth = parseFloat((d * matMultiplier[mat]).toFixed(2));
+
+            let tapDepth, drillDepth;
+            if (mat === '鋼')      { tapDepth = row.steel_tap; drillDepth = row.steel_drill; }
+            else if (mat === '鑄鐵') { tapDepth = row.ci_tap;   drillDepth = row.ci_drill;   }
+            else                    { tapDepth = row.al_tap;   drillDepth = row.al_drill;   }
+
+            // Render results
+            document.getElementById('result-grid').innerHTML = `
+                <div class="result-item highlight">
+                    <div class="label">底孔直徑</div>
+                    <div class="value">${row.hole}</div>
+                    <div class="unit">mm</div>
+                </div>
+                <div class="result-item">
+                    <div class="label">攻牙深度</div>
+                    <div class="value">${tapDepth}</div>
+                    <div class="unit">mm</div>
+                </div>
+                <div class="result-item">
+                    <div class="label">鑽孔深度</div>
+                    <div class="value">${drillDepth}</div>
+                    <div class="unit">mm</div>
+                </div>
+                <div class="result-item">
+                    <div class="label">建議旋入深度</div>
+                    <div class="value">${engageDepth}</div>
+                    <div class="unit">mm（${spec} × ${matMultiplier[mat]}）</div>
+                </div>
+            `;
+
+            const matNote = mat === '鑄鐵' ? '青銅、鑄鋼與鑄件請參照鋼材數值。' : '';
+            document.getElementById('tip-box').innerHTML = `
+                <strong>📌 使用提示</strong><br>
+                螺絲長度 = 旋入深度（${engageDepth} mm）+ 機構板材厚度<br>
+                鑽孔深度（${drillDepth} mm）已含攻牙底部餘量，盲孔務必鑽至此深度再攻牙。
+                ${matNote ? '<br>' + matNote : ''}
+            `;
+
+            document.getElementById('result-card').classList.add('visible');
+
+            // Highlight table row
+            const tr = document.getElementById('row-' + spec);
+            if (tr) {
+                tr.classList.add('highlighted');
+                tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    </script>
+</body>
+</html>
