@@ -47,18 +47,25 @@
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
 
-        /* Drill combo card tabs */
-        .drill-combo-card { cursor: default; }
-        .drill-combo-card:hover { transform: translateY(-5px); }
-        .drill-tabs { display: flex; gap: 0; margin-bottom: 1rem; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
-        .drill-tab { flex: 1; padding: 7px 10px; font-size: 12px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; background: var(--bg-white); color: var(--secondary-color); border: none; cursor: pointer; transition: all 0.2s; border-right: 0.5px solid var(--border-color); }
-        .drill-tab:last-child { border-right: none; }
-        .drill-tab.active { background: var(--primary-color); color: var(--bg-white); }
-        .drill-tab:hover:not(.active) { background: var(--border-color); }
-        .drill-panel { display: none; }
-        .drill-panel.active { display: block; }
-        .drill-link { display: inline-block; margin-top: 1rem; font-size: 13px; font-weight: 600; color: var(--primary-color); text-decoration: none; border-bottom: 1px solid var(--border-color); padding-bottom: 1px; transition: border-color 0.2s; }
-        .drill-link:hover { border-color: var(--primary-color); }
+        /* Sheet-tap combo card */
+        .sheet-combo-card { cursor: default; }
+        .sheet-combo-card:hover { transform: translateY(-5px); }
+        .sheet-tabs { display: flex; gap: 0; margin-bottom: 1rem; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
+        .sheet-tab { flex: 1; padding: 7px 10px; font-size: 12px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; background: var(--bg-white); color: var(--secondary-color); border: none; cursor: pointer; transition: all 0.2s; border-right: 0.5px solid var(--border-color); line-height: 1.4; }
+        .sheet-tab:last-child { border-right: none; }
+        .sheet-tab.active { background: var(--primary-color); color: var(--bg-white); }
+        .sheet-tab:hover:not(.active) { background: var(--border-color); }
+        .sheet-panel { display: none; }
+        .sheet-panel.active { display: block; }
+        .sheet-table-wrap { overflow-x: auto; margin-top: 0.85rem; border-radius: var(--radius-sm); border: 0.5px solid var(--border-color); max-height: 260px; overflow-y: auto; }
+        .sheet-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .sheet-table thead th { position: sticky; top: 0; background: var(--primary-color); color: var(--bg-white); padding: 6px 8px; text-align: center; font-weight: 600; letter-spacing: 0.2px; white-space: nowrap; z-index: 1; }
+        @media (prefers-color-scheme: dark) { .sheet-table thead th { background: #222; } }
+        .sheet-table tbody tr { border-bottom: 0.5px solid var(--border-color); }
+        .sheet-table tbody tr:hover { background-color: var(--border-color); }
+        .sheet-table tbody td { padding: 5px 8px; text-align: center; color: var(--primary-color); white-space: nowrap; }
+        .sheet-table tbody td:first-child { font-weight: 700; }
+        .sheet-note { font-size: 11px; color: var(--secondary-color); line-height: 1.6; margin-top: 0.6rem; padding: 0.5rem 0.75rem; background: var(--bg-white); border-radius: var(--radius-sm); border: 0.5px solid var(--border-color); border-left: 3px solid var(--primary-color); }
     </style>
 </head>
 <body>
@@ -100,38 +107,165 @@
                 <span class="tool-arrow">↗</span>
             </a>
 
-            <div class="tool-card drill-combo-card">
-                <span class="tool-icon">🔩</span>
-                <h3>鑽孔 / 攻牙深度查詢</h3>
+            <a class="tool-card" href="drill-hole-table.html">
+                <span class="tool-icon">🪛</span>
+                <h3>鑽孔 / 攻牙深度查詢（機械設計圖表便覽）</h3>
+                <p>依規格、材質（鋼 / 鑄鐵 / 鋁）快速查詢攻牙深度、鑽孔深度與建議旋入深度。M3～M7。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">M3～M7</span>
+                    <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
+                    <span class="tool-tag">攻牙底孔</span>
+                    <span class="tool-tag">旋入深度</span>
+                </div>
+                <span class="tool-arrow">↗</span>
+            </a>
 
-                <!-- Tab switcher -->
-                <div class="drill-tabs">
-                    <button class="drill-tab active" onclick="switchDrillTab(event, 0)">機械設計圖表便覽</button>
-                    <button class="drill-tab" onclick="switchDrillTab(event, 1)">現代機械設計手冊</button>
+            <a class="tool-card" href="drill-hole-table-2.html">
+                <span class="tool-icon">🔧</span>
+                <h3>鑽孔 / 攻牙深度查詢（現代機械設計手冊）</h3>
+                <p>依規格、材質與孔型（通孔／盲孔）查詢旋入深度、攻牙深度與鑽孔深度。M3～M16。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">M3～M16</span>
+                    <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
+                    <span class="tool-tag">盲孔 / 通孔</span>
+                    <span class="tool-tag">旋入深度</span>
+                </div>
+                <span class="tool-arrow">↗</span>
+            </a>
+
+            <div class="tool-card sheet-combo-card">
+                <span class="tool-icon">🏗️</span>
+                <h3>鐵板攻牙 引伸孔查詢</h3>
+
+                <div class="sheet-tabs">
+                    <button class="sheet-tab active" onclick="switchSheetTab(event, 0)">Trifast plc Group</button>
+                    <button class="sheet-tab" onclick="switchSheetTab(event, 1)">钣金结构设计工艺手册</button>
                 </div>
 
-                <!-- Tab content 0 -->
-                <div class="drill-panel active">
-                    <p>依規格、材質（鋼 / 鑄鐵 / 鋁）快速查詢攻牙深度、鑽孔深度與建議旋入深度。M3～M7。</p>
-                    <div class="tool-tags">
-                        <span class="tool-tag">M3～M7</span>
-                        <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
-                        <span class="tool-tag">攻牙底孔</span>
-                        <span class="tool-tag">旋入深度</span>
+                <!-- Panel 0: Trifast -->
+                <div class="sheet-panel active">
+                    <p style="font-size:13px;color:var(--secondary-color);margin-bottom:0.5rem;">
+                        依螺絲外徑 d 與板厚 t 查詢引伸孔中間值、抽牙高度、內外半徑及有效牙數（已扣除 1 牙無效牙）。
+                    </p>
+                    <div class="sheet-table-wrap">
+                        <table class="sheet-table">
+                            <thead>
+                                <tr>
+                                    <th>d (mm)</th>
+                                    <th>t (mm)</th>
+                                    <th>孔中間值 (mm)</th>
+                                    <th>抽牙高度 h (mm)</th>
+                                    <th>內r (mm)</th>
+                                    <th>外R (mm)</th>
+                                    <th>P (mm)</th>
+                                    <th>有效牙數</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>2.5</td><td>0.5</td><td>2.225</td><td>1.02</td><td>0.13</td><td>0.63</td><td>0.45</td><td>2</td></tr>
+                                <tr><td>2.5</td><td>0.8</td><td>2.240</td><td>1.02</td><td>0.13</td><td>0.93</td><td>0.45</td><td>3</td></tr>
+                                <tr><td>2.5</td><td>1.1</td><td>2.265</td><td>1.02</td><td>0.13</td><td>1.23</td><td>0.45</td><td>4</td></tr>
+                                <tr><td>2.5</td><td>1.6</td><td>2.285</td><td>1.02</td><td>0.15</td><td>1.75</td><td>0.45</td><td>5</td></tr>
+                                <tr><td>3</td><td>0.5</td><td>2.695</td><td>1.19</td><td>0.13</td><td>0.63</td><td>0.50</td><td>2</td></tr>
+                                <tr><td>3</td><td>0.8</td><td>2.725</td><td>1.19</td><td>0.13</td><td>0.93</td><td>0.50</td><td>3</td></tr>
+                                <tr><td>3</td><td>1.1</td><td>2.755</td><td>1.19</td><td>0.13</td><td>1.23</td><td>0.50</td><td>4</td></tr>
+                                <tr><td>3</td><td>1.6</td><td>2.785</td><td>1.19</td><td>0.15</td><td>1.75</td><td>0.50</td><td>5</td></tr>
+                                <tr><td>3</td><td>2.4</td><td>2.815</td><td>1.32</td><td>0.25</td><td>2.65</td><td>0.50</td><td>6</td></tr>
+                                <tr><td>4</td><td>0.8</td><td>3.570</td><td>1.35</td><td>0.13</td><td>0.93</td><td>0.70</td><td>2</td></tr>
+                                <tr><td>4</td><td>1.1</td><td>3.600</td><td>1.35</td><td>0.13</td><td>1.23</td><td>0.70</td><td>3</td></tr>
+                                <tr><td>4</td><td>1.6</td><td>3.625</td><td>1.35</td><td>0.15</td><td>1.75</td><td>0.70</td><td>3</td></tr>
+                                <tr><td>4</td><td>2.4</td><td>3.660</td><td>1.52</td><td>0.25</td><td>2.65</td><td>0.70</td><td>5</td></tr>
+                                <tr><td>4</td><td>3.6</td><td>3.710</td><td>1.83</td><td>0.33</td><td>3.93</td><td>0.70</td><td>7</td></tr>
+                                <tr><td>4.5</td><td>0.8</td><td>4.035</td><td>1.52</td><td>0.13</td><td>0.93</td><td>0.75</td><td>2</td></tr>
+                                <tr><td>4.5</td><td>1.1</td><td>4.065</td><td>1.52</td><td>0.13</td><td>1.23</td><td>0.75</td><td>2</td></tr>
+                                <tr><td>4.5</td><td>1.6</td><td>4.095</td><td>1.55</td><td>0.15</td><td>1.75</td><td>0.75</td><td>3</td></tr>
+                                <tr><td>4.5</td><td>2.4</td><td>4.125</td><td>1.78</td><td>0.25</td><td>2.65</td><td>0.75</td><td>5</td></tr>
+                                <tr><td>4.5</td><td>3.6</td><td>4.175</td><td>2.21</td><td>0.33</td><td>3.93</td><td>0.75</td><td>7</td></tr>
+                                <tr><td>5</td><td>1.1</td><td>4.505</td><td>1.52</td><td>0.13</td><td>1.23</td><td>0.80</td><td>2</td></tr>
+                                <tr><td>5</td><td>1.6</td><td>4.535</td><td>1.55</td><td>0.15</td><td>1.75</td><td>0.80</td><td>3</td></tr>
+                                <tr><td>5</td><td>2.4</td><td>4.565</td><td>1.78</td><td>0.25</td><td>2.65</td><td>0.80</td><td>4</td></tr>
+                                <tr><td>5</td><td>3.6</td><td>4.595</td><td>2.64</td><td>0.33</td><td>3.93</td><td>0.80</td><td>7</td></tr>
+                                <tr><td>6</td><td>1.1</td><td>5.385</td><td>1.78</td><td>0.13</td><td>1.23</td><td>1.00</td><td>2</td></tr>
+                                <tr><td>6</td><td>1.6</td><td>5.415</td><td>1.78</td><td>0.15</td><td>1.75</td><td>1.00</td><td>2</td></tr>
+                                <tr><td>6</td><td>2.4</td><td>5.445</td><td>2.29</td><td>0.25</td><td>2.65</td><td>1.00</td><td>4</td></tr>
+                                <tr><td>6</td><td>3.6</td><td>5.475</td><td>2.64</td><td>0.33</td><td>3.93</td><td>1.00</td><td>5</td></tr>
+                                <tr><td>6</td><td>4.4</td><td>5.525</td><td>2.64</td><td>0.33</td><td>4.73</td><td>1.00</td><td>6</td></tr>
+                                <tr><td>7</td><td>1.1</td><td>6.385</td><td>1.91</td><td>0.15</td><td>1.25</td><td>1.00</td><td>2</td></tr>
+                                <tr><td>7</td><td>1.6</td><td>6.435</td><td>1.91</td><td>0.15</td><td>1.75</td><td>1.00</td><td>3</td></tr>
+                                <tr><td>7</td><td>2.4</td><td>6.485</td><td>2.54</td><td>0.25</td><td>2.65</td><td>1.00</td><td>4</td></tr>
+                                <tr><td>7</td><td>3.6</td><td>6.535</td><td>3.05</td><td>0.33</td><td>3.93</td><td>1.00</td><td>6</td></tr>
+                                <tr><td>7</td><td>4.4</td><td>6.585</td><td>3.05</td><td>0.33</td><td>4.73</td><td>1.00</td><td>6</td></tr>
+                                <tr><td>7</td><td>4.75</td><td>6.665</td><td>3.05</td><td>0.33</td><td>5.08</td><td>1.00</td><td>7</td></tr>
+                                <tr><td>7</td><td>5.5</td><td>6.745</td><td>3.05</td><td>0.33</td><td>5.83</td><td>1.00</td><td>8</td></tr>
+                                <tr><td>8</td><td>1.6</td><td>7.230</td><td>2.11</td><td>0.15</td><td>1.75</td><td>1.25</td><td>2</td></tr>
+                                <tr><td>8</td><td>2.4</td><td>7.260</td><td>2.95</td><td>0.25</td><td>2.65</td><td>1.25</td><td>3</td></tr>
+                                <tr><td>8</td><td>3.6</td><td>7.290</td><td>3.58</td><td>0.33</td><td>3.93</td><td>1.25</td><td>5</td></tr>
+                                <tr><td>8</td><td>4.4</td><td>7.340</td><td>3.58</td><td>0.33</td><td>4.73</td><td>1.25</td><td>5</td></tr>
+                                <tr><td>8</td><td>4.75</td><td>7.390</td><td>3.58</td><td>0.33</td><td>5.08</td><td>1.25</td><td>6</td></tr>
+                                <tr><td>8</td><td>5.5</td><td>7.470</td><td>3.58</td><td>0.33</td><td>5.83</td><td>1.25</td><td>6</td></tr>
+                                <tr><td>10</td><td>1.6</td><td>9.075</td><td>3.56</td><td>0.25</td><td>1.85</td><td>1.50</td><td>2</td></tr>
+                                <tr><td>10</td><td>2.4</td><td>9.125</td><td>3.56</td><td>0.25</td><td>2.65</td><td>1.50</td><td>3</td></tr>
+                                <tr><td>10</td><td>3.6</td><td>9.175</td><td>4.32</td><td>0.33</td><td>3.93</td><td>1.50</td><td>4</td></tr>
+                                <tr><td>10</td><td>4.4</td><td>9.225</td><td>4.32</td><td>0.33</td><td>4.73</td><td>1.50</td><td>5</td></tr>
+                                <tr><td>10</td><td>4.75</td><td>9.305</td><td>4.32</td><td>0.33</td><td>5.08</td><td>1.50</td><td>5</td></tr>
+                                <tr><td>10</td><td>5.5</td><td>9.385</td><td>4.32</td><td>0.33</td><td>5.83</td><td>1.50</td><td>6</td></tr>
+                                <tr><td>12</td><td>2.4</td><td>10.920</td><td>3.81</td><td>0.25</td><td>2.65</td><td>1.75</td><td>3</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <a class="drill-link" href="drill-hole-table.html">開啟工具 ↗</a>
+                    <div class="sheet-note">
+                        ※ 引伸孔欄位為 min/max 中間值。有效牙數已扣除 1 牙無效牙。<br>
+                        資料來源：Trifast plc Group 引伸孔建議表
+                    </div>
                 </div>
 
-                <!-- Tab content 1 -->
-                <div class="drill-panel">
-                    <p>依規格、材質與孔型（通孔／盲孔）查詢旋入深度、攻牙深度與鑽孔深度。M3～M16。</p>
-                    <div class="tool-tags">
-                        <span class="tool-tag">M3～M16</span>
-                        <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
-                        <span class="tool-tag">盲孔 / 通孔</span>
-                        <span class="tool-tag">旋入深度</span>
+                <!-- Panel 1: 钣金手册 -->
+                <div class="sheet-panel">
+                    <p style="font-size:13px;color:var(--secondary-color);margin-bottom:0.5rem;">
+                        依螺絲外徑 d 與板厚 t 查詢抽牙半徑、總抽牙高度及計算牙數（未扣除無效牙）。
+                    </p>
+                    <div class="sheet-table-wrap">
+                        <table class="sheet-table">
+                            <thead>
+                                <tr>
+                                    <th>d (mm)</th>
+                                    <th>t (mm)</th>
+                                    <th>抽牙半徑 r (mm)</th>
+                                    <th>總高度 h (mm)</th>
+                                    <th>P (mm)</th>
+                                    <th>計算牙數</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>2.5</td><td>0.6</td><td>0.30</td><td>1.20</td><td>0.45</td><td>2</td></tr>
+                                <tr><td>2.5</td><td>0.8</td><td>0.40</td><td>1.44</td><td>0.45</td><td>3</td></tr>
+                                <tr><td>2.5</td><td>1.0</td><td>0.50</td><td>1.80</td><td>0.45</td><td>4</td></tr>
+                                <tr><td>2.5</td><td>1.2</td><td>0.60</td><td>1.92</td><td>0.45</td><td>4</td></tr>
+                                <tr><td>3</td><td>1.0</td><td>0.50</td><td>2.00</td><td>0.50</td><td>4</td></tr>
+                                <tr><td>3</td><td>1.2</td><td>0.60</td><td>2.16</td><td>0.50</td><td>4</td></tr>
+                                <tr><td>3</td><td>1.5</td><td>0.75</td><td>2.40</td><td>0.50</td><td>4</td></tr>
+                                <tr><td>4</td><td>1.0</td><td>0.50</td><td>2.00</td><td>0.70</td><td>2</td></tr>
+                                <tr><td>4</td><td>1.2</td><td>0.60</td><td>2.16</td><td>0.70</td><td>3</td></tr>
+                                <tr><td>4</td><td>1.5</td><td>0.75</td><td>2.70</td><td>0.70</td><td>3</td></tr>
+                                <tr><td>4</td><td>2.0</td><td>1.00</td><td>3.20</td><td>0.70</td><td>4</td></tr>
+                                <tr><td>5</td><td>1.2</td><td>0.60</td><td>2.40</td><td>0.80</td><td>3</td></tr>
+                                <tr><td>5</td><td>1.5</td><td>0.75</td><td>3.00</td><td>0.80</td><td>3</td></tr>
+                                <tr><td>5</td><td>2.0</td><td>1.00</td><td>3.60</td><td>0.80</td><td>4</td></tr>
+                                <tr><td>5</td><td>2.5</td><td>1.25</td><td>4.00</td><td>0.80</td><td>5</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <a class="drill-link" href="drill-hole-table-2.html">開啟工具 ↗</a>
+                    <div class="sheet-note">
+                        ※ 計算牙數未扣除無效牙。板厚範圍較少，優先以此資料為參考基準。<br>
+                        資料來源：《钣金结构设计工艺手册》頁 30
+                    </div>
+                </div>
+
+                <div class="tool-tags" style="margin-top:1rem;">
+                    <span class="tool-tag">M2.5～M12</span>
+                    <span class="tool-tag">板厚 0.5～5.5mm</span>
+                    <span class="tool-tag">抽牙高度</span>
+                    <span class="tool-tag">有效牙數</span>
                 </div>
             </div>
 
@@ -140,11 +274,12 @@
     <footer>
         <p>&copy; 2026 Andrew Mechanical & Product Design Studio. All rights reserved.</p>
     </footer>
+
     <script>
-        function switchDrillTab(e, index) {
-            const card = e.target.closest('.drill-combo-card');
-            card.querySelectorAll('.drill-tab').forEach((t, i) => t.classList.toggle('active', i === index));
-            card.querySelectorAll('.drill-panel').forEach((p, i) => p.classList.toggle('active', i === index));
+        function switchSheetTab(e, index) {
+            const card = e.target.closest('.sheet-combo-card');
+            card.querySelectorAll('.sheet-tab').forEach((t, i) => t.classList.toggle('active', i === index));
+            card.querySelectorAll('.sheet-panel').forEach((p, i) => p.classList.toggle('active', i === index));
         }
     </script>
 </body>
