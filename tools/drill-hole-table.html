@@ -9,353 +9,116 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --primary-color: #000;
-            --secondary-color: #666;
-            --border-color: #e0e0e0;
-            --bg-light: #f9f9f9;
-            --bg-white: #ffffff;
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
+            --primary-color: #000; --secondary-color: #666; --border-color: #e0e0e0;
+            --bg-light: #f9f9f9; --bg-white: #ffffff;
+            --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
             --accent: #1a1a2e;
         }
-
         @media (prefers-color-scheme: dark) {
-            :root {
-                --primary-color: #fff;
-                --secondary-color: #aaa;
-                --border-color: #333;
-                --bg-light: #1a1a1a;
-                --bg-white: #0d0d0d;
-            }
+            :root { --primary-color: #fff; --secondary-color: #aaa; --border-color: #333; --bg-light: #1a1a1a; --bg-white: #0d0d0d; }
         }
-
         html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--primary-color);
-            background-color: var(--bg-white);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 5%;
-            border-bottom: 0.5px solid var(--border-color);
-            background-color: rgba(255,255,255,0.92);
-            backdrop-filter: blur(8px);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            header { background-color: rgba(13,13,13,0.92); }
-        }
-
-        .logo {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-            text-decoration: none;
-            color: var(--primary-color);
-        }
-
-        .back-link {
-            font-size: 14px;
-            color: var(--secondary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s;
-        }
-
+        body { font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--primary-color); background-color: var(--bg-white); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        header { position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 5%; border-bottom: 0.5px solid var(--border-color); background-color: rgba(255,255,255,0.92); backdrop-filter: blur(8px); }
+        @media (prefers-color-scheme: dark) { header { background-color: rgba(13,13,13,0.92); } }
+        .logo { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; text-decoration: none; color: var(--primary-color); }
+        .back-link { font-size: 14px; color: var(--secondary-color); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
         .back-link:hover { color: var(--primary-color); }
 
-        .hero {
-            padding: 4rem 5% 2.5rem;
-            max-width: 900px;
-            margin: 0 auto;
-            animation: fadeInDown 0.6s ease;
-        }
+        .hero { padding: 4rem 5% 2rem; max-width: 900px; margin: 0 auto; animation: fadeInDown 0.6s ease; }
+        .hero-label { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.75rem; }
+        .hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+        .hero p { font-size: 15px; color: var(--secondary-color); line-height: 1.8; }
 
-        .hero-label {
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
+        /* ── Source Tabs (underline style, like the screenshot) ── */
+        .source-tabs-wrap { max-width: 900px; margin: 0 auto; padding: 0 5%; border-bottom: 0.5px solid var(--border-color); }
+        .source-tabs { display: flex; gap: 0; }
+        .source-tab {
+            padding: 0.75rem 1.25rem;
+            font-size: 14px; font-weight: 600;
+            font-family: 'Noto Sans TC', sans-serif;
+            background: none; border: none; cursor: pointer;
             color: var(--secondary-color);
-            margin-bottom: 0.75rem;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -0.5px;
+            transition: color 0.2s, border-color 0.2s;
         }
+        .source-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        .source-tab:hover:not(.active) { color: var(--primary-color); }
 
-        .hero h1 {
-            font-size: clamp(26px, 4vw, 38px);
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 1rem;
-        }
+        /* ── Source panels ── */
+        .source-panel { display: none; }
+        .source-panel.active { display: block; }
 
-        .hero p {
-            font-size: 15px;
-            color: var(--secondary-color);
-            line-height: 1.8;
-        }
-
+        /* ── Source note badge ── */
         .source-note {
             display: inline-block;
-            margin-top: 0.75rem;
-            font-size: 12px;
-            color: var(--secondary-color);
-            background-color: var(--bg-light);
-            border: 0.5px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 4px 12px;
+            margin: 1.25rem 0 0;
+            font-size: 12px; color: var(--secondary-color);
+            background-color: var(--bg-light); border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-sm); padding: 4px 12px;
         }
 
-        /* Calculator Section */
-        .calc-section {
-            padding: 1.5rem 5% 5rem;
-            max-width: 900px;
-            margin: 0 auto;
-            animation: fadeInUp 0.7s ease;
-        }
-
-        .selector-card {
-            background-color: var(--bg-light);
-            border-radius: var(--radius-lg);
-            border: 0.5px solid var(--border-color);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .selector-card h2 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--primary-color);
-        }
-
-        .selector-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .field-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--secondary-color);
-            letter-spacing: 0.5px;
-        }
-
+        /* ── Calc section ── */
+        .calc-section { padding: 1.5rem 5% 5rem; max-width: 900px; margin: 0 auto; }
+        .selector-card { background-color: var(--bg-light); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); padding: 2rem; margin-bottom: 1.5rem; }
+        .selector-card h2 { font-size: 16px; font-weight: 700; margin-bottom: 1.5rem; color: var(--primary-color); }
+        .selector-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.25rem; }
+        .field-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .field-group label { font-size: 13px; font-weight: 600; color: var(--secondary-color); letter-spacing: 0.5px; }
         .field-group select {
-            padding: 10px 14px;
-            border: 0.5px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-family: inherit;
-            font-size: 15px;
-            color: var(--primary-color);
-            background-color: var(--bg-white);
-            cursor: pointer;
-            transition: border-color 0.2s;
+            padding: 10px 14px; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm);
+            font-family: inherit; font-size: 15px; color: var(--primary-color);
+            background-color: var(--bg-white); cursor: pointer; transition: border-color 0.2s;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 36px;
+            background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px;
         }
+        .field-group select:focus { outline: none; border-color: var(--primary-color); }
+        .toggle-group { display: flex; gap: 0.5rem; }
+        .toggle-btn { flex: 1; padding: 10px; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; background-color: var(--bg-white); color: var(--secondary-color); transition: all 0.2s; }
+        .toggle-btn.active { background-color: var(--primary-color); color: var(--bg-white); border-color: var(--primary-color); }
 
-        .field-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        /* Result Card */
-        .result-card {
-            background-color: var(--bg-white);
-            border-radius: var(--radius-lg);
-            border: 0.5px solid var(--border-color);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            display: none;
-            animation: fadeInUp 0.4s ease;
-        }
-
+        /* ── Result card ── */
+        .result-card { background-color: var(--bg-white); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); padding: 2rem; margin-bottom: 1.5rem; display: none; animation: fadeInUp 0.4s ease; }
         .result-card.visible { display: block; }
-
-        .result-card h2 {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--secondary-color);
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .result-item {
-            background-color: var(--bg-light);
-            border-radius: var(--radius-md);
-            border: 0.5px solid var(--border-color);
-            padding: 1.25rem;
-            text-align: center;
-        }
-
-        .result-item .label {
-            font-size: 12px;
-            color: var(--secondary-color);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .result-item .value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary-color);
-            line-height: 1;
-        }
-
-        .result-item .unit {
-            font-size: 13px;
-            color: var(--secondary-color);
-            margin-top: 4px;
-        }
-
-        .result-item.highlight {
-            border-color: var(--primary-color);
-            background-color: var(--primary-color);
-        }
-
-        .result-item.highlight .label,
-        .result-item.highlight .value,
-        .result-item.highlight .unit {
-            color: var(--bg-white);
-        }
-
-        /* Tip box */
-        .tip-box {
-            background-color: var(--bg-light);
-            border-radius: var(--radius-md);
-            border-left: 3px solid var(--primary-color);
-            padding: 1rem 1.25rem;
-            font-size: 13px;
-            color: var(--secondary-color);
-            line-height: 1.8;
-        }
-
+        .result-card h2 { font-size: 15px; font-weight: 700; color: var(--secondary-color); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .result-item { background-color: var(--bg-light); border-radius: var(--radius-md); border: 0.5px solid var(--border-color); padding: 1.25rem; text-align: center; }
+        .result-item .label { font-size: 12px; color: var(--secondary-color); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.5px; }
+        .result-item .value { font-size: 28px; font-weight: 700; color: var(--primary-color); line-height: 1; }
+        .result-item .unit { font-size: 13px; color: var(--secondary-color); margin-top: 4px; }
+        .result-item.highlight { border-color: var(--primary-color); background-color: var(--primary-color); }
+        .result-item.highlight .label, .result-item.highlight .value, .result-item.highlight .unit { color: var(--bg-white); }
+        .tip-box { background-color: var(--bg-light); border-radius: var(--radius-md); border-left: 3px solid var(--primary-color); padding: 1rem 1.25rem; font-size: 13px; color: var(--secondary-color); line-height: 1.8; }
         .tip-box strong { color: var(--primary-color); }
 
-        /* Full table */
-        .table-section {
-            margin-top: 2rem;
-        }
-
-        .table-section h2 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: var(--radius-md);
-            border: 0.5px solid var(--border-color);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        thead th {
-            background-color: var(--primary-color);
-            color: var(--bg-white);
-            padding: 10px 14px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-
-        thead th.group-header {
-            background-color: #333;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            thead th { background-color: #222; }
-            thead th.group-header { background-color: #444; }
-        }
-
-        tbody tr {
-            border-bottom: 0.5px solid var(--border-color);
-            transition: background-color 0.15s;
-        }
-
+        /* ── Table ── */
+        .table-section { margin-top: 2rem; }
+        .table-section > h2 { font-size: 16px; font-weight: 700; margin-bottom: 0.5rem; color: var(--primary-color); }
+        .table-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-btn { padding: 6px 18px; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; background-color: var(--bg-white); color: var(--secondary-color); transition: all 0.2s; }
+        .tab-btn.active { background-color: var(--primary-color); color: var(--bg-white); border-color: var(--primary-color); }
+        .table-wrapper { overflow-x: auto; border-radius: var(--radius-md); border: 0.5px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        thead th { background-color: var(--primary-color); color: var(--bg-white); padding: 10px 14px; text-align: center; font-weight: 600; font-size: 12px; letter-spacing: 0.5px; white-space: nowrap; }
+        thead th.sub { background-color: #333; }
+        @media (prefers-color-scheme: dark) { thead th { background-color: #222; } thead th.sub { background-color: #444; } }
+        tbody tr { border-bottom: 0.5px solid var(--border-color); transition: background-color 0.15s; }
         tbody tr:hover { background-color: var(--bg-light); }
+        tbody tr.highlighted { background-color: rgba(0,0,0,0.06) !important; }
+        @media (prefers-color-scheme: dark) { tbody tr.highlighted { background-color: rgba(255,255,255,0.08) !important; } }
+        tbody td { padding: 10px 14px; text-align: center; color: var(--primary-color); }
+        tbody td:first-child { font-weight: 700; }
+        .table-panel { display: none; }
+        .table-panel.active { display: block; }
+        .table-note { font-size: 12px; color: var(--secondary-color); margin-top: 0.75rem; }
 
-        tbody tr.highlighted {
-            background-color: rgba(0,0,0,0.06) !important;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            tbody tr.highlighted { background-color: rgba(255,255,255,0.08) !important; }
-        }
-
-        tbody td {
-            padding: 10px 14px;
-            text-align: center;
-            color: var(--primary-color);
-        }
-
-        tbody td:first-child {
-            font-weight: 700;
-        }
-
-        footer {
-            padding: 1.5rem 5%;
-            border-top: 0.5px solid var(--border-color);
-            text-align: center;
-            font-size: 13px;
-            color: var(--secondary-color);
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 600px) {
-            .selector-grid { grid-template-columns: 1fr 1fr; }
-            .result-grid { grid-template-columns: 1fr 1fr; }
-        }
+        footer { padding: 1.5rem 5%; border-top: 0.5px solid var(--border-color); text-align: center; font-size: 13px; color: var(--secondary-color); }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) { .selector-grid { grid-template-columns: 1fr 1fr; } .result-grid { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
 <body>
@@ -366,181 +129,328 @@
 
     <section class="hero">
         <div class="hero-label">工程查詢工具</div>
-        <h1>🔧  鑽孔 / 攻牙深度查詢</h1>
-        <p>依規格與材質快速查詢攻牙深度、鑽孔深度與旋入深度，並提供攻牙底孔直徑參考。</p>
-        <span class="source-note">資料來源：機械設計圖表便覽 P-10~15，表10-2.19 一般攻牙允許孔徑尺度</span>
+        <h1>🔧 鑽孔 / 攻牙深度查詢</h1>
+        <p>依規格與材質快速查詢攻牙深度、鑽孔深度與旋入深度。提供兩種資料來源對照，板厚有差異時優先參考《現代機械設計手冊》。</p>
     </section>
 
-    <section class="calc-section">
+    <!-- Source Tabs (underline style) -->
+    <div class="source-tabs-wrap">
+        <div class="source-tabs">
+            <button class="source-tab active" onclick="switchSource(0)">機械設計圖表便覽</button>
+            <button class="source-tab" onclick="switchSource(1)">現代機械設計手冊</button>
+        </div>
+    </div>
 
-        <div class="selector-card">
-            <h2>選擇查詢條件</h2>
-            <div class="selector-grid">
-                <div class="field-group">
-                    <label>螺紋規格</label>
-                    <select id="sel-spec" onchange="query()">
-                        <option value="">— 選擇規格 —</option>
-                        <option value="M3">M3</option>
-                        <option value="M3.5">M3.5</option>
-                        <option value="M4">M4</option>
-                        <option value="M4.5">M4.5</option>
-                        <option value="M5">M5</option>
-                        <option value="M5.5">M5.5</option>
-                        <option value="M6">M6</option>
-                        <option value="M7">M7</option>
-                    </select>
-                </div>
-                <div class="field-group">
-                    <label>材質</label>
-                    <select id="sel-mat" onchange="query()">
-                        <option value="鋼">鋼（含青銅、鑄鋼）</option>
-                        <option value="鑄鐵">鑄鐵</option>
-                        <option value="鋁">鋁</option>
-                    </select>
+    <!-- ════════════════════════════════════════════
+         SOURCE 0 ── 機械設計圖表便覽（M3~M7）
+    ════════════════════════════════════════════ -->
+    <div class="source-panel active" id="src-0">
+        <section class="calc-section">
+            <span class="source-note" style="display:block; margin-bottom:1.5rem;">資料來源：機械設計圖表便覽 P-10~15，表10-2.19 一般攻牙允許孔徑尺度</span>
+
+            <div class="selector-card">
+                <h2>選擇查詢條件</h2>
+                <div class="selector-grid">
+                    <div class="field-group">
+                        <label>螺紋規格</label>
+                        <select id="s0-spec" onchange="query0()">
+                            <option value="">— 選擇規格 —</option>
+                            <option value="M3">M3</option>
+                            <option value="M3.5">M3.5</option>
+                            <option value="M4">M4</option>
+                            <option value="M4.5">M4.5</option>
+                            <option value="M5">M5</option>
+                            <option value="M5.5">M5.5</option>
+                            <option value="M6">M6</option>
+                            <option value="M7">M7</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>材質</label>
+                        <select id="s0-mat" onchange="query0()">
+                            <option value="鋼">鋼（含青銅、鑄鋼）</option>
+                            <option value="鑄鐵">鑄鐵</option>
+                            <option value="鋁">鋁</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="result-card" id="result-card">
-            <h2>查詢結果</h2>
-            <div class="result-grid" id="result-grid"></div>
-            <div class="tip-box" id="tip-box"></div>
-        </div>
-
-        <div class="table-section">
-            <h2>完整規格對照表</h2>
-            <div class="table-wrapper">
-                <table id="full-table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">規格</th>
-                            <th rowspan="2">底孔直徑 (mm)</th>
-                            <th colspan="2" class="group-header">鋼</th>
-                            <th colspan="2" class="group-header">鑄鐵</th>
-                            <th colspan="2" class="group-header">鋁</th>
-                        </tr>
-                        <tr>
-                            <th>攻牙深度</th>
-                            <th>鑽孔深度</th>
-                            <th>攻牙深度</th>
-                            <th>鑽孔深度</th>
-                            <th>攻牙深度</th>
-                            <th>鑽孔深度</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body"></tbody>
-                </table>
+            <div class="result-card" id="s0-result">
+                <h2>查詢結果</h2>
+                <div class="result-grid" id="s0-result-grid"></div>
+                <div class="tip-box" id="s0-tip"></div>
             </div>
-            <p style="font-size:12px; color:var(--secondary-color); margin-top:0.75rem;">※ 旋入深度推算：鋼 = 公稱直徑 × 1；鑄鐵 = × 1.5；鋁 = × 1.83　　螺絲長度 = 旋入深度 + 機構厚度</p>
-        </div>
 
-    </section>
+            <div class="table-section">
+                <h2>完整規格對照表</h2>
+                <div class="table-wrapper">
+                    <table id="s0-full-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">規格</th>
+                                <th rowspan="2">底孔直徑 (mm)</th>
+                                <th colspan="2" >鋼</th>
+                                <th colspan="2" >鑄鐵</th>
+                                <th colspan="2" >鋁</th>
+                            </tr>
+                            <tr>
+                                <th class="sub">攻牙深度</th><th class="sub">鑽孔深度</th>
+                                <th class="sub">攻牙深度</th><th class="sub">鑽孔深度</th>
+                                <th class="sub">攻牙深度</th><th class="sub">鑽孔深度</th>
+                            </tr>
+                        </thead>
+                        <tbody id="s0-tbody"></tbody>
+                    </table>
+                </div>
+                <p class="table-note">※ 旋入深度推算：鋼 = 公稱直徑 × 1；鑄鐵 = × 1.5；鋁 = × 1.83　　螺絲長度 = 旋入深度 + 機構厚度</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         SOURCE 1 ── 現代機械設計手冊（M3~M16）
+    ════════════════════════════════════════════ -->
+    <div class="source-panel" id="src-1">
+        <section class="calc-section">
+            <span class="source-note" style="display:block; margin-bottom:1.5rem;">資料來源：現代機械設計手冊 第一卷 連接件與緊固件 第五篇 P-145</span>
+
+            <div class="selector-card">
+                <h2>選擇查詢條件</h2>
+                <div class="selector-grid">
+                    <div class="field-group">
+                        <label>螺紋規格</label>
+                        <select id="s1-spec" onchange="query1()">
+                            <option value="">— 選擇規格 —</option>
+                            <option value="M3">M3</option>
+                            <option value="M4">M4</option>
+                            <option value="M5">M5</option>
+                            <option value="M6">M6</option>
+                            <option value="M8">M8</option>
+                            <option value="M10">M10</option>
+                            <option value="M12">M12</option>
+                            <option value="M16">M16</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>材質</label>
+                        <select id="s1-mat" onchange="query1()">
+                            <option value="steel">鋼（含青銅、鑄鋼）</option>
+                            <option value="ci">鑄鐵</option>
+                            <option value="al">鋁</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>孔型</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" id="s1-btn-blind" onclick="setHole1('blind')">盲孔</button>
+                            <button class="toggle-btn" id="s1-btn-through" onclick="setHole1('through')">通孔</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-card" id="s1-result">
+                <h2>查詢結果</h2>
+                <div class="result-grid" id="s1-result-grid"></div>
+                <div class="tip-box" id="s1-tip"></div>
+            </div>
+
+            <div class="table-section">
+                <h2>完整規格對照表</h2>
+                <div class="table-tabs">
+                    <button class="tab-btn active" onclick="switchTab1('steel', this)">鋼</button>
+                    <button class="tab-btn" onclick="switchTab1('ci', this)">鑄鐵</button>
+                    <button class="tab-btn" onclick="switchTab1('al', this)">鋁</button>
+                </div>
+                <div class="table-panel active" id="s1-tab-steel">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th rowspan="2">規格</th><th>通孔</th><th colspan="3">盲孔</th></tr>
+                                <tr><th class="sub">旋入深度</th><th class="sub">旋入深度</th><th class="sub">攻牙深度</th><th class="sub">鑽孔深度</th></tr>
+                            </thead>
+                            <tbody id="s1-tbody-steel"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="table-panel" id="s1-tab-ci">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th rowspan="2">規格</th><th>通孔</th><th colspan="3">盲孔</th></tr>
+                                <tr><th class="sub">旋入深度</th><th class="sub">旋入深度</th><th class="sub">攻牙深度</th><th class="sub">鑽孔深度</th></tr>
+                            </thead>
+                            <tbody id="s1-tbody-ci"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="table-panel" id="s1-tab-al">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th rowspan="2">規格</th><th>通孔</th><th colspan="3">盲孔</th></tr>
+                                <tr><th class="sub">旋入深度</th><th class="sub">旋入深度</th><th class="sub">攻牙深度</th><th class="sub">鑽孔深度</th></tr>
+                            </thead>
+                            <tbody id="s1-tbody-al"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <p class="table-note">※ 旋入深度推算：鋼 × 1；鑄鐵 × 1.67；鋁 × 2　　螺絲長度 = 旋入深度 + 機構厚度　　通孔 = 整段攻牙，無攻牙深度與鑽孔深度</p>
+            </div>
+        </section>
+    </div>
 
     <footer>
         <p>&copy; 2026 Andrew Mechanical & Product Design Studio. All rights reserved.</p>
     </footer>
 
     <script>
-        const data = [
-            { spec: 'M3',   hole: 2.4,  steel_tap: 3,   steel_drill: 6,   ci_tap: 4.5, ci_drill: 7.5,  al_tap: 5.5, al_drill: 8.5  },
-            { spec: 'M3.5', hole: 2.9,  steel_tap: 3.5, steel_drill: 6.5, ci_tap: 5.5, ci_drill: 8.5,  al_tap: 6.5, al_drill: 9.5  },
-            { spec: 'M4',   hole: 3.25, steel_tap: 4,   steel_drill: 7,   ci_tap: 6,   ci_drill: 9,    al_tap: 7,   al_drill: 10   },
-            { spec: 'M4.5', hole: 3.75, steel_tap: 4.5, steel_drill: 7.5, ci_tap: 7,   ci_drill: 10,   al_tap: 8,   al_drill: 11   },
-            { spec: 'M5',   hole: 4.1,  steel_tap: 5,   steel_drill: 8.5, ci_tap: 8,   ci_drill: 11.5, al_tap: 9,   al_drill: 12.5 },
-            { spec: 'M5.5', hole: 4.6,  steel_tap: 5.5, steel_drill: 9,   ci_tap: 8,   ci_drill: 11.5, al_tap: 10,  al_drill: 13.5 },
-            { spec: 'M6',   hole: 5,    steel_tap: 6,   steel_drill: 10,  ci_tap: 9,   ci_drill: 13,   al_tap: 11,  al_drill: 15   },
-            { spec: 'M7',   hole: 6,    steel_tap: 7,   steel_drill: 11,  ci_tap: 11,  ci_drill: 15,   al_tap: 13,  al_drill: 17   },
-        ];
+    /* ── Source tab switching ── */
+    function switchSource(idx) {
+        document.querySelectorAll('.source-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+        document.querySelectorAll('.source-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+    }
 
-        const matMultiplier = { '鋼': 1, '鑄鐵': 1.5, '鋁': 1.83 };
+    /* ══════════════════════════════════════════
+       SOURCE 0 ── 機械設計圖表便覽
+    ══════════════════════════════════════════ */
+    const data0 = [
+        { spec: 'M3',   hole: 2.4,  steel_tap: 3,   steel_drill: 6,   ci_tap: 4.5, ci_drill: 7.5,  al_tap: 5.5, al_drill: 8.5  },
+        { spec: 'M3.5', hole: 2.9,  steel_tap: 3.5, steel_drill: 6.5, ci_tap: 5.5, ci_drill: 8.5,  al_tap: 6.5, al_drill: 9.5  },
+        { spec: 'M4',   hole: 3.25, steel_tap: 4,   steel_drill: 7,   ci_tap: 6,   ci_drill: 9,    al_tap: 7,   al_drill: 10   },
+        { spec: 'M4.5', hole: 3.75, steel_tap: 4.5, steel_drill: 7.5, ci_tap: 7,   ci_drill: 10,   al_tap: 8,   al_drill: 11   },
+        { spec: 'M5',   hole: 4.1,  steel_tap: 5,   steel_drill: 8.5, ci_tap: 8,   ci_drill: 11.5, al_tap: 9,   al_drill: 12.5 },
+        { spec: 'M5.5', hole: 4.6,  steel_tap: 5.5, steel_drill: 9,   ci_tap: 8,   ci_drill: 11.5, al_tap: 10,  al_drill: 13.5 },
+        { spec: 'M6',   hole: 5,    steel_tap: 6,   steel_drill: 10,  ci_tap: 9,   ci_drill: 13,   al_tap: 11,  al_drill: 15   },
+        { spec: 'M7',   hole: 6,    steel_tap: 7,   steel_drill: 11,  ci_tap: 11,  ci_drill: 15,   al_tap: 13,  al_drill: 17   },
+    ];
+    const matMultiplier0 = { '鋼': 1, '鑄鐵': 1.5, '鋁': 1.83 };
 
-        // Build full table
-        const tbody = document.getElementById('table-body');
-        data.forEach(row => {
-            const d = parseFloat(row.spec.replace('M', ''));
+    // Build table
+    (function() {
+        const tbody = document.getElementById('s0-tbody');
+        data0.forEach(row => {
             const tr = document.createElement('tr');
-            tr.id = 'row-' + row.spec;
-            tr.innerHTML = `
-                <td>${row.spec}</td>
-                <td>${row.hole}</td>
-                <td>${row.steel_tap}</td>
-                <td>${row.steel_drill}</td>
-                <td>${row.ci_tap}</td>
-                <td>${row.ci_drill}</td>
-                <td>${row.al_tap}</td>
-                <td>${row.al_drill}</td>
-            `;
+            tr.id = 's0-row-' + row.spec;
+            tr.innerHTML = `<td>${row.spec}</td><td>${row.hole}</td><td>${row.steel_tap}</td><td>${row.steel_drill}</td><td>${row.ci_tap}</td><td>${row.ci_drill}</td><td>${row.al_tap}</td><td>${row.al_drill}</td>`;
             tbody.appendChild(tr);
         });
+    })();
 
-        function query() {
-            const spec = document.getElementById('sel-spec').value;
-            const mat  = document.getElementById('sel-mat').value;
+    function query0() {
+        const spec = document.getElementById('s0-spec').value;
+        const mat  = document.getElementById('s0-mat').value;
+        document.querySelectorAll('#s0-tbody tr').forEach(r => r.classList.remove('highlighted'));
+        if (!spec) { document.getElementById('s0-result').classList.remove('visible'); return; }
+        const row = data0.find(d => d.spec === spec);
+        if (!row) return;
+        const d = parseFloat(spec.replace('M', ''));
+        const engageDepth = parseFloat((d * matMultiplier0[mat]).toFixed(2));
+        let tapDepth, drillDepth;
+        if (mat === '鋼')       { tapDepth = row.steel_tap; drillDepth = row.steel_drill; }
+        else if (mat === '鑄鐵') { tapDepth = row.ci_tap;   drillDepth = row.ci_drill;   }
+        else                    { tapDepth = row.al_tap;   drillDepth = row.al_drill;   }
+        document.getElementById('s0-result-grid').innerHTML = `
+            <div class="result-item highlight"><div class="label">底孔直徑</div><div class="value">${row.hole}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">攻牙深度</div><div class="value">${tapDepth}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">鑽孔深度</div><div class="value">${drillDepth}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">建議旋入深度</div><div class="value">${engageDepth}</div><div class="unit">mm（${spec} × ${matMultiplier0[mat]}）</div></div>`;
+        document.getElementById('s0-tip').innerHTML = `
+            <strong>📌 使用提示</strong><br>
+            螺絲長度 = 旋入深度（${engageDepth} mm）+ 機構板材厚度<br>
+            鑽孔深度（${drillDepth} mm）已含攻牙底部餘量，盲孔務必鑽至此深度再攻牙。<br>
+            機械設計圖表便覽沒有建議的旋入深度尺寸。<br>
+            以攻牙深度推算鋼類d×1倍，鑄鐵d×1.5倍，鋁d×1.83倍作為螺絲旋入深度的參考值。<br>
+            青銅、鑄鋼、青銅鑄件等同鋼材質。`;
+        document.getElementById('s0-result').classList.add('visible');
+        const tr = document.getElementById('s0-row-' + spec);
+        if (tr) { tr.classList.add('highlighted'); tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    }
 
-            // Clear highlight
-            document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('highlighted'));
+    /* ══════════════════════════════════════════
+       SOURCE 1 ── 現代機械設計手冊
+    ══════════════════════════════════════════ */
+    const data1 = [
+        { spec:'M3',  st:4,   sbe:3,  sbt:4,  sbd:7,  ct:6,  cbe:5,  cbt:6,  cbd:9,  at:8,  abe:6,  abt:7,  abd:10 },
+        { spec:'M4',  st:5.5, sbe:4,  sbt:5.5,sbd:9,  ct:8,  cbe:6,  cbt:7.5,cbd:11, at:10, abe:8,  abt:10, abd:14 },
+        { spec:'M5',  st:7,   sbe:5,  sbt:7,  sbd:11, ct:10, cbe:8,  cbt:10, cbd:14, at:12, abe:10, abt:12, abd:16 },
+        { spec:'M6',  st:8,   sbe:6,  sbt:8,  sbd:13, ct:12, cbe:10, cbt:12, cbd:17, at:15, abe:12, abt:15, abd:20 },
+        { spec:'M8',  st:10,  sbe:8,  sbt:10, sbd:16, ct:15, cbe:12, cbt:14, cbd:20, at:20, abe:16, abt:18, abd:24 },
+        { spec:'M10', st:12,  sbe:10, sbt:13, sbd:20, ct:18, cbe:15, cbt:18, cbd:25, at:24, abe:20, abt:23, abd:30 },
+        { spec:'M12', st:15,  sbe:12, sbt:15, sbd:24, ct:22, cbe:18, cbt:21, cbd:30, at:28, abe:24, abt:27, abd:36 },
+        { spec:'M16', st:20,  sbe:16, sbt:20, sbd:30, ct:28, cbe:24, cbt:28, cbd:33, at:36, abe:32, abt:36, abd:46 },
+    ];
+    let holeType1 = 'blind';
 
-            if (!spec) {
-                document.getElementById('result-card').classList.remove('visible');
-                return;
-            }
+    function setHole1(type) {
+        holeType1 = type;
+        document.getElementById('s1-btn-blind').classList.toggle('active', type === 'blind');
+        document.getElementById('s1-btn-through').classList.toggle('active', type === 'through');
+        query1();
+    }
 
-            const row = data.find(d => d.spec === spec);
-            if (!row) return;
+    function switchTab1(mat, btn) {
+        document.querySelectorAll('#src-1 .table-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('#src-1 .tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('s1-tab-' + mat).classList.add('active');
+        btn.classList.add('active');
+    }
 
-            const d = parseFloat(spec.replace('M', ''));
-            const engageDepth = parseFloat((d * matMultiplier[mat]).toFixed(2));
-
-            let tapDepth, drillDepth;
-            if (mat === '鋼')      { tapDepth = row.steel_tap; drillDepth = row.steel_drill; }
-            else if (mat === '鑄鐵') { tapDepth = row.ci_tap;   drillDepth = row.ci_drill;   }
-            else                    { tapDepth = row.al_tap;   drillDepth = row.al_drill;   }
-
-            // Render results
-            document.getElementById('result-grid').innerHTML = `
-                <div class="result-item highlight">
-                    <div class="label">底孔直徑</div>
-                    <div class="value">${row.hole}</div>
-                    <div class="unit">mm</div>
-                </div>
-                <div class="result-item">
-                    <div class="label">攻牙深度</div>
-                    <div class="value">${tapDepth}</div>
-                    <div class="unit">mm</div>
-                </div>
-                <div class="result-item">
-                    <div class="label">鑽孔深度</div>
-                    <div class="value">${drillDepth}</div>
-                    <div class="unit">mm</div>
-                </div>
-                <div class="result-item">
-                    <div class="label">建議旋入深度</div>
-                    <div class="value">${engageDepth}</div>
-                    <div class="unit">mm（${spec} × ${matMultiplier[mat]}）</div>
-                </div>
-            `;
-
-            const matNote = mat === '鑄鐵' ? '青銅、鑄鋼與鑄件請參照鋼材數值。' : '';
-            document.getElementById('tip-box').innerHTML = `
-                <strong>📌 使用提示</strong><br>
-                螺絲長度 = 旋入深度（${engageDepth} mm）+ 機構板材厚度<br>
-                鑽孔深度（${drillDepth} mm）已含攻牙底部餘量，盲孔務必鑽至此深度再攻牙。<br>
-                機械設計圖表便覽沒有建議的旋入深度尺寸。<br>
-                以攻牙深度推算鋼類d×1倍,鑄鐵d×1.5倍,鋁d×1.83倍作為螺絲旋入深度的參考值。<br>
-                螺絲長度＝旋入深度﹢機構厚度。<br>
-                青銅、鑄鋼、青銅鑄件等同鋼材質。
-                ${matNote ? '<br>' + matNote : ''}
-            `;
-
-            document.getElementById('result-card').classList.add('visible');
-
-            // Highlight table row
-            const tr = document.getElementById('row-' + spec);
-            if (tr) {
-                tr.classList.add('highlighted');
-                tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
+    // Build tables
+    (function() {
+        function buildTable(matKey, tbodyId, getCols) {
+            const tbody = document.getElementById(tbodyId);
+            data1.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.id = 's1-row-' + matKey + '-' + row.spec;
+                tr.innerHTML = `<td>${row.spec}</td>` + getCols(row).map(v => `<td>${v}</td>`).join('');
+                tbody.appendChild(tr);
+            });
         }
+        buildTable('steel', 's1-tbody-steel', r => [r.st, r.sbe, r.sbt, r.sbd]);
+        buildTable('ci',    's1-tbody-ci',    r => [r.ct, r.cbe, r.cbt, r.cbd]);
+        buildTable('al',    's1-tbody-al',    r => [r.at, r.abe, r.abt, r.abd]);
+    })();
+
+    function query1() {
+        const spec = document.getElementById('s1-spec').value;
+        const mat  = document.getElementById('s1-mat').value;
+        document.querySelectorAll('#src-1 tbody tr').forEach(r => r.classList.remove('highlighted'));
+        if (!spec) { document.getElementById('s1-result').classList.remove('visible'); return; }
+        const row = data1.find(d => d.spec === spec);
+        if (!row) return;
+        const isThrough = (holeType1 === 'through');
+        let engage, tap, drill;
+        if (mat === 'steel')     { engage = isThrough ? row.st : row.sbe; tap = isThrough ? null : row.sbt; drill = isThrough ? null : row.sbd; }
+        else if (mat === 'ci')   { engage = isThrough ? row.ct : row.cbe; tap = isThrough ? null : row.cbt; drill = isThrough ? null : row.cbd; }
+        else                     { engage = isThrough ? row.at : row.abe; tap = isThrough ? null : row.abt; drill = isThrough ? null : row.abd; }
+        let html = `<div class="result-item highlight"><div class="label">旋入深度</div><div class="value">${engage}</div><div class="unit">mm</div></div>`;
+        if (!isThrough) {
+            html += `<div class="result-item"><div class="label">攻牙深度</div><div class="value">${tap}</div><div class="unit">mm</div></div>
+                     <div class="result-item"><div class="label">鑽孔深度</div><div class="value">${drill}</div><div class="unit">mm</div></div>`;
+        }
+        document.getElementById('s1-result-grid').innerHTML = html;
+        const matLabel = { steel:'鋼', ci:'鑄鐵', al:'鋁' }[mat];
+        const holeLabel = isThrough ? '通孔（整段攻牙）' : '盲孔';
+        const note = isThrough ? '通孔為整段攻牙，無需計算攻牙深度與鑽孔深度。' : '鑽孔深度已含底部餘量，盲孔務必鑽至此深度再攻牙。';
+        document.getElementById('s1-tip').innerHTML = `
+            <strong>📌 使用提示</strong>（${spec} / ${matLabel} / ${holeLabel}）<br>
+            螺絲長度 = 旋入深度（${engage} mm）+ 機構板材厚度<br>
+            ${note}<br>
+            推算：鋼類 d×1 倍，鑄鐵 d×1.67 倍，鋁 d×2 倍。<br>
+            青銅、鑄鋼、青銅鑄件等同鋼材質。`;
+        document.getElementById('s1-result').classList.add('visible');
+        const tr = document.getElementById('s1-row-' + mat + '-' + spec);
+        if (tr) { tr.classList.add('highlighted'); tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    }
+
+    /* ── Handle ?src= URL param to auto-select tab ── */
+    (function() {
+        const params = new URLSearchParams(location.search);
+        const src = params.get('src');
+        if (src === 'handbook') switchSource(1);
+    })();
     </script>
 </body>
 </html>
