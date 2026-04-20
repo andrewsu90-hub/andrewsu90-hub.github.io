@@ -121,7 +121,6 @@
             margin: 0 auto;
         }
 
-        /* Filter tabs */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -149,19 +148,13 @@
             border-color: var(--primary-color);
         }
 
-        /* Masonry-style grid */
         .gallery-grid {
             columns: 3;
             column-gap: 20px;
         }
 
-        @media (max-width: 900px) {
-            .gallery-grid { columns: 2; }
-        }
-
-        @media (max-width: 540px) {
-            .gallery-grid { columns: 1; }
-        }
+        @media (max-width: 900px) { .gallery-grid { columns: 2; } }
+        @media (max-width: 540px) { .gallery-grid { columns: 1; } }
 
         .gallery-item {
             break-inside: avoid;
@@ -182,9 +175,7 @@
         }
 
         @media (prefers-color-scheme: dark) {
-            .gallery-item:hover {
-                box-shadow: 0 12px 30px rgba(255,255,255,0.06);
-            }
+            .gallery-item:hover { box-shadow: 0 12px 30px rgba(255,255,255,0.06); }
         }
 
         .gallery-item img {
@@ -193,14 +184,9 @@
             transition: transform 0.4s ease;
         }
 
-        .gallery-item:hover img {
-            transform: scale(1.03);
-        }
+        .gallery-item:hover img { transform: scale(1.03); }
 
-        /* Caption overlay */
-        .gallery-caption {
-            padding: 14px var(--spacing-md);
-        }
+        .gallery-caption { padding: 14px var(--spacing-md); }
 
         .gallery-caption h3 {
             font-size: 15px;
@@ -225,7 +211,6 @@
             margin-right: 4px;
         }
 
-        /* Zoom icon hint */
         .zoom-hint {
             position: absolute;
             top: 10px;
@@ -244,9 +229,7 @@
             font-size: 15px;
         }
 
-        .gallery-item:hover .zoom-hint {
-            opacity: 1;
-        }
+        .gallery-item:hover .zoom-hint { opacity: 1; }
 
         /* ── Lightbox ── */
         .lightbox {
@@ -261,9 +244,7 @@
             animation: fadeIn 0.25s ease;
         }
 
-        .lightbox.active {
-            display: flex;
-        }
+        .lightbox.active { display: flex; }
 
         .lightbox-inner {
             position: relative;
@@ -284,22 +265,9 @@
             display: block;
         }
 
-        .lightbox-info {
-            margin-top: 14px;
-            text-align: center;
-            color: #fff;
-        }
-
-        .lightbox-info h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .lightbox-info p {
-            font-size: 14px;
-            color: rgba(255,255,255,0.65);
-        }
+        .lightbox-info { margin-top: 14px; text-align: center; color: #fff; }
+        .lightbox-info h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .lightbox-info p  { font-size: 14px; color: rgba(255,255,255,0.65); }
 
         .lightbox-close {
             position: absolute;
@@ -316,7 +284,6 @@
 
         .lightbox-close:hover { color: #fff; }
 
-        /* Prev / Next arrows */
         .lightbox-arrow {
             position: fixed;
             top: 50%;
@@ -337,11 +304,9 @@
         }
 
         .lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
+        .lightbox-arrow.prev  { left: 20px; }
+        .lightbox-arrow.next  { right: 20px; }
 
-        .lightbox-arrow.prev { left: 20px; }
-        .lightbox-arrow.next { right: 20px; }
-
-        /* Counter */
         .lightbox-counter {
             position: fixed;
             bottom: 20px;
@@ -352,7 +317,6 @@
             letter-spacing: 1px;
         }
 
-        /* Footer */
         footer {
             padding: var(--spacing-lg) 5%;
             border-top: 0.5px solid var(--border-color);
@@ -361,17 +325,14 @@
             color: var(--secondary-color);
         }
 
-        /* Animations */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-16px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-
         @keyframes fadeIn {
             from { opacity: 0; }
             to   { opacity: 1; }
         }
-
         @keyframes zoomIn {
             from { opacity: 0; transform: scale(0.92); }
             to   { opacity: 1; transform: scale(1); }
@@ -392,79 +353,146 @@
 
 <section class="gallery-section">
 
-    <!-- ═══════════════════════════════════════════════════
-         篩選標籤：依需求自由增加 / 刪除 category
-         ═══════════════════════════════════════════════════ -->
+    <!-- ┌─────────────────────────────────────────────────────┐
+         │  新增「分類 tab」：複製下方 button，改 data-filter   │
+         │  與文字，對應 gallery-item 的 data-category 即可    │
+         └─────────────────────────────────────────────────────┘ -->
     <div class="filter-bar" id="filterBar">
         <button class="filter-btn active" data-filter="all">全部</button>
-        <button class="filter-btn" data-filter="渲染">3D 渲染</button>
-        <button class="filter-btn" data-filter="草圖">概念草圖</button>
-        <button class="filter-btn" data-filter="包裝">包裝設計</button>
+        <button class="filter-btn" data-filter="概念草圖">概念草圖</button>
+        <button class="filter-btn" data-filter="3D渲染">3D 渲染</button>
+        <button class="filter-btn" data-filter="包裝設計">包裝設計</button>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════
-         圖片清單：要新增圖片，只需複製一個 .gallery-item
-         區塊，修改 src、標題、描述與 data-category 即可。
-         ═══════════════════════════════════════════════════ -->
+    <!-- ┌─────────────────────────────────────────────────────┐
+         │  新增圖片：複製任一 gallery-item 區塊，只需改：      │
+         │    src           → image01/檔名.jpg                 │
+         │    data-category → 對應上方 tab 的文字              │
+         │    <h3> 標題 與 <p> 描述                            │
+         └─────────────────────────────────────────────────────┘ -->
     <div class="gallery-grid" id="galleryGrid">
 
-        <div class="gallery-item" data-category="渲染" onclick="openLightbox(this)">
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
             <div class="zoom-hint">⤢</div>
-            <img src="image/05.jpg" alt="產品商業擬真渲染" loading="lazy">
+            <img src="image01/01.jpg" alt="概念草圖 01" loading="lazy">
             <div class="gallery-caption">
-                <h3>產品商業擬真渲染</h3>
-                <p>高質感材質與光影設定，適用於募資平台型錄。</p>
-                <span class="gallery-tag">3D渲染</span>
-                <span class="gallery-tag">KeyShot</span>
-            </div>
-        </div>
-
-        <div class="gallery-item" data-category="渲染" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image/01.png" alt="消費性電子外觀渲染" loading="lazy">
-            <div class="gallery-caption">
-                <h3>消費性電子外觀渲染</h3>
-                <p>流線曲面外型結合金屬質感，打造高端產品視覺。</p>
-                <span class="gallery-tag">曲面建模</span>
-                <span class="gallery-tag">渲染</span>
-            </div>
-        </div>
-
-        <div class="gallery-item" data-category="草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image/04.png" alt="仿真機構草圖提案" loading="lazy">
-            <div class="gallery-caption">
-                <h3>仿真機構草圖提案</h3>
-                <p>運動學分析結合概念視覺化，精確傳達設計意圖。</p>
+                <h3>概念草圖 01</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
                 <span class="gallery-tag">概念草圖</span>
-                <span class="gallery-tag">機構設計</span>
             </div>
         </div>
 
-        <div class="gallery-item" data-category="渲染" onclick="openLightbox(this)">
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
             <div class="zoom-hint">⤢</div>
-            <img src="image/dfm.png" alt="DFM 結構分析視覺" loading="lazy">
+            <img src="image01/02.jpg" alt="概念草圖 02" loading="lazy">
             <div class="gallery-caption">
-                <h3>DFM 結構分析視覺</h3>
-                <p>應力熱圖與壁厚分析，直觀呈現優化前後差異。</p>
-                <span class="gallery-tag">DFM</span>
-                <span class="gallery-tag">應力分析</span>
+                <h3>概念草圖 02</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
             </div>
         </div>
 
-        <!-- ── 新增圖片範本（複製以下區塊即可）──
-        <div class="gallery-item" data-category="包裝" onclick="openLightbox(this)">
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
             <div class="zoom-hint">⤢</div>
-            <img src="image/你的圖片.jpg" alt="圖片說明" loading="lazy">
+            <img src="image01/03.jpg" alt="概念草圖 03" loading="lazy">
             <div class="gallery-caption">
-                <h3>標題</h3>
-                <p>簡短描述文字。</p>
-                <span class="gallery-tag">標籤</span>
+                <h3>概念草圖 03</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
             </div>
         </div>
-        ── -->
 
-    </div>
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/04.jpg" alt="概念草圖 04" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 04</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/05.jpg" alt="概念草圖 05" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 05</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/06.jpg" alt="概念草圖 06" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 06</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/07.jpg" alt="概念草圖 07" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 07</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/08.jpg" alt="概念草圖 08" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 08</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/09.jpg" alt="概念草圖 09" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 09</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/10.jpg" alt="概念草圖 10" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 10</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/11.jpg" alt="概念草圖 11" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 11</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="image01/12.jpg" alt="概念草圖 12" loading="lazy">
+            <div class="gallery-caption">
+                <h3>概念草圖 12</h3>
+                <p>產品造型初期概念發想與視覺化提案。</p>
+                <span class="gallery-tag">概念草圖</span>
+            </div>
+        </div>
+
+    </div><!-- end .gallery-grid -->
 </section>
 
 <footer>
@@ -487,9 +515,9 @@
 </div>
 
 <script>
-    // ── Filter logic ──
+    // ── Filter ──
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const items      = () => [...document.querySelectorAll('.gallery-item')];
+    const items = () => [...document.querySelectorAll('.gallery-item')];
 
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -497,16 +525,15 @@
             btn.classList.add('active');
             const cat = btn.dataset.filter;
             items().forEach(item => {
-                const match = cat === 'all' || item.dataset.category === cat;
-                item.style.display = match ? '' : 'none';
+                item.style.display = (cat === 'all' || item.dataset.category === cat) ? '' : 'none';
             });
             buildVisibleIndex();
         });
     });
 
-    // ── Lightbox logic ──
+    // ── Lightbox ──
     let visibleItems = [];
-    let currentIdx   = 0;
+    let currentIdx = 0;
 
     function buildVisibleIndex() {
         visibleItems = items().filter(el => el.style.display !== 'none');
@@ -526,12 +553,11 @@
         const img   = item.querySelector('img');
         const title = item.querySelector('h3')?.textContent || '';
         const desc  = item.querySelector('p')?.textContent  || '';
-        document.getElementById('lightboxImg').src     = img.src;
-        document.getElementById('lightboxImg').alt     = img.alt;
+        document.getElementById('lightboxImg').src = img.src;
+        document.getElementById('lightboxImg').alt = img.alt;
         document.getElementById('lightboxTitle').textContent = title;
         document.getElementById('lightboxDesc').textContent  = desc;
-        document.getElementById('lightboxCounter').textContent =
-            `${idx + 1} / ${visibleItems.length}`;
+        document.getElementById('lightboxCounter').textContent = `${idx + 1} / ${visibleItems.length}`;
     }
 
     function shiftImage(dir) {
