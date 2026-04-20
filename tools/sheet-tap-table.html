@@ -183,11 +183,19 @@
                 </div>
                 <div class="ci-group">
                     <label>軸力係數 Kf</label>
-                    <input type="number" id="ci-kf" value="0.7" min="0.1" max="1" step="0.05">
+                    <select id="ci-kf">
+                        <option value="0.7" selected>使用一般(三柱)【軸力】係數 0.7</option>
+                        <option value="0.65">自定義【軸力】係數 0.65</option>
+                        <option value="0.6">使用TONE【軸力】係數 0.6</option>
+                        <option value="0.75">使用AAMA【軸力】係數 0.75</option>
+                    </select>
                 </div>
                 <div class="ci-group">
                     <label>力矩係數 Kt</label>
-                    <input type="number" id="ci-kt" value="0.2" min="0.1" max="0.4" step="0.01">
+                    <select id="ci-kt">
+                        <option value="0.2" selected>鍍鋅或不銹鋼【K力矩】係數 0.2</option>
+                        <option value="0.16">鍍鉻螺紋【K力矩】係數 0.16</option>
+                    </select>
                 </div>
                 <button class="calc-btn" onclick="runCalc()">計算 ▶</button>
             </div>
@@ -336,7 +344,7 @@
     };
 
     // 強度等級表（依 CNS 3934 表3 / CNS 15590-7）
-    // δyp = Rm_nom / 2（螺牙強度計算保守設計值）
+    // 強度等級基本參數（CNS 3934）
     const GRADES = {
         '3.6':  { Rm_nom:300,  Rm_min:330,  HV_max:250 },
         '4.6':  { Rm_nom:400,  Rm_min:400,  HV_max:250 },
@@ -348,6 +356,19 @@
         '9.8':  { Rm_nom:900,  Rm_min:900,  HV_max:360 },
         '10.9': { Rm_nom:1000, Rm_min:1040, HV_max:380 },
         '12.9': { Rm_nom:1200, Rm_min:1220, HV_max:435 },
+    };
+
+    // δyp 係數（Excel R33:R42，依強度等級）：δyp = MAX(H7 × factor, 200)
+    const FACTORS = {
+        '3.6':0.6, '4.6':0.6, '4.8':0.8, '5.6':0.6, '5.8':0.8,
+        '6.8':0.8, '8.8':0.8, '9.8':0.8, '10.9':0.9, '12.9':0.9,
+    };
+
+    // 保證荷重應力 SP（Excel AB23:AK23，CNS 3934）
+    // 安全負載 = ROUNDUP(SP × As, 0)
+    const SP_TABLE = {
+        '3.6':180, '4.6':225, '4.8':310, '5.6':280, '5.8':380,
+        '6.8':440, '8.8':580, '9.8':650, '10.9':830, '12.9':970,
     };
 
     // Trifast plc Group 引伸孔建議表
@@ -444,27 +465,50 @@
         const P   = scr.P;
         const As  = scr.As;
 
-        // ─ 螺牙強度 ─────────────────────────────────
-        // δyp = Rm_nom / 2（保守設計值，τyp = δyp/2）
-        const delta_yp    = g.Rm_nom / 2;
-        const tau_yp      = delta_yp / 2;
-        const tau_yp_kgf  = tau_yp / 9.81;
-        const single_kgf  = (Math.PI * d * 1 * P * tau_yp_kgf) / 2;
+        const PI     = 3.14;
+        const G      = 9.8;
+        const factor = FACTORS[gradeKey];
+        const SP     = SP_TABLE[gradeKey];
 
-        // ─ δy 判斷（CNS 15590-7）───────────────────
-        // M4 以下：固定 HV max；M5+：L < 2.5d 用 HV max，否則用 Rm min
-        const is_large = d > 4;
-        const useHV    = !is_large || (L < 2.5 * d);
-        const delta_y  = useHV ? g.HV_max : g.Rm_min;
-        const basis    = useHV
-            ? (is_large ? `HV max ${g.HV_max}（L=${L} < 2.5d=${2.5*d}）` : `HV max ${g.HV_max}（M≤4 固定）`)
-            : `Rm min ${g.Rm_min}（L=${L} ≥ 2.5d=${2.5*d}）`;
+        // ─ 模式判斷（對應 Excel H6 公式）──────────────
+        // M8/M10/M12/M16/M18 → Rm nom 模式（Excel 標示 Rm min 但查 Rm_nom）
+        // M4(含)以下 → 固定 HV max
+        // M5~M7：L < 2.5d → HV max；否則 → Rm nom
+        const BIG_BOLTS = ['M8','M10','M12','M16','M18'];
+        const isBigBolt = BIG_BOLTS.includes(specKey);
+        const useHV     = !isBigBolt && (d <= 4 || L < 2.5 * d);
+
+        // H7 = HV_max（HV模式） 或 Rm_nom（Rm模式）
+        const H7    = useHV ? g.HV_max : g.Rm_nom;
+        const basis = isBigBolt
+            ? `Rm nom ${g.Rm_nom}（M8+ 固定）`
+            : useHV
+                ? (d <= 4 ? `HV max ${g.HV_max}（M≤4 固定）`
+                          : `HV max ${g.HV_max}（L=${L} < 2.5d=${2.5*d}）`)
+                : `Rm nom ${g.Rm_nom}（L=${L} ≥ 2.5d=${2.5*d}）`;
+
+        // ─ δyp（螺牙強度用）────────────────────────────
+        // Excel E7: =IF(H7×factor ≥ 200, H7×factor, 200)
+        const delta_yp    = Math.max(H7 * factor, 200);
+        const tau_yp      = delta_yp / 2;
+        const tau_yp_kgf  = Math.round(tau_yp / G * 10) / 10;   // 四捨五入至1位小數
+        const single_kgf  = (PI * d * P * tau_yp_kgf) / 2;
+
+        // ─ δy（Ff 計算用）──────────────────────────────
+        // Excel B18: =IF(H6="HV max", H7, E7)
+        // HV模式 → H7=HV_max；Rm模式 → E7=δyp
+        const delta_y = useHV ? g.HV_max : delta_yp;
 
         const Ff_N   = Kf * delta_y * As;
-        const Ff_kgf = Ff_N / 9.81;
+        const Ff_kgf = Math.round(Ff_N / G * 100) / 100;
         const T_Nm   = Kt * Ff_N * (d / 1000);
 
-        const nc_needed = Math.ceil(Ff_kgf / single_kgf);
+        const nc_needed = Math.round(Ff_kgf / single_kgf);   // 對應 Excel 四捨五入邏輯
+
+        // ─ 最小抗拉負載 / 安全負載──────────────────────
+        // Excel J5: =ROUNDUP(H7×As, 0)，K5: =ROUNDUP(SP×As, 0)
+        const min_tensile_load = Math.ceil(delta_y * As);
+        const safe_load        = Math.ceil(SP * As);
 
         // ─ Trifast 查表（有效牙數 nc ≥ nc_needed）──
         const tfCands = TRIFAST
@@ -478,10 +522,12 @@
 
         calcResult = {
             specKey, L, gradeKey, Kf, Kt, d, P, As,
-            delta_yp, tau_yp, tau_yp_kgf,
             Rm_nom: g.Rm_nom, Rm_min: g.Rm_min, HV_max: g.HV_max,
-            useHV, delta_y, basis,
-            Ff_N, Ff_kgf, T_Nm, single_kgf, nc_needed,
+            factor, H7, SP,
+            delta_yp, tau_yp, tau_yp_kgf, single_kgf,
+            useHV, isBigBolt, delta_y, basis,
+            Ff_N, Ff_kgf, T_Nm, nc_needed,
+            min_tensile_load, safe_load,
             tfRes: tfCands.length ? tfCands[0] : null,
             hbRes: hbCands.length ? hbCands[0] : null,
         };
@@ -501,26 +547,26 @@
         const f = (v, n=2) => typeof v === 'number' ? v.toFixed(n) : String(v);
 
         const items = [
-            { k:'螺絲規格',                     v: c.specKey },
-            { k:'節圓徑 d (mm)',                 v: c.d },
-            { k:'節距 P (mm)',                   v: c.P },
-            { k:'應力截面積 As (mm²)',            v: c.As },
-            { k:'Rm_nom 公稱抗拉強度 (N/mm²)',    v: c.Rm_nom },
-            { k:'Rm_min 最小抗拉強度 (N/mm²)',    v: c.Rm_min },
-            { k:'HV max',                        v: c.HV_max },
-            { k:'δyp 下降伏點強度 (N/mm²)',       v: c.delta_yp,   note:'= Rm_nom/2' },
-            { k:'τyp 剪降伏應力 (N/mm²)',         v: c.tau_yp,     note:'= δyp/2' },
-            { k:'τyp (kgf/mm²)',                  v: f(c.tau_yp_kgf, 3) },
-            { k:'單牙強度 (kgf)',                  v: f(c.single_kgf, 3) },
-            { k:'螺絲長度 L (mm)',                 v: c.L },
-            { k:'2.5d (mm)',                      v: f(2.5 * c.d, 1) },
-            { k:'軸力係數 Kf',                    v: c.Kf },
-            { k:'力矩係數 Kt',                    v: c.Kt },
-            { k:'δy 計算基準',                    v: c.basis,      full: true },
-            { k:'一般算法 δy (N/mm²)',             v: c.delta_y,    hl: true },
-            { k:'軸向力 Ff (N)',                   v: f(c.Ff_N, 1), hl: true },
-            { k:'軸向力 Ff (kgf)',                 v: f(c.Ff_kgf, 2), hl: true },
-            { k:'扭力 T (N·m)',                    v: f(c.T_Nm, 3), hl: true },
+            { k:'螺絲規格',                  v: c.specKey },
+            { k:'節圓徑 d (mm)',              v: c.d },
+            { k:'節距 P (mm)',               v: c.P },
+            { k:'應力截面積 As (mm²)',        v: c.As },
+            { k:'HV max (N/mm²)',            v: c.HV_max },
+            { k:'抗拉強度 Rm (N/mm²)',        v: c.SP },
+            { k:'τyp 剪降伏應力 (N/mm²)',    v: c.tau_yp,        note:'= δyp/2' },
+            { k:'τyp (kgf/mm²)',             v: f(c.tau_yp_kgf, 3) },
+            { k:'單牙強度 (kgf)',             v: f(c.single_kgf, 3) },
+            { k:'螺絲長度 L (mm)',            v: c.L },
+            { k:'2.5d (mm)',                v: f(2.5 * c.d, 1) },
+            { k:'軸力係數 Kf',               v: c.Kf },
+            { k:'力矩係數 Kt',               v: c.Kt },
+            { k:'δy 計算基準',               v: c.basis,         full: true },
+            { k:'一般算法 δy (N/mm²)',        v: c.delta_y,       hl: true },
+            { k:'軸向力 Ff (N)',             v: f(c.Ff_N, 1),    hl: true },
+            { k:'軸向力 Ff (kgf)',           v: f(c.Ff_kgf, 2),  hl: true },
+            { k:'扭力 T (N·m)',              v: f(c.T_Nm, 3),    hl: true },
+            { k:'最小抗拉負載 As×δy (N)',    v: c.min_tensile_load },
+            { k:'安全負載 As×Rm (N)',        v: c.safe_load },
         ];
 
         document.getElementById('params-grid').innerHTML = items.map(it => {
