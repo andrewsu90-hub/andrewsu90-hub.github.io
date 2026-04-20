@@ -267,10 +267,7 @@
             const note = isThrough
                 ? '通孔為整段攻牙，無需計算攻牙深度與鑽孔深度。'
                 : `鑽孔深度已含底部餘量，盲孔務必鑽至此深度再攻牙。`;
-                 通孔表示整段攻牙。(攻牙深度、鑽孔深度會出現#N/A)。<br>
-                 推算鋼類d×1倍,鑄鐵d×1.67倍,鋁d×2倍.<br>
-                 螺絲長度＝旋入深度﹢機構厚度。<br>
-                 青銅、鑄鋼、青銅鑄件等同鋼材質。
+                
             document.getElementById('tip-box').innerHTML = `
                 <strong>📌 使用提示</strong>（${spec} / ${matLabel} / ${holeLabel}）<br>
                 螺絲長度 = 旋入深度（${engage} mm）+ 機構板材厚度<br>${note}`;
