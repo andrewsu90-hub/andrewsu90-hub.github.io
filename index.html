@@ -49,9 +49,7 @@
         }
 
         body {
-            body {
-    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-    /* ... 下面原本的代碼保留 ... */
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--primary-color);
             background-color: var(--bg-white);
             line-height: 1.6;
@@ -559,7 +557,7 @@
         <h2 class="section-title">精選工程實績</h2>
         <div class="project-grid">
             <div class="project-card">
-               <div class="project-image"><img src="04.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
+               <div class="project-image"><img src="image/04.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
                     <h3>複雜連桿機構設計</h3>
                     <p>透過 Creo 運動學模組進行作動模擬，精確計算行程並排除干涉問題，確保機構運作順暢。</p>
@@ -572,7 +570,7 @@
             </div>
 
             <div class="project-card">
-                <div class="project-image"><img src="01.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-image"><img src="image/01.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
                     <h3>消費性電子產品外觀建模</h3>
                     <p>利用高階曲面技巧建構符合人體工學的流線外型，並考量後續的拆件與組裝邏輯。</p>
@@ -635,7 +633,7 @@
 
     <section class="contact" id="contact">
         <h2>啟動設計專案</h2>
-        <p>有機構設計、3D 建模或產品開發的需求嗎？歡迎隨時聯繫討論您的構想與規格。</p>
+        <p>有機構設計、3D 建模 or 產品開發需求嗎？歡迎隨時聯繫討論您的構想與規格。</p>
         <button class="cta-button" onclick="openContactModal()">專案諮詢</button>
         <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">直接發送郵件</a>
     </section>
@@ -667,7 +665,7 @@
 
                 <div class="form-group">
                     <label for="message">專案需求描述 *</label>
-                    <textarea id="message" name="message" required placeholder="請簡述您的專案需求（例如：需要機構設計、既有圖面優化、或是新產品外觀建模等）..."></textarea>
+                    <textarea id="message" name="message" required placeholder="請簡述您的專案需求..."></textarea>
                 </div>
 
                 <button type="submit" class="cta-button" style="width: 100%; border: none;">送出諮詢</button>
@@ -709,8 +707,6 @@
         // Form submission
         function handleFormSubmit(event) {
             event.preventDefault();
-            
-            // Collect form data
             const formData = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
@@ -718,14 +714,8 @@
                 phone: document.getElementById('phone').value,
                 message: document.getElementById('message').value
             };
-
-            // Create mailto link with form data (請將 andrew@example.com 替換成您的真實信箱)
             const mailtoLink = `mailto:andrew@example.com?subject=設計專案諮詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名: ${formData.name}\n郵件: ${formData.email}\n公司: ${formData.company}\n電話: ${formData.phone}\n\n需求描述:\n${formData.message}`)}`;
-            
-            // Open email client
             window.location.href = mailtoLink;
-            
-            // Reset form and close modal
             document.querySelector('form').reset();
             setTimeout(closeContactModal, 500);
         }
@@ -742,7 +732,6 @@
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
         };
-
         const observer = new IntersectionObserver(function(entries) {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -750,7 +739,6 @@
                 }
             });
         }, observerOptions);
-
         document.querySelectorAll('section').forEach(section => {
             section.style.opacity = '0.95';
         });
