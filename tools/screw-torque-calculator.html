@@ -112,7 +112,7 @@
     <section class="hero">
         <div class="hero-label">工程計算工具</div>
         <h1>🔩 碳鋼螺絲扭力計算工具</h1>
-        <p>整合六種常用碳鋼螺絲扭力計算方法，包含一般算法、SP安全負載、破壞扭矩推算、三柱公式、東日T系列與鐵板抽牙分析。依輸入的規格、強度、長度與係數即時計算軸向力、扭力、單牙強度與所需牙數。</p>
+        <p>整合五種常用碳鋼螺絲扭力計算方法，包含一般算法、SP安全負載、破壞扭矩推算、三柱公式與東日T系列。依輸入的規格、強度、長度與係數即時計算軸向力、扭力、單牙強度與所需牙數。</p>
         <span class="source-note">資料來源：CNS 15590-7、CNS 3934、GB/T 3098-13、JIS B 1051、東日扭力資料、三柱扭力計公式</span>
     </section>
 
@@ -170,7 +170,6 @@
             <button class="tab" data-tab="t-break" onclick="switchTab('t-break')">破壞扭矩</button>
             <button class="tab" data-tab="t-mtc" onclick="switchTab('t-mtc')">三柱公式</button>
             <button class="tab" data-tab="t-tohnichi" onclick="switchTab('t-tohnichi')">東日 T 系列</button>
-            <button class="tab" data-tab="t-sheet" onclick="switchTab('t-sheet')">鐵板抽牙</button>
         </div>
 
         <!-- TAB 1: 一般算法 -->
@@ -272,49 +271,6 @@
                 <div id="th-status"></div>
                 <div class="result-grid" id="th-result"></div>
                 <div class="tip-box" id="th-tip"></div>
-            </div>
-        </div>
-
-        <!-- TAB 6: 鐵板抽牙 -->
-        <div class="tab-panel" id="t-sheet">
-            <div class="method-card">
-                <h3>鐵板抽牙 計算</h3>
-                <span class="formula-note">軸力公式：Ff = k · δy · As（以板金許用強度代入）</span>
-                <span class="formula-note">抽牙高度資料來自 Trifast plc Group 與《钣金结构设计工艺手册》，取抽牙高度中間值。</span>
-                <div class="selector-grid" style="margin-top:1rem;">
-                    <div class="field-group">
-                        <label>板金材質許用降伏應力 (N/mm²)</label>
-                        <input type="number" id="sh-sigma" value="250" min="150" step="10" oninput="calcSheet()">
-                    </div>
-                    <div class="field-group">
-                        <label>鐵板厚度 t (mm)</label>
-                        <input type="number" id="sh-thick" value="1.2" min="0.5" step="0.1" oninput="calcSheet()">
-                    </div>
-                </div>
-            </div>
-            <div class="result-card">
-                <h2>鐵板抽牙 計算結果</h2>
-                <div class="result-grid" id="sh-result"></div>
-                <div class="tip-box" id="sh-tip"></div>
-                <div class="table-section">
-                    <h3>抽牙參考表</h3>
-                    <div class="table-wrapper">
-                        <table id="sh-table">
-                            <thead>
-                                <tr>
-                                    <th>規格</th>
-                                    <th>需要牙數</th>
-                                    <th>Trifast 適用板厚 (mm)</th>
-                                    <th>Trifast 抽牙高度 h (mm)</th>
-                                    <th>沖孔中間值 (mm)</th>
-                                    <th>手冊 適用板厚 (mm)</th>
-                                    <th>手冊 抽牙高度 h (mm)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sh-tbody"></tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -426,18 +382,6 @@
         { label: '染黑無潤滑｜SCM-AL', k: 0.55 },
     ];
 
-    // 鐵板抽牙資料 (簡化) — 來源：Trifast plc Group + 钣金结构设计工艺手册
-    // 每一規格包含: 需要牙數, Trifast 適用板厚, 沖孔中間直徑, 抽牙高度h, 內R, 外R; 手冊適用板厚, 手冊抽牙h
-    const SHEET_PUNCH = {
-        'M3':   { nc: 3, t_a: 1.0, hole: 2.7, h_a: 2.0, r_in: 0.1,  R_out: 0.95, t_b: 1.0, h_b: 1.8 },
-        'M3.5': { nc: 3, t_a: 1.0, hole: 3.2, h_a: 2.2, r_in: 0.12, R_out: 1.1,  t_b: 1.0, h_b: 2.0 },
-        'M4':   { nc: 3, t_a: 1.1, hole: 3.6, h_a: 2.45,r_in: 0.13, R_out: 1.23, t_b: 1.2, h_b: 2.16 },
-        'M5':   { nc: 3, t_a: 1.5, hole: 4.5, h_a: 2.9, r_in: 0.15, R_out: 1.55, t_b: 1.5, h_b: 2.7 },
-        'M6':   { nc: 3, t_a: 1.8, hole: 5.4, h_a: 3.5, r_in: 0.18, R_out: 1.85, t_b: 2.0, h_b: 3.3 },
-        'M8':   { nc: 3, t_a: 2.3, hole: 7.2, h_a: 4.5, r_in: 0.25, R_out: 2.5,  t_b: 2.5, h_b: 4.0 },
-        'M10':  { nc: 3, t_a: 3.0, hole: 9.0, h_a: 5.5, r_in: 0.3,  R_out: 3.2,  t_b: 3.0, h_b: 5.0 },
-    };
-
     // ============================================================
     // 初始化 UI
     // ============================================================
@@ -475,15 +419,6 @@
         const mb = s.mb.map(v => v === null ? '—' : v).join('</td><td>');
         tr.innerHTML = `<td>${s.name}</td><td>${s.d}</td><td>${s.P}</td><td>${s.As}</td><td>${mb}</td>`;
         specTbody.appendChild(tr);
-    });
-
-    // 抽牙表
-    const shTbody = document.getElementById('sh-tbody');
-    Object.keys(SHEET_PUNCH).forEach(k => {
-        const d = SHEET_PUNCH[k];
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${k}</td><td>${d.nc}</td><td>${d.t_a}</td><td>${d.h_a}</td><td>${d.hole}</td><td>${d.t_b}</td><td>${d.h_b}</td>`;
-        shTbody.appendChild(tr);
     });
 
     // ============================================================
@@ -744,56 +679,6 @@
         document.getElementById('th-tip').innerHTML = `
             <strong>📌 東日公式</strong>　T = K · (σ軸 · As) · d = ${K} × (${sigma} × ${spec.As}) × ${spec.d/1000} = ${T_Nm} N·m<br>
             0.5T 適用電子零件，基準T 一般用，1.8T 與 2.4T 為高強度螺栓專用。
-        `;
-    }
-
-    // ============================================================
-    // TAB 6: 鐵板抽牙
-    // ============================================================
-    function calcSheet() {
-        const p = getParams();
-        const { spec, axialK, K, nc } = p;
-        const sigma = parseFloat(document.getElementById('sh-sigma').value) || 250;
-        const thick = parseFloat(document.getElementById('sh-thick').value) || 1.2;
-
-        const Ff_N = round(axialK * sigma * spec.As, 2);
-        const Ff_kgf = round(Ff_N / 9.8, 2);
-        const T_Nm = round(K * Ff_N * (spec.d / 1000), 2);
-        const T_kgfcm = round(T_Nm * 100 / 9.8, 2);
-
-        const punch = SHEET_PUNCH[spec.name];
-        let shInfo = '';
-        let effH = '—';
-        if (punch) {
-            // 取兩來源平均作為抽牙高度估計
-            effH = round((punch.h_a + punch.h_b) / 2, 2);
-            shInfo = `<div class="result-item"><div class="label">抽牙高度 h</div><div class="value">${effH}</div><div class="unit">mm</div></div>
-                      <div class="result-item"><div class="label">沖孔中間值</div><div class="value">${punch.hole}</div><div class="unit">mm</div></div>`;
-        } else {
-            shInfo = `<div class="result-item warn"><div class="label">抽牙資料</div><div class="value">—</div><div class="unit">無此規格</div></div>`;
-        }
-        // 實際可承受牙數 = 抽牙高度 / P
-        let threadsAvail = punch ? round(effH / spec.P, 2) : 0;
-        // 單牙強度 (以板金 σ 剪降伏)
-        const tau_kgf = round((sigma / 9.8) / 2, 2);
-        const st = singleThreadStrength(spec.d, nc, spec.P, tau_kgf);
-        const threadsNeeded = st > 0 ? Math.ceil(Ff_kgf / st) : '—';
-
-        document.getElementById('sh-result').innerHTML = `
-            <div class="result-item"><div class="label">板金 δy</div><div class="value">${sigma}</div><div class="unit">N/mm²</div></div>
-            <div class="result-item"><div class="label">軸向力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N (${Ff_kgf} kgf)</div></div>
-            <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_Nm}</div><div class="unit">N·m (${T_kgfcm} kgf·cm)</div></div>
-            ${shInfo}
-            <div class="result-item"><div class="label">抽牙可用牙數</div><div class="value">${threadsAvail}</div><div class="unit">牙 ≈ h/P</div></div>
-            <div class="result-item ${(typeof threadsNeeded === 'number' && threadsAvail < threadsNeeded) ? 'warn' : ''}"><div class="label">需要牙數</div><div class="value">${threadsNeeded}</div><div class="unit">牙</div></div>
-        `;
-        const ok = (typeof threadsNeeded === 'number' && typeof threadsAvail === 'number' && threadsAvail >= threadsNeeded);
-        const msg = ok ? '<strong style="color:var(--ok);">✓ 抽牙高度足夠承受計算軸力。</strong>'
-                       : (punch ? '<strong style="color:var(--warn);">⚠ 抽牙高度不足，建議加厚板金、加大沖孔或改用螺帽壓入。</strong>' : '');
-
-        document.getElementById('sh-tip').innerHTML = `
-            <strong>📌 板金抽牙</strong>　適用一般板厚 0.8–3.0 mm。單牙剪切公式 = (π·d·nc·P·τyp)/2。<br>
-            抽牙高度取 Trifast plc 與《钣金结构设计工艺手册》兩來源之中間值。${msg}
         `;
     }
 
