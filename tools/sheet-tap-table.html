@@ -13,10 +13,11 @@
             --primary-color: #000; --secondary-color: #666; --border-color: #e0e0e0;
             --bg-light: #f9f9f9; --bg-white: #ffffff;
             --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
-            --ok: #2e7d32; --warn: #c62828;
+            --hl-bg: #fff3cd; --hl-border: #e6a817; --hl-text: #7c5000;
+            --warn: #c62828;
         }
         @media (prefers-color-scheme: dark) {
-            :root { --primary-color: #fff; --secondary-color: #aaa; --border-color: #333; --bg-light: #1a1a1a; --bg-white: #0d0d0d; --ok: #66bb6a; --warn: #ef5350; }
+            :root { --primary-color: #fff; --secondary-color: #aaa; --border-color: #333; --bg-light: #1a1a1a; --bg-white: #0d0d0d; --hl-bg: #3d2e00; --hl-border: #a07000; --hl-text: #ffd060; --warn: #ef5350; }
         }
         html { scroll-behavior: smooth; }
         body { font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--primary-color); background-color: var(--bg-white); line-height: 1.6; -webkit-font-smoothing: antialiased; }
@@ -26,15 +27,58 @@
         .back-link { font-size: 14px; color: var(--secondary-color); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
         .back-link:hover { color: var(--primary-color); }
 
-        .hero { padding: 4rem 5% 2rem; max-width: 1000px; margin: 0 auto; animation: fadeInDown 0.6s ease; }
+        .hero { padding: 4rem 5% 2rem; max-width: 1060px; margin: 0 auto; animation: fadeInDown 0.6s ease; }
         .hero-label { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.75rem; }
-        .hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+        .hero h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
         .hero p { font-size: 15px; color: var(--secondary-color); line-height: 1.8; }
         .source-note { display: inline-block; margin-top: 0.75rem; font-size: 12px; color: var(--secondary-color); background-color: var(--bg-light); border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 4px 12px; }
 
-        .main-section { padding: 1rem 5% 5rem; max-width: 1000px; margin: 0 auto; animation: fadeInUp 0.7s ease; }
+        .main-section { padding: 1rem 5% 5rem; max-width: 1060px; margin: 0 auto; animation: fadeInUp 0.7s ease; }
 
-        /* Source tabs */
+        /* ── CALCULATOR PANEL ── */
+        .calc-panel { background: var(--bg-light); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.25rem; border-left: 3px solid var(--primary-color); }
+        .calc-panel-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--secondary-color); margin-bottom: 1rem; }
+        .calc-inputs { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end; }
+        .ci-group { display: flex; flex-direction: column; gap: 0.3rem; min-width: 110px; }
+        .ci-group label { font-size: 11px; font-weight: 700; color: var(--secondary-color); letter-spacing: 0.3px; }
+        .ci-group select,
+        .ci-group input[type="number"] { padding: 8px 10px; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--primary-color); background: var(--bg-white); transition: border-color 0.2s; }
+        .ci-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+        .ci-group input[type="number"] { width: 90px; }
+        .ci-group select:focus, .ci-group input:focus { outline: none; border-color: var(--primary-color); }
+        .calc-btn { padding: 9px 22px; background: var(--primary-color); color: var(--bg-white); border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px; transition: opacity 0.2s; align-self: flex-end; white-space: nowrap; }
+        .calc-btn:hover { opacity: 0.8; }
+
+        /* ── BASIC PARAMS DISPLAY ── */
+        .params-display { display: none; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 0.5px solid var(--border-color); }
+        .params-display.visible { display: block; }
+        .params-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--secondary-color); margin-bottom: 0.6rem; }
+        .params-formula { font-size: 12px; color: var(--secondary-color); margin-bottom: 0.85rem; font-style: italic; background: var(--bg-white); border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 6px 12px; }
+        .params-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 0.5rem; margin-bottom: 0.85rem; }
+        .param-item { background: var(--bg-white); border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; }
+        .param-item .pk { font-size: 11px; color: var(--secondary-color); margin-bottom: 2px; }
+        .param-item .pv { font-size: 13px; font-weight: 700; color: var(--primary-color); }
+        .param-item.hl { background: var(--hl-bg); border-color: var(--hl-border); }
+        .param-item.hl .pk { color: var(--hl-text); }
+        .param-item.hl .pv { color: var(--hl-text); }
+        .param-item.full { grid-column: 1 / -1; background: transparent; border-color: transparent; padding: 2px 0; }
+        .param-item.full .pv { font-size: 12px; font-weight: 400; color: var(--secondary-color); }
+        .nc-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-color); color: var(--bg-white); font-size: 14px; font-weight: 700; padding: 6px 18px; border-radius: 999px; }
+
+        /* ── TAP RESULT SUMMARY ── */
+        .tap-summary { display: none; background: var(--bg-white); border: 0.5px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1rem; }
+        .tap-summary.visible { display: block; }
+        .tap-summary-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--secondary-color); margin-bottom: 0.85rem; }
+        .tap-result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.6rem; }
+        .tap-val { background: var(--bg-light); border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.6rem 0.85rem; }
+        .tap-val .tk { font-size: 11px; color: var(--secondary-color); margin-bottom: 2px; }
+        .tap-val .tv { font-size: 15px; font-weight: 700; }
+        .tap-val.hl { background: var(--hl-bg); border-color: var(--hl-border); border-width: 2px; }
+        .tap-val.hl .tk { color: var(--hl-text); font-weight: 700; }
+        .tap-val.hl .tv { color: var(--hl-text); font-size: 20px; }
+        .no-tap { padding: 1rem; font-size: 13px; color: var(--warn); background: rgba(198,40,40,0.06); border-radius: var(--radius-sm); border: 0.5px solid rgba(198,40,40,0.2); }
+
+        /* ── SOURCE TABS ── */
         .src-tabs { display: flex; gap: 4px; margin-bottom: 1.25rem; border-bottom: 0.5px solid var(--border-color); }
         .src-tab { padding: 10px 18px; border: none; background: transparent; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--secondary-color); border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
         .src-tab:hover { color: var(--primary-color); }
@@ -42,42 +86,46 @@
         .src-panel { display: none; animation: fadeIn 0.3s ease; }
         .src-panel.active { display: block; }
 
-        /* Filter bar */
-        .filter-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; padding: 1.25rem; background: var(--bg-light); border-radius: var(--radius-md); border: 0.5px solid var(--border-color); }
+        /* ── FILTER BAR ── */
+        .filter-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; padding: 1rem 1.25rem; background: var(--bg-light); border-radius: var(--radius-md); border: 0.5px solid var(--border-color); }
         .filter-group { display: flex; flex-direction: column; gap: 0.3rem; min-width: 120px; }
         .filter-group label { font-size: 12px; font-weight: 600; color: var(--secondary-color); }
-        .filter-group select { padding: 8px 10px; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--primary-color); background: var(--bg-white); appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; transition: border-color 0.2s; }
+        .filter-group select { padding: 7px 10px; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--primary-color); background: var(--bg-white); appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
         .filter-group select:focus { outline: none; border-color: var(--primary-color); }
+        .filter-note { font-size: 11.5px; color: var(--secondary-color); align-self: flex-end; padding-bottom: 2px; }
 
-        /* Info card */
-        .info-card { background: var(--bg-light); border-radius: var(--radius-md); border: 0.5px solid var(--border-color); padding: 1.25rem 1.5rem; margin-bottom: 1rem; font-size: 13px; color: var(--secondary-color); line-height: 1.8; border-left: 3px solid var(--primary-color); }
-        .info-card strong { color: var(--primary-color); }
-
-        /* Result table */
-        .result-card { background: var(--bg-white); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); padding: 1.5rem; margin-bottom: 1rem; }
-        .result-card h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--secondary-color); margin-bottom: 1.1rem; }
+        /* ── RESULT TABLE ── */
+        .result-card { background: var(--bg-white); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); padding: 1.25rem; margin-bottom: 1rem; }
+        .result-card h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--secondary-color); margin-bottom: 1rem; }
         .table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 0.5px solid var(--border-color); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         thead th { background: var(--primary-color); color: var(--bg-white); padding: 8px 12px; text-align: center; font-weight: 600; font-size: 12px; letter-spacing: 0.3px; white-space: nowrap; }
         @media (prefers-color-scheme: dark) { thead th { background: #222; } }
         tbody tr { border-bottom: 0.5px solid var(--border-color); transition: background 0.15s; }
         tbody tr:hover { background: var(--bg-light); }
-        tbody tr.highlighted { background: rgba(0,0,0,0.05) !important; }
-        @media (prefers-color-scheme: dark) { tbody tr.highlighted { background: rgba(255,255,255,0.07) !important; } }
+        tbody tr.row-match { background: var(--hl-bg) !important; }
         tbody td { padding: 8px 12px; text-align: center; }
         tbody td:first-child { font-weight: 700; }
+        td.cell-hl { background: var(--hl-bg); color: var(--hl-text); font-weight: 700; }
         .no-result { padding: 2rem; text-align: center; color: var(--secondary-color); font-size: 14px; }
 
-        /* Tip box */
+        /* ── INFO / TIP ── */
+        .info-card { background: var(--bg-light); border-radius: var(--radius-md); border: 0.5px solid var(--border-color); padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 13px; color: var(--secondary-color); line-height: 1.8; border-left: 3px solid var(--primary-color); }
+        .info-card strong { color: var(--primary-color); }
         .tip-box { background: var(--bg-light); border-radius: var(--radius-md); border-left: 3px solid var(--primary-color); padding: 0.85rem 1.1rem; font-size: 12.5px; color: var(--secondary-color); line-height: 1.75; }
         .tip-box strong { color: var(--primary-color); }
 
         footer { padding: 1.5rem 5%; border-top: 0.5px solid var(--border-color); text-align: center; font-size: 13px; color: var(--secondary-color); }
 
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @media (max-width: 600px) { .filter-bar { flex-direction: column; } }
+        @keyframes fadeInDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @media (max-width: 640px) {
+            .calc-inputs { flex-direction: column; }
+            .ci-group input[type="number"] { width: 100%; }
+            .tap-result-grid { grid-template-columns: 1fr 1fr; }
+            .params-grid { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -89,48 +137,116 @@
     <section class="hero">
         <div class="hero-label">工程計算工具</div>
         <h1>🏗️ 鐵板攻牙 引伸孔查詢</h1>
-        <p>依螺絲外徑 d 與板厚 t 查詢引伸孔尺寸、抽牙高度與有效牙數。提供兩種資料來源對照，板厚有差異時優先參考《钣金结构设计工艺手册》。</p>
+        <p>輸入螺絲規格、長度、強度區分與係數，計算所需牙數並查詢適用抽牙鐵板厚度與抽牙高度。提供兩種資料來源對照，板厚有差異時優先參考《钣金结构设计工艺手册》。</p>
         <span class="source-note">資料來源：Trifast plc Group 引伸孔建議表、《钣金结构设计工艺手册》頁 30</span>
     </section>
 
     <section class="main-section">
 
-        <!-- Source tabs -->
+        <!-- ══════════════ CALCULATOR PANEL ══════════════ -->
+        <div class="calc-panel">
+            <div class="calc-panel-title">碳鋼螺絲 強度計算 × 板金抽牙查詢</div>
+            <div class="calc-inputs">
+                <div class="ci-group">
+                    <label>螺絲規格</label>
+                    <select id="ci-spec">
+                        <option value="M2.5">M2.5</option>
+                        <option value="M3">M3</option>
+                        <option value="M3.5">M3.5</option>
+                        <option value="M4">M4</option>
+                        <option value="M5" selected>M5</option>
+                        <option value="M6">M6</option>
+                        <option value="M7">M7</option>
+                        <option value="M8">M8</option>
+                        <option value="M10">M10</option>
+                        <option value="M12">M12</option>
+                    </select>
+                </div>
+                <div class="ci-group">
+                    <label>螺絲長度 L (mm)</label>
+                    <input type="number" id="ci-L" value="4" min="1" step="0.5">
+                </div>
+                <div class="ci-group">
+                    <label>強度區分</label>
+                    <select id="ci-grade">
+                        <option value="3.6">3.6</option>
+                        <option value="4.6">4.6</option>
+                        <option value="4.8" selected>4.8</option>
+                        <option value="5.6">5.6</option>
+                        <option value="5.8">5.8</option>
+                        <option value="6.8">6.8</option>
+                        <option value="8.8">8.8</option>
+                        <option value="9.8">9.8</option>
+                        <option value="10.9">10.9</option>
+                        <option value="12.9">12.9</option>
+                    </select>
+                </div>
+                <div class="ci-group">
+                    <label>軸力係數 Kf</label>
+                    <input type="number" id="ci-kf" value="0.7" min="0.1" max="1" step="0.05">
+                </div>
+                <div class="ci-group">
+                    <label>力矩係數 Kt</label>
+                    <input type="number" id="ci-kt" value="0.2" min="0.1" max="0.4" step="0.01">
+                </div>
+                <button class="calc-btn" onclick="runCalc()">計算 ▶</button>
+            </div>
+
+            <!-- ── 基本參數顯示區 ── -->
+            <div class="params-display" id="params-display">
+                <div class="params-section-title">碳鋼螺絲 — 螺絲強度計算基本參數</div>
+                <div class="params-formula">
+                    螺牙（單牙）強度 (kgf) = (π × d × nc × P × τyp_kgf) / 2 &nbsp;｜&nbsp;
+                    Ff = Kf · δy · As &nbsp;｜&nbsp;
+                    T = Kt · Ff(N) · d(m)
+                </div>
+                <div class="params-grid" id="params-grid"></div>
+                <div id="nc-badge-wrap" style="margin-top:0.6rem;"></div>
+            </div>
+        </div>
+
+        <!-- ══════════════ SOURCE TABS ══════════════ -->
         <div class="src-tabs">
             <button class="src-tab active" id="tab-trifast" onclick="switchSrc('trifast')">Trifast plc Group</button>
             <button class="src-tab" id="tab-handbook" onclick="switchSrc('handbook')">钣金结构设计工艺手册</button>
         </div>
 
-        <!-- ===== TRIFAST PANEL ===== -->
+        <!-- ══════════════ TRIFAST PANEL ══════════════ -->
         <div class="src-panel active" id="panel-trifast">
             <div class="info-card">
                 <strong>📌 Trifast plc Group 引伸孔建議表</strong><br>
-                有效牙數已扣除 1 牙無效牙。引伸孔孔徑欄位為 min/max 中間值。適用板厚 0.5～5.5 mm，規格 M2.5～M12。
+                有效牙數已扣除 1 牙無效牙。引伸孔孔徑取 min/max 中間值。<strong>抽牙高度/h（總厚）= 板厚 t + 突出高度 h</strong>，即原表 "總厚度" 欄位。適用板厚 0.5～5.5 mm，規格 M2.5～M12。
             </div>
+
+            <!-- 板金抽牙計算表 結果 -->
+            <div class="tap-summary" id="tf-summary">
+                <div class="tap-summary-title">板金抽牙計算表 — Trifast plc Group 結果</div>
+                <div id="tf-result-body"></div>
+            </div>
+
+            <!-- 篩選 + 完整參考表 -->
             <div class="filter-bar">
                 <div class="filter-group">
                     <label>螺絲外徑 d (mm)</label>
-                    <select id="tf-d" onchange="renderTrifast()">
-                        <option value="">全部</option>
-                    </select>
+                    <select id="tf-d" onchange="renderTrifast()"><option value="">全部</option></select>
                 </div>
                 <div class="filter-group">
                     <label>板厚 t (mm)</label>
-                    <select id="tf-t" onchange="renderTrifast()">
-                        <option value="">全部</option>
-                    </select>
+                    <select id="tf-t" onchange="renderTrifast()"><option value="">全部</option></select>
                 </div>
+                <span class="filter-note">※ 計算後符合條件列以黃底標示</span>
             </div>
             <div class="result-card">
-                <h2>Trifast 查詢結果</h2>
+                <h2>Trifast 完整參考表</h2>
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
                                 <th>d (mm)</th>
-                                <th>t (mm)</th>
+                                <th>板厚 t (mm)</th>
                                 <th>引伸孔中間值 (mm)</th>
-                                <th>抽牙高度 h (mm)</th>
+                                <th>突出高度 h (mm)</th>
+                                <th>抽牙高度/h 總厚 (mm) ★</th>
                                 <th>內 r (mm)</th>
                                 <th>外 R (mm)</th>
                                 <th>P (mm)</th>
@@ -142,42 +258,47 @@
                 </div>
             </div>
             <div class="tip-box">
-                <strong>使用說明：</strong>選擇螺絲外徑或板厚可快速篩選。有效牙數 = (抽牙高度 h ÷ P) − 1。若板厚介於兩筆資料之間，取相鄰較近值代入。
+                <strong>使用說明：</strong>選擇螺絲外徑或板厚可快速篩選。有效牙數 ≈ floor(總厚 ÷ P) − 1（總厚 = t + 突出高度 h）。若板厚介於兩筆資料之間，取較近值代入。
             </div>
         </div>
 
-        <!-- ===== HANDBOOK PANEL ===== -->
+        <!-- ══════════════ HANDBOOK PANEL ══════════════ -->
         <div class="src-panel" id="panel-handbook">
             <div class="info-card">
                 <strong>📌 《钣金结构设计工艺手册》頁 30</strong><br>
-                計算牙數未扣除無效牙。板厚範圍較少（M2.5～M5），為兩種資料源的優先參考基準。
+                計算牙數<strong>未扣除</strong>無效牙（實際有效牙數 = 計算牙數 − 1）。板厚範圍 M2.5～M5，為優先參考基準。
             </div>
+
+            <!-- 板金抽牙計算表 結果 -->
+            <div class="tap-summary" id="hb-summary">
+                <div class="tap-summary-title">板金抽牙計算表 — 钣金结构设计工艺手册 結果</div>
+                <div id="hb-result-body"></div>
+            </div>
+
+            <!-- 篩選 + 完整參考表 -->
             <div class="filter-bar">
                 <div class="filter-group">
                     <label>螺絲外徑 d (mm)</label>
-                    <select id="hb-d" onchange="renderHandbook()">
-                        <option value="">全部</option>
-                    </select>
+                    <select id="hb-d" onchange="renderHandbook()"><option value="">全部</option></select>
                 </div>
                 <div class="filter-group">
                     <label>板厚 t (mm)</label>
-                    <select id="hb-t" onchange="renderHandbook()">
-                        <option value="">全部</option>
-                    </select>
+                    <select id="hb-t" onchange="renderHandbook()"><option value="">全部</option></select>
                 </div>
+                <span class="filter-note">※ 計算後符合條件列以黃底標示</span>
             </div>
             <div class="result-card">
-                <h2>手冊 查詢結果</h2>
+                <h2>手冊 完整參考表</h2>
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
                                 <th>d (mm)</th>
-                                <th>t (mm)</th>
+                                <th>板厚 t (mm) ★</th>
                                 <th>抽牙半徑 r (mm)</th>
-                                <th>總高度 h (mm)</th>
+                                <th>抽牙高度/h (mm) ★</th>
                                 <th>P (mm)</th>
-                                <th>計算牙數</th>
+                                <th>計算牙數（含無效）</th>
                             </tr>
                         </thead>
                         <tbody id="hb-tbody"></tbody>
@@ -185,7 +306,7 @@
                 </div>
             </div>
             <div class="tip-box">
-                <strong>使用說明：</strong>此資料計算牙數未扣除無效牙，實際有效牙數需再減 1。板厚不在列表中時，取相鄰較近值估算。
+                <strong>使用說明：</strong>計算牙數未扣除無效牙，實際有效牙數需再減 1。板厚不在列表中時，取相鄰較近值估算。
             </div>
         </div>
 
@@ -196,8 +317,41 @@
     </footer>
 
     <script>
-    // ── 資料表 ──────────────────────────────────────────────
+    // ════════════════════════════════════════════════════
+    //  資料表
+    // ════════════════════════════════════════════════════
 
+    // 螺絲規格表（依 Excel 資料清單）
+    const SCREWS = {
+        'M2.5': { d:2.5,  P:0.45, As:3.39  },
+        'M3':   { d:3,    P:0.50, As:5.03  },
+        'M3.5': { d:3.5,  P:0.60, As:6.78  },
+        'M4':   { d:4,    P:0.70, As:8.78  },
+        'M5':   { d:5,    P:0.80, As:14.2  },
+        'M6':   { d:6,    P:1.00, As:20.1  },
+        'M7':   { d:7,    P:1.00, As:28.9  },
+        'M8':   { d:8,    P:1.25, As:36.6  },
+        'M10':  { d:10,   P:1.50, As:58    },
+        'M12':  { d:12,   P:1.75, As:84.3  },
+    };
+
+    // 強度等級表（依 CNS 3934 表3 / CNS 15590-7）
+    // δyp = Rm_nom / 2（螺牙強度計算保守設計值）
+    const GRADES = {
+        '3.6':  { Rm_nom:300,  Rm_min:330,  HV_max:250 },
+        '4.6':  { Rm_nom:400,  Rm_min:400,  HV_max:250 },
+        '4.8':  { Rm_nom:400,  Rm_min:420,  HV_max:250 },
+        '5.6':  { Rm_nom:500,  Rm_min:500,  HV_max:250 },
+        '5.8':  { Rm_nom:500,  Rm_min:520,  HV_max:250 },
+        '6.8':  { Rm_nom:600,  Rm_min:600,  HV_max:250 },
+        '8.8':  { Rm_nom:800,  Rm_min:800,  HV_max:320 },
+        '9.8':  { Rm_nom:900,  Rm_min:900,  HV_max:360 },
+        '10.9': { Rm_nom:1000, Rm_min:1040, HV_max:380 },
+        '12.9': { Rm_nom:1200, Rm_min:1220, HV_max:435 },
+    };
+
+    // Trifast plc Group 引伸孔建議表
+    // h = 突出高度（protrusion above sheet）；total_h = t + h（計算後補充）
     const TRIFAST = [
         {d:2.5, t:0.5,  hole:2.225, h:1.02, r:0.13, R:0.63,  P:0.45, nc:2},
         {d:2.5, t:0.8,  hole:2.240, h:1.02, r:0.13, R:0.93,  P:0.45, nc:3},
@@ -248,7 +402,10 @@
         {d:10,  t:5.5,  hole:9.385, h:4.32, r:0.33, R:5.83,  P:1.50, nc:6},
         {d:12,  t:2.4,  hole:10.920,h:3.81, r:0.25, R:2.65,  P:1.75, nc:3},
     ];
+    // 補充 total_h（抽牙高度/h = 板厚 t + 突出高度 h）
+    TRIFAST.forEach(r => { r.total_h = +(r.t + r.h).toFixed(3); });
 
+    // 钣金结构设计工艺手册（h = 總抽牙高度；nc = 計算牙數，含無效牙）
     const HANDBOOK = [
         {d:2.5, t:0.6, r:0.30, h:1.20, P:0.45, nc:2},
         {d:2.5, t:0.8, r:0.40, h:1.44, P:0.45, nc:3},
@@ -267,8 +424,164 @@
         {d:5,   t:2.5, r:1.25, h:4.00, P:0.80, nc:5},
     ];
 
-    // ── 初始化下拉選單 ──────────────────────────────────────
+    // ════════════════════════════════════════════════════
+    //  計算狀態
+    // ════════════════════════════════════════════════════
+    let calcResult = null;
 
+    function runCalc() {
+        const specKey  = document.getElementById('ci-spec').value;
+        const L        = parseFloat(document.getElementById('ci-L').value);
+        const gradeKey = document.getElementById('ci-grade').value;
+        const Kf       = parseFloat(document.getElementById('ci-kf').value);
+        const Kt       = parseFloat(document.getElementById('ci-kt').value);
+
+        if (!specKey || isNaN(L) || L <= 0) { alert('請確認螺絲規格與長度輸入'); return; }
+
+        const scr = SCREWS[specKey];
+        const g   = GRADES[gradeKey];
+        const d   = scr.d;
+        const P   = scr.P;
+        const As  = scr.As;
+
+        // ─ 螺牙強度 ─────────────────────────────────
+        // δyp = Rm_nom / 2（保守設計值，τyp = δyp/2）
+        const delta_yp    = g.Rm_nom / 2;
+        const tau_yp      = delta_yp / 2;
+        const tau_yp_kgf  = tau_yp / 9.81;
+        const single_kgf  = (Math.PI * d * 1 * P * tau_yp_kgf) / 2;
+
+        // ─ δy 判斷（CNS 15590-7）───────────────────
+        // M4 以下：固定 HV max；M5+：L < 2.5d 用 HV max，否則用 Rm min
+        const is_large = d > 4;
+        const useHV    = !is_large || (L < 2.5 * d);
+        const delta_y  = useHV ? g.HV_max : g.Rm_min;
+        const basis    = useHV
+            ? (is_large ? `HV max ${g.HV_max}（L=${L} < 2.5d=${2.5*d}）` : `HV max ${g.HV_max}（M≤4 固定）`)
+            : `Rm min ${g.Rm_min}（L=${L} ≥ 2.5d=${2.5*d}）`;
+
+        const Ff_N   = Kf * delta_y * As;
+        const Ff_kgf = Ff_N / 9.81;
+        const T_Nm   = Kt * Ff_N * (d / 1000);
+
+        const nc_needed = Math.ceil(Ff_kgf / single_kgf);
+
+        // ─ Trifast 查表（有效牙數 nc ≥ nc_needed）──
+        const tfCands = TRIFAST
+            .filter(r => r.d === d && r.nc >= nc_needed)
+            .sort((a, b) => a.t - b.t);
+
+        // ─ Handbook 查表（計算牙數 nc ≥ nc_needed）─
+        const hbCands = HANDBOOK
+            .filter(r => r.d === d && r.nc >= nc_needed)
+            .sort((a, b) => a.t - b.t);
+
+        calcResult = {
+            specKey, L, gradeKey, Kf, Kt, d, P, As,
+            delta_yp, tau_yp, tau_yp_kgf,
+            Rm_nom: g.Rm_nom, Rm_min: g.Rm_min, HV_max: g.HV_max,
+            useHV, delta_y, basis,
+            Ff_N, Ff_kgf, T_Nm, single_kgf, nc_needed,
+            tfRes: tfCands.length ? tfCands[0] : null,
+            hbRes: hbCands.length ? hbCands[0] : null,
+        };
+
+        renderParams();
+        renderTfSummary();
+        renderHbSummary();
+        renderTrifast();
+        renderHandbook();
+    }
+
+    // ── 基本參數顯示 ─────────────────────────────────
+    function renderParams() {
+        const c = calcResult;
+        document.getElementById('params-display').classList.add('visible');
+
+        const f = (v, n=2) => typeof v === 'number' ? v.toFixed(n) : String(v);
+
+        const items = [
+            { k:'螺絲規格',                     v: c.specKey },
+            { k:'節圓徑 d (mm)',                 v: c.d },
+            { k:'節距 P (mm)',                   v: c.P },
+            { k:'應力截面積 As (mm²)',            v: c.As },
+            { k:'Rm_nom 公稱抗拉強度 (N/mm²)',    v: c.Rm_nom },
+            { k:'Rm_min 最小抗拉強度 (N/mm²)',    v: c.Rm_min },
+            { k:'HV max',                        v: c.HV_max },
+            { k:'δyp 下降伏點強度 (N/mm²)',       v: c.delta_yp,   note:'= Rm_nom/2' },
+            { k:'τyp 剪降伏應力 (N/mm²)',         v: c.tau_yp,     note:'= δyp/2' },
+            { k:'τyp (kgf/mm²)',                  v: f(c.tau_yp_kgf, 3) },
+            { k:'單牙強度 (kgf)',                  v: f(c.single_kgf, 3) },
+            { k:'螺絲長度 L (mm)',                 v: c.L },
+            { k:'2.5d (mm)',                      v: f(2.5 * c.d, 1) },
+            { k:'軸力係數 Kf',                    v: c.Kf },
+            { k:'力矩係數 Kt',                    v: c.Kt },
+            { k:'δy 計算基準',                    v: c.basis,      full: true },
+            { k:'一般算法 δy (N/mm²)',             v: c.delta_y,    hl: true },
+            { k:'軸向力 Ff (N)',                   v: f(c.Ff_N, 1), hl: true },
+            { k:'軸向力 Ff (kgf)',                 v: f(c.Ff_kgf, 2), hl: true },
+            { k:'扭力 T (N·m)',                    v: f(c.T_Nm, 3), hl: true },
+        ];
+
+        document.getElementById('params-grid').innerHTML = items.map(it => {
+            const cls = it.hl ? 'param-item hl' : it.full ? 'param-item full' : 'param-item';
+            const note = it.note ? ` <em style="font-weight:400;font-size:10px">${it.note}</em>` : '';
+            return `<div class="${cls}"><div class="pk">${it.k}${note}</div><div class="pv">${it.v}</div></div>`;
+        }).join('');
+
+        document.getElementById('nc-badge-wrap').innerHTML =
+            `<div class="nc-badge">需要牙數 nc = ${c.nc_needed} 牙</div>`;
+    }
+
+    // ── Trifast 結果摘要 ─────────────────────────────
+    function renderTfSummary() {
+        const c  = calcResult;
+        const el = document.getElementById('tf-summary');
+        el.classList.add('visible');
+        const body = document.getElementById('tf-result-body');
+
+        if (!c.tfRes) {
+            body.innerHTML = `<div class="no-tap">Trifast 表無對應資料（d=${c.d}mm，需 ${c.nc_needed} 牙）。請確認規格是否在 M2.5～M12 範圍內，或降低強度等級。</div>`;
+            return;
+        }
+        const r = c.tfRes;
+        body.innerHTML = `<div class="tap-result-grid">
+            <div class="tap-val"><div class="tk">需要牙數</div><div class="tv">${c.nc_needed} 牙</div></div>
+            <div class="tap-val hl"><div class="tk">適用抽牙鐵板 ★</div><div class="tv">${r.t} mm</div></div>
+            <div class="tap-val"><div class="tk">引伸孔中間值</div><div class="tv">${r.hole.toFixed(3)} mm</div></div>
+            <div class="tap-val hl"><div class="tk">抽牙高度 / h ★</div><div class="tv">${r.total_h.toFixed(2)} mm</div></div>
+            <div class="tap-val"><div class="tk">突出高度 h</div><div class="tv">${r.h.toFixed(2)} mm</div></div>
+            <div class="tap-val"><div class="tk">抽牙半徑 內r</div><div class="tv">${r.r} mm</div></div>
+            <div class="tap-val"><div class="tk">抽牙半徑 外R</div><div class="tv">${r.R} mm</div></div>
+            <div class="tap-val"><div class="tk">有效牙數（表列）</div><div class="tv">${r.nc} 牙</div></div>
+        </div>`;
+    }
+
+    // ── Handbook 結果摘要 ────────────────────────────
+    function renderHbSummary() {
+        const c  = calcResult;
+        const el = document.getElementById('hb-summary');
+        el.classList.add('visible');
+        const body = document.getElementById('hb-result-body');
+
+        if (!c.hbRes) {
+            body.innerHTML = `<div class="no-tap">手冊無對應資料（d=${c.d}mm，需 ${c.nc_needed} 牙）。手冊僅涵蓋 M2.5～M5，請參考 Trifast 分頁。</div>`;
+            return;
+        }
+        const r = c.hbRes;
+        body.innerHTML = `<div class="tap-result-grid">
+            <div class="tap-val"><div class="tk">需要牙數</div><div class="tv">${c.nc_needed} 牙</div></div>
+            <div class="tap-val hl"><div class="tk">適用抽牙鐵板 ★</div><div class="tv">${r.t} mm</div></div>
+            <div class="tap-val hl"><div class="tk">抽牙高度 / h ★</div><div class="tv">${r.h.toFixed(2)} mm</div></div>
+            <div class="tap-val"><div class="tk">抽牙半徑 r</div><div class="tv">${r.r} mm</div></div>
+            <div class="tap-val"><div class="tk">節距 P</div><div class="tv">${r.P} mm</div></div>
+            <div class="tap-val"><div class="tk">計算牙數（含無效）</div><div class="tv">${r.nc} 牙</div></div>
+        </div>`;
+    }
+
+    // ════════════════════════════════════════════════════
+    //  下拉選單初始化
+    // ════════════════════════════════════════════════════
     function populateSelect(selId, vals) {
         const sel = document.getElementById(selId);
         const cur = sel.value;
@@ -280,9 +593,8 @@
             sel.appendChild(o);
         });
     }
-
     function unique(arr, key) {
-        return [...new Set(arr.map(r => r[key]))].sort((a,b) => a-b);
+        return [...new Set(arr.map(r => r[key]))].sort((a, b) => a - b);
     }
 
     populateSelect('tf-d', unique(TRIFAST, 'd'));
@@ -290,60 +602,66 @@
     populateSelect('hb-d', unique(HANDBOOK, 'd'));
     populateSelect('hb-t', unique(HANDBOOK, 't'));
 
-    // ── 渲染 Trifast ─────────────────────────────────────────
-
+    // ════════════════════════════════════════════════════
+    //  表格渲染
+    // ════════════════════════════════════════════════════
     function renderTrifast() {
         const d = document.getElementById('tf-d').value;
         const t = document.getElementById('tf-t').value;
-        const rows = TRIFAST.filter(r =>
-            (!d || r.d == d) && (!t || r.t == t)
-        );
+        const matchD = calcResult ? calcResult.d : null;
+        const matchT = calcResult && calcResult.tfRes ? calcResult.tfRes.t : null;
+
+        const rows = TRIFAST.filter(r => (!d || r.d == d) && (!t || r.t == t));
         const tbody = document.getElementById('tf-tbody');
+
         if (!rows.length) {
-            tbody.innerHTML = `<tr><td colspan="8" class="no-result">無符合條件的資料</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="no-result">無符合條件的資料</td></tr>`;
             return;
         }
-        tbody.innerHTML = rows.map(r => `
-            <tr>
-                <td>${r.d}</td>
-                <td>${r.t}</td>
-                <td>${r.hole.toFixed(3)}</td>
-                <td>${r.h.toFixed(2)}</td>
-                <td>${r.r}</td>
-                <td>${r.R}</td>
-                <td>${r.P}</td>
+        tbody.innerHTML = rows.map(r => {
+            const isMatch = calcResult && r.d === matchD && r.t === matchT;
+            const rc = isMatch ? ' class="row-match"' : '';
+            const c1 = isMatch ? ' class="cell-hl"' : '';
+            const c2 = isMatch ? ' class="cell-hl"' : '';
+            return `<tr${rc}>
+                <td>${r.d}</td><td${c1}>${r.t}</td>
+                <td>${r.hole.toFixed(3)}</td><td>${r.h.toFixed(2)}</td>
+                <td${c2}>${r.total_h.toFixed(2)}</td>
+                <td>${r.r}</td><td>${r.R}</td><td>${r.P}</td>
                 <td><strong>${r.nc}</strong></td>
-            </tr>
-        `).join('');
+            </tr>`;
+        }).join('');
     }
-
-    // ── 渲染 Handbook ────────────────────────────────────────
 
     function renderHandbook() {
         const d = document.getElementById('hb-d').value;
         const t = document.getElementById('hb-t').value;
-        const rows = HANDBOOK.filter(r =>
-            (!d || r.d == d) && (!t || r.t == t)
-        );
+        const matchD = calcResult ? calcResult.d : null;
+        const matchT = calcResult && calcResult.hbRes ? calcResult.hbRes.t : null;
+
+        const rows = HANDBOOK.filter(r => (!d || r.d == d) && (!t || r.t == t));
         const tbody = document.getElementById('hb-tbody');
+
         if (!rows.length) {
             tbody.innerHTML = `<tr><td colspan="6" class="no-result">無符合條件的資料</td></tr>`;
             return;
         }
-        tbody.innerHTML = rows.map(r => `
-            <tr>
-                <td>${r.d}</td>
-                <td>${r.t}</td>
-                <td>${r.r}</td>
-                <td>${r.h.toFixed(2)}</td>
-                <td>${r.P}</td>
-                <td><strong>${r.nc}</strong></td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = rows.map(r => {
+            const isMatch = calcResult && r.d === matchD && r.t === matchT;
+            const rc = isMatch ? ' class="row-match"' : '';
+            const c1 = isMatch ? ' class="cell-hl"' : '';
+            const c2 = isMatch ? ' class="cell-hl"' : '';
+            return `<tr${rc}>
+                <td>${r.d}</td><td${c1}>${r.t}</td>
+                <td>${r.r}</td><td${c2}>${r.h.toFixed(2)}</td>
+                <td>${r.P}</td><td><strong>${r.nc}</strong></td>
+            </tr>`;
+        }).join('');
     }
 
-    // ── Tab 切換 ─────────────────────────────────────────────
-
+    // ════════════════════════════════════════════════════
+    //  Tab 切換
+    // ════════════════════════════════════════════════════
     function switchSrc(src) {
         document.querySelectorAll('.src-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.src-panel').forEach(p => p.classList.remove('active'));
@@ -351,15 +669,18 @@
         document.getElementById('panel-' + src).classList.add('active');
     }
 
-    // ── 讀取 URL 參數自動切換分頁 ────────────────────────────
-
+    // ── URL 參數自動切換 ─────────────────────────────
     const params = new URLSearchParams(location.search);
-    const srcParam = params.get('src');
-    if (srcParam === 'handbook') switchSrc('handbook');
+    if (params.get('src') === 'handbook') switchSrc('handbook');
 
-    // ── 初始渲染 ─────────────────────────────────────────────
+    // ── 初始渲染 ─────────────────────────────────────
     renderTrifast();
     renderHandbook();
+
+    // ── Enter 鍵觸發計算 ─────────────────────────────
+    document.querySelectorAll('.ci-group input, .ci-group select').forEach(el => {
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') runCalc(); });
+    });
     </script>
 </body>
 </html>
