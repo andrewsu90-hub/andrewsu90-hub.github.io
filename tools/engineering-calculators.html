@@ -46,6 +46,19 @@
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
+
+        /* Drill combo card tabs */
+        .drill-combo-card { cursor: default; }
+        .drill-combo-card:hover { transform: translateY(-5px); }
+        .drill-tabs { display: flex; gap: 0; margin-bottom: 1rem; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
+        .drill-tab { flex: 1; padding: 7px 10px; font-size: 12px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; background: var(--bg-white); color: var(--secondary-color); border: none; cursor: pointer; transition: all 0.2s; border-right: 0.5px solid var(--border-color); }
+        .drill-tab:last-child { border-right: none; }
+        .drill-tab.active { background: var(--primary-color); color: var(--bg-white); }
+        .drill-tab:hover:not(.active) { background: var(--border-color); }
+        .drill-panel { display: none; }
+        .drill-panel.active { display: block; }
+        .drill-link { display: inline-block; margin-top: 1rem; font-size: 13px; font-weight: 600; color: var(--primary-color); text-decoration: none; border-bottom: 1px solid var(--border-color); padding-bottom: 1px; transition: border-color 0.2s; }
+        .drill-link:hover { border-color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -87,36 +100,52 @@
                 <span class="tool-arrow">↗</span>
             </a>
 
-            <a class="tool-card" href="drill-hole-table.html">
+            <div class="tool-card drill-combo-card">
                 <span class="tool-icon">🪛</span>
-                <h3>鑽孔 / 攻牙深度查詢（機械設計圖表便覽）</h3>
-                <p>依規格、材質（鋼 / 鑄鐵 / 鋁）快速查詢攻牙深度、鑽孔深度與建議旋入深度。M3～M7。</p>
-                <div class="tool-tags">
-                    <span class="tool-tag">M3～M7</span>
-                    <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
-                    <span class="tool-tag">攻牙底孔</span>
-                    <span class="tool-tag">旋入深度</span>
-                </div>
-                <span class="tool-arrow">↗</span>
-            </a>
+                <h3>鑽孔 / 攻牙深度查詢</h3>
 
-            <a class="tool-card" href="drill-hole-table-2.html">
-                <span class="tool-icon">🔧</span>
-                <h3>鑽孔 / 攻牙深度查詢（現代機械設計手冊）</h3>
-                <p>依規格、材質與孔型（通孔／盲孔）查詢旋入深度、攻牙深度與鑽孔深度。M3～M16。</p>
-                <div class="tool-tags">
-                    <span class="tool-tag">M3～M16</span>
-                    <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
-                    <span class="tool-tag">盲孔 / 通孔</span>
-                    <span class="tool-tag">旋入深度</span>
+                <!-- Tab switcher -->
+                <div class="drill-tabs">
+                    <button class="drill-tab active" onclick="switchDrillTab(event, 0)">機械設計圖表便覽</button>
+                    <button class="drill-tab" onclick="switchDrillTab(event, 1)">現代機械設計手冊</button>
                 </div>
-                <span class="tool-arrow">↗</span>
-            </a>
+
+                <!-- Tab content 0 -->
+                <div class="drill-panel active">
+                    <p>依規格、材質（鋼 / 鑄鐵 / 鋁）快速查詢攻牙深度、鑽孔深度與建議旋入深度。M3～M7。</p>
+                    <div class="tool-tags">
+                        <span class="tool-tag">M3～M7</span>
+                        <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
+                        <span class="tool-tag">攻牙底孔</span>
+                        <span class="tool-tag">旋入深度</span>
+                    </div>
+                    <a class="drill-link" href="drill-hole-table.html">開啟工具 ↗</a>
+                </div>
+
+                <!-- Tab content 1 -->
+                <div class="drill-panel">
+                    <p>依規格、材質與孔型（通孔／盲孔）查詢旋入深度、攻牙深度與鑽孔深度。M3～M16。</p>
+                    <div class="tool-tags">
+                        <span class="tool-tag">M3～M16</span>
+                        <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
+                        <span class="tool-tag">盲孔 / 通孔</span>
+                        <span class="tool-tag">旋入深度</span>
+                    </div>
+                    <a class="drill-link" href="drill-hole-table-2.html">開啟工具 ↗</a>
+                </div>
+            </div>
 
         </div>
     </section>
     <footer>
         <p>&copy; 2026 Andrew Mechanical & Product Design Studio. All rights reserved.</p>
     </footer>
+    <script>
+        function switchDrillTab(e, index) {
+            const card = e.target.closest('.drill-combo-card');
+            card.querySelectorAll('.drill-tab').forEach((t, i) => t.classList.toggle('active', i === index));
+            card.querySelectorAll('.drill-panel').forEach((p, i) => p.classList.toggle('active', i === index));
+        }
+    </script>
 </body>
 </html>
