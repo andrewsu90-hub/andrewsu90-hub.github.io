@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="專業機構設計工程師，提供 Creo 3D建模、複雜機構設計、塑膠射出 DFM 量產評估、應力分析與商業級 3D 產品渲染服務。結合 Python 工程自動化，加速產品從概念到量產的開發流程。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <meta name="keywords" content="機構設計, 產品設計, Creo 3D建模, 量產評估, DFM分析, 塑膠射出成型, 拔模角分析, 應力分析, Python 工程計算, 機構工程師接案, 擬真渲染, 產品視覺提案, 模具干涉檢查">
+    <meta name="author" content="Andrew">
+
+    <meta property="og:title" content="Andrew | 專業機構設計、Creo 3D建模與 DFM 量產評估">
+    <meta property="og:description" content="專注於進階曲面建構、複雜機構設計與塑膠射出 DFM 評估。提供從概念設計到量產投模的端到端硬體開發解決方案。">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_TW">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://andrewsu90-hub-github-io.vercel.app/zh/#person",
+          "name": "Andrew",
+          "jobTitle": "資深機構設計與產品設計工程師",
+          "description": "具備豐富量產經驗的機構工程師，專精於 Creo 參數化設計與 DFM 模具評估。"
+        },
+        {
+          "@type": "ProfessionalService",
+          "@id": "https://andrewsu90-hub-github-io.vercel.app/zh/#service",
+          "name": "Andrew 機構設計與產品開發服務",
+          "description": "提供專業的 Creo 3D建模、機構動態模擬、塑膠射出與鈑金 DFM 評估、以及 Python 工程計算自動化腳本開發。",
+          "areaServed": "TW",
+          "priceRange": "$$",
+          "knowsAbout": [
+            "Creo 機構設計 (Mechanism Design)",
+            "塑膠射出成型 DFM (Injection Molding DFM)",
+            "模具干涉與拔模角分析",
+            "應力與結構強度評估",
+            "商業級 3D 擬真渲染",
+            "Python 參數化自動設計工具"
+          ],
+          "offers": {
+            "@type": "Offer",
+            "description": "機構外殼設計、量產可行性評估、3D 渲染圖製作及自動化運算腳本客製化"
+          }
+        }
+      ]
+    }
+    </script>
+    <title>Andrew | 專業機構設計、Creo 3D建模與 DFM 量產評估</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e8e8e8;
+            --secondary-color: #999;
+            --border-color: #2a2a2a;
+            --bg-light: #141414;
+            --bg-white: #0a0a0f;
+            --accent: #4a9eff;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* 字體加入 Noto Sans TC */
+        body {
+            font-family: 'DM Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            color: var(--primary-color);
+            background-color: var(--bg-white);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            position: relative;
+        }
+
+        /* ── Tech Background Canvas ── */
+        #tech-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Ensure all main content sits above the background */
+        header, section, footer, .modal {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg) 3%;
+            border-bottom: 0.5px solid var(--border-color);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            background-color: rgba(10, 10, 15, 0.85);
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            letter-spacing: 1px;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        nav {
+            display: flex;
+            gap: var(--spacing-lg);
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        nav a:hover {
+            opacity: 0.6;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 3% 4rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero h1 {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: clamp(28px, 4vw, 50px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0.02em;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+
+        .hero p {
+            font-size: 17px;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-sm);
+            max-width: 750px;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        /* Services Section */
+        .services {
+            padding: var(--spacing-xl) 3%;
+            max-width: 1520px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .section-title {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .service-card {
+            padding: var(--spacing-lg);
+            background-color: rgba(20, 20, 20, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--radius-md);
+            border: 0.5px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .service-card h3 {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: var(--primary-color);
+        }
+
+        .service-card p {
+            font-size: 15px;
+            color: var(--secondary-color);
+            line-height: 1.7;
+        }
+
+        /* Portfolio Section */
+        .portfolio {
+            padding: var(--spacing-xl) 3%;
+            max-width: 1520px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-lg);
+        }
+
+        .project-card {
+            background-color: rgba(20, 20, 20, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 0.5px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(255, 255, 255, 0.05);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: #555;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-info {
+            padding: var(--spacing-lg);
+        }
+
+        .project-info h3 {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+
+        .project-info p {
+            font-size: 14.5px;
+            color: var(--secondary-color);
+            margin: var(--spacing-sm) 0;
+            line-height: 1.7;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .project-tag {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 500;
+            background-color: var(--bg-white);
+            color: var(--secondary-color);
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            border: 0.5px solid var(--border-color);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .project-tag:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: var(--spacing-xl) 3%;
+            max-width: 1100px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .contact h2 {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+
+        .contact p {
+            font-size: 16px;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.7;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            border: 1.5px solid var(--primary-color);
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .cta-button:hover {
+            background-color: transparent;
+            color: var(--primary-color);
+        }
+
+        .cta-button-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            margin-left: var(--spacing-md);
+        }
+
+        .cta-button-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+        }
+
+        /* Footer */
+        footer {
+            padding: var(--spacing-lg) 3%;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            font-size: 14px;
+            color: var(--secondary-color);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--secondary-color);
+        }
+
+        .modal h3 {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 24px;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group { margin-bottom: var(--spacing-md); }
+        .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: var(--spacing-xs); }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 14px; border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); font-family: inherit; font-size: 15px;
+            color: var(--primary-color); background-color: var(--bg-light);
+        }
+        .form-group textarea { resize: vertical; min-height: 150px; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 28px; }
+            .project-grid, .service-grid { grid-template-columns: 1fr; }
+            .cta-button-secondary { display: block; margin-left: 0; margin-top: var(--spacing-md); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tech-bg"></canvas>
+
+    <header>
+        <a href="#" class="logo">Andrew Design Studio</a>
+        <nav>
+            <a onclick="smoothScroll('services'); return false;">服務項目</a>
+            <a onclick="smoothScroll('portfolio'); return false;">專案作品</a>
+            <a onclick="smoothScroll('contact'); return false;">聯絡我</a>
+            <a href="../index.html" style="color: var(--accent); margin-left: 10px;">EN</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>產品設計與機構工程服務</h1>
+        <p>擁有紮實的機械工程背景，專注於<strong>進階曲面建構、複雜機構設計與 DFM 可製造性評估</strong>。結合 Creo 3D 建模專業與 Python 工程自動化運算工具，為您提供從概念發想到<strong>塑膠射出量產</strong>的端到端硬體開發解決方案。</p>
+        <p style="color: var(--secondary-color); font-size: 15px; margin-top: var(--spacing-md); font-weight: 500;">
+            搭起設計與製造的橋樑 — 解決工程難題，打造具備市場競爭力的實體產品。
+        </p>
+    </section>
+
+    <section class="services" id="services">
+        <h2 class="section-title">核心服務能力</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>Creo 機構設計與動態模擬</h3>
+                <p>運用 Creo Mechanism 進行精確的 3D 實體與進階曲面建模、複雜內部機構拆解，並執行系統化的運動學分析與干涉檢查。</p>
+            </div>
+            <div class="service-card">
+                <h3>塑膠射出 DFM 與量產評估</h3>
+                <p>針對塑膠射出成型進行材料應力評估、模具干涉檢查與拔模角分析，確保設計符合開模與大規模量產的製造標準。</p>
+            </div>
+            <div class="service-card">
+                <h3>商業級 3D 產品擬真渲染</h3>
+                <p>從初期概念發想到最終高保真產品渲染，為群眾募資、商業型錄與品牌發表提供具備極佳視覺說服力的 3D 影像。</p>
+            </div>
+            <div class="service-card">
+                <h3>Python 工程計算自動化</h3>
+                <p>客製化 Python 工程運算腳本，取代繁瑣的 Excel 人工計算，大幅縮短參數化設計驗證時間並提升研發效率。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="portfolio" id="portfolio">
+        <h2 class="section-title">精選工程專案</h2>
+        <div class="project-grid">
+            <div class="project-card">
+               <div class="project-image"><img src="../image/04.png" alt="Creo 機構運動分析與干涉檢查" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>機構動態模擬與分析</h3>
+                    <p>透過 Creo 運動學模組進行動態模擬，精確計算機構行程並消除模組干涉，確保產品機構作動的順暢性與可靠度。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">Creo建模</span>
+                        <span class="project-tag">運動學分析</span>
+                        <span class="project-tag">機構設計</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image"><img src="../image/01.png" alt="消費性電子產品 Creo 進階曲面設計" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>消費性電子進階曲面建構</h3>
+                    <p>運用進階曲面技巧打造符合人體工學的流線外型，同時全面考量塑膠零件分模線 (Parting line) 與組裝邏輯。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">曲面建模</span>
+                        <span class="project-tag">產品外觀設計</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image"><img src="../image/dfm.png" alt="塑膠射出 DFM 評估與結構應力分析" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>結構應力分析與 DFM 優化</h3>
+                    <p>針對卡扣與承載結構進行加強，優化肉厚以避免塑膠射出成型時產生縮水與翹曲變形，確保量產良率。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">DFM 量產評估</span>
+                        <span class="project-tag">應力分析</span>
+                        <span class="project-tag">塑膠射出</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image"><img src="../image/py.gif" alt="Python 工程運算自動化腳本" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>Python 工程計算自動化</h3>
+                    <p>開發自動化 Python 腳本取代傳統 Excel 人工作業，顯著縮短機構參數化設計與公差驗證的迭代時間。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">工程計算</span>
+                        <span class="project-tag">自動化腳本</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="project-image"><img src="../image/03.gif" alt="精密壓鑄與鈑金零件結構設計" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>精密金屬零件結構設計</h3>
+                    <p>專為壓鑄與鈑金零件進行結構設計，充分考量加工公差範圍 (Tolerance) 與後續表面處理製程的需求。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">金屬加工件</span>
+                        <span class="project-tag">公差分析</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image"><img src="../image/05.jpg" alt="商業級 3D 產品擬真渲染與群眾募資視覺提案" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>商業級 3D 擬真渲染</h3>
+                    <p>高質感的材質與光影設定，產出適用於群眾募資平台、商業型錄與品牌發表會的高擬真產品行銷素材。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">3D 渲染</span>
+                        <span class="project-tag">視覺提案</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <h2>啟動您的專案</h2>
+        <p>無論是機構設計、3D建模還是新產品開發評估，歡迎與我聯繫討論您的需求與規格。</p>
+        <button class="cta-button" onclick="openContactModal()">填寫專案需求</button>
+        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">直接寄信給我</a>
+    </section>
+
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeContactModal()">&times;</button>
+            <h3>專案需求詢問</h3>
+            <form onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">姓名 / 聯絡人 *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">電子郵件 *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="company">公司 / 組織名稱</label>
+                    <input type="text" id="company" name="company">
+                </div>
+                <div class="form-group">
+                    <label for="phone">聯絡電話</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="message">專案需求描述 *</label>
+                    <textarea id="message" name="message" required placeholder="請簡述您的產品開發需求、預計時程等資訊..."></textarea>
+                </div>
+                <button type="submit" class="cta-button" style="width: 100%; border: none;">送出詢問</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Andrew 機構設計與產品開發工作室. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function smoothScroll(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) element.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openContactModal() {
+            document.getElementById('contactModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('contactModal').addEventListener('click', function(e) {
+            if (e.target === this) closeContactModal();
+        });
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                company: document.getElementById('company').value,
+                phone: document.getElementById('phone').value,
+                message: document.getElementById('message').value
+            };
+            const mailtoLink = `mailto:andrew@example.com?subject=專案詢問 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名: ${formData.name}\n信箱: ${formData.email}\n公司: ${formData.company}\n電話: ${formData.phone}\n\n需求描述:\n${formData.message}`)}`;
+            window.location.href = mailtoLink;
+            document.querySelector('form').reset();
+            setTimeout(closeContactModal, 500);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeContactModal();
+        });
+
+        // ── Tech Background ──
+        (function() {
+            const canvas = document.getElementById('tech-bg');
+            const ctx = canvas.getContext('2d');
+            let W, H, nodes, animId;
+
+            function resize() {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            }
+
+            function makeNodes(n) {
+                return Array.from({ length: n }, () => ({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    vx: (Math.random() - 0.5) * 0.35,
+                    vy: (Math.random() - 0.5) * 0.35,
+                    r: Math.random() * 1.8 + 0.8
+                }));
+            }
+
+            function drawGrid() {
+                const step = 52;
+                ctx.strokeStyle = 'rgba(100,160,255,0.13)';
+                ctx.lineWidth = 0.8;
+                for (let x = 0; x < W; x += step) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+                }
+                for (let y = 0; y < H; y += step) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+                }
+            }
+
+            function drawCircuits() {
+                ctx.strokeStyle = 'rgba(120,180,255,0.07)';
+                ctx.lineWidth = 1;
+                const pts = [
+                    [0.05,0.12],[0.18,0.12],[0.18,0.25],[0.35,0.25],[0.35,0.1],[0.55,0.1],
+                    [0.72,0.18],[0.72,0.32],[0.88,0.32],[0.88,0.15],
+                    [0.1,0.72],[0.28,0.72],[0.28,0.6],[0.5,0.6],[0.5,0.78],[0.65,0.78],
+                    [0.8,0.65],[0.92,0.65],[0.92,0.82]
+                ];
+                ctx.beginPath();
+                pts.forEach(([rx, ry], i) => {
+                    const px = rx * W, py = ry * H;
+                    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+                });
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(120,180,255,0.18)';
+                [[0.18,0.25],[0.35,0.25],[0.55,0.1],[0.72,0.32],[0.28,0.72],[0.5,0.6],[0.65,0.78],[0.92,0.65]].forEach(([rx,ry]) => {
+                    ctx.beginPath(); ctx.arc(rx*W, ry*H, 3.5, 0, Math.PI*2); ctx.fill();
+                });
+            }
+
+            function frame() {
+                ctx.clearRect(0, 0, W, H);
+                drawGrid();
+                drawCircuits();
+
+                const maxDist = 140;
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const dx = nodes[i].x - nodes[j].x;
+                        const dy = nodes[i].y - nodes[j].y;
+                        const d = Math.sqrt(dx*dx + dy*dy);
+                        if (d < maxDist) {
+                            const alpha = (1 - d / maxDist) * 0.22;
+                            ctx.strokeStyle = `rgba(120,180,255,${alpha})`;
+                            ctx.lineWidth = 0.7;
+                            ctx.beginPath();
+                            ctx.moveTo(nodes[i].x, nodes[i].y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                nodes.forEach(n => {
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(120,180,255,0.6)`;
+                    ctx.fill();
+
+                    n.x += n.vx; n.y += n.vy;
+                    if (n.x < 0 || n.x > W) n.vx *= -1;
+                    if (n.y < 0 || n.y > H) n.vy *= -1;
+                });
+
+                animId = requestAnimationFrame(frame);
+            }
+
+            resize();
+            nodes = makeNodes(72);
+            frame();
+            window.addEventListener('resize', resize);
+        })();
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.style.opacity = '1';
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0.95';
+        });
+    </script>
+</body>
+</html>
