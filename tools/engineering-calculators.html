@@ -47,6 +47,19 @@
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
 
+        /* ── Geometric Background ── */
+        #geo-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            width: 100%; height: 100%;
+        }
+        header, section, footer {
+            position: relative;
+            z-index: 1;
+        }
+
         /* Combo card shared styles */
         .combo-card { cursor: default; }
         .combo-card:hover { transform: translateY(-5px); }
@@ -62,6 +75,77 @@
     </style>
 </head>
 <body>
+
+<!-- ── Geometric Background SVG ── -->
+<svg id="geo-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0a0a12"/>
+      <stop offset="50%"  stop-color="#0d0d1a"/>
+      <stop offset="100%" stop-color="#080810"/>
+    </linearGradient>
+    <linearGradient id="accentGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#4a9eff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="accentGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7b6fff" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#7b6fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="900" fill="url(#bgGrad)"/>
+  <ellipse cx="200" cy="150" rx="380" ry="280" fill="url(#accentGrad1)"/>
+  <ellipse cx="1280" cy="720" rx="340" ry="260" fill="url(#accentGrad2)"/>
+  <ellipse cx="900" cy="420" rx="260" ry="180" fill="rgba(74,158,255,0.04)"/>
+  <g stroke="rgba(74,158,255,0.08)" stroke-width="0.5">
+    <line x1="0" y1="100" x2="1440" y2="100"/>
+    <line x1="0" y1="200" x2="1440" y2="200"/>
+    <line x1="0" y1="300" x2="1440" y2="300"/>
+    <line x1="0" y1="400" x2="1440" y2="400"/>
+    <line x1="0" y1="500" x2="1440" y2="500"/>
+    <line x1="0" y1="600" x2="1440" y2="600"/>
+    <line x1="0" y1="700" x2="1440" y2="700"/>
+    <line x1="0" y1="800" x2="1440" y2="800"/>
+    <line x1="180" y1="0" x2="180" y2="900"/>
+    <line x1="360" y1="0" x2="360" y2="900"/>
+    <line x1="540" y1="0" x2="540" y2="900"/>
+    <line x1="720" y1="0" x2="720" y2="900"/>
+    <line x1="900" y1="0" x2="900" y2="900"/>
+    <line x1="1080" y1="0" x2="1080" y2="900"/>
+    <line x1="1260" y1="0" x2="1260" y2="900"/>
+  </g>
+  <polygon points="120,30 200,75 200,165 120,210 40,165 40,75"
+           fill="none" stroke="rgba(74,158,255,0.1)" stroke-width="1"/>
+  <polygon points="1320,60 1400,105 1400,195 1320,240 1240,195 1240,105"
+           fill="none" stroke="rgba(123,111,255,0.1)" stroke-width="1"/>
+  <polygon points="680,760 740,795 740,865 680,900 620,865 620,795"
+           fill="none" stroke="rgba(74,158,255,0.08)" stroke-width="1"/>
+  <line x1="0" y1="0" x2="400" y2="900" stroke="rgba(74,158,255,0.05)" stroke-width="1"/>
+  <line x1="1440" y1="0" x2="1040" y2="900" stroke="rgba(123,111,255,0.05)" stroke-width="1"/>
+  <circle cx="360" cy="300" r="60" fill="none" stroke="rgba(74,158,255,0.07)" stroke-width="1"/>
+  <circle cx="360" cy="300" r="40" fill="none" stroke="rgba(74,158,255,0.05)" stroke-width="0.5"/>
+  <circle cx="1080" cy="600" r="80" fill="none" stroke="rgba(123,111,255,0.07)" stroke-width="1"/>
+  <circle cx="1080" cy="600" r="52" fill="none" stroke="rgba(123,111,255,0.05)" stroke-width="0.5"/>
+  <g fill="rgba(74,158,255,0.18)">
+    <circle cx="1180" cy="80"  r="2"/><circle cx="1200" cy="60"  r="1.5"/>
+    <circle cx="1220" cy="90"  r="2"/><circle cx="1240" cy="70"  r="1.5"/>
+    <circle cx="1260" cy="100" r="2"/><circle cx="1160" cy="110" r="1.5"/>
+    <circle cx="1190" cy="130" r="2"/><circle cx="1210" cy="50"  r="1.5"/>
+  </g>
+  <g fill="rgba(123,111,255,0.15)">
+    <circle cx="80"  cy="780" r="2"/><circle cx="100" cy="800" r="1.5"/>
+    <circle cx="60"  cy="810" r="2"/><circle cx="120" cy="760" r="1.5"/>
+    <circle cx="140" cy="790" r="2"/><circle cx="50"  cy="840" r="1.5"/>
+  </g>
+  <g stroke="rgba(74,158,255,0.2)" stroke-width="1">
+    <line x1="720" y1="195" x2="720" y2="205"/><line x1="715" y1="200" x2="725" y2="200"/>
+    <line x1="540" y1="495" x2="540" y2="505"/><line x1="535" y1="500" x2="545" y2="500"/>
+    <line x1="900" y1="295" x2="900" y2="305"/><line x1="895" y1="300" x2="905" y2="300"/>
+    <line x1="180" y1="595" x2="180" y2="605"/><line x1="175" y1="600" x2="185" y2="600"/>
+    <line x1="1260" y1="395" x2="1260" y2="405"/><line x1="1255" y1="400" x2="1265" y2="400"/>
+  </g>
+</svg>
+
     <header>
         <a href="../index.html" class="logo">Andrew Design Studio</a>
         <a href="../index.html" class="back-link">← 返回首頁</a>
