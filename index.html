@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
     <meta name="keywords" content="product design, mechanical engineering, Creo, 3D modeling, Python, stress analysis, DFM">
     <meta name="author" content="Andrew">
-    <title>Andrew | Product & Mechanical Design</title>
+    <title>Anzû | Product & Mechanical Design</title>
     
     <style>
         * {
@@ -72,13 +72,34 @@
             top: 0;
             z-index: 100;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-lg) 3%;
+            flex-direction: column;
             border-bottom: 0.5px solid var(--border-color);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            background-color: rgba(10, 10, 15, 0.85);
+            background-color: rgba(10, 10, 15, 0.90);
+        }
+
+        .header-banner {
+            width: 100%;
+            max-height: 220px;
+            overflow: hidden;
+            display: block;
+            line-height: 0;
+        }
+
+        .header-banner img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            object-position: center 30%;
+            display: block;
+        }
+
+        .header-nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) 3%;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -577,13 +598,18 @@
     <canvas id="tech-bg"></canvas>
 
     <header>
-        <a href="#" class="logo">Andrew Design Studio</a>
-        <nav>
-            <a onclick="smoothScroll('services'); return false;">Services</a>
-            <a onclick="smoothScroll('portfolio'); return false;">Portfolio</a>
-            <a onclick="smoothScroll('contact'); return false;">Contact</a>
-            <a href="zh/index.html" style="color: var(--accent); margin-left: 8px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; text-transform: none; letter-spacing: normal;">中文</a>
-        </nav>
+        <div class="header-banner">
+            <img src="Gemini_Generated_Image_l4799rl4799rl479.png" alt="Anzû Design Studio Banner">
+        </div>
+        <div class="header-nav-row">
+            <a href="#" class="logo">Anzû Design Studio</a>
+            <nav>
+                <a onclick="smoothScroll('services'); return false;">Services</a>
+                <a onclick="smoothScroll('portfolio'); return false;">Portfolio</a>
+                <a onclick="smoothScroll('contact'); return false;">Contact</a>
+                <a href="zh/index.html" style="color: var(--accent); margin-left: 8px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; text-transform: none; letter-spacing: normal;">中文</a>
+            </nav>
+        </div>
     </header>
 
     <section class="hero" id="hero-section">
@@ -737,7 +763,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 Andrew Mechanical &amp; Product Design Studio. All rights reserved.</p>
+        <p>&copy; 2026 Anzû Mechanical &amp; Product Design Studio. All rights reserved.</p>
         <p class="visitor-count">
             <span class="visitor-item">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
