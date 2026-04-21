@@ -4,14 +4,14 @@
     <meta name="google-site-verification" content="pHM1QBJWZEMnjr29tqK_GY-fQ6lJJJWl4DvodGUvozE" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Andrew — 產品設計與機構工程 — Creo 3D建模、機構設計與 DFM 量產評估">
+    <meta name="description" content="Andrew — 產品設計與機械工程 — Creo 3D建模、機構設計與DFM">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
-    <meta name="keywords" content="產品設計, 機構設計, Creo 3D建模, Python 工程計算, 應力分析, DFM 量產評估, 機構工程師接案">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="keywords" content="產品設計, 機械工程, Creo, 3D建模, Python, 應力分析, DFM">
     <meta name="author" content="Andrew">
-    <title>Andrew | 產品設計與機構工程</title>
-    
+    <title>Anzû | 產品設計與機械工程</title>
+
     <style>
         * {
             margin: 0;
@@ -41,8 +41,7 @@
         }
 
         body {
-            /* 加入 Noto Sans TC 確保繁體中文顯示高質感黑體 */
-            font-family: 'DM Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Noto Sans TC', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             font-weight: 300;
             color: var(--primary-color);
             background-color: var(--bg-white);
@@ -73,13 +72,18 @@
             top: 0;
             z-index: 100;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-lg) 3%;
+            flex-direction: column;
             border-bottom: 0.5px solid var(--border-color);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            background-color: rgba(10, 10, 15, 0.85);
+            background-color: rgba(10, 10, 15, 0.90);
+        }
+
+        .header-nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) 3%;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -100,9 +104,9 @@
         nav {
             display: flex;
             gap: var(--spacing-lg);
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 0.1em;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
             align-items: center;
         }
@@ -120,30 +124,45 @@
         }
 
         /* Hero Section */
+        .hero-bg {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('../Gemini_Generated_Image_l4799rl4799rl479.png') center 45% / cover no-repeat;
+            opacity: 0.18;
+            z-index: 0;
+        }
+
         .hero {
             padding: 6rem 3% 4rem;
             max-width: 1100px;
             margin: 0 auto;
             animation: fadeInDown 0.8s ease;
+            position: relative;
+            z-index: 1;
         }
 
         .hero h1 {
-            font-family: 'Bebas Neue', 'Noto Sans TC', sans-serif;
+            font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(32px, 4.2vw, 58px);
-            font-weight: 700;
-            line-height: 1.1;
+            font-weight: 400;
+            line-height: 1.0;
             letter-spacing: 0.04em;
             margin-bottom: var(--spacing-md);
             color: var(--primary-color);
         }
 
         .hero p {
-            font-size: 17px;
-            color: var(--secondary-color);
+            font-size: 18px;
+            color: #c0c0c0;
             margin-bottom: var(--spacing-sm);
-            max-width: 750px;
+            max-width: 700px;
             line-height: 1.8;
-            font-weight: 400;
         }
 
         /* Services Section */
@@ -156,9 +175,9 @@
         }
 
         .section-title {
-            font-family: 'Bebas Neue', 'Noto Sans TC', sans-serif;
-            font-size: 32px;
-            font-weight: 700;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 38px;
+            font-weight: 400;
             letter-spacing: 0.06em;
             margin-bottom: var(--spacing-lg);
             color: var(--primary-color);
@@ -194,10 +213,10 @@
         }
 
         .service-card h3 {
-            font-family: 'Bebas Neue', 'Noto Sans TC', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 0.04em;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
             margin-bottom: var(--spacing-sm);
             color: var(--primary-color);
         }
@@ -287,16 +306,16 @@
         }
 
         .project-info h3 {
-            font-family: 'Bebas Neue', 'Noto Sans TC', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 0.03em;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
             margin-bottom: var(--spacing-xs);
             color: var(--primary-color);
         }
 
         .project-info p {
-            font-size: 14.5px;
+            font-size: 15px;
             color: var(--secondary-color);
             margin: var(--spacing-sm) 0;
             line-height: 1.7;
@@ -358,9 +377,9 @@
         }
 
         .contact h2 {
-            font-family: 'Bebas Neue', 'Noto Sans TC', sans-serif;
-            font-size: 38px;
-            font-weight: 700;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 52px;
+            font-weight: 400;
             letter-spacing: 0.05em;
             margin-bottom: var(--spacing-md);
             color: var(--primary-color);
@@ -463,7 +482,6 @@
         }
 
         .modal h3 {
-            font-family: 'Noto Sans TC', sans-serif;
             font-size: 26px;
             font-weight: 700;
             margin-bottom: var(--spacing-lg);
@@ -580,57 +598,61 @@
     <canvas id="tech-bg"></canvas>
 
     <header>
-        <a href="#" class="logo">Andrew Design Studio</a>
-        <nav>
-            <a onclick="smoothScroll('services'); return false;">服務項目</a>
-            <a onclick="smoothScroll('portfolio'); return false;">專案作品</a>
-            <a onclick="smoothScroll('contact'); return false;">聯絡我</a>
-            <a href="../index.html" style="color: var(--accent); margin-left: 8px; font-weight: 600; font-family: 'DM Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.05em;">EN</a>
-        </nav>
+        <div class="header-nav-row">
+            <a href="../index.html" class="logo">Anzû Design Studio</a>
+            <nav>
+                <a onclick="smoothScroll('services'); return false;">服務項目</a>
+                <a onclick="smoothScroll('portfolio'); return false;">作品集</a>
+                <a onclick="smoothScroll('contact'); return false;">聯絡我們</a>
+                <a href="../index.html" style="color: var(--accent); margin-left: 8px; font-weight: 600; font-family: 'DM Sans', sans-serif; text-transform: none; letter-spacing: normal;">EN</a>
+            </nav>
+        </div>
     </header>
 
+    <div class="hero-bg">
     <section class="hero" id="hero-section">
-        <h1>產品設計 &amp; 機構工程</h1>
-        <p>擁有紮實的機械工程背景，專注於進階曲面建構、複雜機構設計與 DFM 可製造性評估。結合 Creo 3D 建模專業與 Python 工程自動化運算工具，為您提供從概念發想到量產投模的端到端硬體開發解決方案。</p>
-        <p style="color: var(--secondary-color); font-size: 15px; margin-top: var(--spacing-md); font-weight: 500;">
-            搭起設計與製造的橋樑 — 解決工程難題，打造具備市場競爭力的實體硬體產品。
+        <h1>產品設計與機械工程</h1>
+        <p>深厚的機械工程背景，專注於進階曲面建模、複雜機構設計與製造可行性評估。結合 Creo 3D 建模專業與 Python 工程工具，提供從概念到量產的端對端解決方案。</p>
+        <p style="color: #c0c0c0; font-size: 15px; margin-top: var(--spacing-md); font-weight: 500;">
+            橋接設計與製造——以工程思維解決難題，打造市場就緒的硬體產品。
         </p>
     </section>
+    </div>
 
     <section class="services" id="services">
-        <h2 class="section-title">核心服務能力</h2>
+        <h2 class="section-title">核心能力</h2>
         <div class="service-grid">
             <div class="service-card">
-                <h3>Creo 機構設計與動態模擬</h3>
-                <p>運用 Creo Mechanism 進行精確的 3D 實體與進階曲面建模、複雜內部機構拆解，並執行系統化的運動學分析與干涉檢查。</p>
+                <h3>Creo 機構設計</h3>
+                <p>精確的 3D 實體與進階曲面建模、複雜內部機構拆解，以及使用 Creo Mechanism 進行系統化運動分析。</p>
             </div>
             <div class="service-card">
-                <h3>DFM 量產與模具評估</h3>
-                <p>針對材料進行應力評估、模具干涉檢查與拔模角分析，確保設計完全符合開模與大規模量產的製造標準。</p>
+                <h3>可製造性設計 (DFM)</h3>
+                <p>材料應力評估、干涉檢查與拔模角分析——確保設計完全符合模具開發與量產製造要求。</p>
             </div>
             <div class="service-card">
-                <h3>商業級 3D 產品擬真渲染</h3>
-                <p>從初期概念發想到最終高保真產品渲染，為群眾募資平台、商業型錄與品牌發表提供具備極佳視覺說服力的 3D 影像素材。</p>
+                <h3>照片級渲染與視覺提案</h3>
+                <p>從早期概念發想到最終高擬真產品渲染——提供具商業說服力的視覺素材，適用於群眾募資、型錄與品牌簡報。</p>
             </div>
             <div class="service-card">
-                <h3>Python 工程計算自動化</h3>
-                <p>客製化 Python 工程運算腳本與自動化資料處理，顯著縮短參數化設計驗證時間並大幅提升研發效率。</p>
+                <h3>Python 工程工具</h3>
+                <p>客製化 Python 腳本，用於工程計算與自動化資料處理——大幅縮短設計驗證時間，提升開發效率。</p>
             </div>
         </div>
     </section>
 
     <section class="portfolio" id="portfolio">
-        <h2 class="section-title">精選工程專案</h2>
+        <h2 class="section-title">精選工程作品</h2>
         <div class="project-grid">
             <div class="project-card">
                <div class="project-image"><img src="../image/04.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>機構動態模擬與分析</h3>
-                    <p>透過 Creo 運動學模組進行動態模擬，精確計算機構行程並消除模組干涉，確保產品機構作動的順暢性與可靠度。</p>
+                    <h3>模擬驅動機構設計</h3>
+                    <p>使用 Creo 運動分析模組進行運動模擬——精確計算行程並消除干涉，確保機構順暢運作。</p>
                     <div class="project-tags">
-                        <span class="project-tag">Creo建模</span>
-                        <span class="project-tag">運動學分析</span>
-                        <span class="project-tag">機構設計</span>
+                        <span class="project-tag">Creo</span>
+                        <span class="project-tag">Kinematic Analysis</span>
+                        <span class="project-tag">Mechanism Design</span>
                     </div>
                 </div>
             </div>
@@ -638,11 +660,11 @@
             <div class="project-card">
                 <div class="project-image"><img src="../image/01.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>消費性電子進階曲面建構</h3>
-                    <p>運用進階曲面技巧打造符合人體工學的流線外型，同時全面考量塑膠零件分模線 (Parting line) 與組裝邏輯。</p>
+                    <h3>消費電子曲面建模</h3>
+                    <p>運用進階曲面技術建構符合人因工學的流線型態——完整考量分模線與組裝邏輯。</p>
                     <div class="project-tags">
-                        <span class="project-tag">曲面建模</span>
-                        <span class="project-tag">產品外觀設計</span>
+                        <span class="project-tag">Surface Modeling</span>
+                        <span class="project-tag">Industrial Design</span>
                     </div>
                 </div>
             </div>
@@ -650,12 +672,12 @@
             <div class="project-card">
                 <div class="project-image"><img src="../image/dfm.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>結構應力分析與 DFM 優化</h3>
-                    <p>針對卡扣與承載結構進行加強，優化肉厚以避免塑膠射出成型時產生縮水與翹曲變形，確保量產良率。</p>
+                    <h3>結構應力與 DFM 優化</h3>
+                    <p>強化卡鉤與承載件的結構，優化壁厚以降低射出成型件的縮水痕與翹曲變形。</p>
                     <div class="project-tags">
-                        <span class="project-tag">DFM 量產評估</span>
-                        <span class="project-tag">應力分析</span>
-                        <span class="project-tag">塑膠射出</span>
+                        <span class="project-tag">DFM</span>
+                        <span class="project-tag">Stress Analysis</span>
+                        <span class="project-tag">Injection Molding</span>
                     </div>
                 </div>
             </div>
@@ -663,22 +685,22 @@
             <div class="project-card">
                 <div class="project-image"><img src="../image/py.gif" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>Python 工程計算自動化</h3>
-                    <p>開發自動化 Python 腳本取代傳統 Excel 繁瑣的人工作業，大幅縮短機構參數化設計與公差驗證的迭代時間。</p>
+                    <h3>Python 自動化工程計算</h3>
+                    <p>以 Python 腳本取代繁瑣的 Excel 手算——大幅縮短參數化設計驗證時間。</p>
                     <div class="project-tags">
-                        <a class="project-tag" href="../tools/engineering-calculators.html" target="_blank" rel="noopener" title="開啟工程計算工具">工程計算器</a>
+                        <a class="project-tag" href="#" onclick="openCalcGate(event)" title="開啟工程計算工具">工程計算工具</a>
                     </div>
                 </div>
             </div>
-            
+
             <div class="project-card">
                 <div class="project-image"><img src="../image/03.gif" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>精密金屬零件結構設計</h3>
-                    <p>專為精密壓鑄與鈑金零件進行結構設計，充分考量金屬加工公差範圍 (Tolerance) 與後續表面處理製程的需求。</p>
+                    <h3>精密金屬零件設計</h3>
+                    <p>針對壓鑄與鈑金件的專屬結構設計——考量加工公差與表面處理製程需求。</p>
                     <div class="project-tags">
-                        <span class="project-tag">金屬加工件</span>
-                        <span class="project-tag">公差分析</span>
+                        <span class="project-tag">Metal Fabrication</span>
+                        <span class="project-tag">Tolerance Analysis</span>
                     </div>
                 </div>
             </div>
@@ -686,11 +708,11 @@
             <div class="project-card">
                 <div class="project-image"><img src="../image/05.jpg" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>商業級 3D 擬真渲染</h3>
-                    <p>高質感的材質與光影設定，產出適用於群眾募資平台、商業產品型錄與品牌發表會的高擬真產品視覺行銷素材。</p>
+                    <h3>商業照片級渲染</h3>
+                    <p>高擬真材質與燈光設置，產出適用於群眾募資平台或商業型錄的產品級影像。</p>
                     <div class="project-tags">
-                        <span class="project-tag">3D 渲染</span>
-                        <a class="project-tag" href="../visual-proposal.html" title="檢視視覺提案作品集">視覺提案</a>
+                        <span class="project-tag">3D Rendering</span>
+                        <a class="project-tag" href="../visual-proposal.html" title="查看視覺提案作品集">視覺提案</a>
                     </div>
                 </div>
             </div>
@@ -698,16 +720,16 @@
     </section>
 
     <section class="contact" id="contact">
-        <h2>啟動您的專案</h2>
-        <p>無論是機構設計、3D建模還是新產品開發評估，歡迎與我聯繫討論您的需求與規格。</p>
-        <button class="cta-button" onclick="openContactModal()">填寫專案需求</button>
-        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">直接寄信給我</a>
+        <h2>開始專案</h2>
+        <p>需要機構設計、3D 建模或產品開發服務？讓我們討論您的概念與規格需求。</p>
+        <button class="cta-button" onclick="openContactModal()">專案洽詢</button>
+        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">發送 Email</a>
     </section>
 
     <div class="modal" id="contactModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeContactModal()">&times;</button>
-            <h3>專案需求詢問</h3>
+            <h3>專案洽詢</h3>
             <form onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
                     <label for="name">姓名 / 聯絡人 *</label>
@@ -720,7 +742,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="company">公司 / 組織名稱</label>
+                    <label for="company">公司 / 組織</label>
                     <input type="text" id="company" name="company">
                 </div>
 
@@ -730,17 +752,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="message">專案需求描述 *</label>
-                    <textarea id="message" name="message" required placeholder="請簡述您的產品開發需求、預計時程等資訊..."></textarea>
+                    <label for="message">專案描述 *</label>
+                    <textarea id="message" name="message" required placeholder="簡述您的專案需求..."></textarea>
                 </div>
 
-                <button type="submit" class="cta-button" style="width: 100%; border: none;">送出詢問</button>
+                <button type="submit" class="cta-button" style="width: 100%; border: none;">送出洽詢</button>
             </form>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2026 Andrew 機構設計與產品開發工作室. All rights reserved.</p>
+        <p>&copy; 2026 Anzû Mechanical &amp; Product Design Studio. All rights reserved.</p>
         <p class="visitor-count">
             <span class="visitor-item">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -749,7 +771,7 @@
             <span class="visitor-sep">·</span>
             <span class="visitor-item">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                總瀏覽量 <span id="stat-pv" style="color:#4a9eff;font-weight:600;margin:0 3px">--</span>
+                總瀏覽次數 <span id="stat-pv" style="color:#4a9eff;font-weight:600;margin:0 3px">--</span>
             </span>
         </p>
     </footer>
@@ -781,7 +803,7 @@
             }
         });
 
-        // Form submission (翻譯信件內容範本)
+        // Form submission
         function handleFormSubmit(event) {
             event.preventDefault();
             const formData = {
@@ -791,7 +813,7 @@
                 phone: document.getElementById('phone').value,
                 message: document.getElementById('message').value
             };
-            const mailtoLink = `mailto:andrew@example.com?subject=專案詢問 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名: ${formData.name}\n信箱: ${formData.email}\n公司: ${formData.company}\n電話: ${formData.phone}\n\n需求描述:\n${formData.message}`)}`;
+            const mailtoLink = `mailto:andrew@example.com?subject=專案洽詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名：${formData.name}\n電子郵件：${formData.email}\n公司：${formData.company}\n電話：${formData.phone}\n\n專案描述：\n${formData.message}`)}`;
             window.location.href = mailtoLink;
             document.querySelector('form').reset();
             setTimeout(closeContactModal, 500);
@@ -838,32 +860,29 @@
                 }
             }
 
-            // ── 優化：更少數量、更高亮度的白色漸暈發光特效 ──
             let glowingBlocks = [];
             function drawGlowingBlocks() {
                 const step = 52;
-                
+
                 const heroSection = document.getElementById('hero-section');
                 const headerSection = document.querySelector('header');
-                
+
                 if (!heroSection || !headerSection) return;
 
                 const heroRect = heroSection.getBoundingClientRect();
                 const headerRect = headerSection.getBoundingClientRect();
-                
+
                 const topBound = headerRect.bottom;
                 const bottomBound = heroRect.bottom;
 
-                // 1. 大幅降低方塊出現機率，讓畫面更乾淨聚焦
-                if (Math.random() < 0.04) { 
+                if (Math.random() < 0.04) {
                     if (bottomBound > topBound) {
                         let randomY = topBound + Math.random() * (bottomBound - topBound);
                         glowingBlocks.push({
                             x: Math.floor(Math.random() * (W / step)) * step,
                             y: Math.floor(randomY / step) * step,
                             alpha: 0,
-                            // 2. 提高極限亮度，讓亮起來時更有衝擊力
-                            maxAlpha: 0.5 + Math.random() * 0.4, 
+                            maxAlpha: 0.5 + Math.random() * 0.4,
                             fadeIn: true
                         });
                     }
@@ -871,31 +890,28 @@
 
                 for (let i = glowingBlocks.length - 1; i >= 0; i--) {
                     let b = glowingBlocks[i];
-                    
+
                     if (b.fadeIn) {
-                        b.alpha += 0.015; 
+                        b.alpha += 0.015;
                         if (b.alpha >= b.maxAlpha) b.fadeIn = false;
                     } else {
-                        b.alpha -= 0.005; 
+                        b.alpha -= 0.005;
                         if (b.alpha <= 0) {
                             glowingBlocks.splice(i, 1);
                             continue;
                         }
                     }
 
-                    // 取得方塊中心點
                     let cx = b.x + step / 2;
                     let cy = b.y + step / 2;
-                    
-                    // 繪製漸暈發光方塊 (白色 Radial Gradient)
+
                     let blockGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, step);
                     blockGrad.addColorStop(0, `rgba(255, 255, 255, ${b.alpha})`);
                     blockGrad.addColorStop(1, `rgba(255, 255, 255, 0)`);
-                    
+
                     ctx.fillStyle = blockGrad;
                     ctx.fillRect(b.x, b.y, step, step);
 
-                    // 繪製鄰近格線同步發光 (向外延伸 2.5 格的距離)
                     let lineGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, step * 2.5);
                     lineGrad.addColorStop(0, `rgba(255, 255, 255, ${b.alpha * 0.9})`);
                     lineGrad.addColorStop(1, `rgba(255, 255, 255, 0)`);
@@ -903,19 +919,17 @@
                     ctx.strokeStyle = lineGrad;
                     ctx.lineWidth = 1.5;
                     ctx.beginPath();
-                    
-                    // 上下兩條水平格線延伸
-                    ctx.moveTo(cx - step * 2.5, b.y); 
+
+                    ctx.moveTo(cx - step * 2.5, b.y);
                     ctx.lineTo(cx + step * 2.5, b.y);
-                    ctx.moveTo(cx - step * 2.5, b.y + step); 
+                    ctx.moveTo(cx - step * 2.5, b.y + step);
                     ctx.lineTo(cx + step * 2.5, b.y + step);
-                    
-                    // 左右兩條垂直格線延伸
-                    ctx.moveTo(b.x, cy - step * 2.5); 
+
+                    ctx.moveTo(b.x, cy - step * 2.5);
                     ctx.lineTo(b.x, cy + step * 2.5);
-                    ctx.moveTo(b.x + step, cy - step * 2.5); 
+                    ctx.moveTo(b.x + step, cy - step * 2.5);
                     ctx.lineTo(b.x + step, cy + step * 2.5);
-                    
+
                     ctx.stroke();
                 }
             }
@@ -936,7 +950,6 @@
                     i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
                 });
                 ctx.stroke();
-                // dots at junctions
                 ctx.fillStyle = dark ? 'rgba(120,180,255,0.18)' : 'rgba(0,80,200,0.13)';
                 [[0.18,0.25],[0.35,0.25],[0.55,0.1],[0.72,0.32],[0.28,0.72],[0.5,0.6],[0.65,0.78],[0.92,0.65]].forEach(([rx,ry]) => {
                     ctx.beginPath(); ctx.arc(rx*W, ry*H, 3.5, 0, Math.PI*2); ctx.fill();
@@ -946,7 +959,7 @@
             // ── Meteors ──
             let meteors = [];
             function makeMeteor() {
-                const angle = Math.PI / 5; // ~36 degrees diagonal
+                const angle = Math.PI / 5;
                 const speed = 6 + Math.random() * 7;
                 return {
                     x: Math.random() * W * 1.5 - W * 0.2,
@@ -983,7 +996,6 @@
                     ctx.strokeStyle = grad;
                     ctx.lineWidth = m.width;
                     ctx.stroke();
-                    // bright head dot
                     ctx.beginPath();
                     ctx.arc(m.x, m.y, m.width * 1.2, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(220,240,255,${m.alpha})`;
@@ -1000,10 +1012,9 @@
                 ctx.clearRect(0, 0, W, H);
 
                 drawGrid(true);
-                drawGlowingBlocks(); // 呼叫優化後的白色漸暈發光特效
+                drawGlowingBlocks();
                 drawCircuits(true);
 
-                // connection lines
                 const maxDist = 160;
                 const lineBase = '120,180,255';
                 for (let i = 0; i < nodes.length; i++) {
@@ -1023,7 +1034,6 @@
                     }
                 }
 
-                // nodes
                 nodes.forEach(n => {
                     ctx.beginPath();
                     ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
@@ -1069,11 +1079,9 @@
             const UV_KEY = 'andrew_site_uv';
             const SESSION_KEY = 'andrew_site_session';
 
-            // PV: increment on every page load
             const pv = (parseInt(localStorage.getItem(PV_KEY)) || 0) + 1;
             localStorage.setItem(PV_KEY, pv);
 
-            // UV: count once per browser session
             let uv = parseInt(localStorage.getItem(UV_KEY)) || 0;
             if (!sessionStorage.getItem(SESSION_KEY)) {
                 uv += 1;
@@ -1085,5 +1093,81 @@
             document.getElementById('stat-uv').textContent = uv.toLocaleString();
         })();
     </script>
+
+<!-- ── Engineering Calc Password Gate ── -->
+<div id="calcGate" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,10,15,0.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;">
+  <div id="calcGateCard" style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:14px;padding:36px 40px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
+    <div style="font-size:32px;margin-bottom:14px;">🔒</div>
+    <h3 style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;letter-spacing:0.5px;margin-bottom:8px;color:var(--primary-color);">Engineering Calc</h3>
+    <p style="font-size:13px;color:var(--secondary-color);margin-bottom:20px;line-height:1.6;">請輸入密碼以開啟工程計算工具</p>
+    <input id="calcPwInput" type="password" inputmode="numeric" autocomplete="off" placeholder="••••"
+      style="width:100%;padding:12px 14px;border:0.5px solid var(--border-color);border-radius:8px;background:var(--bg-white);color:var(--primary-color);font-family:inherit;font-size:18px;text-align:center;letter-spacing:8px;outline:none;transition:border-color 0.2s;">
+    <div id="calcPwMsg" style="min-height:18px;font-size:12.5px;color:#ef5350;margin:8px 0 0;"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button onclick="closeCalcGate()" style="flex:1;padding:11px;border-radius:8px;border:0.5px solid var(--border-color);background:transparent;color:var(--secondary-color);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;">取消</button>
+      <button onclick="checkCalcPw()" style="flex:1;padding:11px;border-radius:8px;border:0.5px solid var(--primary-color);background:var(--primary-color);color:var(--bg-white);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;">確認</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes calcShake {
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-7px)}
+    75%{transform:translateX(7px)}
+  }
+</style>
+
+<script>
+(function(){
+  const PW   = "0000";
+  const DEST = "../tools/engineering-calculators.html";
+
+  window.openCalcGate = function(e){
+    e.preventDefault();
+    const gate = document.getElementById("calcGate");
+    gate.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    const input = document.getElementById("calcPwInput");
+    input.value = "";
+    document.getElementById("calcPwMsg").textContent = "";
+    setTimeout(()=>input.focus(), 50);
+  };
+
+  window.closeCalcGate = function(){
+    document.getElementById("calcGate").style.display = "none";
+    document.body.style.overflow = "";
+  };
+
+  window.checkCalcPw = function(){
+    const input = document.getElementById("calcPwInput");
+    const msg   = document.getElementById("calcPwMsg");
+    const card  = document.getElementById("calcGateCard");
+    if(input.value === PW){
+      closeCalcGate();
+      location.href = DEST;
+    } else {
+      msg.textContent = "密碼錯誤，請重新輸入";
+      card.style.animation = "none";
+      void card.offsetWidth;
+      card.style.animation = "calcShake 0.4s";
+      input.value = "";
+      input.focus();
+    }
+  };
+
+  document.getElementById("calcGate").addEventListener("click", function(e){
+    if(e.target === this) closeCalcGate();
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(document.getElementById("calcGate").style.display === "flex"){
+      if(e.key === "Enter")  checkCalcPw();
+      if(e.key === "Escape") closeCalcGate();
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
