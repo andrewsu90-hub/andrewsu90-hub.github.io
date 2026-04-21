@@ -723,7 +723,7 @@
         <h2>開始專案</h2>
         <p>需要機構設計、3D 建模或產品開發服務？讓我們討論您的概念與規格需求。</p>
         <button class="cta-button" onclick="openContactModal()">專案洽詢</button>
-        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">發送 Email</a>
+        <a href="https://mail.google.com/mail/?view=cm&to=andrewsu90@gmail.com" target="_blank" class="cta-button cta-button-secondary">Send an Email</a>
     </section>
 
     <div class="modal" id="contactModal">
@@ -813,7 +813,7 @@
                 phone: document.getElementById('phone').value,
                 message: document.getElementById('message').value
             };
-            const mailtoLink = `mailto:andrew@example.com?subject=專案洽詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名：${formData.name}\n電子郵件：${formData.email}\n公司：${formData.company}\n電話：${formData.phone}\n\n專案描述：\n${formData.message}`)}`;
+            const mailtoLink = `mailto:andrewsu90@gmail.com?subject=專案洽詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名：${formData.name}\n電子郵件：${formData.email}\n公司：${formData.company}\n電話：${formData.phone}\n\n專案描述：\n${formData.message}`)}`;
             window.location.href = mailtoLink;
             document.querySelector('form').reset();
             setTimeout(closeContactModal, 500);
