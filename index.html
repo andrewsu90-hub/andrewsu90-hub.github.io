@@ -79,21 +79,6 @@
             background-color: rgba(10, 10, 15, 0.90);
         }
 
-        .header-banner {
-            width: 100%;
-            overflow: hidden;
-            display: block;
-            line-height: 0;
-        }
-
-        .header-banner img {
-            width: 100%;
-            height: clamp(220px, 28vw, 420px);
-            object-fit: cover;
-            object-position: center 45%;
-            display: block;
-        }
-
         .header-nav-row {
             display: flex;
             justify-content: space-between;
@@ -139,11 +124,27 @@
         }
 
         /* Hero Section */
+        .hero-bg {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('Gemini_Generated_Image_l4799rl4799rl479.png') center 45% / cover no-repeat;
+            opacity: 0.18;
+            z-index: 0;
+        }
+
         .hero {
             padding: 6rem 3% 4rem;
             max-width: 1100px;
             margin: 0 auto;
             animation: fadeInDown 0.8s ease;
+            position: relative;
+            z-index: 1;
         }
 
         .hero h1 {
@@ -597,9 +598,6 @@
     <canvas id="tech-bg"></canvas>
 
     <header>
-        <div class="header-banner">
-            <img src="Gemini_Generated_Image_l4799rl4799rl479.png" alt="Anzû Design Studio Banner">
-        </div>
         <div class="header-nav-row">
             <a href="#" class="logo">Anzû Design Studio</a>
             <nav>
@@ -611,6 +609,7 @@
         </div>
     </header>
 
+    <div class="hero-bg">
     <section class="hero" id="hero-section">
         <h1>Product Design &amp; Mechanical Engineering</h1>
         <p>A solid mechanical engineering background focused on advanced surface modeling, complex mechanism design, and manufacturing feasibility assessment. Combining Creo 3D modeling expertise with Python-based engineering tools to deliver end-to-end solutions — from concept to production.</p>
@@ -618,6 +617,7 @@
             Bridging design and manufacturing — solving engineering challenges to build market-ready hardware products.
         </p>
     </section>
+    </div>
 
     <section class="services" id="services">
         <h2 class="section-title">Core Capabilities</h2>
