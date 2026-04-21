@@ -723,7 +723,7 @@
         <h2>Start a Project</h2>
         <p>Have a mechanism design, 3D modeling, or product development need? Let's discuss your concept and specifications.</p>
         <button class="cta-button" onclick="openContactModal()">Project Inquiry</button>
-        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">Send an Email</a>
+        <a href="mailto:andrewsu90@gmail.com" class="cta-button cta-button-secondary">Send an Email</a>
     </section>
 
     <div class="modal" id="contactModal">
@@ -813,7 +813,7 @@
                 phone: document.getElementById('phone').value,
                 message: document.getElementById('message').value
             };
-            const mailtoLink = `mailto:andrew@example.com?subject=Project Inquiry - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nPhone: ${formData.phone}\n\nProject Description:\n${formData.message}`)}`;
+            const mailtoLink = `mailto:andrewsu90@gmail.com?subject=Project Inquiry - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nPhone: ${formData.phone}\n\nProject Description:\n${formData.message}`)}`;
             window.location.href = mailtoLink;
             document.querySelector('form').reset();
             setTimeout(closeContactModal, 500);
