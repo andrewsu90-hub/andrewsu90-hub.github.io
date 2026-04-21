@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Andrew 產品造型與機構設計 - 專注於 Creo 3D建模、機構設計與量產評估">
+    <meta name="description" content="Andrew — Product Design & Mechanical Engineering — Creo 3D Modeling, Mechanism Design & DFM">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-    <meta name="keywords" content="產品設計, 機構設計, Creo, 3D建模, Python, 應力分析">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <meta name="keywords" content="product design, mechanical engineering, Creo, 3D modeling, Python, stress analysis, DFM">
     <meta name="author" content="Andrew">
-    <title>Andrew | 產品造型與機構設計</title>
+    <title>Andrew | Product & Mechanical Design</title>
     
     <style>
         * {
@@ -40,7 +40,8 @@
         }
 
         body {
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
             color: var(--primary-color);
             background-color: var(--bg-white);
             line-height: 1.6;
@@ -86,7 +87,7 @@
         }
 
         .logo {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Bebas Neue', sans-serif;
             font-size: 36px;
             font-weight: 800;
             letter-spacing: 1px;
@@ -97,8 +98,10 @@
         nav {
             display: flex;
             gap: var(--spacing-lg);
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
         }
 
         nav a {
@@ -122,9 +125,11 @@
         }
 
         .hero h1 {
-            font-size: clamp(36px, 6vw, 52px);
-            font-weight: 700;
-            line-height: 1.2;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(52px, 8vw, 86px);
+            font-weight: 400;
+            line-height: 1.0;
+            letter-spacing: 0.04em;
             margin-bottom: var(--spacing-md);
             color: var(--primary-color);
         }
@@ -147,8 +152,10 @@
         }
 
         .section-title {
-            font-size: 30px;
-            font-weight: 700;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 38px;
+            font-weight: 400;
+            letter-spacing: 0.06em;
             margin-bottom: var(--spacing-lg);
             color: var(--primary-color);
         }
@@ -183,8 +190,10 @@
         }
 
         .service-card h3 {
-            font-size: 18px;
-            font-weight: 700;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            font-weight: 400;
+            letter-spacing: 0.06em;
             margin-bottom: var(--spacing-sm);
             color: var(--primary-color);
         }
@@ -274,8 +283,10 @@
         }
 
         .project-info h3 {
-            font-size: 19px;
-            font-weight: 700;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            font-weight: 400;
+            letter-spacing: 0.05em;
             margin-bottom: var(--spacing-xs);
             color: var(--primary-color);
         }
@@ -343,8 +354,10 @@
         }
 
         .contact h2 {
-            font-size: 32px;
-            font-weight: 700;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 52px;
+            font-weight: 400;
+            letter-spacing: 0.05em;
             margin-bottom: var(--spacing-md);
             color: var(--primary-color);
         }
@@ -534,6 +547,24 @@
             .service-grid { grid-template-columns: 1fr; }
             .modal-content { padding: var(--spacing-lg); }
         }
+
+        .visitor-count {
+            margin-top: 10px;
+            font-size: 13px;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .visitor-item {
+            display: inline-flex;
+            align-items: center;
+        }
+        .visitor-sep {
+            opacity: 0.4;
+        }
     </style>
 </head>
 <body>
@@ -542,54 +573,54 @@
     <header>
         <a href="#" class="logo">Andrew Design Studio</a>
         <nav>
-            <a onclick="smoothScroll('services'); return false;">專業服務</a>
-            <a onclick="smoothScroll('portfolio'); return false;">工程實績</a>
-            <a onclick="smoothScroll('contact'); return false;">聯絡提案</a>
+            <a onclick="smoothScroll('services'); return false;">Services</a>
+            <a onclick="smoothScroll('portfolio'); return false;">Portfolio</a>
+            <a onclick="smoothScroll('contact'); return false;">Contact</a>
         </nav>
     </header>
 
     <section class="hero">
-        <h1>產品造型與機構設計</h1>
-        <p>擁有紮實的機械設計背景，專注於高階曲面建構、複雜機構設計與量產可行性評估。結合 Creo 3D 建模實力與 Python 工程輔助計算，提供從概念發想到落地製造的全方位解決方案。</p>
+        <h1>Product Design &amp; Mechanical Engineering</h1>
+        <p>A solid mechanical engineering background focused on advanced surface modeling, complex mechanism design, and manufacturing feasibility assessment. Combining Creo 3D modeling expertise with Python-based engineering tools to deliver end-to-end solutions — from concept to production.</p>
         <p style="color: var(--secondary-color); font-size: 15px; margin-top: var(--spacing-md); font-weight: 500;">
-            精準對接開模製造，解決研發痛點，打造具備市場競爭力的硬體產品。
+            Bridging design and manufacturing — solving engineering challenges to build market-ready hardware products.
         </p>
     </section>
 
     <section class="services" id="services">
-        <h2 class="section-title">核心技術範疇</h2>
+        <h2 class="section-title">Core Capabilities</h2>
         <div class="service-grid">
             <div class="service-card">
-                <h3>Creo 機構設計</h3>
-                <p>執行精準的 3D 實體與高階曲面建模、內部複雜機構拆解，以及系統性的運動學分析 (Mechanism Analysis)。</p>
+                <h3>Creo Mechanism Design</h3>
+                <p>Precise 3D solid and advanced surface modeling, complex internal mechanism breakdown, and systematic kinematic analysis using Creo Mechanism.</p>
             </div>
             <div class="service-card">
-                <h3>量產可行性評估 (DFM)</h3>
-                <p>執行材質應力考量、干涉檢查與開模拔模角評估，確保設計圖能順利對接後端模具廠與量產製造。</p>
+                <h3>Design for Manufacturing (DFM)</h3>
+                <p>Material stress evaluation, interference checking, and draft angle analysis — ensuring designs are fully production-ready for tooling and mass manufacturing.</p>
             </div>
             <div class="service-card">
-                <h3>擬真渲染與外觀提案</h3>
-                <p>從初期的產品外觀概念發想，到最終的高畫質產品擬真渲染，打造極具商業價值的視覺呈現。</p>
+                <h3>Photorealistic Rendering &amp; Visual Proposals</h3>
+                <p>From early concept ideation to final high-fidelity product renders — delivering commercially compelling visuals for crowdfunding, catalogs, and brand presentations.</p>
             </div>
             <div class="service-card">
-                <h3>Python 工程輔助</h3>
-                <p>運用 Python 開發專屬的工程計算腳本與自動化數據處理工具，有效縮短設計驗證時間並提升開發效率。</p>
+                <h3>Python Engineering Tools</h3>
+                <p>Custom Python scripts for engineering calculations and automated data processing — significantly reducing design validation time and boosting development efficiency.</p>
             </div>
         </div>
     </section>
 
     <section class="portfolio" id="portfolio">
-        <h2 class="section-title">精選工程實績</h2>
+        <h2 class="section-title">Selected Engineering Work</h2>
         <div class="project-grid">
             <div class="project-card">
                <div class="project-image"><img src="image/04.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>仿真機構設計</h3>
-                    <p>透過 Creo 運動學模組進行作動模擬，精確計算行程並排除干涉問題，確保機構運作順暢。</p>
+                    <h3>Simulation-Driven Mechanism Design</h3>
+                    <p>Motion simulation using Creo's kinematic module — precise stroke calculation and interference elimination for smooth mechanism operation.</p>
                     <div class="project-tags">
                         <span class="project-tag">Creo</span>
-                        <span class="project-tag">運動學分析</span>
-                        <span class="project-tag">機構設計</span>
+                        <span class="project-tag">Kinematic Analysis</span>
+                        <span class="project-tag">Mechanism Design</span>
                     </div>
                 </div>
             </div>
@@ -597,11 +628,11 @@
             <div class="project-card">
                 <div class="project-image"><img src="image/01.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>消費性電子產品外觀建模</h3>
-                    <p>利用高階曲面技巧建構符合人體工學的流線外型，並考量後續的拆件與組裝邏輯。</p>
+                    <h3>Consumer Electronics Surface Modeling</h3>
+                    <p>Advanced surface techniques used to build ergonomic, flowing forms — with full consideration of part split lines and assembly logic.</p>
                     <div class="project-tags">
-                        <span class="project-tag">曲面建模</span>
-                        <span class="project-tag">產品外觀</span>
+                        <span class="project-tag">Surface Modeling</span>
+                        <span class="project-tag">Industrial Design</span>
                     </div>
                 </div>
             </div>
@@ -609,23 +640,23 @@
             <div class="project-card">
                 <div class="project-image"><img src="image/dfm.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>結構應力與 DFM 優化</h3>
-                    <p>針對易斷裂的卡勾與承重件進行結構強化設計，優化壁厚均勻度，減少縮水變形等射出成型缺陷。</p>
+                    <h3>Structural Stress &amp; DFM Optimization</h3>
+                    <p>Structural reinforcement of snap hooks and load-bearing parts, wall thickness optimization to minimize sink marks and warping in injection-molded components.</p>
                     <div class="project-tags">
                         <span class="project-tag">DFM</span>
-                        <span class="project-tag">應力考量</span>
-                        <span class="project-tag">塑膠射出</span>
+                        <span class="project-tag">Stress Analysis</span>
+                        <span class="project-tag">Injection Molding</span>
                     </div>
                 </div>
             </div>
 
             <div class="project-card">
-                <div class="project-image"><img src="image/py.gif" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-image"><img src="image/py.jpg" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>Python 自動化工程計算</h3>
-                    <p>撰寫 Python 腳本取代繁瑣的 Excel 人工計算，將參數化設計的驗證時間大幅縮短。</p>
+                    <h3>Python Automated Engineering Calc</h3>
+                    <p>Python scripts replacing tedious Excel manual calculations — dramatically cutting down parametric design verification time.</p>
                     <div class="project-tags">
-                        <a class="project-tag" href="tools/engineering-calculators.html" target="_blank" rel="noopener" title="開啟工程計算工具選單">工程計算</a>
+                        <a class="project-tag" href="tools/engineering-calculators.html" target="_blank" rel="noopener" title="Open Engineering Calculator Tools">Engineering Calc</a>
                     </div>
                 </div>
             </div>
@@ -633,11 +664,11 @@
             <div class="project-card">
                 <div class="project-image"><img src="image/03.gif" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>金屬件精密結構設計</h3>
-                    <p>針對壓鑄與板金件進行專屬的結構設計，考量加工公差與表面處理工藝要求。</p>
+                    <h3>Precision Metal Component Design</h3>
+                    <p>Dedicated structural design for die-cast and sheet metal parts — accounting for machining tolerances and surface treatment process requirements.</p>
                     <div class="project-tags">
-                        <span class="project-tag">金屬加工</span>
-                        <span class="project-tag">公差分析</span>
+                        <span class="project-tag">Metal Fabrication</span>
+                        <span class="project-tag">Tolerance Analysis</span>
                     </div>
                 </div>
             </div>
@@ -645,11 +676,11 @@
             <div class="project-card">
                 <div class="project-image"><img src="image/05.jpg" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
-                    <h3>產品商業擬真渲染</h3>
-                    <p>設定高質感的材質與光影表現，產出可用於募資平台或型錄展示的逼真產品渲染圖。</p>
+                    <h3>Commercial Photorealistic Rendering</h3>
+                    <p>High-fidelity material and lighting setups producing photorealistic product images ready for crowdfunding platforms or commercial catalogs.</p>
                     <div class="project-tags">
-                        <span class="project-tag">3D渲染</span>
-                        <a class="project-tag" href="visual-proposal.html" title="查看視覺提案作品集">視覺提案</a>
+                        <span class="project-tag">3D Rendering</span>
+                        <a class="project-tag" href="visual-proposal.html" title="View Visual Proposal Portfolio">Visual Proposals</a>
                     </div>
                 </div>
             </div>
@@ -657,49 +688,60 @@
     </section>
 
     <section class="contact" id="contact">
-        <h2>啟動設計專案</h2>
-        <p>有機構設計、3D 建模 or 產品開發需求嗎？歡迎隨時聯繫討論您的構想與規格。</p>
-        <button class="cta-button" onclick="openContactModal()">專案諮詢</button>
-        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">直接發送郵件</a>
+        <h2>Start a Project</h2>
+        <p>Have a mechanism design, 3D modeling, or product development need? Let's discuss your concept and specifications.</p>
+        <button class="cta-button" onclick="openContactModal()">Project Inquiry</button>
+        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">Send an Email</a>
     </section>
 
     <div class="modal" id="contactModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeContactModal()">&times;</button>
-            <h3>專案諮詢表單</h3>
+            <h3>Project Inquiry</h3>
             <form onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
-                    <label for="name">姓名 / 聯絡人 *</label>
+                    <label for="name">Name / Contact Person *</label>
                     <input type="text" id="name" name="name" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">電子郵件 *</label>
+                    <label for="email">Email Address *</label>
                     <input type="email" id="email" name="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="company">公司 / 單位名稱</label>
+                    <label for="company">Company / Organization</label>
                     <input type="text" id="company" name="company">
                 </div>
 
                 <div class="form-group">
-                    <label for="phone">聯絡電話</label>
+                    <label for="phone">Phone Number</label>
                     <input type="tel" id="phone" name="phone">
                 </div>
 
                 <div class="form-group">
-                    <label for="message">專案需求描述 *</label>
-                    <textarea id="message" name="message" required placeholder="請簡述您的專案需求..."></textarea>
+                    <label for="message">Project Description *</label>
+                    <textarea id="message" name="message" required placeholder="Briefly describe your project requirements..."></textarea>
                 </div>
 
-                <button type="submit" class="cta-button" style="width: 100%; border: none;">送出諮詢</button>
+                <button type="submit" class="cta-button" style="width: 100%; border: none;">Submit Inquiry</button>
             </form>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2026 Andrew Mechanical & Product Design Studio. All rights reserved.</p>
+        <p>&copy; 2026 Andrew Mechanical &amp; Product Design Studio. All rights reserved.</p>
+        <p class="visitor-count">
+            <span class="visitor-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Unique Visitors <span id="stat-uv" style="color:#4a9eff;font-weight:600;margin:0 3px">--</span>
+            </span>
+            <span class="visitor-sep">·</span>
+            <span class="visitor-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Total Page Views <span id="stat-pv" style="color:#4a9eff;font-weight:600;margin:0 3px">--</span>
+            </span>
+        </p>
     </footer>
 
     <script>
@@ -739,7 +781,7 @@
                 phone: document.getElementById('phone').value,
                 message: document.getElementById('message').value
             };
-            const mailtoLink = `mailto:andrew@example.com?subject=設計專案諮詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名: ${formData.name}\n郵件: ${formData.email}\n公司: ${formData.company}\n電話: ${formData.phone}\n\n需求描述:\n${formData.message}`)}`;
+            const mailtoLink = `mailto:andrew@example.com?subject=Project Inquiry - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nPhone: ${formData.phone}\n\nProject Description:\n${formData.message}`)}`;
             window.location.href = mailtoLink;
             document.querySelector('form').reset();
             setTimeout(closeContactModal, 500);
@@ -871,6 +913,28 @@
         document.querySelectorAll('section').forEach(section => {
             section.style.opacity = '0.95';
         });
+
+        // ── Visitor Counter (localStorage) ──
+        (function() {
+            const PV_KEY = 'andrew_site_pv';
+            const UV_KEY = 'andrew_site_uv';
+            const SESSION_KEY = 'andrew_site_session';
+
+            // PV: increment on every page load
+            const pv = (parseInt(localStorage.getItem(PV_KEY)) || 0) + 1;
+            localStorage.setItem(PV_KEY, pv);
+
+            // UV: count once per browser session
+            let uv = parseInt(localStorage.getItem(UV_KEY)) || 0;
+            if (!sessionStorage.getItem(SESSION_KEY)) {
+                uv += 1;
+                localStorage.setItem(UV_KEY, uv);
+                sessionStorage.setItem(SESSION_KEY, '1');
+            }
+
+            document.getElementById('stat-pv').textContent = pv.toLocaleString();
+            document.getElementById('stat-uv').textContent = uv.toLocaleString();
+        })();
     </script>
 </body>
 </html>
