@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="google-site-verification" content="pHM1QBJWZEMnjr29tqK_GY-fQ6lJJJWl4DvodGUvozE" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Andrew — Product Design & Mechanical Engineering — Creo 3D Modeling, Mechanism Design & DFM">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
     <meta name="keywords" content="product design, mechanical engineering, Creo, 3D modeling, Python, stress analysis, DFM">
     <meta name="author" content="Andrew">
     <title>Andrew | Product & Mechanical Design</title>
@@ -88,10 +87,10 @@
         }
 
         .logo {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-size: 24px;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             text-decoration: none;
             color: var(--primary-color);
         }
@@ -103,7 +102,7 @@
             font-weight: 400;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            align-items: center; /* 讓中文按鈕與英文選單垂直對齊 */
+            align-items: center;
         }
 
         nav a {
@@ -586,7 +585,7 @@
         </nav>
     </header>
 
-    <section class="hero">
+    <section class="hero" id="hero-section">
         <h1>Product Design &amp; Mechanical Engineering</h1>
         <p>A solid mechanical engineering background focused on advanced surface modeling, complex mechanism design, and manufacturing feasibility assessment. Combining Creo 3D modeling expertise with Python-based engineering tools to deliver end-to-end solutions — from concept to production.</p>
         <p style="color: var(--secondary-color); font-size: 15px; margin-top: var(--spacing-md); font-weight: 500;">
@@ -835,6 +834,88 @@
                 }
             }
 
+            // ── 優化：更少數量、更高亮度的白色漸暈發光特效 ──
+            let glowingBlocks = [];
+            function drawGlowingBlocks() {
+                const step = 52;
+                
+                const heroSection = document.getElementById('hero-section');
+                const headerSection = document.querySelector('header');
+                
+                if (!heroSection || !headerSection) return;
+
+                const heroRect = heroSection.getBoundingClientRect();
+                const headerRect = headerSection.getBoundingClientRect();
+                
+                const topBound = headerRect.bottom;
+                const bottomBound = heroRect.bottom;
+
+                // 1. 大幅降低方塊出現機率，讓畫面更乾淨聚焦
+                if (Math.random() < 0.04) { 
+                    if (bottomBound > topBound) {
+                        let randomY = topBound + Math.random() * (bottomBound - topBound);
+                        glowingBlocks.push({
+                            x: Math.floor(Math.random() * (W / step)) * step,
+                            y: Math.floor(randomY / step) * step,
+                            alpha: 0,
+                            // 2. 提高極限亮度，讓亮起來時更有衝擊力
+                            maxAlpha: 0.5 + Math.random() * 0.4, 
+                            fadeIn: true
+                        });
+                    }
+                }
+
+                for (let i = glowingBlocks.length - 1; i >= 0; i--) {
+                    let b = glowingBlocks[i];
+                    
+                    if (b.fadeIn) {
+                        b.alpha += 0.015; 
+                        if (b.alpha >= b.maxAlpha) b.fadeIn = false;
+                    } else {
+                        b.alpha -= 0.005; 
+                        if (b.alpha <= 0) {
+                            glowingBlocks.splice(i, 1);
+                            continue;
+                        }
+                    }
+
+                    // 取得方塊中心點
+                    let cx = b.x + step / 2;
+                    let cy = b.y + step / 2;
+                    
+                    // 繪製漸暈發光方塊 (白色 Radial Gradient)
+                    let blockGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, step);
+                    blockGrad.addColorStop(0, `rgba(255, 255, 255, ${b.alpha})`);
+                    blockGrad.addColorStop(1, `rgba(255, 255, 255, 0)`);
+                    
+                    ctx.fillStyle = blockGrad;
+                    ctx.fillRect(b.x, b.y, step, step);
+
+                    // 繪製鄰近格線同步發光 (向外延伸 2.5 格的距離)
+                    let lineGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, step * 2.5);
+                    lineGrad.addColorStop(0, `rgba(255, 255, 255, ${b.alpha * 0.9})`);
+                    lineGrad.addColorStop(1, `rgba(255, 255, 255, 0)`);
+
+                    ctx.strokeStyle = lineGrad;
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    
+                    // 上下兩條水平格線延伸
+                    ctx.moveTo(cx - step * 2.5, b.y); 
+                    ctx.lineTo(cx + step * 2.5, b.y);
+                    ctx.moveTo(cx - step * 2.5, b.y + step); 
+                    ctx.lineTo(cx + step * 2.5, b.y + step);
+                    
+                    // 左右兩條垂直格線延伸
+                    ctx.moveTo(b.x, cy - step * 2.5); 
+                    ctx.lineTo(b.x, cy + step * 2.5);
+                    ctx.moveTo(b.x + step, cy - step * 2.5); 
+                    ctx.lineTo(b.x + step, cy + step * 2.5);
+                    
+                    ctx.stroke();
+                }
+            }
+
             function drawCircuits(dark) {
                 const color = dark ? 'rgba(120,180,255,0.07)' : 'rgba(0,80,200,0.055)';
                 ctx.strokeStyle = color;
@@ -915,6 +996,7 @@
                 ctx.clearRect(0, 0, W, H);
 
                 drawGrid(true);
+                drawGlowingBlocks(); // 呼叫優化後的白色漸暈發光特效
                 drawCircuits(true);
 
                 // connection lines
