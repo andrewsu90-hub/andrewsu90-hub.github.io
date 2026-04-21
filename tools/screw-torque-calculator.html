@@ -476,7 +476,7 @@
         document.getElementById('derived-info').innerHTML =
             `d=${p.spec.d} mm, P=${p.spec.P} mm, As=${p.spec.As} mm², 2.5d=${round(p.spec.d*2.5,2)} mm ｜` +
             `取用模式：<strong style="color:var(--primary-color);">${p.mode === 'HV_max' ? 'HV max 值計算' : (p.mode === 'Rm_nom' ? 'Rm nom 值計算' : 'Rm min 值計算')}</strong>` +
-            ` ｜ δy = <strong style="color:var(--primary-color);">${round(p.deltaY,2)}</strong> N/mm² ｜ SP-δyp = <strong style="color:var(--primary-color);">${round(p.spDeltaY,2)}</strong> N/mm²`;
+            `使用下降伏點強度值 ｜ δy = <strong style="color:var(--primary-color);">${round(p.deltaY,2)}</strong> N/mm² ｜ SP-δyp = <strong style="color:var(--primary-color);">${round(p.spDeltaY,2)}</strong> N/mm²`;
 
         // 高亮主表
         document.querySelectorAll('#spec-tbody tr').forEach(r => r.classList.remove('highlighted'));
