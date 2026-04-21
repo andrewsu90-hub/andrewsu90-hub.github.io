@@ -6,7 +6,7 @@
     <meta name="description" content="Andrew — Product Design & Mechanical Engineering — Creo 3D Modeling, Mechanism Design & DFM">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
     <meta name="keywords" content="product design, mechanical engineering, Creo, 3D modeling, Python, stress analysis, DFM">
     <meta name="author" content="Andrew">
     <title>Andrew | Product & Mechanical Design</title>
@@ -102,6 +102,7 @@
             font-weight: 400;
             letter-spacing: 0.14em;
             text-transform: uppercase;
+            align-items: center; /* 讓中文按鈕與英文選單垂直對齊 */
         }
 
         nav a {
@@ -535,7 +536,7 @@
             .service-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-                /* Responsive */
+        /* Responsive */
         @media (max-width: 768px) {
             header { padding: var(--spacing-md) 3%; }
             nav { gap: var(--spacing-md); font-size: 14px; }
@@ -580,6 +581,7 @@
             <a onclick="smoothScroll('services'); return false;">Services</a>
             <a onclick="smoothScroll('portfolio'); return false;">Portfolio</a>
             <a onclick="smoothScroll('contact'); return false;">Contact</a>
+            <a href="zh/index.html" style="color: var(--accent); margin-left: 8px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; text-transform: none; letter-spacing: normal;">中文</a>
         </nav>
     </header>
 
