@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Andrew 產品造型與機構設計 - 專注於 Creo 3D建模、機構設計與量產評估">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="keywords" content="產品設計, 機構設計, Creo, 3D建模, Python, 應力分析">
+    <meta name="author" content="Andrew">
+    <title>Andrew | 產品造型與機構設計</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #000;
+            --secondary-color: #666;
+            --border-color: #e0e0e0;
+            --bg-light: #f9f9f9;
+            --bg-white: #ffffff;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #fff;
+                --secondary-color: #aaa;
+                --border-color: #333;
+                --bg-light: #1a1a1a;
+                --bg-white: #0d0d0d;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--primary-color);
+            background-color: var(--bg-white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg) 5%;
+            border-bottom: 0.5px solid var(--border-color);
+            background-color: var(--bg-white);
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            header {
+                background-color: rgba(13, 13, 13, 0.9);
+            }
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        nav {
+            display: flex;
+            gap: var(--spacing-lg);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            opacity: 0.6;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 5% 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 52px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-sm);
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        /* Services Section */
+        .services {
+            padding: var(--spacing-xl) 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .section-title {
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .service-card {
+            padding: var(--spacing-lg);
+            background-color: var(--bg-light);
+            border-radius: var(--radius-md);
+            border: 0.5px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .service-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: var(--primary-color);
+        }
+
+        .service-card p {
+            font-size: 15px;
+            color: var(--secondary-color);
+            line-height: 1.7;
+        }
+
+        /* Portfolio Section */
+        .portfolio {
+            padding: var(--spacing-xl) 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .project-card {
+            background-color: var(--bg-light);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 0.5px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .project-card:hover {
+                box-shadow: 0 12px 30px rgba(255, 255, 255, 0.05);
+            }
+        }
+
+        .project-image {
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #e6e6e6 0%, #d4d4d4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: #999;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .project-image {
+                background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+                color: #555;
+            }
+        }
+
+        .project-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(0, 0, 0, 0.05) 100%);
+        }
+
+        .project-info {
+            padding: var(--spacing-lg);
+        }
+
+        .project-info h3 {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+
+        .project-info p {
+            font-size: 15px;
+            color: var(--secondary-color);
+            margin: var(--spacing-sm) 0;
+            line-height: 1.7;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .project-tag {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 500;
+            background-color: var(--bg-white);
+            color: var(--secondary-color);
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            border: 0.5px solid var(--border-color);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .project-tag:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+        }
+
+        a.project-tag {
+            cursor: pointer;
+            position: relative;
+            padding-right: 24px;
+        }
+
+        a.project-tag::after {
+            content: "\2197";
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        a.project-tag:hover::after {
+            opacity: 1;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: var(--spacing-xl) 5%;
+            max-width: 900px;
+            margin: 0 auto;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .contact h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+
+        .contact p {
+            font-size: 16px;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.7;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            border: 1.5px solid var(--primary-color);
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .cta-button:hover {
+            background-color: transparent;
+            color: var(--primary-color);
+        }
+
+        .cta-button-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            margin-left: var(--spacing-md);
+        }
+
+        .cta-button-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+        }
+
+        /* Footer */
+        footer {
+            padding: var(--spacing-lg) 5%;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            font-size: 14px;
+            color: var(--secondary-color);
+        }
+
+        /* Contact Form Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--secondary-color);
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+
+        .modal h3 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--primary-color);
+            background-color: var(--bg-light);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .form-group input:focus,
+            .form-group textarea:focus {
+                box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+            }
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { padding: var(--spacing-md) 5%; }
+            nav { gap: var(--spacing-md); font-size: 14px; }
+            .hero { padding: 4rem 5% 2rem; }
+            .hero h1 { font-size: 32px; }
+            .hero p { font-size: 16px; }
+            .cta-button-secondary {
+                display: block;
+                margin-left: 0;
+                margin-top: var(--spacing-md);
+            }
+            .project-grid { grid-template-columns: 1fr; }
+            .service-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: var(--spacing-lg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">Andrew Design Studio</a>
+        <nav>
+            <a onclick="smoothScroll('services'); return false;">專業服務</a>
+            <a onclick="smoothScroll('portfolio'); return false;">工程實績</a>
+            <a onclick="smoothScroll('contact'); return false;">聯絡提案</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>產品造型與機構設計</h1>
+        <p>擁有紮實的機械設計背景，專注於高階曲面建構、複雜機構設計與量產可行性評估。結合 Creo 3D 建模實力與 Python 工程輔助計算，提供從概念發想到落地製造的全方位解決方案。</p>
+        <p style="color: var(--secondary-color); font-size: 15px; margin-top: var(--spacing-md); font-weight: 500;">
+            精準對接開模製造，解決研發痛點，打造具備市場競爭力的硬體產品。
+        </p>
+    </section>
+
+    <section class="services" id="services">
+        <h2 class="section-title">核心技術範疇</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>Creo 機構設計</h3>
+                <p>執行精準的 3D 實體與高階曲面建模、內部複雜機構拆解，以及系統性的運動學分析 (Mechanism Analysis)。</p>
+            </div>
+            <div class="service-card">
+                <h3>量產可行性評估 (DFM)</h3>
+                <p>執行材質應力考量、干涉檢查與開模拔模角評估，確保設計圖能順利對接後端模具廠與量產製造。</p>
+            </div>
+            <div class="service-card">
+                <h3>擬真渲染與外觀提案</h3>
+                <p>從初期的產品外觀概念發想，到最終的高畫質產品擬真渲染，打造極具商業價值的視覺呈現。</p>
+            </div>
+            <div class="service-card">
+                <h3>Python 工程輔助</h3>
+                <p>運用 Python 開發專屬的工程計算腳本與自動化數據處理工具，有效縮短設計驗證時間並提升開發效率。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="portfolio" id="portfolio">
+        <h2 class="section-title">精選工程實績</h2>
+        <div class="project-grid">
+            <div class="project-card">
+               <div class="project-image"><img src="image/04.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>仿真機構設計</h3>
+                    <p>透過 Creo 運動學模組進行作動模擬，精確計算行程並排除干涉問題，確保機構運作順暢。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">Creo</span>
+                        <span class="project-tag">運動學分析</span>
+                        <span class="project-tag">機構設計</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image"><img src="image/01.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>消費性電子產品外觀建模</h3>
+                    <p>利用高階曲面技巧建構符合人體工學的流線外型，並考量後續的拆件與組裝邏輯。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">曲面建模</span>
+                        <span class="project-tag">產品外觀</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image"><img src="image/dfm.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>結構應力與 DFM 優化</h3>
+                    <p>針對易斷裂的卡勾與承重件進行結構強化設計，優化壁厚均勻度，減少縮水變形等射出成型缺陷。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">DFM</span>
+                        <span class="project-tag">應力考量</span>
+                        <span class="project-tag">塑膠射出</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image"><img src="image/py.jpg" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>Python 自動化工程計算</h3>
+                    <p>撰寫 Python 腳本取代繁瑣的 Excel 人工計算，將參數化設計的驗證時間大幅縮短。</p>
+                    <div class="project-tags">
+                        <a class="project-tag" href="tools/engineering-calculators.html" target="_blank" rel="noopener" title="開啟工程計算工具選單">工程計算</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="project-image"><img src="image/03.gif" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>金屬件精密結構設計</h3>
+                    <p>針對壓鑄與板金件進行專屬的結構設計，考量加工公差與表面處理工藝要求。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">金屬加工</span>
+                        <span class="project-tag">公差分析</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image"><img src="image/05.jpg" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-info">
+                    <h3>產品商業擬真渲染</h3>
+                    <p>設定高質感的材質與光影表現，產出可用於募資平台或型錄展示的逼真產品渲染圖。</p>
+                    <div class="project-tags">
+                        <span class="project-tag">3D渲染</span>
+                        <a class="project-tag" href="visual-proposal.html" title="查看視覺提案作品集">視覺提案</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <h2>啟動設計專案</h2>
+        <p>有機構設計、3D 建模 or 產品開發需求嗎？歡迎隨時聯繫討論您的構想與規格。</p>
+        <button class="cta-button" onclick="openContactModal()">專案諮詢</button>
+        <a href="mailto:andrew@example.com" class="cta-button cta-button-secondary">直接發送郵件</a>
+    </section>
+
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeContactModal()">&times;</button>
+            <h3>專案諮詢表單</h3>
+            <form onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">姓名 / 聯絡人 *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">電子郵件 *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="company">公司 / 單位名稱</label>
+                    <input type="text" id="company" name="company">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">聯絡電話</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">專案需求描述 *</label>
+                    <textarea id="message" name="message" required placeholder="請簡述您的專案需求..."></textarea>
+                </div>
+
+                <button type="submit" class="cta-button" style="width: 100%; border: none;">送出諮詢</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Andrew Mechanical & Product Design Studio. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Smooth scroll navigation
+        function smoothScroll(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Contact modal functions
+        function openContactModal() {
+            document.getElementById('contactModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('contactModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeContactModal();
+            }
+        });
+
+        // Form submission
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                company: document.getElementById('company').value,
+                phone: document.getElementById('phone').value,
+                message: document.getElementById('message').value
+            };
+            const mailtoLink = `mailto:andrew@example.com?subject=設計專案諮詢 - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`姓名: ${formData.name}\n郵件: ${formData.email}\n公司: ${formData.company}\n電話: ${formData.phone}\n\n需求描述:\n${formData.message}`)}`;
+            window.location.href = mailtoLink;
+            document.querySelector('form').reset();
+            setTimeout(closeContactModal, 500);
+        }
+
+        // Keyboard: Close modal on ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeContactModal();
+            }
+        });
+
+        // Scroll animation trigger
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                }
+            });
+        }, observerOptions);
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0.95';
+        });
+    </script>
+</body>
+</html>
