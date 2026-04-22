@@ -345,6 +345,28 @@
             from { opacity: 0; transform: scale(0.92); }
             to   { opacity: 1; transform: scale(1); }
         }
+
+        /* ── Sub-filter back button ── */
+        .sub-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            background: transparent;
+            color: var(--secondary-color);
+            border: 0.5px solid var(--border-color);
+            border-radius: 99px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            letter-spacing: 0.04em;
+        }
+        .sub-back-btn:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -448,15 +470,26 @@
 
 <section class="gallery-section">
 
-    <!-- ┌─────────────────────────────────────────────────────┐
-         │  新增「分類 tab」：複製下方 button，改 data-filter   │
-         │  與文字，對應 gallery-item 的 data-category 即可    │
-         └─────────────────────────────────────────────────────┘ -->
+    <!-- 主 filter bar -->
     <div class="filter-bar" id="filterBar">
         <button class="filter-btn active" data-filter="all">全部</button>
         <button class="filter-btn" data-filter="概念草圖">概念草圖</button>
         <button class="filter-btn" data-filter="3D渲染">3D 渲染</button>
         <button class="filter-btn" data-filter="包裝設計">包裝設計</button>
+    </div>
+
+    <!-- 3D 渲染 sub-filter bar -->
+    <div class="filter-bar" id="subFilterBar" style="display:none;margin-top:-8px;padding-top:14px;border-top:0.5px solid var(--border-color);">
+        <button class="sub-back-btn" id="subBackBtn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+            返回
+        </button>
+        <button class="filter-btn active" data-sub="all-3d">全部 3D</button>
+        <button class="filter-btn" data-sub="KIOSK">KIOSK</button>
+        <button class="filter-btn" data-sub="3C Products">3C Products</button>
+        <button class="filter-btn" data-sub="Furniture">Furniture</button>
+        <button class="filter-btn" data-sub="Tools">Tools</button>
+        <button class="filter-btn" data-sub="Automobiles">Automobiles</button>
     </div>
 
     <!-- ┌─────────────────────────────────────────────────────┐
@@ -466,6 +499,51 @@
          │    <h3> 標題 與 <p> 描述                            │
          └─────────────────────────────────────────────────────┘ -->
     <div class="gallery-grid" id="galleryGrid">
+
+        <!-- ── KIOSK 3D Renders ── -->
+        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="../3D_RENDER/KIOSK/E1.jpg" alt="KIOSK Render 01" loading="lazy">
+            <div class="gallery-caption">
+                <h3>KIOSK E1</h3>
+                <p>KIOSK 產品 3D 渲染提案。</p>
+                <span class="gallery-tag">3D 渲染</span>
+                <span class="gallery-tag">KIOSK</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="../3D_RENDER/KIOSK/E2.jpg" alt="KIOSK Render 02" loading="lazy">
+            <div class="gallery-caption">
+                <h3>KIOSK E2</h3>
+                <p>KIOSK 產品 3D 渲染提案。</p>
+                <span class="gallery-tag">3D 渲染</span>
+                <span class="gallery-tag">KIOSK</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="../3D_RENDER/KIOSK/E3.jpg" alt="KIOSK Render 03" loading="lazy">
+            <div class="gallery-caption">
+                <h3>KIOSK E3</h3>
+                <p>KIOSK 產品 3D 渲染提案。</p>
+                <span class="gallery-tag">3D 渲染</span>
+                <span class="gallery-tag">KIOSK</span>
+            </div>
+        </div>
+
+        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+            <div class="zoom-hint">⤢</div>
+            <img src="../3D_RENDER/KIOSK/E4.jpg" alt="KIOSK Render 04" loading="lazy">
+            <div class="gallery-caption">
+                <h3>KIOSK E4</h3>
+                <p>KIOSK 產品 3D 渲染提案。</p>
+                <span class="gallery-tag">3D 渲染</span>
+                <span class="gallery-tag">KIOSK</span>
+            </div>
+        </div>
 
         <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
             <div class="zoom-hint">⤢</div>
@@ -611,19 +689,67 @@
 
 <script>
     // ── Filter ──
-    const filterBtns = document.querySelectorAll('.filter-btn');
+    const filterBtns = document.querySelectorAll('#filterBar .filter-btn');
+    const subFilterBtns = document.querySelectorAll('#subFilterBar .filter-btn');
     const items = () => [...document.querySelectorAll('.gallery-item')];
 
+    let currentMainFilter = 'all';
+    let currentSubFilter  = 'all-3d';
+
+    function applyFilters() {
+        items().forEach(item => {
+            const cat = item.dataset.category;
+            const sub = item.dataset.subcategory || '';
+
+            if (currentMainFilter === 'all') {
+                item.style.display = '';
+            } else if (currentMainFilter === '3D渲染') {
+                if (cat !== '3D渲染') { item.style.display = 'none'; return; }
+                item.style.display = (currentSubFilter === 'all-3d' || sub === currentSubFilter) ? '' : 'none';
+            } else {
+                item.style.display = (cat === currentMainFilter) ? '' : 'none';
+            }
+        });
+        buildVisibleIndex();
+    }
+
+    // 主 filter
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             filterBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const cat = btn.dataset.filter;
-            items().forEach(item => {
-                item.style.display = (cat === 'all' || item.dataset.category === cat) ? '' : 'none';
-            });
-            buildVisibleIndex();
+            currentMainFilter = btn.dataset.filter;
+
+            if (currentMainFilter === '3D渲染') {
+                document.getElementById('subFilterBar').style.display = 'flex';
+                // reset sub
+                subFilterBtns.forEach(b => b.classList.remove('active'));
+                subFilterBtns[0].classList.add('active');
+                currentSubFilter = 'all-3d';
+            } else {
+                document.getElementById('subFilterBar').style.display = 'none';
+            }
+            applyFilters();
         });
+    });
+
+    // Sub filter
+    subFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            subFilterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSubFilter = btn.dataset.sub;
+            applyFilters();
+        });
+    });
+
+    // Sub-filter 返回按鈕 → 回到「全部」主 filter
+    document.getElementById('subBackBtn').addEventListener('click', () => {
+        document.getElementById('subFilterBar').style.display = 'none';
+        filterBtns.forEach(b => b.classList.remove('active'));
+        filterBtns[0].classList.add('active');
+        currentMainFilter = 'all';
+        applyFilters();
     });
 
     // ── Lightbox ──
