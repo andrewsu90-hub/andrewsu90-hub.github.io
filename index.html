@@ -667,6 +667,16 @@
                 </div>
             </div>
 
+            <!-- Stress Video Modal -->
+            <div id="stressVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+                <div style="position:relative;width:90%;max-width:900px;">
+                    <button onclick="closeStressVideoModal()" style="position:absolute;top:-40px;right:0;background:none;border:none;color:#e8e8e8;font-size:28px;cursor:pointer;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">&times;</button>
+                    <video id="stressVideo" src="video/stress.mp4" controls playsinline preload="none"
+                        style="width:100%;border-radius:10px;display:block;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    </video>
+                </div>
+            </div>
+
             <div class="project-card">
                 <div class="project-image"><img src="image/01.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
@@ -686,7 +696,7 @@
                     <p>Structural reinforcement of snap hooks and load-bearing parts, wall thickness optimization to minimize sink marks and warping in injection-molded components.</p>
                     <div class="project-tags">
                         <span class="project-tag">DFM</span>
-                        <span class="project-tag">Stress Analysis</span>
+                        <a class="project-tag" href="#" onclick="openStressVideoModal(event)" title="Watch Stress Analysis Demo">&#9654; Stress Analysis</a>
                         <span class="project-tag">Injection Molding</span>
                     </div>
                 </div>
@@ -811,6 +821,32 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && document.getElementById('videoModal').style.display === 'flex') closeVideoModal();
+        });
+
+        // Stress Video Modal
+        function openStressVideoModal(e) {
+            e.preventDefault();
+            const modal = document.getElementById('stressVideoModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            document.getElementById('stressVideo').play();
+        }
+
+        function closeStressVideoModal() {
+            const modal = document.getElementById('stressVideoModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            const v = document.getElementById('stressVideo');
+            v.pause();
+            v.currentTime = 0;
+        }
+
+        document.getElementById('stressVideoModal').addEventListener('click', function(e) {
+            if (e.target === this) closeStressVideoModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('stressVideoModal').style.display === 'flex') closeStressVideoModal();
         });
 
         // Smooth scroll navigation
