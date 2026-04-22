@@ -658,19 +658,17 @@
             </div>
 
             <!-- ══ Mechanism Design — Video Gallery Overlay ══ -->
-            <div id="videoModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(8,8,12,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);overflow-y:auto;">
-                <div style="max-width:1100px;margin:0 auto;padding:48px 4% 80px;">
-                    <!-- Header -->
-                    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;border-bottom:0.5px solid #2a2a2a;padding-bottom:20px;">
-                        <div>
-                            <p style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#555;margin-bottom:6px;">Engineering Work</p>
-                            <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:0.06em;color:#e8e8e8;margin:0;">Mechanism Design</h2>
-                        </div>
-                        <button onclick="closeVideoModal()" style="background:none;border:none;color:#999;font-size:13px;font-family:'DM Sans',sans-serif;letter-spacing:0.12em;text-transform:uppercase;padding:0;cursor:pointer;transition:color 0.2s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='#e8e8e8'" onmouseout="this.style.color='#999'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回首頁</button>
-                    </div>
-                    <!-- Video Card Grid -->
+            <div id="videoModal" style="display:none;position:fixed;inset:0;z-index:9999;background:#0a0a0f;overflow-y:auto;">
+                <!-- Nav bar — 對齊主站 header 風格 -->
+                <div style="position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid #2a2a2a;background:rgba(10,10,15,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+                    <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:#e8e8e8;">Anzû Design Studio</span>
+                    <button onclick="closeVideoModal()" style="background:none;border:none;color:#999;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:0;cursor:pointer;transition:opacity 0.3s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.opacity=0.6" onmouseout="this.style.opacity=1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回首頁</button>
+                </div>
+                <!-- Content -->
+                <div style="max-width:1520px;margin:0 auto;padding:3rem 3% 5rem;">
+                    <h2 class="section-title">Mechanism Design</h2>
                     <div id="mechVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
-                        <!-- 新增影片：複製下方卡片 <div class="vcard"> 區塊，修改 data-src 與標題 -->
+                        <!-- 新增影片：複製下方 <div class="vcard"> 區塊，修改 data-src 與標題 -->
                         <div class="vcard" data-src="video/mechanism.mp4" data-title="Mechanism Demo"
                             style="background:rgba(18,18,22,0.9);border:0.5px solid #2a2a2a;border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
                             onmouseover="this.style.borderColor='#e8e8e8';this.style.transform='translateY(-4px)'"
@@ -695,19 +693,17 @@
             </div>
 
             <!-- ══ Stress Analysis — Video Gallery Overlay ══ -->
-            <div id="stressVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(8,8,12,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);overflow-y:auto;">
-                <div style="max-width:1100px;margin:0 auto;padding:48px 4% 80px;">
-                    <!-- Header -->
-                    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;border-bottom:0.5px solid #2a2a2a;padding-bottom:20px;">
-                        <div>
-                            <p style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#555;margin-bottom:6px;">Engineering Work</p>
-                            <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:0.06em;color:#e8e8e8;margin:0;">Stress Analysis</h2>
-                        </div>
-                        <button onclick="closeStressVideoModal()" style="background:none;border:none;color:#999;font-size:13px;font-family:'DM Sans',sans-serif;letter-spacing:0.12em;text-transform:uppercase;padding:0;cursor:pointer;transition:color 0.2s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='#e8e8e8'" onmouseout="this.style.color='#999'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回首頁</button>
-                    </div>
-                    <!-- Video Card Grid -->
+            <div id="stressVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;background:#0a0a0f;overflow-y:auto;">
+                <!-- Nav bar -->
+                <div style="position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid #2a2a2a;background:rgba(10,10,15,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+                    <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:#e8e8e8;">Anzû Design Studio</span>
+                    <button onclick="closeStressVideoModal()" style="background:none;border:none;color:#999;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:0;cursor:pointer;transition:opacity 0.3s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.opacity=0.6" onmouseout="this.style.opacity=1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回首頁</button>
+                </div>
+                <!-- Content -->
+                <div style="max-width:1520px;margin:0 auto;padding:3rem 3% 5rem;">
+                    <h2 class="section-title">Stress Analysis</h2>
                     <div id="stressVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
-                        <!-- 新增影片：複製下方卡片 <div class="vcard"> 區塊，修改 data-src 與標題 -->
+                        <!-- 新增影片：複製下方 <div class="vcard"> 區塊，修改 data-src 與標題 -->
                         <div class="vcard" data-src="video/stress.mp4" data-title="Stress Analysis Demo"
                             style="background:rgba(18,18,22,0.9);border:0.5px solid #2a2a2a;border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
                             onmouseover="this.style.borderColor='#e8e8e8';this.style.transform='translateY(-4px)'"
@@ -736,7 +732,7 @@
                 <div style="position:relative;width:92%;max-width:1000px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
                         <p id="lightboxTitle" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.06em;color:#e8e8e8;margin:0;"></p>
-                        <button onclick="closeLightbox()" style="background:none;border:none;color:#999;font-size:13px;font-family:'DM Sans',sans-serif;letter-spacing:0.12em;text-transform:uppercase;padding:0;cursor:pointer;transition:color 0.2s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='#e8e8e8'" onmouseout="this.style.color='#999'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回</button>
+                        <button onclick="closeLightbox()" style="background:none;border:none;color:#999;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:0;cursor:pointer;transition:opacity 0.3s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.opacity=0.6" onmouseout="this.style.opacity=1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回</button>
                     </div>
                     <video id="lightboxVideo" controls playsinline
                         style="width:100%;border-radius:10px;display:block;background:#000;box-shadow:0 24px 60px rgba(0,0,0,0.8);max-height:75vh;">
