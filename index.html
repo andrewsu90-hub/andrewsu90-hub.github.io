@@ -652,8 +652,18 @@
                     <div class="project-tags">
                         <span class="project-tag">Creo</span>
                         <span class="project-tag">Kinematic Analysis</span>
-                        <span class="project-tag">Mechanism Design</span>
+                        <a class="project-tag" href="#" onclick="openVideoModal(event)" title="Watch Mechanism Design Demo">&#9654; Mechanism Design</a>
                     </div>
+                </div>
+            </div>
+
+            <!-- Video Modal -->
+            <div id="videoModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+                <div style="position:relative;width:90%;max-width:900px;">
+                    <button onclick="closeVideoModal()" style="position:absolute;top:-40px;right:0;background:none;border:none;color:#e8e8e8;font-size:28px;cursor:pointer;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">&times;</button>
+                    <video id="mechVideo" src="video/mechanism.mp4" controls playsinline preload="none"
+                        style="width:100%;border-radius:10px;display:block;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+                    </video>
                 </div>
             </div>
 
@@ -777,6 +787,32 @@
     </footer>
 
     <script>
+        // Video Modal
+        function openVideoModal(e) {
+            e.preventDefault();
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            document.getElementById('mechVideo').play();
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            const v = document.getElementById('mechVideo');
+            v.pause();
+            v.currentTime = 0;
+        }
+
+        document.getElementById('videoModal').addEventListener('click', function(e) {
+            if (e.target === this) closeVideoModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('videoModal').style.display === 'flex') closeVideoModal();
+        });
+
         // Smooth scroll navigation
         function smoothScroll(sectionId) {
             const element = document.getElementById(sectionId);
