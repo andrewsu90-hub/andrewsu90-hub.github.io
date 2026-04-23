@@ -195,8 +195,11 @@
         <div class="tab-panel" id="t-hex">
             <div class="method-card">
                 <h3>六角頭 承載面積（Hex Head Bolt）</h3>
-                <span class="formula-note">Ab = 0.866 × S² − π/4 × dh²</span>
+                <span class="formula-note">Ab1 = 0.866 × S² − π/4 × dh取表²　Ab2 = 0.866 × S² − π/4 × dh手動²</span>
                 <span class="formula-note">S = 對邊寬度（GB3104 標準系列 Smax）　dh = 通孔直徑（GB5277）</span>
+                <div style="margin-top:0.85rem; padding:0.65rem 1rem; background:var(--bg-white); border-radius:var(--radius-md); border:0.5px solid var(--border-color); font-size:12px; color:var(--secondary-color); line-height:1.8;">
+                    M3（含）以上；以中等裝配為優先；M7 / M14 / M18+ 無標準通孔表值，dh 需手動輸入
+                </div>
             </div>
             <div class="selector-card">
                 <h2>六角頭 輸入參數</h2>
@@ -206,7 +209,7 @@
                         <select id="hex-spec" onchange="onHexSpecChange()"></select>
                     </div>
                     <div class="field-group">
-                        <label>裝配精度（通孔 dh 查表）</label>
+                        <label>裝配精度</label>
                         <select id="hex-fit" onchange="onHexFitChange()">
                             <option value="中等" selected>中等裝配（優先）</option>
                             <option value="精">精裝配</option>
@@ -214,8 +217,13 @@
                         </select>
                     </div>
                     <div class="field-group">
-                        <label>通孔直徑 dh (mm)</label>
-                        <input type="number" id="hex-dh" step="0.01" min="0" oninput="calcHex()">
+                        <label>通孔直徑 dh 取表建議值 (mm)</label>
+                        <input type="number" id="hex-dh-table" step="0.01" min="0" readonly
+                            style="background:var(--bg-light); color:var(--secondary-color); cursor:default;">
+                    </div>
+                    <div class="field-group">
+                        <label>通孔直徑 dh 手動輸入 (mm)</label>
+                        <input type="number" id="hex-dh-manual" step="0.01" min="0" oninput="calcHex()">
                     </div>
                     <div class="field-group">
                         <label>對邊寬度 S (mm)</label>
@@ -476,7 +484,9 @@
         const spec = HEX_DATA[specName];
         const fit = document.getElementById('hex-fit').value;
         const dhTable = HOLE_DH[specName];
-        document.getElementById('hex-dh').value = dhTable ? dhTable[fit] : '';
+        const dhVal = dhTable ? dhTable[fit] : '';
+        document.getElementById('hex-dh-table').value = dhVal;
+        document.getElementById('hex-dh-manual').value = dhVal;  // 預設同取表值
         document.getElementById('hex-s').value = spec.S;
         document.querySelectorAll('#hex-ref-tbody tr').forEach(r => r.classList.remove('highlighted'));
         const row = document.getElementById('hex-row-' + specName);
@@ -488,45 +498,81 @@
         const specName = hexSpecSel.value;
         const fit = document.getElementById('hex-fit').value;
         const dhTable = HOLE_DH[specName];
-        if (dhTable && dhTable[fit] !== undefined) document.getElementById('hex-dh').value = dhTable[fit];
+        const dhVal = (dhTable && dhTable[fit] !== undefined) ? dhTable[fit] : '';
+        document.getElementById('hex-dh-table').value = dhVal;
+        // 手動輸入欄位保留使用者值（不自動覆蓋）
         calcHex();
     }
 
     function calcHex() {
         const specName = hexSpecSel.value;
         const spec = HEX_DATA[specName];
-        const S = parseFloat(document.getElementById('hex-s').value) || 0;
-        const dh = parseFloat(document.getElementById('hex-dh').value) || 0;
+        const S   = parseFloat(document.getElementById('hex-s').value) || 0;
+        const dhT = parseFloat(document.getElementById('hex-dh-table').value) || 0;   // 取表
+        const dhM = parseFloat(document.getElementById('hex-dh-manual').value) || 0;  // 手動
         const dhNote = HOLE_DH[specName] ? '通孔 dh 已查表' : '通孔 dh 無標準表值，請手動輸入';
 
         document.getElementById('hex-derived').innerHTML =
             `d=${spec.d} mm, P=${spec.P} mm, As=<strong style="color:var(--primary-color)">${spec.As}</strong> mm²　｜　標準 S=${spec.S} mm　｜　${dhNote}　｜　GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}`;
 
-        if (!S || !dh) {
-            document.getElementById('hex-status').innerHTML = `<div class="status-bar warn">請輸入 S 與 dh 值</div>`;
+        if (!S) {
+            document.getElementById('hex-status').innerHTML = `<div class="status-bar neutral">請輸入對邊寬度 S</div>`;
             document.getElementById('hex-result').innerHTML = '';
             document.getElementById('hex-tip').innerHTML = '';
             return;
         }
 
-        const Ab = round(0.866 * S * S - Math.PI / 4 * dh * dh, 2);
-        const ratio = round(Ab / spec.As, 2);
-        const isOK = ratio >= spec.refRatio;
+        // Ab1：取表 dh
+        const hasAb1 = dhT > 0;
+        const Ab1    = hasAb1 ? round(0.866 * S * S - Math.PI / 4 * dhT * dhT, 2) : null;
+        const ratio1 = Ab1 !== null ? round(Ab1 / spec.As, 2) : null;
+        const ok1    = ratio1 !== null ? ratio1 >= spec.refRatio : null;
 
+        // Ab2：手動 dh
+        const hasAb2 = dhM > 0;
+        const Ab2    = hasAb2 ? round(0.866 * S * S - Math.PI / 4 * dhM * dhM, 2) : null;
+        const ratio2 = Ab2 !== null ? round(Ab2 / spec.As, 2) : null;
+        const ok2    = ratio2 !== null ? ratio2 >= spec.refRatio : null;
+
+        // 整體狀態
+        const anyNG  = (ok1 === false) || (ok2 === false);
+        const allOK  = (ok1 !== false) && (ok2 !== false) && (ok1 || ok2);
+        const statusClass = anyNG ? 'warn' : (allOK ? 'ok' : 'neutral');
+        const statusText  = anyNG ? '✗ NG — Ab/As 未達標準參考值' : (allOK ? '✓ OK — Ab/As 達標' : '請輸入通孔直徑 dh');
         document.getElementById('hex-status').innerHTML =
-            `<div class="status-bar ${isOK ? 'ok' : 'warn'}">${isOK ? '✓ OK — Ab/As 達標' : '✗ NG — Ab/As 未達標準參考值'}</div>`;
+            `<div class="status-bar ${statusClass}">${statusText}</div>`;
+
+        // result items
+        const ab1HTML = Ab1 !== null ? `
+            <div class="result-item highlight"><div class="label">Ab1（dh 取表）</div><div class="value">${Ab1}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${ok1 ? '' : 'warn'}"><div class="label">Ab1/As　dh取表判定</div><div class="value">${ratio1}</div><div class="unit">${ok1 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
+        ` : `
+            <div class="result-item"><div class="label">Ab1（dh 取表）</div><div class="value">—</div><div class="unit">dh 取表無資料</div></div>
+            <div class="result-item"><div class="label">Ab1/As　dh取表判定</div><div class="value">—</div><div class="unit"></div></div>
+        `;
+        const ab2HTML = Ab2 !== null ? `
+            <div class="result-item highlight"><div class="label">Ab2（dh 手動）</div><div class="value">${Ab2}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${ok2 ? '' : 'warn'}"><div class="label">Ab2/As　dh手動判定</div><div class="value">${ratio2}</div><div class="unit">${ok2 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
+        ` : `
+            <div class="result-item"><div class="label">Ab2（dh 手動）</div><div class="value">—</div><div class="unit">請輸入 dh 手動值</div></div>
+            <div class="result-item"><div class="label">Ab2/As　dh手動判定</div><div class="value">—</div><div class="unit"></div></div>
+        `;
 
         document.getElementById('hex-result').innerHTML = `
             <div class="result-item"><div class="label">應力面積 As</div><div class="value">${spec.As}</div><div class="unit">mm²</div></div>
-            <div class="result-item"><div class="label">通孔徑 dh</div><div class="value">${dh}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">dh 取表建議值</div><div class="value">${dhT || '—'}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">dh 手動輸入</div><div class="value">${dhM || '—'}</div><div class="unit">mm</div></div>
             <div class="result-item"><div class="label">對邊寬度 S</div><div class="value">${S}</div><div class="unit">mm</div></div>
-            <div class="result-item highlight"><div class="label">承載面積 Ab</div><div class="value">${Ab}</div><div class="unit">mm²</div></div>
-            <div class="result-item ${isOK ? '' : 'warn'}"><div class="label">Ab/As 比值</div><div class="value">${ratio}</div><div class="unit">（參考 ${spec.refRatio}）</div></div>
+            ${ab1HTML}
+            ${ab2HTML}
         `;
+
+        const line1 = Ab1 !== null ? `Ab1 = 0.866 × ${S}² − π/4 × ${dhT}² = <strong>${Ab1}</strong> mm²　→　Ab1/As = ${ratio1}　${ok1 ? '✓ OK' : '✗ NG'}<br>` : '';
+        const line2 = Ab2 !== null ? `Ab2 = 0.866 × ${S}² − π/4 × ${dhM}² = <strong>${Ab2}</strong> mm²　→　Ab2/As = ${ratio2}　${ok2 ? '✓ OK' : '✗ NG'}<br>` : '';
         document.getElementById('hex-tip').innerHTML = `
-            <strong>📌 公式</strong>　Ab = 0.866 × S² − π/4 × dh² = 0.866 × ${S}² − π/4 × ${dh}² = <strong>${Ab}</strong> mm²<br>
-            Ab/As = ${Ab} ÷ ${spec.As} = <strong>${ratio}</strong>　（標準 S=${spec.S} mm 中等裝配時，GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}）<br>
-            判定：Ab/As ≥ ${spec.refRatio} → OK，否則 → NG
+            <strong>📌 公式</strong>　Ab = 0.866 × S² − π/4 × dh²　　判定：Ab/As ≥ ${spec.refRatio} → OK，否則 → NG<br>
+            ${line1}${line2}
+            標準 S=${spec.S} mm 中等裝配時，GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}
         `;
     }
 
