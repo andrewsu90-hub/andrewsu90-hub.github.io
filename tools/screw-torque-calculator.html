@@ -521,7 +521,7 @@
         document.getElementById('gen-result').innerHTML = `
             <div class="result-item"><div class="label">δy (降伏)</div><div class="value">${round(deltaY,2)}</div><div class="unit">N/mm²</div></div>
             <div class="result-item"><div class="label">軸向力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N (${Ff_kgf} kgf)</div></div>
-            <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_Nm}</div><div class="unit">N·m (${T_kgfcm} kgf·cm)</div></div>
+            <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_kgfcm}</div><div class="unit">kgf·cm (${T_Nm} N·m)</div></div>
             <div class="result-item"><div class="label">一般算法-單牙強度(kgf)</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
@@ -550,7 +550,7 @@
         document.getElementById('sp-result').innerHTML = `
             <div class="result-item"><div class="label">SP δyp</div><div class="value">${round(spDeltaY,2)}</div><div class="unit">N/mm²</div></div>
             <div class="result-item"><div class="label">軸向力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N (${Ff_kgf} kgf)</div></div>
-            <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_Nm}</div><div class="unit">N·m (${T_kgfcm} kgf·cm)</div></div>
+            <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_kgfcm}</div><div class="unit">kgf·cm (${T_Nm} N·m)</div></div>
             <div class="result-item"><div class="label">SP抗拉強度值計算-單牙強度(kgf)</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
@@ -595,9 +595,9 @@
         document.getElementById('br-status').innerHTML = `<div class="status-bar ok">適用強度 ${grade}　MB,min = ${mbMin} N·m</div>`;
         document.getElementById('br-result').innerHTML = `
             <div class="result-item"><div class="label">MB,min</div><div class="value">${mbMin}</div><div class="unit">N·m</div></div>
-            <div class="result-item highlight"><div class="label">安全扭矩</div><div class="value">${safeT}</div><div class="unit">N·m</div></div>
+            <div class="result-item"><div class="label">安全扭矩</div><div class="value">${safeT}</div><div class="unit">N·m</div></div>
             <div class="result-item"><div class="label">推算軸力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N</div></div>
-            <div class="result-item"><div class="label">T (kgf·cm)</div><div class="value">${T_kgfcm}</div><div class="unit">kgf·cm</div></div>
+            <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_kgfcm}</div><div class="unit">kgf·cm (${safeT} N·m)</div></div>
             <div class="result-item"><div class="label">一般算法-單牙強度</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
