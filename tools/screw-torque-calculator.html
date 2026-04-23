@@ -229,7 +229,12 @@
                     </div>
                     <div class="field-group">
                         <label>Q 緊固係數</label>
-                        <input type="number" id="q-mtc" value="1.4" min="1" step="0.1" oninput="calcMTC()">
+                        <select id="q-mtc" onchange="calcMTC()">
+                            <option value="1.25">Q=1.25｜力矩板手｜錳燐酸鹽｜油潤滑/MoS₂膏</option>
+                            <option value="1.4" selected>Q=1.4｜力矩板手/限制板手｜無處理/燐酸鹽</option>
+                            <option value="1.6">Q=1.6｜衝擊板手</option>
+                            <option value="1.8">Q=1.8｜力矩板手/限制板手｜無處理｜無潤滑</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -618,32 +623,40 @@
         const { spec, axialK, nc } = p;
         const kMtc = parseFloat(document.getElementById('k-mtc').value);
         const Q = parseFloat(document.getElementById('q-mtc').value) || 1.4;
+        // δy(N/mm²): 三柱公式直接使用 mode 選定的原始 δy（HV_max 不乘 b14）
         const deltaY_Nmm = p.mode === 'HV_max' ? p.G.hv_max : Math.max((p.mode === 'Rm_nom' ? p.G.rm_nom : p.G.rm_min) * p.G.b14, 200);
-        const deltaY_kgfcm2 = Math.floor((deltaY_Nmm / 0.98) / 10);  // N/mm² → kgf/cm²
+        // Excel 表格中 δy 欄位以 /10 簡化換算為 kgf/cm² 標示
+        const deltaY_kgfcm2 = Math.floor(deltaY_Nmm / 10);
         const d_cm = spec.d / 10;
-        const As_cm2 = spec.As / 100;  // mm² → cm²  (but Excel seems to use As in mm²; we follow Excel formula)
-        // 實際公式按 Excel: I19 = 0.35 × K × (1+1/Q) × δy(kgf/cm²) × As × d(cm)
-        // 其中 Excel 中 As 是 mm² 值直接乘進去 — 按樣本驗算 0.35×0.175×1.714×32×5.03×0.3 = 5.07 kgf.cm
+        // 三柱公式: T = 0.35 × K × (1+1/Q) × δy(kgf/cm²) × As(mm²) × d(cm)
         const T_kgfcm = round(0.35 * kMtc * (1 + 1/Q) * deltaY_kgfcm2 * spec.As * d_cm, 2);
         const T_Nm = round(T_kgfcm * 9.8 / 100, 2);
-        const Ff_N = round(axialK * deltaY_Nmm * spec.As, 2);
+        // 三柱 Ff = 0.35 × (1+1/Q) × δy(N/mm²) × As(mm²)
+        const Ff_N = round(0.35 * (1 + 1/Q) * deltaY_Nmm * spec.As, 2);
         const Ff_kgf = round(Ff_N / 9.8, 2);
-        const tau_kgf = round((deltaY_Nmm / 9.8) / 2, 2);
-        const st = singleThreadStrength(spec.d, nc, spec.P, tau_kgf);
-        const threads = st > 0 ? Math.round(Ff_kgf / st) : '—';
+        // 一般算法-單牙強度：使用 HV_max × b14 的 τ（與一般算法/破壞扭矩一致）
+        const h7 = p.mode === 'HV_max' ? p.G.hv_max : (p.mode === 'Rm_nom' ? p.G.rm_nom : p.G.rm_min);
+        const e7 = Math.max(h7 * p.G.b14, 200);
+        const genTau = round((e7 / 2) / 9.8, 2);
+        const st = singleThreadStrength(spec.d, nc, spec.P, genTau);
+        // 需要牙數 = CEILING(Ff_kgf / 單牙強度)
+        const threads = st > 0 ? Math.ceil(Ff_kgf / st) : '—';
 
         document.getElementById('mtc-result').innerHTML = `
             <div class="result-item"><div class="label">δy</div><div class="value">${deltaY_kgfcm2}</div><div class="unit">kgf/cm²</div></div>
             <div class="result-item"><div class="label">軸向力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N (${Ff_kgf} kgf)</div></div>
             <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_kgfcm}</div><div class="unit">kgf·cm (${T_Nm} N·m)</div></div>
             <div class="result-item"><div class="label">K 三柱</div><div class="value">${kMtc}</div><div class="unit"></div></div>
-            <div class="result-item"><div class="label">Q 緊固</div><div class="value">${Q}</div><div class="unit"></div></div>
+            <div class="result-item"><div class="label">一般算法-單牙強度</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
         document.getElementById('mtc-tip').innerHTML = `
             <strong>📌 三柱公式</strong><br>
-            T = 0.35 × K × (1 + 1/Q) × δy × As × d<br>
+            T = 0.35 × K × (1 + 1/Q) × δy(kgf/cm²) × As(mm²) × d(cm)<br>
             = 0.35 × ${kMtc} × (1+1/${Q}) × ${deltaY_kgfcm2} × ${spec.As} × ${d_cm} = <strong>${T_kgfcm}</strong> kgf·cm<br>
+            三柱 Ff = 0.35 × (1+1/${Q}) × ${deltaY_Nmm} × ${spec.As} = ${Ff_N} N（${Ff_kgf} kgf）<br>
+            一般算法-單牙強度 = (π × ${spec.d} × ${nc} × ${spec.P} × ${genTau}) ÷ 2 = ${st} kgf<br>
+            需要牙數 = ⌈ ${Ff_kgf} ÷ ${st} ⌉ = ${threads} 牙<br>
             三柱扭力計算與軸力係數無關，受 K（潤滑/摩擦）與 Q（緊固係數）主導。
         `;
     }
