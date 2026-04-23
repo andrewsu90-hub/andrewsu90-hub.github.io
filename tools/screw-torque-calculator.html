@@ -515,7 +515,7 @@
             <div class="result-item"><div class="label">δy (降伏)</div><div class="value">${round(deltaY,2)}</div><div class="unit">N/mm²</div></div>
             <div class="result-item"><div class="label">軸向力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N (${Ff_kgf} kgf)</div></div>
             <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_Nm}</div><div class="unit">N·m (${T_kgfcm} kgf·cm)</div></div>
-            <div class="result-item"><div class="label">單牙強度</div><div class="value">${st}</div><div class="unit">kgf</div></div>
+            <div class="result-item"><div class="label">一般算法-單牙強度(kgf)</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
         document.getElementById('gen-tip').innerHTML = `
@@ -544,7 +544,7 @@
             <div class="result-item"><div class="label">SP δyp</div><div class="value">${round(spDeltaY,2)}</div><div class="unit">N/mm²</div></div>
             <div class="result-item"><div class="label">軸向力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N (${Ff_kgf} kgf)</div></div>
             <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_Nm}</div><div class="unit">N·m (${T_kgfcm} kgf·cm)</div></div>
-            <div class="result-item"><div class="label">單牙強度</div><div class="value">${st}</div><div class="unit">kgf</div></div>
+            <div class="result-item"><div class="label">SP抗拉強度值計算-單牙強度(kgf)</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
         document.getElementById('sp-tip').innerHTML = `
@@ -681,9 +681,12 @@
         const Ff_kgf = round(Ff_N / 9.8, 2);
         const T_Nm = round(K * Ff_N * (spec.d / 1000), 2);
         const T_kgfcm = round(T_Nm * 100 / 9.8, 2);
-        const tau_kgf = round((sigma / 9.8) / 2, 2);
-        const st = singleThreadStrength(spec.d, nc, spec.P, tau_kgf);
-        const threads = st > 0 ? Math.round(Ff_kgf / st) : '—';
+        // 單牙強度使用一般算法 τyp（同 Excel I27），非東日軸應力
+        const h7 = p.mode === 'HV_max' ? p.G.hv_max : (p.mode === 'Rm_nom' ? p.G.rm_nom : p.G.rm_min);
+        const e7 = Math.max(h7 * p.G.b14, 200);
+        const genTau = round((e7 / 2) / 9.8, 2);
+        const st = singleThreadStrength(spec.d, nc, spec.P, genTau);
+        const threads = st > 0 ? Math.ceil(Ff_kgf / st) : '—';
 
         // 系列判斷
         const 判斷 = getTohnichi判斷(series, grade, level, spec.name);
@@ -701,12 +704,13 @@
             <div class="result-item"><div class="label">軸向力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N (${Ff_kgf} kgf)</div></div>
             <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_kgfcm}</div><div class="unit">kgf·cm (${T_Nm} N·m)</div></div>
             ${判斷HTML}
-            <div class="result-item"><div class="label">單牙強度</div><div class="value">${st}</div><div class="unit">kgf</div></div>
+            <div class="result-item"><div class="label">一般算法-單牙強度(kgf)</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
         document.getElementById('th-tip').innerHTML = `
             <strong>📌 東日公式</strong>　T = K · Ff · d = ${K} × ${Ff_N} × ${spec.d/1000} = ${T_Nm} N·m（${T_kgfcm} kgf·cm）<br>
             Ff = σ軸 × As = ${sigma} × ${spec.As} = ${Ff_N} N<br>
+            一般算法-單牙強度 τyp = ${genTau} kgf/mm² → ST = (π × ${spec.d} × ${nc} × ${spec.P} × ${genTau}) ÷ 2 = ${st} kgf<br>
             0.5T：電子零件(4.6以下)　基準T：一般用(4.6–6.8)　1.8T：高強度(8.8+)　2.4T：建築用(10.9+)
         `;
     }
