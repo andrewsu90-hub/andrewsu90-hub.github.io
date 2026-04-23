@@ -348,25 +348,12 @@
         '12.9': { rm_nom: 1200,rm_min: 1220,hv_min: 385, hv_max: 435, re_nom: null,re_min: null,r02_nom: 1080,r02_min: 1100,sp_ratio: 0.88, sp: 970, b14: 0.9 },
     };
 
-    // 東日系列 軸力值 (N/mm²)
+    // 東日系列 軸力值 (N/mm²) — 同系列各強度等級值相同，只依 series+level 查表
     const TOHNICHI = {
-        '0.5T系列': {
-            '3.6': {min: 80, '標準值': 105, max: 150}, '4.6': {min: 80, '標準值': 105, max: 150},
-            '4.8': {min: 80, '標準值': 105, max: 150}, '5.6': {min: 80, '標準值': 105, max: 150},
-            '5.8': {min: 80, '標準值': 105, max: 150}, '6.8': {min: 80, '標準值': 105, max: 150},
-        },
-        '基準T系列': {
-            '3.6': {min: 160,'標準值': 210, max: 300}, '4.6': {min: 160,'標準值': 210, max: 300},
-            '4.8': {min: 160,'標準值': 210, max: 300}, '5.6': {min: 160,'標準值': 210, max: 300},
-            '5.8': {min: 160,'標準值': 210, max: 300}, '6.8': {min: 160,'標準值': 210, max: 300},
-        },
-        '1.8T系列': {
-            '8.8': {min: 290,'標準值': 380, max: 540}, '9.8': {min: 290,'標準值': 380, max: 540},
-            '10.9':{min: 290,'標準值': 380, max: 540}, '12.9':{min: 290,'標準值': 380, max: 540},
-        },
-        '2.4T系列': {
-            '10.9':{min: 380,'標準值': 500, max: 710}, '12.9':{min: 380,'標準值': 500, max: 710},
-        },
+        '0.5T系列': { min: 80,  '標準值': 105, max: 150 },
+        '基準T系列': { min: 160, '標準值': 210, max: 300 },
+        '1.8T系列':  { min: 290, '標準值': 380, max: 540 },
+        '2.4T系列':  { min: 380, '標準值': 500, max: 710 },
     };
 
     // 三柱 K係數 對照（簡化版 — 潤滑與材質組合）
@@ -664,40 +651,63 @@
     // ============================================================
     // TAB 5: 東日 T系列
     // ============================================================
+    // 系列判斷邏輯 (對應 Excel B18)
+    function getTohnichi判斷(series, grade, level, specName) {
+        if (level !== '標準值') return null; // 非標準值不判斷
+        const g = parseFloat(grade);
+        if (series === '0.5T系列' && [3.6, 4.6].includes(g)) return true;
+        if (series === '基準T系列' && [4.6, 4.8, 5.6, 5.8, 6.8].includes(g)) return true;
+        if (series === '基準T系列' && g === 8.8 && ['M2','M2.5','M3','M3.5','M4'].includes(specName)) return true;
+        if (series === '1.8T系列' && [8.8, 9.8, 10.9, 12.9].includes(g)) return true;
+        if (series === '2.4T系列' && [10.9, 12.9].includes(g)) return true;
+        return false;
+    }
+
     function calcTohnichi() {
         const p = getParams();
         const { spec, grade, K, nc } = p;
         const series = document.getElementById('th-series').value;
         const level = document.getElementById('th-level').value;
 
-        const table = TOHNICHI[series];
-        if (!table || !table[grade]) {
-            document.getElementById('th-status').innerHTML = `<div class="status-bar warn">${series} 不支援強度 ${grade}</div>`;
-            document.getElementById('th-result').innerHTML = '';
-            document.getElementById('th-tip').innerHTML = '請參考：0.5T(≤4.6)、基準T(3.6–6.8)、1.8T(8.8–12.9)、2.4T(10.9–12.9)。';
+        const sigma = TOHNICHI[series]?.[level];
+        if (sigma === undefined) {
+            document.getElementById('th-status').innerHTML = '';
+            document.getElementById('th-result').innerHTML = `<p style="color:var(--secondary-color);font-size:13px;padding:0.5rem 0;">無對應資料</p>`;
+            document.getElementById('th-tip').innerHTML = '';
             return;
         }
-        const sigma = table[grade][level];
+
         const Ff_N = round(sigma * spec.As, 2);
         const Ff_kgf = round(Ff_N / 9.8, 2);
         const T_Nm = round(K * Ff_N * (spec.d / 1000), 2);
         const T_kgfcm = round(T_Nm * 100 / 9.8, 2);
-        // 單牙強度
         const tau_kgf = round((sigma / 9.8) / 2, 2);
         const st = singleThreadStrength(spec.d, nc, spec.P, tau_kgf);
         const threads = st > 0 ? Math.round(Ff_kgf / st) : '—';
 
-        document.getElementById('th-status').innerHTML = `<div class="status-bar ok">${series}　強度 ${grade}　Level=${level}　軸應力=${sigma} N/mm²</div>`;
+        // 系列判斷
+        const 判斷 = getTohnichi判斷(series, grade, level, spec.name);
+        let 判斷HTML = '';
+        if (判斷 === true) {
+            判斷HTML = `<div class="result-item" style="border-color:var(--ok);"><div class="label">系列判斷</div><div class="value" style="font-size:15px;color:var(--ok);">系列選擇正確</div><div class="unit"></div></div>`;
+        } else if (判斷 === false) {
+            判斷HTML = `<div class="result-item warn"><div class="label">系列判斷</div><div class="value" style="font-size:15px;">系列選擇錯誤</div><div class="unit"></div></div>`;
+        }
+
+        document.getElementById('th-status').innerHTML =
+            `<div class="status-bar neutral">${series}　強度 ${grade}　Level=${level}　軸應力=${sigma} N/mm²</div>`;
         document.getElementById('th-result').innerHTML = `
             <div class="result-item"><div class="label">軸應力 σ</div><div class="value">${sigma}</div><div class="unit">N/mm²</div></div>
             <div class="result-item"><div class="label">軸向力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N (${Ff_kgf} kgf)</div></div>
-            <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_Nm}</div><div class="unit">N·m (${T_kgfcm} kgf·cm)</div></div>
+            <div class="result-item highlight"><div class="label">T 扭力</div><div class="value">${T_kgfcm}</div><div class="unit">kgf·cm (${T_Nm} N·m)</div></div>
+            ${判斷HTML}
             <div class="result-item"><div class="label">單牙強度</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
         document.getElementById('th-tip').innerHTML = `
-            <strong>📌 東日公式</strong>　T = K · (σ軸 · As) · d = ${K} × (${sigma} × ${spec.As}) × ${spec.d/1000} = ${T_Nm} N·m<br>
-            0.5T 適用電子零件，基準T 一般用，1.8T 與 2.4T 為高強度螺栓專用。
+            <strong>📌 東日公式</strong>　T = K · Ff · d = ${K} × ${Ff_N} × ${spec.d/1000} = ${T_Nm} N·m（${T_kgfcm} kgf·cm）<br>
+            Ff = σ軸 × As = ${sigma} × ${spec.As} = ${Ff_N} N<br>
+            0.5T：電子零件(4.6以下)　基準T：一般用(4.6–6.8)　1.8T：高強度(8.8+)　2.4T：建築用(10.9+)
         `;
     }
 
