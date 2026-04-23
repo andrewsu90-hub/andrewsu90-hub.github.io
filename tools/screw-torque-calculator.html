@@ -585,10 +585,11 @@
         const safeT = round(mbMin * axialK, 2);
         const Ff_N = round(safeT / (K * (spec.d / 1000)), 2);
         const T_kgfcm = round(safeT * 100 / 9.8, 2);
-        // SP 單牙強度
+        // SP 單牙強度：牙數以 SP 的 Ff 計算（Excel 規範：裂斷扭矩計算的牙數以SP的單牙強度計算）
         const spTau = round((p.spDeltaY / 2) / 9.8, 2);
         const st = singleThreadStrength(spec.d, nc, spec.P, spTau);
-        const threads = st > 0 ? Math.ceil((Ff_N/9.8) / st) : '—';
+        const spFf_N = round(axialK * p.spDeltaY * spec.As, 2);
+        const threads = st > 0 ? Math.ceil((spFf_N/9.8) / st) : '—';
 
         document.getElementById('br-status').innerHTML = `<div class="status-bar ok">適用強度 ${grade}　MB,min = ${mbMin} N·m</div>`;
         document.getElementById('br-result').innerHTML = `
