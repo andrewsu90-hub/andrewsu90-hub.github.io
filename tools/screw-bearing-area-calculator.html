@@ -122,8 +122,11 @@
         <div class="tab-panel active" id="t-pan">
             <div class="method-card">
                 <h3>盤頭螺釘 承載面積（Pan Head Screw）</h3>
-                <span class="formula-note">Ab = π/4 × (dw² − dh²)</span>
+                <span class="formula-note">Ab1 = π/4 × (dw² − dh取表²)　Ab2 = π/4 × (dw² − dh手動²)</span>
                 <span class="formula-note">dw = 螺釘頭支撐面外徑（GB67/GB818 dwmax）　dh = 通孔直徑（GB5277）</span>
+                <div style="margin-top:0.85rem; padding:0.65rem 1rem; background:var(--bg-white); border-radius:var(--radius-md); border:0.5px solid var(--border-color); font-size:12px; color:var(--secondary-color); line-height:1.8;">
+                    M1.6（含）以上；以中等裝配為優先；頭直徑尺寸直接輸入（自訂居多）
+                </div>
             </div>
             <div class="selector-card">
                 <h2>盤頭螺釘 輸入參數</h2>
@@ -133,7 +136,7 @@
                         <select id="pan-spec" onchange="onPanSpecChange()"></select>
                     </div>
                     <div class="field-group">
-                        <label>裝配精度（通孔 dh 查表）</label>
+                        <label>裝配精度</label>
                         <select id="pan-fit" onchange="onPanFitChange()">
                             <option value="中等" selected>中等裝配（優先）</option>
                             <option value="精">精裝配</option>
@@ -141,8 +144,13 @@
                         </select>
                     </div>
                     <div class="field-group">
-                        <label>通孔直徑 dh (mm)</label>
-                        <input type="number" id="pan-dh" step="0.01" min="0" oninput="calcPan()">
+                        <label>通孔直徑 dh 取表建議值 (mm)</label>
+                        <input type="number" id="pan-dh-table" step="0.01" min="0" readonly
+                            style="background:var(--bg-light); color:var(--secondary-color); cursor:default;">
+                    </div>
+                    <div class="field-group">
+                        <label>通孔直徑 dh 手動輸入 (mm)</label>
+                        <input type="number" id="pan-dh-manual" step="0.01" min="0" oninput="calcPan()">
                     </div>
                     <div class="field-group">
                         <label>盤頭外徑 dw (mm)</label>
@@ -369,7 +377,9 @@
         const spec = PAN_DATA[specName];
         const fit = document.getElementById('pan-fit').value;
         const dhTable = HOLE_DH[specName];
-        document.getElementById('pan-dh').value = dhTable ? dhTable[fit] : '';
+        const dhVal = dhTable ? dhTable[fit] : '';
+        document.getElementById('pan-dh-table').value = dhVal;
+        document.getElementById('pan-dh-manual').value = dhVal;  // 預設同取表值，讓使用者自行修改
         document.getElementById('pan-dw').value = spec.dw;
         document.querySelectorAll('#pan-ref-tbody tr').forEach(r => r.classList.remove('highlighted'));
         const row = document.getElementById('pan-row-' + specName);
@@ -381,44 +391,80 @@
         const specName = panSpecSel.value;
         const fit = document.getElementById('pan-fit').value;
         const dhTable = HOLE_DH[specName];
-        if (dhTable && dhTable[fit] !== undefined) document.getElementById('pan-dh').value = dhTable[fit];
+        const dhVal = (dhTable && dhTable[fit] !== undefined) ? dhTable[fit] : '';
+        document.getElementById('pan-dh-table').value = dhVal;
+        // 只更新取表值；手動輸入欄位保留使用者值（不自動覆蓋）
         calcPan();
     }
 
     function calcPan() {
         const specName = panSpecSel.value;
         const spec = PAN_DATA[specName];
-        const dw = parseFloat(document.getElementById('pan-dw').value) || 0;
-        const dh = parseFloat(document.getElementById('pan-dh').value) || 0;
+        const dw        = parseFloat(document.getElementById('pan-dw').value) || 0;
+        const dhT       = parseFloat(document.getElementById('pan-dh-table').value) || 0;   // 取表
+        const dhM       = parseFloat(document.getElementById('pan-dh-manual').value) || 0;  // 手動
 
         document.getElementById('pan-derived').innerHTML =
             `d=${spec.d} mm, P=${spec.P} mm, As=<strong style="color:var(--primary-color)">${spec.As}</strong> mm²　｜　標準 dw=${spec.dw} mm　｜　GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}`;
 
-        if (!dw || !dh || dw <= dh) {
-            document.getElementById('pan-status').innerHTML = `<div class="status-bar warn">請確認 dw > dh > 0</div>`;
+        if (!dw) {
+            document.getElementById('pan-status').innerHTML = `<div class="status-bar neutral">請輸入盤頭外徑 dw</div>`;
             document.getElementById('pan-result').innerHTML = '';
             document.getElementById('pan-tip').innerHTML = '';
             return;
         }
 
-        const Ab = round(Math.PI / 4 * (dw * dw - dh * dh), 2);
-        const ratio = round(Ab / spec.As, 2);
-        const isOK = ratio >= spec.refRatio;
+        // Ab1：取表 dh
+        const hasAb1 = dhT > 0 && dw > dhT;
+        const Ab1    = hasAb1 ? round(Math.PI / 4 * (dw * dw - dhT * dhT), 2) : null;
+        const ratio1 = Ab1 !== null ? round(Ab1 / spec.As, 2) : null;
+        const ok1    = ratio1 !== null ? ratio1 >= spec.refRatio : null;
 
+        // Ab2：手動 dh
+        const hasAb2 = dhM > 0 && dw > dhM;
+        const Ab2    = hasAb2 ? round(Math.PI / 4 * (dw * dw - dhM * dhM), 2) : null;
+        const ratio2 = Ab2 !== null ? round(Ab2 / spec.As, 2) : null;
+        const ok2    = ratio2 !== null ? ratio2 >= spec.refRatio : null;
+
+        // 整體狀態
+        const anyNG  = (ok1 === false) || (ok2 === false);
+        const allOK  = (ok1 !== false) && (ok2 !== false) && (ok1 || ok2);
+        const statusClass = anyNG ? 'warn' : (allOK ? 'ok' : 'neutral');
+        const statusText  = anyNG ? '✗ NG — Ab/As 未達標準參考值' : (allOK ? '✓ OK — Ab/As 達標' : '請輸入通孔直徑 dh');
         document.getElementById('pan-status').innerHTML =
-            `<div class="status-bar ${isOK ? 'ok' : 'warn'}">${isOK ? '✓ OK — Ab/As 達標' : '✗ NG — Ab/As 未達標準參考值'}</div>`;
+            `<div class="status-bar ${statusClass}">${statusText}</div>`;
+
+        // result items
+        const ab1HTML = Ab1 !== null ? `
+            <div class="result-item highlight"><div class="label">Ab1（dh 取表）</div><div class="value">${Ab1}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${ok1 ? '' : 'warn'}"><div class="label">Ab1/As　dh取表判定</div><div class="value">${ratio1}</div><div class="unit">${ok1 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
+        ` : `
+            <div class="result-item"><div class="label">Ab1（dh 取表）</div><div class="value">—</div><div class="unit">dh 取表無資料</div></div>
+            <div class="result-item"><div class="label">Ab1/As　dh取表判定</div><div class="value">—</div><div class="unit"></div></div>
+        `;
+        const ab2HTML = Ab2 !== null ? `
+            <div class="result-item highlight"><div class="label">Ab2（dh 手動）</div><div class="value">${Ab2}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${ok2 ? '' : 'warn'}"><div class="label">Ab2/As　dh手動判定</div><div class="value">${ratio2}</div><div class="unit">${ok2 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
+        ` : `
+            <div class="result-item"><div class="label">Ab2（dh 手動）</div><div class="value">—</div><div class="unit">請輸入 dh 手動值</div></div>
+            <div class="result-item"><div class="label">Ab2/As　dh手動判定</div><div class="value">—</div><div class="unit"></div></div>
+        `;
 
         document.getElementById('pan-result').innerHTML = `
             <div class="result-item"><div class="label">應力面積 As</div><div class="value">${spec.As}</div><div class="unit">mm²</div></div>
-            <div class="result-item"><div class="label">通孔徑 dh</div><div class="value">${dh}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">dh 取表建議值</div><div class="value">${dhT || '—'}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">dh 手動輸入</div><div class="value">${dhM || '—'}</div><div class="unit">mm</div></div>
             <div class="result-item"><div class="label">頭外徑 dw</div><div class="value">${dw}</div><div class="unit">mm</div></div>
-            <div class="result-item highlight"><div class="label">承載面積 Ab</div><div class="value">${Ab}</div><div class="unit">mm²</div></div>
-            <div class="result-item ${isOK ? '' : 'warn'}"><div class="label">Ab/As 比值</div><div class="value">${ratio}</div><div class="unit">（參考 ${spec.refRatio}）</div></div>
+            ${ab1HTML}
+            ${ab2HTML}
         `;
+
+        const line1 = Ab1 !== null ? `Ab1 = π/4 × (${dw}² − ${dhT}²) = <strong>${Ab1}</strong> mm²　→　Ab1/As = ${ratio1}　${ok1 ? '✓ OK' : '✗ NG'}<br>` : '';
+        const line2 = Ab2 !== null ? `Ab2 = π/4 × (${dw}² − ${dhM}²) = <strong>${Ab2}</strong> mm²　→　Ab2/As = ${ratio2}　${ok2 ? '✓ OK' : '✗ NG'}<br>` : '';
         document.getElementById('pan-tip').innerHTML = `
-            <strong>📌 公式</strong>　Ab = π/4 × (dw² − dh²) = π/4 × (${dw}² − ${dh}²) = <strong>${Ab}</strong> mm²<br>
-            Ab/As = ${Ab} ÷ ${spec.As} = <strong>${ratio}</strong>　（標準 dw=${spec.dw} mm 中等裝配時，GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}）<br>
-            判定：Ab/As ≥ ${spec.refRatio} → OK，否則 → NG
+            <strong>📌 公式</strong>　Ab = π/4 × (dw² − dh²)　　判定：Ab/As ≥ ${spec.refRatio} → OK，否則 → NG<br>
+            ${line1}${line2}
+            標準 dw=${spec.dw} mm 中等裝配時，GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}
         `;
     }
 
