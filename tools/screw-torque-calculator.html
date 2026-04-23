@@ -585,11 +585,13 @@
         const safeT = round(mbMin * axialK, 2);
         const Ff_N = round(safeT / (K * (spec.d / 1000)), 2);
         const T_kgfcm = round(safeT * 100 / 9.8, 2);
-        // SP 單牙強度：牙數以 SP 的 Ff 計算（Excel 規範：裂斷扭矩計算的牙數以SP的單牙強度計算）
-        const spTau = round((p.spDeltaY / 2) / 9.8, 2);
-        const st = singleThreadStrength(spec.d, nc, spec.P, spTau);
-        const spFf_N = round(axialK * p.spDeltaY * spec.As, 2);
-        const threads = st > 0 ? Math.ceil((spFf_N/9.8) / st) : '—';
+        // 一般算法-單牙強度：使用 HV_max × b14 作為 δy（與一般算法一致）
+        const h7 = p.mode === 'HV_max' ? p.G.hv_max : (p.mode === 'Rm_nom' ? p.G.rm_nom : p.G.rm_min);
+        const e7 = Math.max(h7 * p.G.b14, 200);
+        const genTau = round((e7 / 2) / 9.8, 2);
+        const st = singleThreadStrength(spec.d, nc, spec.P, genTau);
+        // 需要牙數 = CEILING( 破壞扭矩-F(N) ÷ 9.8 ÷ 一般算法-單牙強度(kgf) )
+        const threads = st > 0 ? Math.ceil((Ff_N / 9.8) / st) : '—';
 
         document.getElementById('br-status').innerHTML = `<div class="status-bar ok">適用強度 ${grade}　MB,min = ${mbMin} N·m</div>`;
         document.getElementById('br-result').innerHTML = `
@@ -597,11 +599,14 @@
             <div class="result-item highlight"><div class="label">安全扭矩</div><div class="value">${safeT}</div><div class="unit">N·m</div></div>
             <div class="result-item"><div class="label">推算軸力 Ff</div><div class="value">${Ff_N}</div><div class="unit">N</div></div>
             <div class="result-item"><div class="label">T (kgf·cm)</div><div class="value">${T_kgfcm}</div><div class="unit">kgf·cm</div></div>
+            <div class="result-item"><div class="label">一般算法-單牙強度</div><div class="value">${st}</div><div class="unit">kgf</div></div>
             <div class="result-item"><div class="label">需要牙數</div><div class="value">${threads}</div><div class="unit">牙</div></div>
         `;
         document.getElementById('br-tip').innerHTML = `
             <strong>📌 公式</strong>　安全扭矩 ≈ MB,min × 軸力係數 = ${mbMin} × ${axialK} = ${safeT} N·m<br>
-            推算軸力 Ff = 安全扭矩 ÷ (K × d) = ${safeT} ÷ (${K} × ${spec.d/1000}) = ${Ff_N} N
+            推算軸力 Ff = 安全扭矩 ÷ (K × d) = ${safeT} ÷ (${K} × ${spec.d/1000}) = ${Ff_N} N<br>
+            一般算法-單牙強度 = (π × ${spec.d} × ${nc} × ${spec.P} × ${genTau}) ÷ 2 = ${st} kgf<br>
+            需要牙數 = ⌈ ${Ff_N} N ÷ 9.8 ÷ ${st} kgf ⌉ = ⌈ ${round(Ff_N/9.8/st, 4)} ⌉ = ${threads} 牙
         `;
     }
 
