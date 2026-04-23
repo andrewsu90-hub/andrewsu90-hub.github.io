@@ -97,6 +97,14 @@
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* Inner sub-tabs */
+        .inner-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 0.5px solid var(--border-color); }
+        .inner-tab { padding: 8px 16px; border: 0.5px solid transparent; border-bottom: none; background: transparent; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--secondary-color); border-radius: var(--radius-sm) var(--radius-sm) 0 0; white-space: nowrap; transition: all 0.2s; }
+        .inner-tab:hover { color: var(--primary-color); }
+        .inner-tab.active { color: var(--primary-color); background: var(--bg-light); border-color: var(--border-color); margin-bottom: -0.5px; }
+        .inner-tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .inner-tab-panel.active { display: block; }
+
         @media (max-width: 600px) {
             .selector-grid { grid-template-columns: 1fr 1fr; }
             .result-grid { grid-template-columns: 1fr 1fr; }
@@ -170,6 +178,7 @@
             <button class="tab" data-tab="t-break" onclick="switchTab('t-break')">破壞扭矩</button>
             <button class="tab" data-tab="t-mtc" onclick="switchTab('t-mtc')">三柱公式</button>
             <button class="tab" data-tab="t-tohnichi" onclick="switchTab('t-tohnichi')">東日 T 系列</button>
+            <button class="tab" data-tab="t-bearing" onclick="switchTab('t-bearing')">承載面積計算</button>
         </div>
 
         <!-- TAB 1: 一般算法 -->
@@ -316,6 +325,141 @@
                 <div class="result-grid" id="th-result"></div>
                 <div class="tip-box" id="th-tip"></div>
             </div>
+        </div>
+
+        <!-- TAB 6: 承載面積計算 -->
+        <div class="tab-panel" id="t-bearing">
+
+            <div class="method-card">
+                <h3>承載面積計算（Bearing Area）</h3>
+                <span class="formula-note">盤頭螺釘：Ab = π/4 × (dw² − dh²)　　六角頭：Ab = 0.866 × S² − π/4 × dh²</span>
+                <span class="formula-note">Ab/As ≥ 標準參考值 → OK（依 GBT 16823-1 表4/5）</span>
+                <div class="inner-tabs">
+                    <button class="inner-tab active" data-inner-tab="t-pan" onclick="switchInnerTab('t-pan')">盤頭螺釘</button>
+                    <button class="inner-tab" data-inner-tab="t-hex" onclick="switchInnerTab('t-hex')">六角頭</button>
+                </div>
+            </div>
+
+            <!-- 盤頭螺釘 sub-tab -->
+            <div class="inner-tab-panel active" id="t-pan">
+                <div class="selector-card">
+                    <h2>盤頭螺釘 承載面積參數</h2>
+                    <div class="selector-grid">
+                        <div class="field-group">
+                            <label>螺絲規格</label>
+                            <select id="pan-spec" onchange="onPanSpecChange()"></select>
+                        </div>
+                        <div class="field-group">
+                            <label>裝配精度（通孔 dh 查表）</label>
+                            <select id="pan-fit" onchange="onPanFitChange()">
+                                <option value="中等" selected>中等裝配（優先）</option>
+                                <option value="精">精裝配</option>
+                                <option value="粗">粗裝配</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label>通孔直徑 dh (mm)</label>
+                            <input type="number" id="pan-dh" step="0.01" min="0" oninput="calcPan()">
+                        </div>
+                        <div class="field-group">
+                            <label>盤頭外徑 dw (mm)</label>
+                            <input type="number" id="pan-dw" step="0.01" min="0" oninput="calcPan()">
+                        </div>
+                    </div>
+                    <div style="margin-top:0.75rem; padding:0.75rem 1rem; background:var(--bg-white); border-radius:var(--radius-md); border:0.5px solid var(--border-color); font-size:12px; color:var(--secondary-color); line-height:1.8;">
+                        <strong style="color:var(--primary-color);">自動推導：</strong><span id="pan-derived">—</span>
+                    </div>
+                </div>
+                <div class="result-card">
+                    <h2>盤頭螺釘 承載面積計算結果</h2>
+                    <div id="pan-status"></div>
+                    <div class="result-grid" id="pan-result"></div>
+                    <div class="tip-box" id="pan-tip"></div>
+                </div>
+                <div class="method-card table-section">
+                    <h3>盤頭螺釘 標準 dw 與通孔直徑 dh 查詢表（GB5277 / GBT 16823-1 表5）</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">規格</th>
+                                    <th rowspan="2">d (mm)</th>
+                                    <th rowspan="2">As (mm²)</th>
+                                    <th rowspan="2">標準 dw (mm)</th>
+                                    <th colspan="3">通孔 dh (mm)</th>
+                                    <th rowspan="2">標準 Ab/As 參考值</th>
+                                </tr>
+                                <tr><th>精</th><th>中等</th><th>粗</th></tr>
+                            </thead>
+                            <tbody id="pan-ref-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div style="font-size:11px;color:var(--secondary-color);margin-top:0.4rem;line-height:1.7;">
+                        標準 Ab/As 以中等裝配 dh + 標準 dw 計算。盤頭外徑 dw 以 GB67/GB818 dwmax 為準，實際設計多以自訂值輸入。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 六角頭 sub-tab -->
+            <div class="inner-tab-panel" id="t-hex">
+                <div class="selector-card">
+                    <h2>六角頭 承載面積參數</h2>
+                    <div class="selector-grid">
+                        <div class="field-group">
+                            <label>螺絲規格</label>
+                            <select id="hex-spec" onchange="onHexSpecChange()"></select>
+                        </div>
+                        <div class="field-group">
+                            <label>裝配精度（通孔 dh 查表）</label>
+                            <select id="hex-fit" onchange="onHexFitChange()">
+                                <option value="中等" selected>中等裝配（優先）</option>
+                                <option value="精">精裝配</option>
+                                <option value="粗">粗裝配</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label>通孔直徑 dh (mm)</label>
+                            <input type="number" id="hex-dh" step="0.01" min="0" oninput="calcHex()">
+                        </div>
+                        <div class="field-group">
+                            <label>對邊寬度 S (mm)</label>
+                            <input type="number" id="hex-s" step="0.01" min="0" oninput="calcHex()">
+                        </div>
+                    </div>
+                    <div style="margin-top:0.75rem; padding:0.75rem 1rem; background:var(--bg-white); border-radius:var(--radius-md); border:0.5px solid var(--border-color); font-size:12px; color:var(--secondary-color); line-height:1.8;">
+                        <strong style="color:var(--primary-color);">自動推導：</strong><span id="hex-derived">—</span>
+                    </div>
+                </div>
+                <div class="result-card">
+                    <h2>六角頭 承載面積計算結果</h2>
+                    <div id="hex-status"></div>
+                    <div class="result-grid" id="hex-result"></div>
+                    <div class="tip-box" id="hex-tip"></div>
+                </div>
+                <div class="method-card table-section">
+                    <h3>六角頭標準系列 對邊寬度 S 與承載面積查詢表（GBT 16823-1 表4）</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>規格</th>
+                                    <th>d (mm)</th>
+                                    <th>As (mm²)</th>
+                                    <th>標準 S (mm)</th>
+                                    <th>中等 dh (mm)</th>
+                                    <th>標準 Ab (mm²)</th>
+                                    <th>標準 Ab/As 參考值</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hex-ref-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div style="font-size:11px;color:var(--secondary-color);margin-top:0.4rem;line-height:1.7;">
+                        標準 Ab 以中等裝配 dh 計算（M7/M14/M18+ 無標準通孔表值，標準 Ab 欄顯示「—」）。S 依 GB3104 標準系列 Smax 值。
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Global spec table -->
@@ -753,6 +897,237 @@
             0.5T：電子零件(4.6以下)　基準T：一般用(4.6–6.8)　1.8T：高強度(8.8+)　2.4T：建築用(10.9+)
         `;
     }
+
+    // ============================================================
+    // Inner Tab 切換（承載面積）
+    // ============================================================
+    function switchInnerTab(id) {
+        document.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.inner-tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelector(`.inner-tab[data-inner-tab="${id}"]`).classList.add('active');
+        document.getElementById(id).classList.add('active');
+    }
+
+    // ============================================================
+    // 承載面積計算 資料表
+    // ============================================================
+
+    // 通孔直徑 dh（GB5277 中等裝配系列）
+    const HOLE_DH = {
+        'M1.6': { 精: 1.7, 中等: 1.8, 粗: 2.0 },
+        'M2':   { 精: 2.2, 中等: 2.4, 粗: 2.6 },
+        'M2.5': { 精: 2.7, 中等: 2.9, 粗: 3.1 },
+        'M3':   { 精: 3.2, 中等: 3.4, 粗: 3.6 },
+        'M4':   { 精: 4.3, 中等: 4.5, 粗: 4.8 },
+        'M5':   { 精: 5.3, 中等: 5.5, 粗: 5.8 },
+        'M6':   { 精: 6.4, 中等: 6.6, 粗: 7.0 },
+        'M8':   { 精: 8.4, 中等: 9.0, 粗: 10.0 },
+        'M10':  { 精: 10.5, 中等: 11.0, 粗: 12.0 },
+        'M12':  { 精: 13.0, 中等: 13.5, 粗: 14.5 },
+        'M16':  { 精: 17.0, 中等: 17.5, 粗: 18.5 },
+    };
+
+    // 盤頭螺釘 資料（GB67/GB818 dwmax；GBT 16823-1 表5 Ab/As 參考值）
+    const PAN_DATA = {
+        'M1.6': { d: 1.6, P: 0.35, As: 1.27, dw: 3.2,  refRatio: 4.3 },
+        'M2':   { d: 2,   P: 0.4,  As: 2.07, dw: 4.0,  refRatio: 3.9 },
+        'M2.5': { d: 2.5, P: 0.45, As: 3.39, dw: 5.0,  refRatio: 3.8 },
+        'M3':   { d: 3,   P: 0.5,  As: 5.03, dw: 5.6,  refRatio: 3.1 },
+        'M4':   { d: 4,   P: 0.7,  As: 8.78, dw: 8.0,  refRatio: 3.9 },
+        'M5':   { d: 5,   P: 0.8,  As: 14.2, dw: 9.5,  refRatio: 3.3 },
+        'M6':   { d: 6,   P: 1.0,  As: 20.1, dw: 12.0, refRatio: 3.9 },
+        'M8':   { d: 8,   P: 1.25, As: 36.6, dw: 16.0, refRatio: 3.7 },
+        'M10':  { d: 10,  P: 1.5,  As: 58.0, dw: 20.0, refRatio: 3.8 },
+    };
+
+    // 六角頭 資料（GB3104 標準系列 Smax；GBT 16823-1 表4 Ab/As 參考值）
+    const HEX_DATA = {
+        'M3':  { d: 3,  P: 0.5,  As: 5.03,  S: 5.5,  refRatio: 3.4 },
+        'M4':  { d: 4,  P: 0.7,  As: 8.78,  S: 7.0,  refRatio: 3.0 },
+        'M5':  { d: 5,  P: 0.8,  As: 14.2,  S: 8.0,  refRatio: 2.2 },
+        'M6':  { d: 6,  P: 1.0,  As: 20.1,  S: 10.0, refRatio: 2.6 },
+        'M7':  { d: 7,  P: 1.0,  As: 28.9,  S: 11.0, refRatio: 2.1 },
+        'M8':  { d: 8,  P: 1.25, As: 36.6,  S: 13.0, refRatio: 2.3 },
+        'M10': { d: 10, P: 1.5,  As: 58.0,  S: 16.0, refRatio: 2.2 },
+        'M12': { d: 12, P: 1.75, As: 84.3,  S: 18.0, refRatio: 1.6 },
+        'M14': { d: 14, P: 2.0,  As: 115,   S: 21.0, refRatio: 1.7 },
+        'M16': { d: 16, P: 2.0,  As: 157,   S: 24.0, refRatio: 1.6 },
+        'M18': { d: 18, P: 2.5,  As: 192,   S: 27.0, refRatio: 1.7 },
+        'M20': { d: 20, P: 2.5,  As: 245,   S: 30.0, refRatio: 1.6 },
+        'M22': { d: 22, P: 2.5,  As: 303,   S: 34.0, refRatio: 1.8 },
+        'M24': { d: 24, P: 3.0,  As: 353,   S: 36.0, refRatio: 1.7 },
+    };
+
+    // 初始化 盤頭 規格下拉
+    const panSpecSel = document.getElementById('pan-spec');
+    Object.keys(PAN_DATA).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k; opt.textContent = k;
+        if (k === 'M4') opt.selected = true;
+        panSpecSel.appendChild(opt);
+    });
+
+    // 初始化 六角頭 規格下拉
+    const hexSpecSel = document.getElementById('hex-spec');
+    Object.keys(HEX_DATA).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k; opt.textContent = k;
+        if (k === 'M4') opt.selected = true;
+        hexSpecSel.appendChild(opt);
+    });
+
+    // 填入 盤頭 參考表
+    const panRefTbody = document.getElementById('pan-ref-tbody');
+    Object.entries(PAN_DATA).forEach(([name, s]) => {
+        const dh = HOLE_DH[name] || {};
+        const tr = document.createElement('tr');
+        tr.id = 'pan-row-' + name;
+        tr.innerHTML = `<td>${name}</td><td>${s.d}</td><td>${s.As}</td><td>${s.dw}</td>
+            <td>${dh.精 ?? '—'}</td><td>${dh.中等 ?? '—'}</td><td>${dh.粗 ?? '—'}</td>
+            <td>${s.refRatio}</td>`;
+        panRefTbody.appendChild(tr);
+    });
+
+    // 填入 六角頭 參考表
+    const hexRefTbody = document.getElementById('hex-ref-tbody');
+    Object.entries(HEX_DATA).forEach(([name, s]) => {
+        const dh = HOLE_DH[name];
+        const dhMid = dh ? dh.中等 : null;
+        const AbStd = dhMid ? round(0.866 * s.S * s.S - Math.PI / 4 * dhMid * dhMid, 1) : '—';
+        const tr = document.createElement('tr');
+        tr.id = 'hex-row-' + name;
+        tr.innerHTML = `<td>${name}</td><td>${s.d}</td><td>${s.As}</td><td>${s.S}</td>
+            <td>${dhMid ?? '—'}</td><td>${AbStd}</td><td>${s.refRatio}</td>`;
+        hexRefTbody.appendChild(tr);
+    });
+
+    // ============================================================
+    // 盤頭螺釘 承載面積
+    // ============================================================
+    function onPanSpecChange() {
+        const specName = panSpecSel.value;
+        const spec = PAN_DATA[specName];
+        const fit = document.getElementById('pan-fit').value;
+        const dhTable = HOLE_DH[specName];
+        document.getElementById('pan-dh').value = dhTable ? dhTable[fit] : '';
+        document.getElementById('pan-dw').value = spec.dw;
+        document.querySelectorAll('#pan-ref-tbody tr').forEach(r => r.classList.remove('highlighted'));
+        const row = document.getElementById('pan-row-' + specName);
+        if (row) row.classList.add('highlighted');
+        calcPan();
+    }
+
+    function onPanFitChange() {
+        const specName = panSpecSel.value;
+        const fit = document.getElementById('pan-fit').value;
+        const dhTable = HOLE_DH[specName];
+        if (dhTable && dhTable[fit] !== undefined) document.getElementById('pan-dh').value = dhTable[fit];
+        calcPan();
+    }
+
+    function calcPan() {
+        const specName = panSpecSel.value;
+        const spec = PAN_DATA[specName];
+        const dw = parseFloat(document.getElementById('pan-dw').value) || 0;
+        const dh = parseFloat(document.getElementById('pan-dh').value) || 0;
+
+        document.getElementById('pan-derived').innerHTML =
+            `d=${spec.d} mm, P=${spec.P} mm, As=<strong style="color:var(--primary-color)">${spec.As}</strong> mm²　｜　標準 dw=${spec.dw} mm　｜　GBT 16823-1 Ab/As 參考值=${spec.refRatio}`;
+
+        if (!dw || !dh || dw <= dh) {
+            document.getElementById('pan-status').innerHTML = `<div class="status-bar warn">請確認 dw > dh > 0</div>`;
+            document.getElementById('pan-result').innerHTML = '';
+            document.getElementById('pan-tip').innerHTML = '';
+            return;
+        }
+
+        const Ab = round(Math.PI / 4 * (dw * dw - dh * dh), 2);
+        const ratio = round(Ab / spec.As, 2);
+        const isOK = ratio >= spec.refRatio;
+
+        document.getElementById('pan-status').innerHTML =
+            `<div class="status-bar ${isOK ? 'ok' : 'warn'}">${isOK ? '✓ OK — Ab/As 達標' : '✗ NG — Ab/As 未達標準參考值'}</div>`;
+
+        document.getElementById('pan-result').innerHTML = `
+            <div class="result-item"><div class="label">應力面積 As</div><div class="value">${spec.As}</div><div class="unit">mm²</div></div>
+            <div class="result-item"><div class="label">通孔徑 dh</div><div class="value">${dh}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">頭外徑 dw</div><div class="value">${dw}</div><div class="unit">mm</div></div>
+            <div class="result-item highlight"><div class="label">承載面積 Ab</div><div class="value">${Ab}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${isOK ? '' : 'warn'}"><div class="label">Ab/As 比值</div><div class="value">${ratio}</div><div class="unit">（參考 ${spec.refRatio}）</div></div>
+        `;
+        document.getElementById('pan-tip').innerHTML = `
+            <strong>📌 公式</strong>　Ab = π/4 × (dw² − dh²) = π/4 × (${dw}² − ${dh}²) = <strong>${Ab}</strong> mm²<br>
+            Ab/As = ${Ab} ÷ ${spec.As} = <strong>${ratio}</strong>　（標準 dw=${spec.dw} mm 中等裝配時，GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}）<br>
+            判定：Ab/As ≥ ${spec.refRatio} → OK，否則 → NG
+        `;
+    }
+
+    // ============================================================
+    // 六角頭 承載面積
+    // ============================================================
+    function onHexSpecChange() {
+        const specName = hexSpecSel.value;
+        const spec = HEX_DATA[specName];
+        const fit = document.getElementById('hex-fit').value;
+        const dhTable = HOLE_DH[specName];
+        document.getElementById('hex-dh').value = dhTable ? dhTable[fit] : '';
+        document.getElementById('hex-s').value = spec.S;
+        document.querySelectorAll('#hex-ref-tbody tr').forEach(r => r.classList.remove('highlighted'));
+        const row = document.getElementById('hex-row-' + specName);
+        if (row) row.classList.add('highlighted');
+        calcHex();
+    }
+
+    function onHexFitChange() {
+        const specName = hexSpecSel.value;
+        const fit = document.getElementById('hex-fit').value;
+        const dhTable = HOLE_DH[specName];
+        if (dhTable && dhTable[fit] !== undefined) document.getElementById('hex-dh').value = dhTable[fit];
+        calcHex();
+    }
+
+    function calcHex() {
+        const specName = hexSpecSel.value;
+        const spec = HEX_DATA[specName];
+        const S = parseFloat(document.getElementById('hex-s').value) || 0;
+        const dh = parseFloat(document.getElementById('hex-dh').value) || 0;
+        const dhNote = HOLE_DH[specName] ? '通孔 dh 已查表' : '通孔 dh 無標準表值，請手動輸入';
+
+        document.getElementById('hex-derived').innerHTML =
+            `d=${spec.d} mm, P=${spec.P} mm, As=<strong style="color:var(--primary-color)">${spec.As}</strong> mm²　｜　標準 S=${spec.S} mm　｜　${dhNote}　｜　GBT 16823-1 Ab/As 參考值=${spec.refRatio}`;
+
+        if (!S || !dh) {
+            document.getElementById('hex-status').innerHTML = `<div class="status-bar warn">請輸入 S 與 dh 值</div>`;
+            document.getElementById('hex-result').innerHTML = '';
+            document.getElementById('hex-tip').innerHTML = '';
+            return;
+        }
+
+        const Ab = round(0.866 * S * S - Math.PI / 4 * dh * dh, 2);
+        const ratio = round(Ab / spec.As, 2);
+        const isOK = ratio >= spec.refRatio;
+
+        document.getElementById('hex-status').innerHTML =
+            `<div class="status-bar ${isOK ? 'ok' : 'warn'}">${isOK ? '✓ OK — Ab/As 達標' : '✗ NG — Ab/As 未達標準參考值'}</div>`;
+
+        document.getElementById('hex-result').innerHTML = `
+            <div class="result-item"><div class="label">應力面積 As</div><div class="value">${spec.As}</div><div class="unit">mm²</div></div>
+            <div class="result-item"><div class="label">通孔徑 dh</div><div class="value">${dh}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">對邊寬度 S</div><div class="value">${S}</div><div class="unit">mm</div></div>
+            <div class="result-item highlight"><div class="label">承載面積 Ab</div><div class="value">${Ab}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${isOK ? '' : 'warn'}"><div class="label">Ab/As 比值</div><div class="value">${ratio}</div><div class="unit">（參考 ${spec.refRatio}）</div></div>
+        `;
+        document.getElementById('hex-tip').innerHTML = `
+            <strong>📌 公式</strong>　Ab = 0.866 × S² − π/4 × dh² = 0.866 × ${S}² − π/4 × ${dh}² = <strong>${Ab}</strong> mm²<br>
+            Ab/As = ${Ab} ÷ ${spec.As} = <strong>${ratio}</strong>　（標準 S=${spec.S} mm 中等裝配時，GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}）<br>
+            判定：Ab/As ≥ ${spec.refRatio} → OK，否則 → NG
+        `;
+    }
+
+    // 承載面積初始化
+    function calcSheet() {}   // no-op（calcAll 保留呼叫點）
+    onPanSpecChange();
+    onHexSpecChange();
 
     // 初始計算
     calcAll();
