@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TP-Module 尺寸鍊統計公差分析系統 (V10.0)</title>
+    <title>TP-Module 尺寸鍊統計公差分析系統 (V12.0)</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
         .container { max-width: 1250px; margin: auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
@@ -58,23 +58,56 @@
         .footer-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #2c3e50; }
         .footer-group textarea { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px; background-color: #fff9e6; font-family: inherit; font-size: 1em; resize: vertical; box-sizing: border-box; }
 
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
         @media print {
-            body { background-color: #fff; padding: 0; }
-            .container { box-shadow: none; max-width: 100%; padding: 0; }
-            .instructions, .helper-tool, #btn-add-row, .btn-print, .btn-del-th, .btn-del-td { display: none !important; }
-            input, select, textarea { background-color: transparent !important; border: none !important; box-shadow: none !important; appearance: none; -webkit-appearance: none; color: #000 !important; }
-            .summary-card { border: 1px solid #000; }
-            .rss-card { color: #000 !important; border: 2px solid #000; background: transparent !important; }
+            body { background-color: #fff; padding: 0; margin: 0; font-size: 10pt; }
+            .container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; margin: 0; }
+            .instructions, .helper-tool, #btn-add-row, .btn-print, .btn-del-th, .btn-del-td, hr { display: none !important; }
+            
+            /* Optimize Table for A4 */
+            table { width: 100%; table-layout: fixed; font-size: 9pt; border-collapse: collapse; }
+            th, td { padding: 4px 2px; word-wrap: break-word; overflow: hidden; }
+            
+            /* Critical Fix for Inputs cutting off */
+            input, select, textarea { 
+                background-color: transparent !important; 
+                border: none !important; 
+                box-shadow: none !important; 
+                appearance: none; 
+                -webkit-appearance: none; 
+                color: #000 !important; 
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                font-size: 9pt !important;
+                text-align: center;
+            }
+            input[type="text"].desc { text-align: left; }
+            
+            .summary-grid { gap: 10px; margin-bottom: 10px; }
+            .summary-card { border: 1px solid #000; padding: 10px; }
+            .summary-card .value { font-size: 1.2em; margin-top: 5px; }
+            .rss-grid { gap: 10px; margin-bottom: 10px; }
+            .rss-card { color: #000 !important; border: 2px solid #000; background: transparent !important; padding: 10px; }
             .rss-3 { border-color: #27ae60; } .rss-45 { border-color: #f39c12; } .rss-6 { border-color: #c0392b; }
-            .rss-value { color: #000 !important; }
-            textarea { border: 1px solid #ccc !important; background: #fff !important; }
+            .rss-card .rss-value { color: #000 !important; font-size: 1.5em; margin-top: 5px; }
+            textarea { border: 1px solid #ccc !important; background: #fff !important; height: auto; font-size: 10pt !important; }
+            .dashboard-section { gap: 10px; margin-bottom: 10px; }
+            h1 { font-size: 1.4em; margin-bottom: 10px; }
+            h2 { font-size: 1.2em; margin-bottom: 5px; margin-top: 10px;}
+            h3 { font-size: 1.1em; margin-bottom: 5px; margin-top: 5px;}
+            .report-footer { padding: 10px; border: none; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>TP-Module 尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v10.0 極值法長條圖綜合版</span></h1>
+    <h1>TP-Module 尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v12.0 A4報表防裁切列印版 (小數點三位)</span></h1>
     
     <div class="helper-tool">
         <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em;"><span>🧮 <strong>軸孔浮動間隙計算機 (Asm Shift Helper)</strong></span></div>
@@ -125,15 +158,15 @@
     <div class="dashboard-section">
         <div class="chart-container">
             <h3>📈 預測組裝良率常態分佈圖 (Dynamic Multi-zone Coloring)</h3>
-            <svg id="norm-dist-chart" width="800" height="300" style="max-width: 100%;"></svg>
+            <svg id="norm-dist-chart" viewBox="0 0 800 400" style="width: 100%; height: auto;"></svg>
         </div>
         <div>
             <h2>📊 尺寸鍊評估報告 Summary</h2>
             <div class="summary-grid">
                 <div class="summary-card"><div>名義閉合間隙 (Nominal Mean)</div><div class="value" id="out-nominal">0.00 mm</div></div>
                 <div class="summary-card"><div>極值法公差 (Worst Case)</div><div class="value" id="out-wc">± 0.00 mm</div></div>
-                <div class="summary-card"><div>總變異數 (SUMSQ)</div><div class="value" id="out-sumsq">0.00000</div></div>
-                <div class="summary-card"><div>系統總標準差 (1σ)</div><div class="value" id="out-sys-sigma">0.0000 mm</div></div>
+                <div class="summary-card"><div>總變異數 (SUMSQ)</div><div class="value" id="out-sumsq">0.0000</div></div>
+                <div class="summary-card"><div>系統總標準差 (1σ)</div><div class="value" id="out-sys-sigma">0.000 mm</div></div>
             </div>
             <h3>🎯 目標品質預測 (RSS 輸出結果)</h3>
             <div class="rss-grid">
@@ -186,8 +219,8 @@
                         <option value="均勻" ${data.dist === '均勻' ? 'selected' : ''}>均勻</option>
                     </select>
                 </td>
-                <td class="protected sigma">0.0000</td>
-                <td class="protected variance">0.000000</td>
+                <td class="protected sigma">0.000</td>
+                <td class="protected variance">0.00000</td>
                 <td class="btn-del-td"><button class="btn-del" onclick="deleteRow(this)">刪除</button></td>
             </tr>
         `;
@@ -235,7 +268,7 @@
         const width = 800; const height = 300; const padding = 50;
         
         // --- 設定動態畫布高度，給 Worst Case 留足夠空間 ---
-        svg.setAttribute("height", "400");
+        // viewBox is handling height automatically now
         
         if (sigma <= 0) sigma = 0.001;
         
@@ -385,16 +418,16 @@ function calculateTolerance() {
             if (tol > 0) { sigma = (dist === '均勻') ? (tol / Math.sqrt(3)) : (tol / 3); }
             const variance = Math.pow(sigma, 2);
 
-            row.querySelector('.sigma').textContent = sigma > 0 ? sigma.toFixed(4) : "0.0000";
-            row.querySelector('.variance').textContent = variance > 0 ? variance.toFixed(6) : "0.000000";
+            row.querySelector('.sigma').textContent = sigma > 0 ? sigma.toFixed(3) : "0.000";
+            row.querySelector('.variance').textContent = variance > 0 ? variance.toFixed(3) : "0.00000";
             dimSum += (plus - minus); worstCase += tol; sumVariance += variance;
         });
 
         const sysSigma = Math.sqrt(sumVariance);
         document.getElementById('out-nominal').textContent = dimSum.toFixed(2) + ' mm';
         document.getElementById('out-wc').textContent = '± ' + worstCase.toFixed(3) + ' mm';
-        document.getElementById('out-sumsq').textContent = sumVariance.toFixed(6);
-        document.getElementById('out-sys-sigma').textContent = sysSigma.toFixed(4) + ' mm';
+        document.getElementById('out-sumsq').textContent = sumVariance.toFixed(3);
+        document.getElementById('out-sys-sigma').textContent = sysSigma.toFixed(3) + ' mm';
         document.getElementById('out-3sigma').textContent = '± ' + (sysSigma * 3).toFixed(3) + ' mm';
         document.getElementById('out-45sigma').textContent = '± ' + (sysSigma * 4.5).toFixed(3) + ' mm';
         document.getElementById('out-6sigma').textContent = '± ' + (sysSigma * 6).toFixed(3) + ' mm';
