@@ -1,970 +1,592 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
-    <meta name="google-site-verification" content="pHM1QBJWZEMnjr29tqK_GY-fQ6lJJJWl4DvodGUvozE" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Andrew — Product Design & Mechanical Engineering — Creo 3D Modeling, Mechanism Design & DFM">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
-    <meta name="keywords" content="product design, mechanical engineering, Creo, 3D modeling, Python, stress analysis, DFM">
-    <meta name="author" content="Andrew">
-    <title>Anzû | Product & Mechanical Design</title>
-
+    <title>TP-Module 尺寸鍊統計公差分析系統 (V20.0)</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #f0f0f0;
-            --secondary-color: #a3a3a3;
-            --text-muted: #c8c8c8; /* 新增：用於卡片內文提高易讀性 */
-            --border-color: #333333; /* 稍微提亮邊框層次 */
-            --bg-light: #181818;
-            --bg-white: #0c0c0c; /* 中性深黑，移除冷藍調 */
-            --accent: #E67E22; /* 專業工業橘 */
-            --spacing-xs: 0.5rem;
-            --spacing-sm: 1rem;
-            --spacing-md: 1.5rem;
-            --spacing-lg: 2rem;
-            --spacing-xl: 3rem;
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-weight: 300;
-            color: var(--primary-color);
-            background-color: var(--bg-white);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            position: relative;
-        }
-
-        /* ── Tech Background Canvas ── */
-        #tech-bg {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        header, section, footer, .modal {
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header & Navigation */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            border-bottom: 0.5px solid var(--border-color);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            background-color: rgba(12, 12, 12, 0.90);
-        }
-
-        .header-nav-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-md) 3%;
-        }
-
-        .logo {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1250px; margin: auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #2c3e50; }
+        
+        /* 導覽列與返回按鈕 */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .top-bar h1 { margin: 0; border: none; padding: 0; }
+        .back-link {
             text-decoration: none;
-            color: var(--primary-color);
-        }
-
-        nav {
-            display: flex;
-            gap: var(--spacing-lg);
-            font-size: 12px;
-            font-weight: 400;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            align-items: center;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--primary-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        nav a:hover {
-            color: var(--accent);
-            opacity: 1;
-        }
-
-        /* Hero Section */
-        .hero-bg {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-bg::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url('Gemini_Generated_Image_l4799rl4799rl479.png') center 45% / 100% auto no-repeat;
-            opacity: 1;
-            z-index: 0;
-        }
-
-        .hero {
-            padding: 6rem 3% 4rem;
-            max-width: 1100px;
-            margin: 0 auto;
-            animation: fadeInDown 0.8s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(32px, 4.2vw, 58px);
-            font-weight: 400;
-            line-height: 1.0;
-            letter-spacing: 0.04em;
-            margin-bottom: var(--spacing-md);
-            color: var(--primary-color);
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: var(--text-muted);
-            margin-bottom: var(--spacing-sm);
-            max-width: 700px;
-            line-height: 1.8;
-        }
-
-        /* Services Section */
-        .services {
-            padding: var(--spacing-xl) 3%;
-            max-width: 1520px;
-            margin: 0 auto;
-            border-top: 0.5px solid var(--border-color);
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .section-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 38px;
-            font-weight: 400;
-            letter-spacing: 0.06em;
-            margin-bottom: var(--spacing-lg);
-            color: var(--primary-color);
-        }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .service-card {
-            padding: var(--spacing-lg);
-            background-color: rgba(24, 24, 24, 0.75);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: var(--radius-md);
-            border: 0.5px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .service-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(230, 126, 34, 0.12); /* 工業橘光暈 */
-        }
-
-        .service-card h3 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 22px;
-            font-weight: 400;
-            letter-spacing: 0.06em;
-            margin-bottom: var(--spacing-sm);
-            color: var(--primary-color);
-        }
-
-        .service-card p {
-            font-size: 15px;
-            color: var(--text-muted); /* 提升對比度 */
-            line-height: 1.7;
-        }
-
-        /* Portfolio Section */
-        .portfolio {
-            padding: var(--spacing-xl) 3%;
-            max-width: 1520px;
-            margin: 0 auto;
-            border-top: 0.5px solid var(--border-color);
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .project-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--spacing-lg);
-        }
-
-        .project-card {
-            background-color: rgba(24, 24, 24, 0.75);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border: 0.5px solid var(--border-color);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .project-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-6px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .project-image {
-            width: 100%;
-            height: 240px;
-            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-image::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-        }
-
-        .project-info {
-            padding: var(--spacing-lg);
-        }
-
-        .project-info h3 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 22px;
-            font-weight: 400;
-            letter-spacing: 0.05em;
-            margin-bottom: var(--spacing-xs);
-            color: var(--primary-color);
-        }
-
-        .project-info p {
-            font-size: 15px;
-            color: var(--text-muted); /* 提升對比度 */
-            margin: var(--spacing-sm) 0;
-            line-height: 1.7;
-        }
-
-        .project-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--spacing-sm);
-            margin-top: var(--spacing-md);
-        }
-
-        .project-tag {
-            display: inline-block;
-            font-size: 13px;
-            font-weight: 500;
-            background-color: var(--bg-white);
-            color: var(--secondary-color);
-            padding: 6px 14px;
-            border-radius: var(--radius-sm);
-            border: 0.5px solid var(--border-color);
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        .project-tag:hover {
-            background-color: var(--accent);
-            color: var(--bg-white);
-            border-color: var(--accent);
-        }
-
-        a.project-tag {
-            cursor: pointer;
-            position: relative;
-            padding-right: 24px;
-        }
-
-        a.project-tag::after {
-            content: "\2197";
-            position: absolute;
-            right: 9px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 11px;
-            opacity: 0.7;
-        }
-
-        a.project-tag:hover::after {
-            opacity: 1;
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: var(--spacing-xl) 3%;
-            max-width: 1100px;
-            margin: 0 auto;
-            border-top: 0.5px solid var(--border-color);
-            text-align: center;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .contact h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 52px;
-            font-weight: 400;
-            letter-spacing: 0.05em;
-            margin-bottom: var(--spacing-md);
-            color: var(--primary-color);
-        }
-
-        .contact p {
-            font-size: 16px;
-            color: var(--text-muted);
-            margin-bottom: var(--spacing-lg);
-            line-height: 1.7;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 16px 40px;
-            background-color: var(--accent); /* 使用強調色 */
-            color: var(--bg-white);
-            border: 1.5px solid var(--accent);
-            border-radius: var(--radius-md);
-            font-size: 16px;
+            color: #7f8c8d;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-        }
-
-        .cta-button:hover {
-            background-color: transparent;
-            color: var(--accent);
-        }
-
-        .cta-button-secondary {
-            background-color: transparent;
-            color: var(--primary-color);
-            border: 1.5px solid var(--border-color); /* 增加邊框層次 */
-            margin-left: var(--spacing-md);
-        }
-
-        .cta-button-secondary:hover {
-            background-color: var(--bg-light);
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        /* Footer */
-        footer {
-            padding: var(--spacing-lg) 3%;
-            border-top: 0.5px solid var(--border-color);
-            text-align: center;
-            font-size: 14px;
-            color: var(--secondary-color);
-        }
-
-        /* Contact Form Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(6px);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: var(--bg-light);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            max-width: 550px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            animation: slideUp 0.3s ease;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: var(--spacing-md);
-            right: var(--spacing-md);
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--secondary-color);
-            transition: color 0.3s ease;
-        }
-
-        .modal-close:hover {
-            color: var(--accent);
-        }
-
-        .modal h3 {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: var(--spacing-lg);
-            color: var(--primary-color);
-        }
-
-        .form-group {
-            margin-bottom: var(--spacing-md);
-        }
-
-        .form-group label {
-            display: block;
             font-size: 15px;
-            font-weight: 600;
-            margin-bottom: var(--spacing-xs);
-            color: var(--primary-color);
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-family: inherit;
-            font-size: 15px;
-            color: var(--primary-color);
-            background-color: var(--bg-white);
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
             transition: all 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.15);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 150px;
-        }
-
-        /* Animations */
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        @media (max-width: 900px) { .service-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) {
-            header { padding: var(--spacing-md) 3%; }
-            nav { gap: var(--spacing-md); font-size: 14px; }
-            .hero { padding: 4rem 3% 2rem; }
-            .hero h1 { font-size: 32px; }
-            .hero p { font-size: 16px; }
-            .cta-button-secondary { display: block; margin-left: 0; margin-top: var(--spacing-md); }
-            .project-grid { grid-template-columns: 1fr; }
-            .service-grid { grid-template-columns: 1fr; }
-            .modal-content { padding: var(--spacing-lg); }
-        }
-
-        .visitor-count {
-            margin-top: 10px;
-            font-size: 13px;
-            opacity: 0.6;
+            background: #fdfdfd;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 6px;
         }
-        .visitor-item { display: inline-flex; align-items: center; }
-        .visitor-sep { opacity: 0.4; }
+        .back-link:hover {
+            color: #E67E22; /* 配合 Anzû Design Studio 首頁的工業橘 */
+            border-color: #E67E22;
+            background: rgba(230, 126, 34, 0.05);
+        }
+
+        /* 輔助計算機樣式 */
+        .helper-tool { background-color: #fdfae6; border: 1px dashed #f39c12; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; flex-direction: column; }
+        .calc-row { display: flex; align-items: center; gap: 10px; width: 100%; margin-bottom: 8px; }
+        .calc-label { font-weight: bold; width: 100px; color: #2c3e50; }
+        .calc-sign { font-weight: bold; font-size: 1.2em; color: #27ae60; }
+        .helper-tool input { width: 100px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; }
+        .calc-mini-out { font-size: 0.95em; color: #7f8c8d; margin-left: 10px; }
+        .calc-mini-out span { font-weight: bold; color: #2980b9; }
+        .helper-result { font-size: 1.2em; font-weight: bold; color: #27ae60; background: #eafaf1; padding: 5px 10px; border-radius: 4px; }
+
+        /* 設計判定卡片樣式 */
+        .judgment-card { background: #fff; border: 2px solid #2ecc71; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(46, 204, 113, 0.15); }
+        .judgment-card.ng { border-color: #e74c3c; box-shadow: 0 4px 6px rgba(231, 76, 60, 0.15); }
+        .judgment-card h3 { margin-top: 0; color: #2ecc71; display: flex; align-items: center; gap: 8px; }
+        .judgment-card.ng h3 { color: #e74c3c; }
+        .judgement-row { display: flex; align-items: center; gap: 20px; font-size: 1.1em; flex-wrap: wrap; margin-bottom: 15px; }
+        .judgement-row input { width: 100px; font-size: 1.1em; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: center; background-color: #fff9e6; font-weight: bold;}
+        .compare-sign { font-size: 1.8em; font-weight: bold; color: #7f8c8d; }
+        .sigma-display { background: #ecf0f1; padding: 10px 15px; border-radius: 6px; font-weight: bold; color: #2c3e50; }
+        .badge { font-size: 1.5em; font-weight: bold; padding: 8px 25px; border-radius: 30px; color: white; background: #2ecc71; }
+        .badge.ng { background: #e74c3c; }
+        .judgement-msg { padding: 12px; background: #f8f9fa; border-radius: 6px; color: #555; font-size: 1.05em; border-left: 4px solid #2ecc71; }
+        .judgment-card.ng .judgement-msg { border-left-color: #e74c3c; background: #fdf3f2; }
+
+        /* 圖形與數據儀表板排版 */
+        .dashboard-section { display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px; }
+        .chart-container { background: #fdfdfd; border: 1px solid #ddd; border-radius: 6px; padding: 15px; text-align: center; }
+        
+        /* 表格樣式 */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: center; vertical-align: middle; }
+        th { background-color: #34495e; color: white; font-size: 0.9em; padding: 10px; }
+        input[type="number"].table-input, input[type="text"].table-input, select { width: 90%; padding: 6px; border: 1px solid #3498db; border-radius: 4px; background-color: #fff9e6; text-align: center; font-weight: bold; }
+        input:placeholder-shown.table-input { background-color: #fdfcf7; border-color: #bdc3c7; font-weight: normal; }
+        input[type="text"].desc { text-align: left; width: 95%; }
+        .protected { background-color: #ecf0f1; color: #7f8c8d; font-weight: bold; }
+        
+        /* 按鈕樣式 */
+        .action-bar { display: flex; justify-content: justify; gap: 10px; margin-top: 10px; margin-bottom: 25px; }
+        .btn-add { background-color: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        .btn-add:hover { background-color: #2ecc71; }
+        .btn-print { background-color: #2980b9; color: white; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 6px; cursor: pointer; margin-left: auto; }
+        .btn-print:hover { background-color: #3498db; }
+        .btn-del { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em; }
+        .btn-del:hover { background-color: #c0392b; }
+
+        /* 總結區塊樣式 */
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .summary-card { background: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 6px; text-align: center; }
+        .summary-card .value { font-size: 1.5em; font-weight: bold; color: #2980b9; margin-top: 10px; }
+        .rss-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;}
+        .rss-card { padding: 20px; border-radius: 6px; text-align: center; color: white; }
+        .rss-3 { background-color: #27ae60; }
+        .rss-45 { background-color: #f39c12; }
+        .rss-6 { background-color: #c0392b; }
+        .rss-card .rss-value { font-size: 2em; font-weight: bold; margin-top: 10px; }
+        .report-footer { background-color: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 6px; }
+        .footer-group { margin-bottom: 15px; }
+        .footer-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #2c3e50; }
+        .footer-group textarea { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px; background-color: #fff9e6; font-family: inherit; font-size: 1em; resize: vertical; box-sizing: border-box; }
+
+        /* 報表列印防裁切優化 */
+        @page { size: A4 portrait; margin: 10mm; }
+        @media print {
+            body { background-color: #fff; padding: 0; margin: 0; font-size: 10pt; }
+            .container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; margin: 0; }
+            /* 新增 .back-link 到隱藏清單，確保列印時不顯示 */
+            .instructions, .helper-tool, .back-link, #btn-add-row, .btn-print, .btn-del-th, .btn-del-td, hr { display: none !important; }
+            .top-bar { border-bottom: none; padding-bottom: 0; margin-bottom: 10px; }
+            table { width: 100%; table-layout: fixed; font-size: 9pt; border-collapse: collapse; }
+            th, td { padding: 4px 2px; word-wrap: break-word; overflow: hidden; }
+            input, select, textarea { background-color: transparent !important; border: none !important; box-shadow: none !important; appearance: none; -webkit-appearance: none; color: #000 !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-sizing: border-box !important; font-size: 9pt !important; text-align: center; }
+            input[type="text"].desc { text-align: left; }
+            .summary-grid { gap: 10px; margin-bottom: 10px; }
+            .summary-card { border: 1px solid #000; padding: 10px; }
+            .summary-card .value { font-size: 1.2em; margin-top: 5px; }
+            .rss-grid { gap: 10px; margin-bottom: 10px; }
+            .rss-card { color: #000 !important; border: 2px solid #000; background: transparent !important; padding: 10px; }
+            .rss-3 { border-color: #27ae60; } .rss-45 { border-color: #f39c12; } .rss-6 { border-color: #c0392b; }
+            .rss-card .rss-value { color: #000 !important; font-size: 1.5em; margin-top: 5px; }
+            textarea { border: 1px solid #ccc !important; background: #fff !important; height: auto; font-size: 10pt !important; }
+            .dashboard-section { gap: 10px; margin-bottom: 10px; }
+            h1 { font-size: 1.4em; margin-bottom: 0; }
+            h2 { font-size: 1.2em; margin-bottom: 5px; margin-top: 10px;}
+            h3 { font-size: 1.1em; margin-bottom: 5px; margin-top: 5px;}
+            .report-footer { padding: 10px; border: none; }
+            .judgment-card { border: 2px solid #000; padding: 10px; margin-bottom: 10px; }
+            .judgment-card h3 { color: #000 !important; font-size: 1.2em; margin-bottom: 5px; }
+            .badge { padding: 4px 12px; border: 2px solid #000; color: #000 !important; font-size: 1.2em; background: transparent !important; }
+            .judgement-msg { border-left: none; padding: 5px; font-weight: bold; }
+        }
     </style>
 </head>
 <body>
-    <canvas id="tech-bg"></canvas>
 
-    <header>
-        <div class="header-nav-row">
-            <a href="#" class="logo">Anzû Design Studio</a>
-            <nav>
-                <a onclick="smoothScroll('services'); return false;">Services</a>
-                <a onclick="smoothScroll('portfolio'); return false;">Portfolio</a>
-                <a onclick="smoothScroll('contact'); return false;">Contact</a>
-                <a href="zh/index.html" style="color: var(--accent); margin-left: 8px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; text-transform: none; letter-spacing: normal;">中文</a>
-            </nav>
-        </div>
-    </header>
-
-    <div class="hero-bg">
-    <section class="hero" id="hero-section">
-        <h1>Product Design &amp; Mechanical Engineering</h1>
-        <p>A solid mechanical engineering background focused on advanced surface modeling, complex mechanism design, and manufacturing feasibility assessment. Combining Creo 3D modeling expertise with Python-based engineering tools to deliver end-to-end solutions — from concept to production.</p>
-        <p style="color: var(--text-muted); font-size: 15px; margin-top: var(--spacing-md); font-weight: 500;">
-            Bridging design and manufacturing — solving engineering challenges to build market-ready hardware products.
-        </p>
-    </section>
+<div class="container">
+    <div class="top-bar">
+        <h1>TP-Module 尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v20.0 作品集導覽整合版</span></h1>
+        <a href="../index.html" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            返回首頁
+        </a>
     </div>
-
-    <section class="services" id="services">
-        <h2 class="section-title">Core Capabilities</h2>
-        <div class="service-grid">
-            <div class="service-card">
-                <h3>Creo Mechanism Design</h3>
-                <p>Precise 3D solid and advanced surface modeling, complex internal mechanism breakdown, and systematic kinematic analysis using Creo Mechanism.</p>
-            </div>
-            <div class="service-card">
-                <h3>Design for Manufacturing (DFM)</h3>
-                <p>Material stress evaluation, interference checking, and draft angle analysis — ensuring designs are fully production-ready for tooling and mass manufacturing.</p>
-            </div>
-            <div class="service-card">
-                <h3>Photorealistic Rendering &amp; Visual Proposals</h3>
-                <p>From early concept ideation to final high-fidelity product renders — delivering commercially compelling visuals for crowdfunding, catalogs, and brand presentations.</p>
-            </div>
-            <div class="service-card">
-                <h3>Python Engineering Tools</h3>
-                <p>Custom Python scripts for engineering calculations and automated data processing — significantly reducing design validation time and boosting development efficiency.</p>
-            </div>
+    
+    <div class="helper-tool">
+        <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em;"><span>🧮 <strong>軸孔浮動間隙計算機 (Asm Shift Helper)</strong></span></div>
+        <div class="calc-row">
+            <span class="calc-label">🕳️ 孔 (Hole):</span>
+            <input type="number" id="calc-hole-nom" value="3.5" step="0.01">
+            <span class="calc-sign">+</span>
+            <input type="number" id="calc-hole-up" placeholder="上限公差" value="0.1" step="0.01">
+            <span class="calc-mini-out">➔ 最大孔徑: <span id="out-hole-max">3.600</span></span>
         </div>
-    </section>
-
-    <section class="portfolio" id="portfolio">
-        <h2 class="section-title">Selected Engineering Work</h2>
-        <div class="project-grid">
-            <div class="project-card">
-               <div class="project-image"><img src="image/04.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
-                <div class="project-info">
-                    <h3>Simulation-Driven Mechanism Design</h3>
-                    <p>Motion simulation using Creo's kinematic module — precise stroke calculation and interference elimination for smooth mechanism operation.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">Creo</span>
-                        <span class="project-tag">Kinematic Analysis</span>
-                        <a class="project-tag" href="#" onclick="openVideoModal(event)" title="Watch Mechanism Design Demo">Mechanism Design</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image"><img src="image/01.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
-                <div class="project-info">
-                    <h3>Consumer Electronics Surface Modeling</h3>
-                    <p>Advanced surface techniques used to build ergonomic, flowing forms — with full consideration of part split lines and assembly logic.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">Surface Modeling</span>
-                        <span class="project-tag">Industrial Design</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image"><img src="image/dfm.png" style="width: 100%; height: 100%; object-fit: cover;"></div>
-                <div class="project-info">
-                    <h3>Structural Stress &amp; DFM Optimization</h3>
-                    <p>Structural reinforcement of snap hooks and load-bearing parts, wall thickness optimization to minimize sink marks and warping in injection-molded components.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">DFM</span>
-                        <a class="project-tag" href="#" onclick="openStressVideoModal(event)" title="Watch Stress Analysis Demo">Stress Analysis</a>
-                        <span class="project-tag">Injection Molding</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image"><img src="image/py.gif" style="width: 100%; height: 100%; object-fit: cover;"></div>
-                <div class="project-info">
-                    <h3>Python Automated Engineering Calc</h3>
-                    <p>Python scripts replacing tedious Excel manual calculations — dramatically cutting down parametric design verification time.</p>
-                    <div class="project-tags">
-                        <a class="project-tag" href="#" onclick="openCalcGate(event)" title="Open Engineering Calculator Tools">Engineering Calc</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image"><img src="image/03.gif" style="width: 100%; height: 100%; object-fit: cover;"></div>
-                <div class="project-info">
-                    <h3>Precision Metal Component Design</h3>
-                    <p>Dedicated structural design for die-cast and sheet metal parts — accounting for machining tolerances and surface treatment process requirements.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">Metal Fabrication</span>
-                        <a class="project-tag" href="公差分析/公差分析_v10.html" target="_blank" title="Open Tolerance Analysis Tool">Tolerance Analysis</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image"><img src="image/05.jpg" style="width: 100%; height: 100%; object-fit: cover;"></div>
-                <div class="project-info">
-                    <h3>Commercial Photorealistic Rendering</h3>
-                    <p>High-fidelity material and lighting setups producing photorealistic product images ready for crowdfunding platforms or commercial catalogs.</p>
-                    <div class="project-tags">
-                        <a class="project-tag" href="visual-proposal.html" title="View Visual Proposal Portfolio">Visual Proposals</a>
-                    </div>
-                </div>
-            </div>
+        <div class="calc-row">
+            <span class="calc-label">🔩 軸 (Shaft):</span>
+            <input type="number" id="calc-shaft-nom" value="3.0" step="0.01">
+            <span class="calc-sign">+</span>
+            <input type="number" id="calc-shaft-low" placeholder="下限公差" value="-0.1" step="0.01">
+            <span class="calc-mini-out">➔ 最小軸徑: <span id="out-shaft-min">2.900</span></span>
         </div>
-    </section>
-
-    <section class="contact" id="contact">
-        <h2>Start a Project</h2>
-        <p>Have a mechanism design, 3D modeling, or product development need? Let's discuss your concept and specifications.</p>
-        <button class="cta-button" onclick="openContactModal()">Project Inquiry</button>
-        <a href="https://mail.google.com/mail/?view=cm&to=andrewsu90@gmail.com" target="_blank" class="cta-button cta-button-secondary">Send an Email</a>
-    </section>
-
-    <div class="modal" id="contactModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeContactModal()">&times;</button>
-            <h3>Project Inquiry</h3>
-            <form onsubmit="handleFormSubmit(event)">
-                <div class="form-group">
-                    <label for="name">Name / Contact Person *</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email Address *</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="company">Company / Organization</label>
-                    <input type="text" id="company" name="company">
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone">
-                </div>
-                <div class="form-group">
-                    <label for="message">Project Description *</label>
-                    <textarea id="message" name="message" required placeholder="Briefly describe your project requirements..."></textarea>
-                </div>
-                <button type="submit" class="cta-button" style="width: 100%; border: none;">Submit Inquiry</button>
-            </form>
+        <div style="width: 100%; margin-top: 10px; padding-top: 15px; border-top: 1px dashed #f39c12;">
+            <span style="color:#7f8c8d; font-size:0.9em;">公式：[ (最大孔) - (最小軸) ] / 2</span><br>
+            <span style="margin-top:5px; display:inline-block;">👉 建議填入表格的 ± 浮動公差： <span class="helper-result" id="calc-result">0.350</span> mm</span>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 Anzû Mechanical &amp; Product Design Studio. All rights reserved.</p>
-        <p class="visitor-count">
-            <span class="visitor-item">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Unique Visitors <span id="stat-uv" style="color:var(--accent);font-weight:600;margin:0 3px">--</span>
-            </span>
-            <span class="visitor-sep">·</span>
-            <span class="visitor-item">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                Total Page Views <span id="stat-pv" style="color:var(--accent);font-weight:600;margin:0 3px">--</span>
-            </span>
-        </p>
-    </footer>
+    <h2>📝 尺寸鍊明細與分析表</h2>
+    <table id="ta-table">
+        <thead>
+            <tr>
+                <th width="4%">No.</th>
+                <th width="33%">變量描述 (Description)</th>
+                <th width="11%">增環 (+)</th>
+                <th width="11%">減環 (-)</th>
+                <th width="13%">± 公差 (Tol)</th>
+                <th width="11%">分佈類型</th>
+                <th width="11%">標準差 (1σ)</th>
+                <th width="11%">變異數 (σ²)</th>
+                <th width="5%" class="btn-del-th">操作</th>
+            </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+    
+    <div class="action-bar">
+        <button id="btn-add-row" class="btn-add">➕ 新增一列 (Add Row)</button>
+        <button id="btn-print-report" class="btn-print" onclick="window.print()">📄 輸出工程報表 (Print PDF)</button>
+    </div>
 
-    <div id="videoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
-        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
-            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
-            <button onclick="closeVideoModal()" style="background:none;border:none;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:0;cursor:pointer;transition:color 0.3s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--secondary-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回首頁</button>
+    <hr>
+    
+    <div class="judgment-card" id="judgement-panel">
+        <h3 id="judgement-title">✅ 設計判定 (Design Judgment)</h3>
+        <div class="judgement-row">
+            <label style="font-weight: bold;">輸入目標規格值 (Target Spec): ± <input type="number" id="spec-target" value="0.35" step="0.01"></label>
+            <span class="compare-sign" id="compare-sign">≥</span>
+            <span class="sigma-display">修正型統計公差值 (True Limit): <span id="judgement-3sigma" style="color: #2980b9;">0.000</span> mm</span>
+            <span class="badge" id="judgement-badge">OK</span>
         </div>
-        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
-            <div style="max-width:1520px;margin:0 auto;">
-                <h2 class="section-title" style="margin-bottom:2rem;">Mechanism Design</h2>
-                <div id="mechVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
-                    <div class="vcard" data-src="video/mechanism.mp4" data-title="Mechanism Demo"
-                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
-                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
-                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
-                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
-                            <video src="video/mechanism.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
-                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
-                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="padding:14px 16px;">
-                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">Mechanism Demo</p>
-                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">mechanism.mp4</p>
-                        </div>
-                    </div>
-                    <div class="vcard" data-src="video/TA_3D_GDT.mp4" data-title="TA 3D GD&T Demo"
-                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
-                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
-                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
-                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
-                            <video src="video/TA_3D_GDT.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
-                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
-                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="padding:14px 16px;">
-                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">TA 3D GD&amp;T Demo</p>
-                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">TA_3D_GDT.mp4</p>
-                        </div>
-                    </div>
-                </div>
+        <div class="judgement-msg" id="judgement-msg">計算中...</div>
+    </div>
+
+    <div class="dashboard-section">
+        <div class="chart-container">
+            <h3>📈 預測組裝良率常態分佈與 Worst Case 對比圖</h3>
+            <svg id="norm-dist-chart" viewBox="0 0 800 400" style="width: 100%; height: auto;"></svg>
+        </div>
+        
+        <div>
+            <h2>📊 尺寸鍊評估報告 Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card"><div>名義閉合間隙 (Nominal Mean)</div><div class="value" id="out-nominal">0.000 mm</div></div>
+                <div class="summary-card"><div>極值法公差 (Worst Case)</div><div class="value" id="out-wc">± 0.000 mm</div></div>
+                <div class="summary-card"><div>系統總標準差 (1σ)</div><div class="value" id="out-sys-sigma">0.000 mm</div></div>
+                <div class="summary-card"><div>預估能力指標 (Z-score)</div><div class="value" id="out-zscore" style="color:#d35400;">0.000</div></div>
+            </div>
+            
+            <div class="summary-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="summary-card" style="background:#eafaf1; border-color:#2ecc71;"><div>組裝合格率 (Yield)</div><div class="value" id="out-yield" style="color:#27ae60;">100.000 %</div></div>
+                <div class="summary-card" style="background:#fdf3f2; border-color:#e74c3c;"><div>每百萬不良數 (DPMO)</div><div class="value" id="out-dpmo" style="color:#c0392b;">0.000</div></div>
+                <div class="summary-card" id="card-cpk"><div>製程能力指數 (Cpk)</div><div class="value" id="out-cpk" style="font-size: 1.8em;">0.00</div></div>
+            </div>
+
+            <h3>🎯 傳統製程品質預測 (純高斯還原指標)</h3>
+            <div class="rss-grid">
+                <div class="rss-card rss-3"><div>3σ 傳統公差 (99.73%)</div><div class="rss-value" id="out-3sigma">± 0.000 mm</div></div>
+                <div class="rss-card rss-45"><div>4.5σ 範本目標 (品質高標)</div><div class="rss-value" id="out-45sigma">± 0.000 mm</div></div>
+                <div class="rss-card rss-6"><div>6σ 終局指標 (百萬分之3.4)</div><div class="rss-value" id="out-6sigma">± 0.000 mm</div></div>
             </div>
         </div>
     </div>
-
-    <div id="stressVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
-        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
-            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
-            <button onclick="closeStressVideoModal()" style="background:none;border:none;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:0;cursor:pointer;transition:color 0.3s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--secondary-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回首頁</button>
-        </div>
-        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
-            <div style="max-width:1520px;margin:0 auto;">
-                <h2 class="section-title" style="margin-bottom:2rem;">Stress Analysis</h2>
-                <div id="stressVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
-                    <div class="vcard" data-src="video/stress.mp4" data-title="Stress Analysis Demo"
-                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
-                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
-                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
-                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
-                            <video src="video/stress.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
-                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
-                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="padding:14px 16px;">
-                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">Stress Analysis Demo</p>
-                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">stress.mp4</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    
+    <hr>
+    <h2>📝 結論與對策 (Conclusion & Solution)</h2>
+    <div class="report-footer">
+        <div class="footer-group"><label>Conclusions (結論判斷):</label><textarea rows="3"></textarea></div>
+        <div class="footer-group"><label>Solution (對策與建議):</label><textarea rows="3"></textarea></div>
     </div>
-
-    <div id="videoLightbox" style="display:none;position:fixed;inset:0;z-index:10000;flex-direction:column;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">
-        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid #2a2a2a;">
-            <p id="lightboxTitle" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.06em;color:#fff;margin:0;"></p>
-            <button onclick="closeLightbox()" style="background:none;border:none;color:#999;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:0;cursor:pointer;transition:color 0.3s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='#E67E22'" onmouseout="this.style.color='#999'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回</button>
-        </div>
-        <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 3%;">
-            <video id="lightboxVideo" controls playsinline style="width:100%;max-width:1000px;border-radius:10px;display:block;background:#000;box-shadow:0 24px 60px rgba(230,126,34,0.1);max-height:80vh;"></video>
-        </div>
-    </div>
-
-    <script>
-        function openVideoModal(e) { e.preventDefault(); document.getElementById('videoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-        function closeVideoModal() { document.getElementById('videoModal').style.display = 'none'; document.body.style.overflow = ''; }
-        function openStressVideoModal(e) { e.preventDefault(); document.getElementById('stressVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-        function closeStressVideoModal() { document.getElementById('stressVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
-        function openLightbox(src, title) { const lb = document.getElementById('videoLightbox'); const vid = document.getElementById('lightboxVideo'); document.getElementById('lightboxTitle').textContent = title; vid.src = src; lb.style.display = 'flex'; vid.play(); }
-        function closeLightbox() { const lb = document.getElementById('videoLightbox'); const vid = document.getElementById('lightboxVideo'); lb.style.display = 'none'; vid.pause(); vid.src = ''; }
-        document.querySelectorAll('.vcard').forEach(function(card) { card.addEventListener('click', function() { openLightbox(this.dataset.src, this.dataset.title); }); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { if (document.getElementById('videoLightbox').style.display === 'flex') { closeLightbox(); return; } if (document.getElementById('videoModal').style.display === 'flex') { closeVideoModal(); return; } if (document.getElementById('stressVideoModal').style.display === 'flex') { closeStressVideoModal(); return; } } });
-        function smoothScroll(sectionId) { const element = document.getElementById(sectionId); if (element) { element.scrollIntoView({ behavior: 'smooth' }); } }
-        function openContactModal() { document.getElementById('contactModal').classList.add('active'); document.body.style.overflow = 'hidden'; }
-        function closeContactModal() { document.getElementById('contactModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
-        document.getElementById('contactModal').addEventListener('click', function(e) { if (e.target === this) { closeContactModal(); } });
-        function handleFormSubmit(event) { event.preventDefault(); const formData = { name: document.getElementById('name').value, email: document.getElementById('email').value, company: document.getElementById('company').value, phone: document.getElementById('phone').value, message: document.getElementById('message').value }; const mailtoLink = `mailto:andrewsu90@gmail.com?subject=Project Inquiry - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nPhone: ${formData.phone}\n\nProject Description:\n${formData.message}`)}`; window.location.href = mailtoLink; document.querySelector('form').reset(); setTimeout(closeContactModal, 500); }
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeContactModal(); } });
-
-        // ── Tech Background: 顏色已配合工業橘主題調整 ──
-        (function() {
-            const canvas = document.getElementById('tech-bg');
-            const ctx = canvas.getContext('2d');
-            let W, H, nodes, animId;
-
-            function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-            function makeNodes(n) { return Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35, r: Math.random() * 1.8 + 0.8 })); }
-
-            function drawGrid() {
-                const step = 52;
-                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-                ctx.lineWidth = 0.8;
-                for (let x = 0; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-                for (let y = 0; y < H; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-            }
-
-            let glowingBlocks = [];
-            function drawGlowingBlocks() {
-                const step = 52;
-                const heroSection = document.getElementById('hero-section');
-                const headerSection = document.querySelector('header');
-                if (!heroSection || !headerSection) return;
-                const heroRect = heroSection.getBoundingClientRect();
-                const headerRect = headerSection.getBoundingClientRect();
-                const topBound = headerRect.bottom;
-                const bottomBound = heroRect.bottom;
-
-                if (Math.random() < 0.04) {
-                    if (bottomBound > topBound) {
-                        let randomY = topBound + Math.random() * (bottomBound - topBound);
-                        glowingBlocks.push({ x: Math.floor(Math.random() * (W / step)) * step, y: Math.floor(randomY / step) * step, alpha: 0, maxAlpha: 0.5 + Math.random() * 0.4, fadeIn: true });
-                    }
-                }
-
-                for (let i = glowingBlocks.length - 1; i >= 0; i--) {
-                    let b = glowingBlocks[i];
-                    if (b.fadeIn) { b.alpha += 0.015; if (b.alpha >= b.maxAlpha) b.fadeIn = false; } else { b.alpha -= 0.005; if (b.alpha <= 0) { glowingBlocks.splice(i, 1); continue; } }
-                    let cx = b.x + step / 2; let cy = b.y + step / 2;
-                    let blockGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, step);
-                    blockGrad.addColorStop(0, `rgba(255, 255, 255, ${b.alpha})`);
-                    blockGrad.addColorStop(1, `rgba(255, 255, 255, 0)`);
-                    ctx.fillStyle = blockGrad; ctx.fillRect(b.x, b.y, step, step);
-                    let lineGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, step * 2.5);
-                    lineGrad.addColorStop(0, `rgba(255, 255, 255, ${b.alpha * 0.9})`);
-                    lineGrad.addColorStop(1, `rgba(255, 255, 255, 0)`);
-                    ctx.strokeStyle = lineGrad; ctx.lineWidth = 1.5; ctx.beginPath();
-                    ctx.moveTo(cx - step * 2.5, b.y); ctx.lineTo(cx + step * 2.5, b.y);
-                    ctx.moveTo(cx - step * 2.5, b.y + step); ctx.lineTo(cx + step * 2.5, b.y + step);
-                    ctx.moveTo(b.x, cy - step * 2.5); ctx.lineTo(b.x, cy + step * 2.5);
-                    ctx.moveTo(b.x + step, cy - step * 2.5); ctx.lineTo(b.x + step, cy + step * 2.5);
-                    ctx.stroke();
-                }
-            }
-
-            function drawCircuits() {
-                ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-                ctx.lineWidth = 1;
-                const pts = [[0.05,0.12],[0.18,0.12],[0.18,0.25],[0.35,0.25],[0.35,0.1],[0.55,0.1],[0.72,0.18],[0.72,0.32],[0.88,0.32],[0.88,0.15],[0.1,0.72],[0.28,0.72],[0.28,0.6],[0.5,0.6],[0.5,0.78],[0.65,0.78],[0.8,0.65],[0.92,0.65],[0.92,0.82]];
-                ctx.beginPath();
-                pts.forEach(([rx, ry], i) => { const px = rx * W, py = ry * H; i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py); });
-                ctx.stroke();
-                ctx.fillStyle = 'rgba(230,126,34,0.3)'; /* 工業橘節點 */
-                [[0.18,0.25],[0.35,0.25],[0.55,0.1],[0.72,0.32],[0.28,0.72],[0.5,0.6],[0.65,0.78],[0.92,0.65]].forEach(([rx,ry]) => { ctx.beginPath(); ctx.arc(rx*W, ry*H, 3.5, 0, Math.PI*2); ctx.fill(); });
-            }
-
-            let meteors = [];
-            function makeMeteor() { const angle = Math.PI / 5; const speed = 6 + Math.random() * 7; return { x: Math.random() * W * 1.5 - W * 0.2, y: -20 - Math.random() * 200, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, len: 80 + Math.random() * 120, alpha: 0.6 + Math.random() * 0.4, width: 0.8 + Math.random() * 1.2, life: 1.0 }; }
-            function initMeteors() { meteors = []; for (let i = 0; i < 6; i++) { const m = makeMeteor(); m.y = Math.random() * H; m.x = Math.random() * W; meteors.push(m); } }
-
-            function drawMeteors() {
-                meteors.forEach((m, idx) => {
-                    const tailX = m.x - m.vx / Math.hypot(m.vx, m.vy) * m.len; const tailY = m.y - m.vy / Math.hypot(m.vx, m.vy) * m.len;
-                    const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
-                    grad.addColorStop(0, `rgba(230,126,34,0)`);
-                    grad.addColorStop(0.6, `rgba(230,126,34,${m.alpha * 0.3})`);
-                    grad.addColorStop(1, `rgba(230,126,34,${m.alpha})`);
-                    ctx.beginPath(); ctx.moveTo(tailX, tailY); ctx.lineTo(m.x, m.y); ctx.strokeStyle = grad; ctx.lineWidth = m.width; ctx.stroke();
-                    ctx.beginPath(); ctx.arc(m.x, m.y, m.width * 1.2, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,200,150,${m.alpha})`; ctx.fill();
-                    m.x += m.vx; m.y += m.vy;
-                    if (m.x > W + 100 || m.y > H + 100) { meteors[idx] = makeMeteor(); }
-                });
-            }
-
-            function frame() {
-                ctx.clearRect(0, 0, W, H);
-                drawGrid();
-                drawGlowingBlocks();
-                drawCircuits();
-
-                const maxDist = 200;
-                const lineBase = '255,255,255'; /* 銀白連線 */
-                for (let i = 0; i < nodes.length; i++) {
-                    for (let j = i + 1; j < nodes.length; j++) {
-                        const dx = nodes[i].x - nodes[j].x; const dy = nodes[i].y - nodes[j].y; const d = Math.sqrt(dx*dx + dy*dy);
-                        if (d < maxDist) {
-                            const alpha = (1 - d / maxDist) * 0.25;
-                            ctx.strokeStyle = `rgba(${lineBase},${alpha})`; ctx.lineWidth = 1.0;
-                            ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
-                        }
-                    }
-                }
-
-                nodes.forEach(n => {
-                    ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(230,126,34,0.6)`; /* 工業橘節點 */
-                    ctx.fill();
-                    n.x += n.vx; n.y += n.vy;
-                    if (n.x < 0 || n.x > W) n.vx *= -1; if (n.y < 0 || n.y > H) n.vy *= -1;
-                });
-
-                drawMeteors();
-                animId = requestAnimationFrame(frame);
-            }
-
-            resize(); nodes = makeNodes(85); initMeteors(); frame(); window.addEventListener('resize', () => { resize(); initMeteors(); });
-        })();
-
-        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-        const observer = new IntersectionObserver(function(entries) { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = '1'; } }); }, observerOptions);
-        document.querySelectorAll('section').forEach(section => { section.style.opacity = '0.95'; });
-
-        (function() {
-            const PV_KEY = 'andrew_site_pv'; const UV_KEY = 'andrew_site_uv'; const SESSION_KEY = 'andrew_site_session';
-            const pv = (parseInt(localStorage.getItem(PV_KEY)) || 0) + 1; localStorage.setItem(PV_KEY, pv);
-            let uv = parseInt(localStorage.getItem(UV_KEY)) || 0;
-            if (!sessionStorage.getItem(SESSION_KEY)) { uv += 1; localStorage.setItem(UV_KEY, uv); sessionStorage.setItem(SESSION_KEY, '1'); }
-            document.getElementById('stat-pv').textContent = pv.toLocaleString(); document.getElementById('stat-uv').textContent = uv.toLocaleString();
-        })();
-    </script>
-
-<div id="calcGate" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,12,12,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;">
-  <div id="calcGateCard" style="background:var(--bg-light);border:1px solid var(--border-color);border-radius:14px;padding:36px 40px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
-    <div style="font-size:32px;margin-bottom:14px;">🔒</div>
-    <h3 style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;letter-spacing:0.5px;margin-bottom:8px;color:var(--primary-color);">Engineering Calc</h3>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;">請輸入密碼以開啟工程計算工具</p>
-    <input id="calcPwInput" type="password" inputmode="numeric" autocomplete="off" placeholder="••••"
-      style="width:100%;padding:12px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-white);color:var(--primary-color);font-family:inherit;font-size:18px;text-align:center;letter-spacing:8px;outline:none;transition:border-color 0.2s;">
-    <div id="calcPwMsg" style="min-height:18px;font-size:12.5px;color:#ef5350;margin:8px 0 0;"></div>
-    <div style="display:flex;gap:10px;margin-top:16px;">
-      <button onclick="closeCalcGate()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--primary-color);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;">取消</button>
-      <button onclick="checkCalcPw()" style="flex:1;padding:11px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--bg-white);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;">確認</button>
-    </div>
-  </div>
 </div>
 
-<style>
-  @keyframes calcShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
-</style>
-
 <script>
-(function(){
-  const PW   = "0000";
-  const DEST = "tools/engineering-calculators.html";
-  window.openCalcGate = function(e){ e.preventDefault(); const gate = document.getElementById("calcGate"); gate.style.display = "flex"; document.body.style.overflow = "hidden"; const input = document.getElementById("calcPwInput"); input.value = ""; document.getElementById("calcPwMsg").textContent = ""; setTimeout(()=>input.focus(), 50); };
-  window.closeCalcGate = function(){ document.getElementById("calcGate").style.display = "none"; document.body.style.overflow = ""; };
-  window.checkCalcPw = function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); if(input.value === PW){ closeCalcGate(); location.href = DEST; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
-  document.getElementById("calcGate").addEventListener("click", function(e){ if(e.target === this) closeCalcGate(); });
-  document.addEventListener("keydown", function(e){ if(document.getElementById("calcGate").style.display === "flex"){ if(e.key === "Enter") checkCalcPw(); if(e.key === "Escape") closeCalcGate(); } });
-})();
+    let currentRowCount = 15;
+    const defaultData = [
+        { desc: "Pane中心到lcd bkt側壁尺寸", plus: "140.0", minus: "", tol: "0.15", dist: "常態" },
+        { desc: "Chassis Hole距離lcd bkt側壁：【位置度】", plus: "5.0", minus: "", tol: "0.10", dist: "常態" },
+        { desc: "Asm shift lcd bkt hole-screw", plus: "", minus: "", tol: "0.25", dist: "均勻" },
+        { desc: "M圈(MMC)", plus: "", minus: "", tol: "0.05", dist: "常態" },
+        { desc: "前框Boss Hole到中心距離尺寸", plus: "", minus: "145.0", tol: "0.15", dist: "常態" }
+    ];
+
+    function initTable() {
+        const tbody = document.getElementById('table-body');
+        let rowsHtml = '';
+        for (let i = 0; i < 15; i++) {
+            const data = i < 5 ? defaultData[i] : { desc: "", plus: "", minus: "", tol: "", dist: "常態" };
+            rowsHtml += createRowHTML(data);
+        }
+        tbody.innerHTML = rowsHtml;
+        updateRowNumbers();
+    }
+
+    function createRowHTML(data) {
+        return `
+            <tr>
+                <td class="row-index"></td>
+                <td><input type="text" class="table-input desc" value="${data.desc}"></td>
+                <td><input type="number" class="table-input plus" value="${data.plus}" step="0.1"></td>
+                <td><input type="number" class="table-input minus" value="${data.minus}" step="0.1"></td>
+                <td><input type="number" class="table-input tol" value="${data.tol}" step="0.01"></td>
+                <td>
+                    <select class="dist">
+                        <option value="常態" ${data.dist === '常態' ? 'selected' : ''}>常態</option>
+                        <option value="均勻" ${data.dist === '均勻' ? 'selected' : ''}>均勻</option>
+                    </select>
+                </td>
+                <td class="protected sigma">0.000</td>
+                <td class="protected variance">0.000</td>
+                <td class="btn-del-td"><button class="btn-del" onclick="deleteRow(this)">刪除</button></td>
+            </tr>
+        `;
+    }
+
+    function updateRowNumbers() {
+        document.querySelectorAll('#ta-table tbody tr').forEach((row, index) => { row.querySelector('.row-index').textContent = index + 1; });
+    }
+
+    function deleteRow(btn) { btn.closest('tr').remove(); updateRowNumbers(); calculateTolerance(); }
+
+    function addNewRow() {
+        currentRowCount++;
+        const tbody = document.getElementById('table-body');
+        tbody.insertAdjacentHTML('beforeend', createRowHTML({ desc: "", plus: "", minus: "", tol: "", dist: "常態" }));
+        tbody.lastElementChild.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', calculateTolerance); input.addEventListener('change', calculateTolerance);
+        });
+        updateRowNumbers();
+    }
+
+    function calcAsmShift() {
+        const holeNom = parseFloat(document.getElementById('calc-hole-nom').value) || 0;
+        const holeUp = parseFloat(document.getElementById('calc-hole-up').value) || 0; 
+        const shaftNom = parseFloat(document.getElementById('calc-shaft-nom').value) || 0;
+        const shaftLow = parseFloat(document.getElementById('calc-shaft-low').value) || 0; 
+        
+        let holeMax = holeNom > 0 ? (holeNom + holeUp) : 0;
+        let shaftMin = shaftNom > 0 ? (shaftNom + shaftLow) : 0;
+        
+        document.getElementById('out-hole-max').textContent = holeMax.toFixed(3);
+        document.getElementById('out-shaft-min').textContent = shaftMin.toFixed(3);
+        
+        if (holeMax > 0 && shaftMin > 0) {
+            document.getElementById('calc-result').textContent = ((holeMax - shaftMin) / 2).toFixed(3);
+        } else {
+            document.getElementById('calc-result').textContent = "0.000";
+        }
+    }
+
+    function erf(x) {
+        const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+        const sign = (x < 0) ? -1 : 1; x = Math.abs(x);
+        const t = 1.0 / (1.0 + p * x);
+        const y = 1.0 - (((((a5 * t + a4) * t) + a3 * t + a2) * t + a1) * t * Math.exp(-x * x));
+        return sign * y;
+    }
+
+    function normCDF(x, mean, sigma) {
+        return 0.5 * (1 + erf((x - mean) / (sigma * Math.sqrt(2))));
+    }
+
+    function mixedCDF(x, mean, sigmaN, a) {
+        if (a <= 0.001) return normCDF(x, mean, sigmaN);
+        let integrationSum = 0;
+        const steps = 40;
+        const tMin = x - a; const tMax = x + a;
+        const dt = (tMax - tMin) / steps;
+        
+        for (let i = 0; i <= steps; i++) {
+            let t = tMin + i * dt;
+            let cdfVal = normCDF(t, mean, sigmaN);
+            let weight = (i === 0 || i === steps) ? 1 : (i % 2 === 1) ? 4 : 2;
+            integrationSum += weight * cdfVal;
+        }
+        return (integrationSum * dt / 3) / (2 * a);
+    }
+
+    function findTrueLimit(sigmaN, a) {
+        let low = 0;
+        let high = 4 * sigmaN + a;
+        const targetArea = 0.9973002; 
+        
+        for (let k = 0; k < 25; k++) {
+            let mid = (low + high) / 2;
+            let area = mixedCDF(mid, 0, sigmaN, a) - mixedCDF(-mid, 0, sigmaN, a);
+            if (area < targetArea) low = mid; else high = mid;
+        }
+        return low;
+    }
+
+    function drawNormalDistribution(mean, sigma, worstCase, specLimit, trueLimit) {
+        const svg = document.getElementById('norm-dist-chart');
+        svg.innerHTML = ''; 
+        const width = 800; const height = 300; const padding = 50;
+        
+        if (sigma <= 0) sigma = 0.001;
+        const maxRange = Math.max(4.5 * sigma, worstCase * 1.15, trueLimit * 1.15);
+        const xMin = mean - maxRange; const xMax = mean + maxRange;
+
+        function getXPixel(xVal) { return padding + ((xVal - xMin) / (xMax - xMin)) * (width - 2 * padding); }
+        function getYPixel(yVal) { const maxDensity = 1 / (sigma * Math.sqrt(2 * Math.PI)); return height - padding - (yVal / maxDensity) * (height - 2 * padding); }
+        function gaussian(x) { return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-Math.pow(x - mean, 2) / (2 * Math.pow(sigma, 2))); }
+
+        let axes = `<line x1="${padding}" y1="${height-padding}" x2="${width-padding}" y2="${height-padding}" stroke="#7f8c8d" stroke-width="2"/>`;
+        axes += `<line x1="${getXPixel(mean)}" y1="${padding}" x2="${getXPixel(mean)}" y2="${height-padding}" stroke="#95a5a6" stroke-dasharray="4"/>`;
+        axes += `<text x="${getXPixel(mean)}" y="${height-padding+20}" font-size="12" text-anchor="middle" font-weight="bold" fill="#7f8c8d">統計中心 Mean: ${mean.toFixed(3)}</text>`;
+
+        const lsl = -specLimit; const usl = specLimit;
+        const samples = 200; const dx = (xMax - xMin) / samples;
+        
+        let pathD_ok = ""; let fillD_ok = "";
+        let pathD_ng_l = ""; let fillD_ng_l = "";
+        let pathD_ng_r = ""; let fillD_ng_r = "";
+
+        function startFill(fillD, px, hp) { return `M ${px} ${hp} `; }
+
+        for (let i = 0; i <= samples; i++) {
+            let x = xMin + i * dx; let y = gaussian(x); let px = getXPixel(x); let py = getYPixel(y);
+            let zone = (x < lsl) ? 'NG_L' : (x > usl) ? 'NG_R' : 'OK';
+
+            if (i > 0) {
+                let prevX = xMin + (i-1) * dx;
+                if (prevX < lsl && x >= lsl) {
+                    let borderY = gaussian(lsl); let borderPX = getXPixel(lsl); let borderPY = getYPixel(borderY);
+                    pathD_ng_l += `L ${borderPX} ${borderPY} `;
+                    fillD_ng_l += `L ${borderPX} ${borderPY} L ${borderPX} ${height-padding} Z`;
+                    fillD_ok = startFill(fillD_ok, borderPX, height-padding) + `L ${borderPX} ${borderPY} `;
+                    pathD_ok = `M ${borderPX} ${borderPY} `;
+                }
+                if (prevX <= usl && x > usl) {
+                    let borderY = gaussian(usl); let borderPX = getXPixel(usl); let borderPY = getYPixel(borderY);
+                    pathD_ok += `L ${borderPX} ${borderPY} `;
+                    fillD_ok += `L ${borderPX} ${borderPY} L ${borderPX} ${height-padding} Z`;
+                    fillD_ng_r = startFill(fillD_ng_r, borderPX, height-padding) + `L ${borderPX} ${borderPY} `;
+                    pathD_ng_r = `M ${borderPX} ${borderPY} `;
+                }
+            }
+
+            if (zone === 'NG_L') {
+                if (i === 0) fillD_ng_l = startFill(fillD_ng_l, px, height-padding);
+                if (!pathD_ng_l) pathD_ng_l = `M ${px} ${py} `; else pathD_ng_l += `L ${px} ${py} `;
+                fillD_ng_l += `L ${px} ${py} `;
+                if (i === samples) fillD_ng_l += `L ${px} ${height-padding} Z`;
+            } else if (zone === 'OK') {
+                if (i === 0) { fillD_ok = startFill(fillD_ok, px, height-padding); pathD_ok = `M ${px} ${py} `; }
+                else if (!pathD_ok) { pathD_ok += `L ${px} ${py} `; }
+                else { pathD_ok += `L ${px} ${py} `; }
+                fillD_ok += `L ${px} ${py} `;
+                if (i === samples) fillD_ok += `L ${px} ${height-padding} Z`;
+            } else {
+                if (i === 0) { fillD_ng_r = startFill(fillD_ng_r, px, height-padding); pathD_ng_r = `M ${px} ${py} `; }
+                else if (!pathD_ng_r) { pathD_ng_r += `L ${px} ${py} `; }
+                else { pathD_ng_r += `L ${px} ${py} `; }
+                fillD_ng_r += `L ${px} ${py} `;
+                if (i === samples) fillD_ng_r += `L ${px} ${height-padding} Z`;
+            }
+        }
+
+        let elements = `
+            ${fillD_ng_l ? `<path d="${fillD_ng_l}" fill="rgba(231, 76, 60, 0.25)" />` : ""}
+            ${pathD_ng_l ? `<path d="${pathD_ng_l}" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="3" />` : ""}
+            ${fillD_ok ? `<path d="${fillD_ok}" fill="rgba(39, 174, 96, 0.25)" />` : ""}
+            ${pathD_ok ? `<path d="${pathD_ok}" fill="none" stroke="#27ae60" stroke-width="3" />` : ""}
+            ${fillD_ng_r ? `<path d="${fillD_ng_r}" fill="rgba(231, 76, 60, 0.25)" />` : ""}
+            ${pathD_ng_r ? `<path d="${pathD_ng_r}" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="3" />` : ""}
+        `;
+
+        if (getXPixel(usl) >= padding && getXPixel(usl) <= width - padding) {
+            elements += `<line x1="${getXPixel(usl)}" y1="${padding}" x2="${getXPixel(usl)}" y2="${height-padding}" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,3"/><text x="${getXPixel(usl)}" y="${padding-10}" font-size="11" fill="#c0392b" text-anchor="middle" font-weight="bold">目標 USL (+${usl.toFixed(3)})</text>`;
+        }
+        if (getXPixel(lsl) >= padding && getXPixel(lsl) <= width - padding) {
+            elements += `<line x1="${getXPixel(lsl)}" y1="${padding}" x2="${getXPixel(lsl)}" y2="${height-padding}" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,3"/><text x="${getXPixel(lsl)}" y="${padding-10}" font-size="11" fill="#c0392b" text-anchor="middle" font-weight="bold">目標 LSL (${lsl.toFixed(3)})</text>`;
+        }
+
+        const tlPlus = mean + trueLimit; const tlMinus = mean - trueLimit;
+        if (getXPixel(tlPlus) >= padding && getXPixel(tlPlus) <= width - padding) {
+            elements += `<line x1="${getXPixel(tlPlus)}" y1="${padding-20}" x2="${getXPixel(tlPlus)}" y2="${height-padding}" stroke="#e74c3c" stroke-width="2" />
+                         <text x="${getXPixel(tlPlus)}" y="${padding-25}" font-size="11" fill="#e74c3c" text-anchor="middle" font-weight="bold">${tlPlus.toFixed(3)}</text>`;
+        }
+        if (getXPixel(tlMinus) >= padding && getXPixel(tlMinus) <= width - padding) {
+            elements += `<line x1="${getXPixel(tlMinus)}" y1="${padding-20}" x2="${getXPixel(tlMinus)}" y2="${height-padding}" stroke="#e74c3c" stroke-width="2" />
+                         <text x="${getXPixel(tlMinus)}" y="${padding-25}" font-size="11" fill="#e74c3c" text-anchor="middle" font-weight="bold">${tlMinus.toFixed(3)}</text>`;
+        }
+
+        const sigma3Plus = mean + 3 * sigma; const sigma3Minus = mean - 3 * sigma;
+        elements += `<circle cx="${getXPixel(sigma3Plus)}" cy="${getYPixel(gaussian(sigma3Plus))}" r="4" fill="#bdc3c7"/><text x="${getXPixel(sigma3Plus)+5}" y="${getYPixel(gaussian(sigma3Plus))-5}" font-size="10" fill="#7f8c8d">+3σ (${sigma3Plus.toFixed(3)})</text><circle cx="${getXPixel(sigma3Minus)}" cy="${getYPixel(gaussian(sigma3Minus))}" r="4" fill="#bdc3c7"/><text x="${getXPixel(sigma3Minus)-5}" y="${getYPixel(gaussian(sigma3Minus))-5}" font-size="10" fill="#7f8c8d" text-anchor="end">-3σ (${sigma3Minus.toFixed(3)})</text>`;
+        
+        const wcMinus = mean - worstCase; const wcPlus = mean + worstCase;
+        const wcY = height - padding + 55; const barH = 16;
+        let wcElements = ``;
+        
+        if (wcMinus < lsl) {
+            const xStart = getXPixel(wcMinus); const xEnd = getXPixel(Math.min(wcPlus, lsl));
+            wcElements += `<rect x="${xStart}" y="${wcY}" width="${Math.max(0, xEnd - xStart)}" height="${barH}" fill="rgba(231, 76, 60, 0.6)" rx="2"/>`;
+        }
+        if (wcPlus > lsl && wcMinus < usl) {
+            const xStart = getXPixel(Math.max(wcMinus, lsl)); const xEnd = getXPixel(Math.min(wcPlus, usl));
+            wcElements += `<rect x="${xStart}" y="${wcY}" width="${Math.max(0, xEnd - xStart)}" height="${barH}" fill="rgba(39, 174, 96, 0.7)" rx="2"/>`;
+        }
+        if (wcPlus > usl) {
+            const xStart = getXPixel(Math.max(wcMinus, usl)); const xEnd = getXPixel(wcPlus);
+            wcElements += `<rect x="${xStart}" y="${wcY}" width="${Math.max(0, xEnd - xStart)}" height="${barH}" fill="rgba(231, 76, 60, 0.6)" rx="2"/>`;
+        }
+        
+        wcElements += `
+            <rect x="${getXPixel(wcMinus)}" y="${wcY}" width="${getXPixel(wcPlus) - getXPixel(wcMinus)}" height="${barH}" fill="none" stroke="#2c3e50" stroke-width="1.5" rx="2"/>
+            <line x1="${getXPixel(wcMinus)}" y1="${wcY-4}" x2="${getXPixel(wcMinus)}" y2="${wcY+barH+4}" stroke="#2c3e50" stroke-width="2"/>
+            <line x1="${getXPixel(wcPlus)}" y1="${wcY-4}" x2="${getXPixel(wcPlus)}" y2="${wcY+barH+4}" stroke="#2c3e50" stroke-width="2"/>
+            <text x="${getXPixel(wcMinus)}" y="${wcY+barH+18}" font-size="11" fill="#2c3e50" text-anchor="middle" font-weight="bold">${wcMinus.toFixed(3)}</text>
+            <text x="${getXPixel(wcPlus)}" y="${wcY+barH+18}" font-size="11" fill="#2c3e50" text-anchor="middle" font-weight="bold">${wcPlus.toFixed(3)}</text>
+            <text x="${getXPixel(mean)}" y="${wcY-8}" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="bold">極值法 Worst Case 區間帶 (±${worstCase.toFixed(3)})</text>
+        `;
+
+        svg.innerHTML = axes + elements + wcElements;
+    }
+
+    function calculateTolerance() {
+        let dimSum = 0; let worstCase = 0;
+        let varNormal = 0;  
+        let varUniform = 0; 
+        let eqA_sq = 0;     
+        
+        const specTarget = parseFloat(document.getElementById('spec-target').value) || 0.35;
+
+        document.querySelectorAll('#ta-table tbody tr').forEach(row => {
+            const plus = parseFloat(row.querySelector('.plus').value) || 0;
+            const minus = parseFloat(row.querySelector('.minus').value) || 0;
+            const tol = parseFloat(row.querySelector('.tol').value) || 0;
+            const dist = row.querySelector('.dist').value;
+
+            let sigma = 0;
+            if (tol > 0) { 
+                if (dist === '均勻') {
+                    sigma = tol / Math.sqrt(3);
+                    varUniform += Math.pow(sigma, 2);
+                    eqA_sq += Math.pow(tol, 2);
+                } else {
+                    sigma = tol / 3;
+                    varNormal += Math.pow(sigma, 2);
+                }
+            }
+
+            const variance = Math.pow(sigma, 2);
+            row.querySelector('.sigma').textContent = sigma > 0 ? sigma.toFixed(3) : "0.000";
+            row.querySelector('.variance').textContent = variance > 0 ? variance.toFixed(3) : "0.000";
+            
+            dimSum += (plus - minus); worstCase += tol;
+        });
+
+        const totalVariance = varNormal + varUniform;
+        const sysSigma = Math.sqrt(totalVariance);
+        const sigmaN = Math.sqrt(varNormal);
+        const eqA = Math.sqrt(eqA_sq); 
+
+        let cpk = 0;
+        let zScore = 0;
+        if (sysSigma > 0) {
+            let distanceToSpec = specTarget - Math.abs(dimSum);
+            cpk = distanceToSpec / (3 * sysSigma);
+            zScore = distanceToSpec / sysSigma;
+        }
+
+        let yieldFraction = mixedCDF(specTarget, dimSum, sigmaN, eqA) - mixedCDF(-specTarget, dimSum, sigmaN, eqA);
+        let yieldPercent = Math.max(0, Math.min(100, yieldFraction * 100));
+        let dpmo = Math.max(0, (1 - yieldFraction) * 1000000);
+        
+        let trueLimit = findTrueLimit(sigmaN, eqA);
+
+        document.getElementById('out-nominal').textContent = dimSum.toFixed(3) + ' mm';
+        document.getElementById('out-wc').textContent = '± ' + worstCase.toFixed(3) + ' mm';
+        document.getElementById('out-sys-sigma').textContent = sysSigma.toFixed(3) + ' mm';
+        document.getElementById('out-zscore').textContent = zScore.toFixed(3);
+        document.getElementById('out-yield').textContent = yieldPercent.toFixed(3) + ' %';
+        document.getElementById('out-dpmo').textContent = dpmo.toFixed(0);
+
+        let cpkEl = document.getElementById('out-cpk');
+        let cardCpk = document.getElementById('card-cpk');
+        cpkEl.textContent = Math.max(0, cpk).toFixed(2);
+        
+        if (cpk >= 1.33) {
+            cpkEl.style.color = '#27ae60'; cardCpk.style.borderColor = '#2ecc71'; cardCpk.style.background = '#eafaf1';
+        } else if (cpk >= 1.0) {
+            cpkEl.style.color = '#f39c12'; cardCpk.style.borderColor = '#f39c12'; cardCpk.style.background = '#fdfae6';
+        } else {
+            cpkEl.style.color = '#c0392b'; cardCpk.style.borderColor = '#e74c3c'; cardCpk.style.background = '#fdf3f2';
+        }
+
+        document.getElementById('out-3sigma').textContent = '± ' + (sysSigma * 3).toFixed(3) + ' mm';
+        document.getElementById('out-45sigma').textContent = '± ' + (sysSigma * 4.5).toFixed(3) + ' mm';
+        document.getElementById('out-6sigma').textContent = '± ' + (sysSigma * 6).toFixed(3) + ' mm';
+
+        document.getElementById('judgement-3sigma').textContent = trueLimit.toFixed(3);
+        const jPanel = document.getElementById('judgement-panel');
+        const jBadge = document.getElementById('judgement-badge');
+        const jSign = document.getElementById('compare-sign');
+        const jMsg = document.getElementById('judgement-msg');
+        const jTitle = document.getElementById('judgement-title');
+
+        if (specTarget >= trueLimit) {
+            jPanel.className = 'judgment-card';
+            jBadge.className = 'badge'; jBadge.textContent = 'OK';
+            jSign.textContent = '≥'; jSign.style.color = '#2ecc71';
+            jTitle.innerHTML = '✅ 設計判定 (Design Judgment) - 合格';
+            jMsg.innerHTML = `目標規格 (±${specTarget.toFixed(3)}) 大於或等於修正型統計公差 (±${trueLimit.toFixed(3)})。量產組裝干涉機率極低，預估 Cpk 達 ${Math.max(0, cpk).toFixed(2)}。`;
+        } else {
+            jPanel.className = 'judgment-card ng';
+            jBadge.className = 'badge ng'; jBadge.textContent = 'NG';
+            jSign.textContent = '<'; jSign.style.color = '#e74c3c';
+            jTitle.innerHTML = '❌ 設計判定 (Design Judgment) - 不合格';
+            jMsg.innerHTML = `目標規格 (±${specTarget.toFixed(3)}) 小於修正型統計公差 (±${trueLimit.toFixed(3)})。預計每百萬台有 ${dpmo.toFixed(0)} 台不良 (DPMO)，請修改幾何或收緊公差。`;
+        }
+
+        drawNormalDistribution(dimSum, sysSigma, worstCase, specTarget, trueLimit);
+    }
+
+    window.onload = function() {
+        initTable();
+        ['calc-hole-nom', 'calc-hole-up', 'calc-shaft-nom', 'calc-shaft-low'].forEach(id => { document.getElementById(id).addEventListener('input', calcAsmShift); });
+        document.getElementById('btn-add-row').addEventListener('click', addNewRow);
+        document.getElementById('spec-target').addEventListener('input', calculateTolerance);
+        document.querySelectorAll('#ta-table input, #ta-table select').forEach(input => { input.addEventListener('input', calculateTolerance); input.addEventListener('change', calculateTolerance); });
+        calcAsmShift();
+        calculateTolerance();
+    };
 </script>
 
 </body>
