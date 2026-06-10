@@ -137,21 +137,49 @@
         <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em;"><span>🧮 <strong>軸孔浮動間隙計算機 (Asm Shift Helper)</strong></span></div>
         <div class="calc-row">
             <span class="calc-label">🕳️ 孔 (Hole):</span>
-            <input type="number" id="calc-hole-nom" value="3.5" step="0.01">
+            <input type="number" id="calc-hole-nom" value="2.10" step="0.01">
             <span class="calc-sign">+</span>
-            <input type="number" id="calc-hole-up" placeholder="上限公差" value="0.1" step="0.01">
-            <span class="calc-mini-out">➔ 最大孔徑: <span id="out-hole-max">3.600</span></span>
+            <input type="number" id="calc-hole-up" placeholder="直徑公差" value="0.05" step="0.01">
+            <span class="calc-mini-out">➔ 最大孔徑: <span id="out-hole-max">2.150</span></span>
         </div>
         <div class="calc-row">
             <span class="calc-label">🔩 軸 (Shaft):</span>
-            <input type="number" id="calc-shaft-nom" value="3.0" step="0.01">
-            <span class="calc-sign">+</span>
-            <input type="number" id="calc-shaft-low" placeholder="下限公差" value="-0.1" step="0.01">
-            <span class="calc-mini-out">➔ 最小軸徑: <span id="out-shaft-min">2.900</span></span>
+            <input type="number" id="calc-shaft-nom" value="2.00" step="0.01">
+            <span class="calc-sign">-</span>
+            <input type="number" id="calc-shaft-low" placeholder="直徑公差" value="0.05" step="0.01">
+            <span class="calc-mini-out">➔ 最小軸徑: <span id="out-shaft-min">1.950</span></span>
         </div>
+        
         <div style="width: 100%; margin-top: 10px; padding-top: 15px; border-top: 1px dashed #f39c12;">
-            <span style="color:#7f8c8d; font-size:0.9em;">公式：[ (最大孔) - (最小軸) ] / 2</span><br>
-            <span style="margin-top:5px; display:inline-block;">👉 建議填入表格的 ± 浮動公差： <span class="helper-result" id="calc-result">0.350</span> mm</span>
+            <span style="color:#7f8c8d; font-size:0.9em;">💡 <strong>半徑 1/2 轉換原則</strong>：公差迴路為中心線到邊緣，故直徑總變異須除以 2 轉為半徑。</span><br>
+            <span style="margin-top:10px; display:inline-block; font-weight: bold; color: #2c3e50;">👉 請將以下三項新增至您的尺寸鍊明細表：</span>
+            
+            <table style="width: 100%; margin-top: 8px; background-color: #fff; border: 1px solid #f39c12;">
+                <tr style="background-color: #fdfae6;">
+                    <th style="padding: 6px; border: 1px solid #f39c12; color: #2c3e50;">變量描述</th>
+                    <th style="padding: 6px; border: 1px solid #f39c12; color: #2c3e50;">± 公差 (Tol)</th>
+                    <th style="padding: 6px; border: 1px solid #f39c12; color: #2c3e50;">分佈類型</th>
+                    <th style="padding: 6px; border: 1px solid #f39c12; color: #2c3e50;">計算邏輯</th>
+                </tr>
+                <tr>
+                    <td style="padding: 6px; border: 1px solid #f39c12;">Hole_加工變異 (半徑)</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12; font-weight: bold; color: #27ae60;" id="out-hole-rad-tol">0.025</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12;">常態</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12; font-size: 0.85em; color: #7f8c8d;">孔直徑公差 ÷ 2</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px; border: 1px solid #f39c12;">Shaft_加工變異 (半徑)</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12; font-weight: bold; color: #27ae60;" id="out-shaft-rad-tol">0.025</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12;">常態</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12; font-size: 0.85em; color: #7f8c8d;">軸直徑公差 ÷ 2</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px; border: 1px solid #f39c12;">AS_名目間隙 (半徑)</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12; font-weight: bold; color: #2980b9;" id="out-as-nom-gap">0.050</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12;">均勻</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12; font-size: 0.85em; color: #7f8c8d;">(孔公稱 - 軸公稱) ÷ 2</td>
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -294,22 +322,37 @@
         updateRowNumbers();
     }
 
+    // 更新後的軸孔浮動間隙轉換邏輯
     function calcAsmShift() {
         const holeNom = parseFloat(document.getElementById('calc-hole-nom').value) || 0;
-        const holeUp = parseFloat(document.getElementById('calc-hole-up').value) || 0; 
+        const holeUp = Math.abs(parseFloat(document.getElementById('calc-hole-up').value)) || 0; 
         const shaftNom = parseFloat(document.getElementById('calc-shaft-nom').value) || 0;
-        const shaftLow = parseFloat(document.getElementById('calc-shaft-low').value) || 0; 
+        const shaftLow = Math.abs(parseFloat(document.getElementById('calc-shaft-low').value)) || 0; 
         
+        // 1. 計算最大/最小直徑 (給 UI 顯示參考)
         let holeMax = holeNom > 0 ? (holeNom + holeUp) : 0;
-        let shaftMin = shaftNom > 0 ? (shaftNom + shaftLow) : 0;
+        let shaftMin = shaftNom > 0 ? (shaftNom - shaftLow) : 0;
         
         document.getElementById('out-hole-max').textContent = holeMax.toFixed(3);
         document.getElementById('out-shaft-min').textContent = shaftMin.toFixed(3);
         
-        if (holeMax > 0 && shaftMin > 0) {
-            document.getElementById('calc-result').textContent = ((holeMax - shaftMin) / 2).toFixed(3);
+        // 2. 核心邏輯：將直徑變異轉換為 3 項半徑變異
+        if (holeNom > 0 && shaftNom > 0) {
+            // Hole 加工變異 (半徑) = 直徑公差 / 2
+            let holeRadTol = holeUp / 2;
+            document.getElementById('out-hole-rad-tol').textContent = holeRadTol.toFixed(3);
+            
+            // Shaft 加工變異 (半徑) = 直徑公差 / 2
+            let shaftRadTol = shaftLow / 2;
+            document.getElementById('out-shaft-rad-tol').textContent = shaftRadTol.toFixed(3);
+            
+            // AS 名目間隙 (半徑) = (孔公稱直徑 - 軸公稱直徑) / 2
+            let asNomGap = (holeNom - shaftNom) / 2;
+            document.getElementById('out-as-nom-gap').textContent = Math.max(0, asNomGap).toFixed(3); 
         } else {
-            document.getElementById('calc-result').textContent = "0.000";
+            document.getElementById('out-hole-rad-tol').textContent = "0.000";
+            document.getElementById('out-shaft-rad-tol').textContent = "0.000";
+            document.getElementById('out-as-nom-gap').textContent = "0.000";
         }
     }
 
