@@ -139,7 +139,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 1.5rem;
-            max-width: 1100px; /* 放寬以容納兩個卡片 */
+            max-width: 760px;
         }
 
         /* ── Tool card ── */
@@ -237,6 +237,7 @@
 <body>
     <canvas id="tech-bg"></canvas>
 
+    <!-- ── Header ── -->
     <header>
         <a href="../index.html" class="logo">Anzû</a>
         <a href="../index.html" class="back-btn">
@@ -247,6 +248,7 @@
         </a>
     </header>
 
+    <!-- ── Main ── -->
     <main>
         <div class="breadcrumb">
             TOLERANCE ANALYSIS &nbsp;/&nbsp; <span class="accent">公差分析</span>
@@ -263,10 +265,12 @@
 
         <div class="tools-grid">
 
-            <a href="00.html" class="tool-card">
+            <!-- TP-Module Card -->
+            <a href="公差分析_v10.html" class="tool-card">
                 <div class="status-dot" title="線上可用"></div>
 
                 <div class="tool-icon">
+                    <!-- Table / spreadsheet icon -->
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -290,6 +294,7 @@
                     <span class="tool-tag">GD&amp;T</span>
                     <span class="tool-tag">CETOL</span>
                     <span class="tool-tag">Asm Shift</span>
+                    <span class="tool-tag">增環 / 減環</span>
                 </div>
 
                 <div class="tool-link">
@@ -302,45 +307,10 @@
                 </div>
             </a>
 
-            <a href="#" class="tool-card">
-                <div class="status-dot" title="提供下載" style="background: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);"></div>
+        </div><!-- /tools-grid -->
+    </main>
 
-                <div class="tool-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <rect x="8" y="12" width="8" height="6"></rect>
-                        <line x1="8" y1="15" x2="16" y2="15"></line>
-                        <line x1="12" y1="12" x2="12" y2="18"></line>
-                    </svg>
-                </div>
-
-                <h2>Excel 工程計算模板</h2>
-
-                <p>
-                    提供標準化 Excel 格式的工程計算與尺寸鍊分析模板。支援複雜的客製化公式修改與離線分析，方便工程師快速建檔與團隊共享。
-                </p>
-
-                <div class="tool-tags">
-                    <span class="tool-tag">Excel</span>
-                    <span class="tool-tag">離線工具</span>
-                    <span class="tool-tag">試算表模板</span>
-                    <span class="tool-tag">團隊共享</span>
-                </div>
-
-                <div class="tool-link">
-                    下載 / 開啟
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="7" y1="17" x2="17" y2="7"/>
-                        <polyline points="7,7 17,7 17,17"/>
-                    </svg>
-                </div>
-            </a>
-
-        </div></main>
-
+    <!-- ── Tech Background ── -->
     <script>
     (function () {
         const canvas = document.getElementById('tech-bg');
