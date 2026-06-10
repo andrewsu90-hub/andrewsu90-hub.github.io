@@ -14,6 +14,7 @@
         .container { max-width: 1250px; margin: 30px auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         h1, h2, h3 { color: #2c3e50; }
         
+        /* 輔助計算機樣式 */
         .helper-tool { background-color: #fdfae6; border: 1px dashed #f39c12; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; flex-direction: column; }
         .calc-row { display: flex; align-items: center; gap: 10px; width: 100%; margin-bottom: 8px; }
         .calc-label { font-weight: bold; width: 100px; color: #2c3e50; }
@@ -23,12 +24,16 @@
         .calc-mini-out span { font-weight: bold; color: #2980b9; }
         .helper-result { font-size: 1.2em; font-weight: bold; color: #27ae60; background: #eafaf1; padding: 5px 10px; border-radius: 4px; }
 
+        /* 🚀 新增：目標規格設定卡片樣式 */
+        .spec-tool { background-color: #eef7ff; border: 1px dashed #3498db; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; flex-direction: column; }
+        .spec-tool input { width: 100px; padding: 6px; text-align: center; border: 1px solid #3498db; border-radius: 4px; font-weight: bold; background-color: #fff; }
+
+        /* 設計判定卡片樣式 */
         .judgment-card { background: #fff; border: 2px solid #2ecc71; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(46, 204, 113, 0.15); }
         .judgment-card.ng { border-color: #e74c3c; box-shadow: 0 4px 6px rgba(231, 76, 60, 0.15); }
         .judgment-card h3 { margin-top: 0; color: #2ecc71; display: flex; align-items: center; gap: 8px; }
         .judgment-card.ng h3 { color: #e74c3c; }
-        .judgement-row { display: flex; align-items: center; gap: 20px; font-size: 1.1em; flex-wrap: wrap; margin-bottom: 15px; }
-        .judgement-row input { width: 100px; font-size: 1.1em; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: center; background-color: #fff9e6; font-weight: bold;}
+        .judgement-row { display: flex; align-items: center; gap: 15px; font-size: 1.1em; flex-wrap: wrap; margin-bottom: 15px; }
         .compare-sign { font-size: 1.8em; font-weight: bold; color: #7f8c8d; }
         .sigma-display { background: #ecf0f1; padding: 10px 15px; border-radius: 6px; font-weight: bold; color: #2c3e50; }
         .badge { font-size: 1.5em; font-weight: bold; padding: 8px 25px; border-radius: 30px; color: white; background: #2ecc71; }
@@ -102,9 +107,10 @@
             .judgment-card { border: 2px solid #000; padding: 10px; margin-bottom: 10px; }
             .judgment-card h3 { color: #000 !important; font-size: 1.2em; margin-bottom: 5px; }
             
-            .judgement-row { flex-wrap: nowrap !important; align-items: center !important; gap: 10px !important; }
+            .judgement-row { flex-wrap: nowrap !important; align-items: center !important; gap: 5px !important; }
             .judgement-row label { white-space: nowrap !important; }
-            .judgement-row input#spec-target { width: 50px !important; text-align: center !important; display: inline-block !important; border-bottom: 1px solid #000 !important; border-radius: 0 !important; margin: 0 5px !important; }
+            .spec-tool { border: 1px solid #000 !important; background: transparent !important; }
+            .spec-tool input { border: none !important; background: transparent !important; }
             .sigma-display { padding: 0 !important; background: transparent !important; }
             
             .badge { padding: 4px 12px; border: 2px solid #000; color: #000 !important; font-size: 1.2em; background: transparent !important; }
@@ -149,6 +155,14 @@
         </div>
     </div>
 
+    <div class="card spec-tool">
+        <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em; color: #2980b9;">🎯 <strong>目標規格設定 (Target Spec Settings)</strong></div>
+        <div style="display:flex; flex-wrap:wrap; gap:25px; align-items:center;">
+            <div>解題 / 目標中心值 (Nominal Target): <input type="number" id="nominal-target" value="0.00" step="0.01"> mm</div>
+            <div>輸入目標規格值 (Tolerance Spec): ± <input type="number" id="spec-target" value="0.35" step="0.01"> mm</div>
+        </div>
+    </div>
+
     <h2>📝 尺寸鍊明細與分析表</h2>
     <table id="ta-table">
         <thead>
@@ -177,9 +191,8 @@
     <div class="judgment-card" id="judgement-panel">
         <h3 id="judgement-title">✅ 設計判定 (Design Judgment)</h3>
         <div class="judgement-row">
-            <label style="font-weight: bold;">輸入目標規格值 (Target Spec): ± <input type="number" id="spec-target" value="0.35" step="0.01"></label>
+            <span class="sigma-display">等效消耗公差 (True Limit + 中心偏移): <span id="judgement-3sigma" style="color: #2980b9;">0.000</span> mm</span>
             <span class="compare-sign" id="compare-sign">≥</span>
-            <span class="sigma-display">修正型統計公差值 (True Limit): <span id="judgement-3sigma" style="color: #2980b9;">0.000</span> mm</span>
             <span class="badge" id="judgement-badge">OK</span>
         </div>
         <div class="judgement-msg" id="judgement-msg">計算中...</div>
@@ -194,7 +207,7 @@
         <div>
             <h2>📊 尺寸鍊評估報告 Summary</h2>
             <div class="summary-grid">
-                <div class="summary-card"><div>名義閉合間隙 (Nominal Mean)</div><div class="value" id="out-nominal">0.000 mm</div></div>
+                <div class="summary-card"><div>實際疊加平均值 (Mean)</div><div class="value" id="out-nominal">0.000 mm</div></div>
                 <div class="summary-card"><div>極值法公差 (Worst Case)</div><div class="value" id="out-wc">± 0.000 mm</div></div>
                 <div class="summary-card"><div>系統總標準差 (1σ)</div><div class="value" id="out-sys-sigma">0.000 mm</div></div>
                 <div class="summary-card"><div>預估能力指標 (Z-score)</div><div class="value" id="out-zscore" style="color:#d35400;">0.000</div></div>
@@ -341,13 +354,13 @@
         return low;
     }
 
-    function drawNormalDistribution(mean, sigma, worstCase, specLimit, trueLimit) {
+    function drawNormalDistribution(mean, sigma, worstCase, specLimit, trueLimit, nominalTarget) {
         const svg = document.getElementById('norm-dist-chart');
         svg.innerHTML = ''; 
         const width = 800; const height = 300; const padding = 50;
         
         if (sigma <= 0) sigma = 0.001;
-        const maxRange = Math.max(4.5 * sigma, worstCase * 1.15, trueLimit * 1.15);
+        const maxRange = Math.max(4.5 * sigma, worstCase * 1.15, trueLimit * 1.15, Math.abs(mean - nominalTarget) + specLimit * 1.15);
         const xMin = mean - maxRange; const xMax = mean + maxRange;
 
         function getXPixel(xVal) { return padding + ((xVal - xMin) / (xMax - xMin)) * (width - 2 * padding); }
@@ -356,9 +369,10 @@
 
         let axes = `<line x1="${padding}" y1="${height-padding}" x2="${width-padding}" y2="${height-padding}" stroke="#7f8c8d" stroke-width="2"/>`;
         axes += `<line x1="${getXPixel(mean)}" y1="${padding}" x2="${getXPixel(mean)}" y2="${height-padding}" stroke="#95a5a6" stroke-dasharray="4"/>`;
-        axes += `<text x="${getXPixel(mean)}" y="${height-padding+20}" font-size="12" text-anchor="middle" font-weight="bold" fill="#7f8c8d">統計中心 Mean: ${mean.toFixed(3)}</text>`;
+        axes += `<text x="${getXPixel(mean)}" y="${height-padding+20}" font-size="12" text-anchor="middle" font-weight="bold" fill="#7f8c8d">實際平均值 Mean: ${mean.toFixed(3)}</text>`;
 
-        const lsl = -specLimit; const usl = specLimit;
+        const lsl = nominalTarget - specLimit; 
+        const usl = nominalTarget + specLimit;
         const samples = 200; const dx = (xMax - xMin) / samples;
         
         let pathD_ok = ""; let fillD_ok = "";
@@ -419,7 +433,7 @@
         `;
 
         if (getXPixel(usl) >= padding && getXPixel(usl) <= width - padding) {
-            elements += `<line x1="${getXPixel(usl)}" y1="${padding}" x2="${getXPixel(usl)}" y2="${height-padding}" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,3"/><text x="${getXPixel(usl)}" y="${padding-10}" font-size="11" fill="#c0392b" text-anchor="middle" font-weight="bold">目標 USL (+${usl.toFixed(3)})</text>`;
+            elements += `<line x1="${getXPixel(usl)}" y1="${padding}" x2="${getXPixel(usl)}" y2="${height-padding}" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,3"/><text x="${getXPixel(usl)}" y="${padding-10}" font-size="11" fill="#c0392b" text-anchor="middle" font-weight="bold">目標 USL (${usl.toFixed(3)})</text>`;
         }
         if (getXPixel(lsl) >= padding && getXPixel(lsl) <= width - padding) {
             elements += `<line x1="${getXPixel(lsl)}" y1="${padding}" x2="${getXPixel(lsl)}" y2="${height-padding}" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,3"/><text x="${getXPixel(lsl)}" y="${padding-10}" font-size="11" fill="#c0392b" text-anchor="middle" font-weight="bold">目標 LSL (${lsl.toFixed(3)})</text>`;
@@ -474,6 +488,7 @@
         let eqA_sq = 0;     
         
         const specTarget = parseFloat(document.getElementById('spec-target').value) || 0.35;
+        const nominalTarget = parseFloat(document.getElementById('nominal-target').value) || 0;
 
         document.querySelectorAll('#ta-table tbody tr').forEach(row => {
             const plus = parseFloat(row.querySelector('.plus').value) || 0;
@@ -502,18 +517,22 @@
 
         const totalVariance = varNormal + varUniform;
         const sysSigma = Math.sqrt(totalVariance);
-        const sigmaN = Math.max(Math.sqrt(varNormal), 1e-8); // 加上 1e-8 防止除以零錯誤
+        const sigmaN = Math.max(Math.sqrt(varNormal), 1e-8); 
         const eqA = Math.sqrt(eqA_sq); 
+
+        let meanShift = Math.abs(dimSum - nominalTarget);
 
         let cpk = 0;
         let zScore = 0;
         if (sysSigma > 0) {
-            let distanceToSpec = specTarget - Math.abs(dimSum);
+            let distanceToSpec = specTarget - meanShift;
             cpk = distanceToSpec / (3 * sysSigma);
             zScore = distanceToSpec / sysSigma;
         }
 
-        let yieldFraction = mixedCDF(specTarget, dimSum, sigmaN, eqA) - mixedCDF(-specTarget, dimSum, sigmaN, eqA);
+        const usl = nominalTarget + specTarget;
+        const lsl = nominalTarget - specTarget;
+        let yieldFraction = mixedCDF(usl, dimSum, sigmaN, eqA) - mixedCDF(lsl, dimSum, sigmaN, eqA);
         let yieldPercent = Math.max(0, Math.min(100, yieldFraction * 100));
         let dpmo = Math.max(0, (1 - yieldFraction) * 1000000);
         
@@ -542,36 +561,40 @@
         document.getElementById('out-45sigma').textContent = '± ' + (sysSigma * 4.5).toFixed(3) + ' mm';
         document.getElementById('out-6sigma').textContent = '± ' + (sysSigma * 6).toFixed(3) + ' mm';
 
-        document.getElementById('judgement-3sigma').textContent = trueLimit.toFixed(3);
+        let reqTolerance = trueLimit + meanShift;
+        document.getElementById('judgement-3sigma').textContent = reqTolerance.toFixed(3);
         const jPanel = document.getElementById('judgement-panel');
         const jBadge = document.getElementById('judgement-badge');
         const jSign = document.getElementById('compare-sign');
         const jMsg = document.getElementById('judgement-msg');
         const jTitle = document.getElementById('judgement-title');
 
-        if (specTarget >= trueLimit) {
+        if (specTarget >= reqTolerance) {
             jPanel.className = 'judgment-card';
             jBadge.className = 'badge'; jBadge.textContent = 'OK';
             jSign.textContent = '≥'; jSign.style.color = '#2ecc71';
             jTitle.innerHTML = '✅ 設計判定 (Design Judgment) - 合格';
-            jMsg.innerHTML = `目標規格 (±${specTarget.toFixed(3)}) 大於或等於修正型統計公差 (±${trueLimit.toFixed(3)})。量產組裝干涉機率極低，預估 Cpk 達 ${Math.max(0, cpk).toFixed(2)}。`;
+            jMsg.innerHTML = `目標公差 (±${specTarget.toFixed(3)}) 可涵蓋系統統計離散 (±${trueLimit.toFixed(3)}) 與設計中心偏移 (${meanShift.toFixed(3)})。量產組裝干涉機率極低，預估 Cpk 達 ${Math.max(0, cpk).toFixed(2)}。`;
         } else {
             jPanel.className = 'judgment-card ng';
             jBadge.className = 'badge ng'; jBadge.textContent = 'NG';
             jSign.textContent = '<'; jSign.style.color = '#e74c3c';
             jTitle.innerHTML = '❌ 設計判定 (Design Judgment) - 不合格';
-            jMsg.innerHTML = `目標規格 (±${specTarget.toFixed(3)}) 小於修正型統計公差 (±${trueLimit.toFixed(3)})。預計每百萬台有 ${dpmo.toFixed(0)} 台不良 (DPMO)，請修改幾何或收緊公差。`;
+            jMsg.innerHTML = `目標公差 (±${specTarget.toFixed(3)}) 不足！系統統計離散 (±${trueLimit.toFixed(3)}) 加上設計中心偏移 (${meanShift.toFixed(3)}) 已超出容許範圍。預計每百萬台有 ${dpmo.toFixed(0)} 台不良 (DPMO)，請修改幾何或收緊公差。`;
         }
 
-        drawNormalDistribution(dimSum, sysSigma, worstCase, specTarget, trueLimit);
+        drawNormalDistribution(dimSum, sysSigma, worstCase, specTarget, trueLimit, nominalTarget);
     }
 
     window.onload = function() {
         initTable();
         ['calc-hole-nom', 'calc-hole-up', 'calc-shaft-nom', 'calc-shaft-low'].forEach(id => { document.getElementById(id).addEventListener('input', calcAsmShift); });
         document.getElementById('btn-add-row').addEventListener('click', addNewRow);
+        
+        document.getElementById('nominal-target').addEventListener('input', calculateTolerance);
         document.getElementById('spec-target').addEventListener('input', calculateTolerance);
         document.querySelectorAll('#ta-table input, #ta-table select').forEach(input => { input.addEventListener('input', calculateTolerance); input.addEventListener('change', calculateTolerance); });
+        
         calcAsmShift();
         calculateTolerance();
     };
