@@ -24,7 +24,7 @@
         .calc-mini-out span { font-weight: bold; color: #2980b9; }
         .helper-result { font-size: 1.2em; font-weight: bold; color: #27ae60; background: #eafaf1; padding: 5px 10px; border-radius: 4px; }
 
-        /* 🚀 新增：目標規格設定卡片樣式 */
+        /* 目標規格設定卡片樣式 */
         .spec-tool { background-color: #eef7ff; border: 1px dashed #3498db; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; flex-direction: column; }
         .spec-tool input { width: 100px; padding: 6px; text-align: center; border: 1px solid #3498db; border-radius: 4px; font-weight: bold; background-color: #fff; }
 
@@ -79,7 +79,8 @@
         @media print {
             body { background-color: #fff; padding: 0; margin: 0; font-size: 10pt; }
             .container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; margin: 0; }
-            .instructions, .helper-tool, #btn-add-row, .btn-print, .btn-del-th, .btn-del-td, hr { display: none !important; }
+            
+            .instructions, #btn-add-row, .btn-print, .btn-del-th, .btn-del-td, hr { display: none !important; }
             header { display: none !important; } 
             
             table { width: 100%; table-layout: fixed; font-size: 9pt; border-collapse: collapse; }
@@ -109,12 +110,22 @@
             
             .judgement-row { flex-wrap: nowrap !important; align-items: center !important; gap: 5px !important; }
             .judgement-row label { white-space: nowrap !important; }
-            .spec-tool { border: 1px solid #000 !important; background: transparent !important; }
-            .spec-tool input { border: none !important; background: transparent !important; }
             .sigma-display { padding: 0 !important; background: transparent !important; }
             
             .badge { padding: 4px 12px; border: 2px solid #000; color: #000 !important; font-size: 1.2em; background: transparent !important; }
             .judgement-msg { border-left: none; padding: 5px; font-weight: bold; }
+
+            /* 計算機列印專屬樣式 */
+            .helper-tool { border: 1px solid #000 !important; background: transparent !important; page-break-inside: avoid; margin-bottom: 15px; }
+            .helper-tool table, .helper-tool th, .helper-tool td { border: 1px solid #000 !important; color: #000 !important; background-color: transparent !important; }
+            .calc-row { display: flex !important; flex-wrap: wrap !important; align-items: center !important; }
+            .calc-row input { display: inline-block !important; width: 60px !important; border-bottom: 1px solid #000 !important; margin: 0 5px !important; border-radius: 0 !important; }
+
+            /* 🚀 修改重點：目標規格設定的列印排版修復 */
+            .spec-tool { border: 1px solid #000 !important; background: transparent !important; padding: 10px !important; margin-bottom: 15px !important; }
+            .spec-tool > div:nth-child(2) { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 20px !important; align-items: center !important; }
+            .spec-tool > div:nth-child(2) > div { white-space: nowrap !important; margin-bottom: 0 !important; display: flex !important; align-items: center !important; }
+            .spec-tool input { display: inline-block !important; width: 60px !important; border-bottom: 1px solid #000 !important; margin: 0 5px !important; border-radius: 0 !important; }
         }
     </style>
 </head>
@@ -156,10 +167,10 @@
             
             <table style="width: 100%; margin-top: 8px; background-color: #fff; border: 1px solid #f39c12;">
                 <tr style="background-color: #fdfae6;">
-                    <th style="padding: 6px; border: 1px solid #f39c12; color: #2c3e50;">變量描述</th>
-                    <th style="padding: 6px; border: 1px solid #f39c12; color: #2c3e50;">± 公差 (Tol)</th>
-                    <th style="padding: 6px; border: 1px solid #f39c12; color: #2c3e50;">分佈類型</th>
-                    <th style="padding: 6px; border: 1px solid #f39c12; color: #2c3e50;">計算邏輯</th>
+                    <th style="padding: 6px; border: 1px solid #f39c12; color: #ffffff;">變量描述</th>
+                    <th style="padding: 6px; border: 1px solid #f39c12; color: #ffffff;">± 公差 (Tol)</th>
+                    <th style="padding: 6px; border: 1px solid #f39c12; color: #ffffff;">分佈類型</th>
+                    <th style="padding: 6px; border: 1px solid #f39c12; color: #ffffff;">計算邏輯</th>
                 </tr>
                 <tr>
                     <td style="padding: 6px; border: 1px solid #f39c12;">Hole_加工變異 (半徑)</td>
@@ -176,7 +187,7 @@
                 <tr>
                     <td style="padding: 6px; border: 1px solid #f39c12;">AS_名目間隙 (半徑)</td>
                     <td style="padding: 6px; border: 1px solid #f39c12; font-weight: bold; color: #2980b9;" id="out-as-nom-gap">0.050</td>
-                    <td style="padding: 6px; border: 1px solid #f39c12;">均勻</td>
+                    <td style="padding: 6px; border: 1px solid #f39c12; font-weight: bold;">均勻</td>
                     <td style="padding: 6px; border: 1px solid #f39c12; font-size: 0.85em; color: #7f8c8d;">(孔公稱 - 軸公稱) ÷ 2</td>
                 </tr>
             </table>
@@ -322,31 +333,25 @@
         updateRowNumbers();
     }
 
-    // 更新後的軸孔浮動間隙轉換邏輯
     function calcAsmShift() {
         const holeNom = parseFloat(document.getElementById('calc-hole-nom').value) || 0;
         const holeUp = Math.abs(parseFloat(document.getElementById('calc-hole-up').value)) || 0; 
         const shaftNom = parseFloat(document.getElementById('calc-shaft-nom').value) || 0;
         const shaftLow = Math.abs(parseFloat(document.getElementById('calc-shaft-low').value)) || 0; 
         
-        // 1. 計算最大/最小直徑 (給 UI 顯示參考)
         let holeMax = holeNom > 0 ? (holeNom + holeUp) : 0;
         let shaftMin = shaftNom > 0 ? (shaftNom - shaftLow) : 0;
         
         document.getElementById('out-hole-max').textContent = holeMax.toFixed(3);
         document.getElementById('out-shaft-min').textContent = shaftMin.toFixed(3);
         
-        // 2. 核心邏輯：將直徑變異轉換為 3 項半徑變異
         if (holeNom > 0 && shaftNom > 0) {
-            // Hole 加工變異 (半徑) = 直徑公差 / 2
             let holeRadTol = holeUp / 2;
             document.getElementById('out-hole-rad-tol').textContent = holeRadTol.toFixed(3);
             
-            // Shaft 加工變異 (半徑) = 直徑公差 / 2
             let shaftRadTol = shaftLow / 2;
             document.getElementById('out-shaft-rad-tol').textContent = shaftRadTol.toFixed(3);
             
-            // AS 名目間隙 (半徑) = (孔公稱直徑 - 軸公稱直徑) / 2
             let asNomGap = (holeNom - shaftNom) / 2;
             document.getElementById('out-as-nom-gap').textContent = Math.max(0, asNomGap).toFixed(3); 
         } else {
