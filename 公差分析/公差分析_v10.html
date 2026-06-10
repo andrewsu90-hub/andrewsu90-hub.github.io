@@ -233,7 +233,7 @@
     function initTable() {
         const tbody = document.getElementById('table-body');
         let rowsHtml = '';
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 8; i++) {
             const data = i < 5 ? defaultData[i] : { desc: "", plus: "", minus: "", tol: "", dist: "常態" };
             rowsHtml += createRowHTML(data);
         }
