@@ -502,7 +502,7 @@
 
         const totalVariance = varNormal + varUniform;
         const sysSigma = Math.sqrt(totalVariance);
-        const sigmaN = Math.sqrt(varNormal);
+        const sigmaN = Math.max(Math.sqrt(varNormal), 1e-8); // 加上 1e-8 防止除以零錯誤
         const eqA = Math.sqrt(eqA_sq); 
 
         let cpk = 0;
