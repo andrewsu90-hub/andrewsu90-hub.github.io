@@ -328,7 +328,7 @@
     function mixedCDF(x, mean, sigmaN, a) {
         if (a <= 0.001) return normCDF(x, mean, sigmaN);
         let integrationSum = 0;
-        const steps = 40;
+        const steps = 120;
         const tMin = x - a; const tMax = x + a;
         const dt = (tMax - tMin) / steps;
         
@@ -343,10 +343,10 @@
 
     function findTrueLimit(sigmaN, a) {
         let low = 0;
-        let high = 4 * sigmaN + a;
+        let high = 4 * sigmaN + a*1.2;
         const targetArea = 0.9973002; 
         
-        for (let k = 0; k < 25; k++) {
+        for (let k = 0; k < 40; k++) {
             let mid = (low + high) / 2;
             let area = mixedCDF(mid, 0, sigmaN, a) - mixedCDF(-mid, 0, sigmaN, a);
             if (area < targetArea) low = mid; else high = mid;
