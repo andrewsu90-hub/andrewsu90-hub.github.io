@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尺寸鍊統計公差分析系統 (V19.3)</title>
+    <title>尺寸鍊統計公差分析系統 (V19.5)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,6 +62,8 @@
         .action-bar { display: flex; align-items: center; gap: 10px; margin-top: 10px; margin-bottom: 25px; }
         .btn-add { background-color: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 6px; cursor: pointer; }
         .btn-add:hover { background-color: #2ecc71; }
+        .btn-save { background-color: #e67e22; color: white; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background-color 0.3s; }
+        .btn-save:hover { background-color: #d35400; }
         .btn-print { background-color: #2980b9; color: white; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 6px; cursor: pointer; margin-left: auto; }
         .btn-print:hover { background-color: #3498db; }
         .btn-del { background-color: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em; }
@@ -87,7 +89,8 @@
             body { background-color: #fff; padding: 0; margin: 0; font-size: 10pt; }
             .container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; margin: 0; }
             
-            .instructions, #btn-add-row, .btn-print, .btn-del-th, .btn-del-td, hr { display: none !important; }
+            /* 隱藏新增按鈕、儲存按鈕與列印按鈕等操作元件 */
+            .instructions, #btn-add-row, #btn-save-state, .btn-print, .btn-del-th, .btn-del-td, hr { display: none !important; }
             header { display: none !important; } 
             
             table { width: 100%; table-layout: fixed; font-size: 9pt; border-collapse: collapse; }
@@ -132,10 +135,9 @@
             .spec-item { white-space: nowrap !important; margin-bottom: 0 !important; display: flex !important; align-items: center !important; }
             .spec-tool input { display: inline-block !important; width: 60px !important; border-bottom: 1px solid #000 !important; margin: 0 5px !important; border-radius: 0 !important; }
 
-            /* 專案名稱輸入框的列印樣式：變成底線填寫欄 */
             .section-header { margin-top: 15px !important; margin-bottom: 5px !important; }
             .analysis-name-input { border: none !important; border-bottom: 1px solid #000 !important; border-radius: 0 !important; font-size: 1.2em !important; padding: 0 5px !important; width: 400px !important; background: transparent !important; text-align: left !important; font-weight: bold !important; }
-            .analysis-name-input::placeholder { color: transparent; } /* 列印時隱藏 placeholder */
+            .analysis-name-input::placeholder { color: transparent; }
         }
     </style>
 </head>
@@ -152,22 +154,22 @@
 </header>
 
 <div class="container">
-    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v19.3 專案分析報表版</span></h1>
+    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v19.5 快取記憶儲存版</span></h1>
     
     <div class="helper-tool">
         <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em;"><span>🧮 <strong>軸孔浮動間隙計算機 (Asm Shift Helper)</strong></span></div>
         <div class="calc-row">
             <span class="calc-label">🕳️ 孔 (Hole):</span>
-            <input type="number" id="calc-hole-nom" value="2.10" step="any">
+            <input type="number" id="calc-hole-nom" value="2.10" step="0.01">
             <span class="calc-sign">+</span>
-            <input type="number" id="calc-hole-up" placeholder="直徑公差" value="0.05" step="any">
+            <input type="number" id="calc-hole-up" placeholder="直徑公差" value="0.05" step="0.01">
             <span class="calc-mini-out">➔ 最大孔徑: <span id="out-hole-max">2.150</span></span>
         </div>
         <div class="calc-row">
             <span class="calc-label">🔩 軸 (Shaft):</span>
-            <input type="number" id="calc-shaft-nom" value="2.00" step="any">
+            <input type="number" id="calc-shaft-nom" value="2.00" step="0.01">
             <span class="calc-sign">-</span>
-            <input type="number" id="calc-shaft-low" placeholder="直徑公差" value="0.05" step="any">
+            <input type="number" id="calc-shaft-low" placeholder="直徑公差" value="0.05" step="0.01">
             <span class="calc-mini-out">➔ 最小軸徑: <span id="out-shaft-min">1.950</span></span>
         </div>
         
@@ -207,11 +209,11 @@
     <div class="card spec-tool">
         <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em; color: #2980b9;">🎯 <strong>目標規格設定 (Target Spec Settings)</strong></div>
         <div class="spec-row">
-            <div class="spec-item">目標中心值 (Nominal Target): <input type="number" id="nominal-target" value="0.00" step="any"> mm</div>
+            <div class="spec-item">目標中心值 (Nominal Target): <input type="number" id="nominal-target" value="0.00" step="0.01"> mm</div>
             <div class="spec-item">
                 輸入目標規格值：
-                <span>+</span><input type="number" id="spec-upper" value="0.35" step="any" placeholder="上限公差">
-                <span>/ -</span><input type="number" id="spec-lower" value="0.35" step="any" placeholder="下限公差"> mm
+                <span>+</span><input type="number" id="spec-upper" value="0.35" step="0.01" placeholder="上限公差">
+                <span>/ -</span><input type="number" id="spec-lower" value="0.35" step="0.01" placeholder="下限公差"> mm
             </div>
             <div style="font-size: 0.9em; color: #7f8c8d;" id="spec-real-limits">
                 ( 容許範圍：<span id="txt-lsl">0.000</span> ~ <span id="txt-usl">0.000</span> mm )
@@ -221,7 +223,7 @@
 
     <div class="section-header">
         <h2>📝 尺寸鍊明細與分析表</h2>
-        <input type="text" class="analysis-name-input" placeholder="請輸入此次分析專案名稱 (例如：Mini PC 機殼組裝分析)...">
+        <input type="text" id="project-name" class="analysis-name-input" placeholder="請輸入此次分析專案名稱 (例如：Mini PC 機殼組裝分析)...">
     </div>
 
     <table id="ta-table">
@@ -243,6 +245,7 @@
     
     <div class="action-bar">
         <button type="button" id="btn-add-row" class="btn-add">➕ 新增一列 (Add Row)</button>
+        <button type="button" id="btn-save-state" class="btn-save">💾 儲存當前設定 (Save Data)</button>
         <button type="button" id="btn-print-report" class="btn-print" onclick="window.print()">📄 輸出工程報表 (Print PDF)</button>
     </div>
 
@@ -291,8 +294,8 @@
     <hr>
     <h2>📝 結論與對策 (Conclusion & Solution)</h2>
     <div class="report-footer">
-        <div class="footer-group"><label>Conclusions (結論判斷):</label><textarea rows="3"></textarea></div>
-        <div class="footer-group"><label>Solution (對策與建議):</label><textarea rows="3"></textarea></div>
+        <div class="footer-group"><label>Conclusions (結論判斷):</label><textarea id="txt-conclusion" rows="3"></textarea></div>
+        <div class="footer-group"><label>Solution (對策與建議):</label><textarea id="txt-solution" rows="3"></textarea></div>
     </div>
 </div>
 
@@ -306,6 +309,106 @@
         { desc: "前框Boss Hole到中心距離尺寸", plus: "", minus: "145.0", tol: "0.15", dist: "常態" }
     ];
 
+    // 儲存當前設定到 LocalStorage
+    function saveCurrentState() {
+        const state = {
+            helper: {
+                holeNom: document.getElementById('calc-hole-nom').value,
+                holeUp: document.getElementById('calc-hole-up').value,
+                shaftNom: document.getElementById('calc-shaft-nom').value,
+                shaftLow: document.getElementById('calc-shaft-low').value
+            },
+            spec: {
+                nominalTarget: document.getElementById('nominal-target').value,
+                specUpper: document.getElementById('spec-upper').value,
+                specLower: document.getElementById('spec-lower').value
+            },
+            project: {
+                name: document.getElementById('project-name').value,
+                conclusion: document.getElementById('txt-conclusion').value,
+                solution: document.getElementById('txt-solution').value
+            },
+            tableData: []
+        };
+
+        document.querySelectorAll('#ta-table tbody tr').forEach(row => {
+            state.tableData.push({
+                desc: row.querySelector('.desc').value || "",
+                plus: row.querySelector('.plus').value || "",
+                minus: row.querySelector('.minus').value || "",
+                tol: row.querySelector('.tol').value || "",
+                dist: row.querySelector('.dist').value
+            });
+        });
+
+        localStorage.setItem('anzuToleranceState', JSON.stringify(state));
+        
+        // 視覺回饋
+        const btn = document.getElementById('btn-save-state');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "✅ 已儲存！";
+        btn.style.backgroundColor = "#27ae60";
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.backgroundColor = "";
+        }, 2000);
+    }
+
+    // 載入之前儲存的設定
+    function loadSavedState() {
+        const saved = localStorage.getItem('anzuToleranceState');
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                
+                if(state.helper) {
+                    document.getElementById('calc-hole-nom').value = state.helper.holeNom;
+                    document.getElementById('calc-hole-up').value = state.helper.holeUp;
+                    document.getElementById('calc-shaft-nom').value = state.helper.shaftNom;
+                    document.getElementById('calc-shaft-low').value = state.helper.shaftLow;
+                }
+                if(state.spec) {
+                    document.getElementById('nominal-target').value = state.spec.nominalTarget;
+                    document.getElementById('spec-upper').value = state.spec.specUpper;
+                    document.getElementById('spec-lower').value = state.spec.specLower;
+                }
+                if(state.project) {
+                    document.getElementById('project-name').value = state.project.name || "";
+                    document.getElementById('txt-conclusion').value = state.project.conclusion || "";
+                    document.getElementById('txt-solution').value = state.project.solution || "";
+                }
+                if(state.tableData && state.tableData.length > 0) {
+                    const tbody = document.getElementById('table-body');
+                    tbody.innerHTML = '';
+                    currentRowCount = 0;
+                    state.tableData.forEach(data => {
+                        tbody.insertAdjacentHTML('beforeend', createRowHTML(data));
+                        currentRowCount++;
+                    });
+                    return true;
+                }
+            } catch(e) {
+                console.error("無法載入儲存的設定", e);
+            }
+        }
+        return false;
+    }
+
+    // 全域監聽：動態根據輸入值的「最小位數」調整上下箭頭的 step 單位
+    document.addEventListener('input', function(e) {
+        if (e.target.tagName.toLowerCase() === 'input' && e.target.type === 'number') {
+            let val = e.target.value;
+            if (val !== "") {
+                if (val.includes('.')) {
+                    let dec = val.split('.')[1].length;
+                    e.target.step = dec > 0 ? (1 / Math.pow(10, dec)).toFixed(dec) : "1";
+                } else {
+                    e.target.step = "1";
+                }
+            }
+        }
+    });
+
     function initTable() {
         const tbody = document.getElementById('table-body');
         let rowsHtml = '';
@@ -314,17 +417,16 @@
             rowsHtml += createRowHTML(data);
         }
         tbody.innerHTML = rowsHtml;
-        updateRowNumbers();
     }
 
     function createRowHTML(data) {
         return `
             <tr>
                 <td class="row-index"></td>
-                <td><input type="text" class="table-input desc" value="${data.desc}"></td>
-                <td><input type="number" class="table-input plus" value="${data.plus}" step="any"></td>
-                <td><input type="number" class="table-input minus" value="${data.minus}" step="any"></td>
-                <td><input type="number" class="table-input tol" value="${data.tol}" step="any"></td>
+                <td><input type="text" class="table-input desc" value="${data.desc || ''}"></td>
+                <td><input type="number" class="table-input plus" value="${data.plus || ''}" step="0.1"></td>
+                <td><input type="number" class="table-input minus" value="${data.minus || ''}" step="0.1"></td>
+                <td><input type="number" class="table-input tol" value="${data.tol || ''}" step="0.01"></td>
                 <td>
                     <select class="dist">
                         <option value="常態" ${data.dist === '常態' ? 'selected' : ''}>常態</option>
@@ -669,14 +771,27 @@
     }
 
     window.onload = function() {
-        initTable();
+        // 先嘗試載入存檔，如果沒有存檔才載入預設表格
+        if (!loadSavedState()) {
+            initTable();
+        } else {
+            updateRowNumbers();
+        }
+
+        // 為所有表格欄位綁定計算事件
+        document.querySelectorAll('#ta-table input, #ta-table select').forEach(input => { 
+            input.addEventListener('input', calculateTolerance); 
+            input.addEventListener('change', calculateTolerance); 
+        });
+
         ['calc-hole-nom', 'calc-hole-up', 'calc-shaft-nom', 'calc-shaft-low'].forEach(id => { document.getElementById(id).addEventListener('input', calcAsmShift); });
+        
         document.getElementById('btn-add-row').addEventListener('click', addNewRow);
+        document.getElementById('btn-save-state').addEventListener('click', saveCurrentState); // 綁定儲存按鈕
         
         document.getElementById('nominal-target').addEventListener('input', calculateTolerance);
         document.getElementById('spec-upper').addEventListener('input', calculateTolerance);
         document.getElementById('spec-lower').addEventListener('input', calculateTolerance);
-        document.querySelectorAll('#ta-table input, #ta-table select').forEach(input => { input.addEventListener('input', calculateTolerance); input.addEventListener('change', calculateTolerance); });
         
         calcAsmShift();
         calculateTolerance();
