@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尺寸鍊統計公差分析系統 (V19.2)</title>
+    <title>尺寸鍊統計公差分析系統 (V19.3)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,6 +29,12 @@
         .spec-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
         .spec-item { display: flex; align-items: center; gap: 5px; }
 
+        /* 標題與專案名稱輸入框樣式 */
+        .section-header { display: flex; align-items: center; gap: 15px; margin-top: 20px; margin-bottom: 10px; }
+        .section-header h2 { margin: 0; }
+        .analysis-name-input { font-size: 1.1em; padding: 6px 12px; border: 1px dashed #3498db; border-radius: 4px; width: 380px; font-weight: bold; color: #2c3e50; background-color: #fff; }
+        .analysis-name-input:focus { border-style: solid; outline: none; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); }
+
         /* 設計判定卡片樣式 */
         .judgment-card { background: #fff; border: 2px solid #2ecc71; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(46, 204, 113, 0.15); }
         .judgment-card.ng { border-color: #e74c3c; box-shadow: 0 4px 6px rgba(231, 76, 60, 0.15); }
@@ -45,7 +51,6 @@
         .dashboard-section { display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px; }
         .chart-container { background: #fdfdfd; border: 1px solid #ddd; border-radius: 6px; padding: 15px; text-align: center; }
         
-        /* 表格優化設計，修正寬度分配 */
         table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 6px; text-align: center; vertical-align: middle; word-wrap: break-word; }
         th { background-color: #34495e; color: white; font-size: 0.9em; padding: 10px 4px; }
@@ -126,6 +131,11 @@
             .spec-row { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 20px !important; align-items: center !important; }
             .spec-item { white-space: nowrap !important; margin-bottom: 0 !important; display: flex !important; align-items: center !important; }
             .spec-tool input { display: inline-block !important; width: 60px !important; border-bottom: 1px solid #000 !important; margin: 0 5px !important; border-radius: 0 !important; }
+
+            /* 專案名稱輸入框的列印樣式：變成底線填寫欄 */
+            .section-header { margin-top: 15px !important; margin-bottom: 5px !important; }
+            .analysis-name-input { border: none !important; border-bottom: 1px solid #000 !important; border-radius: 0 !important; font-size: 1.2em !important; padding: 0 5px !important; width: 400px !important; background: transparent !important; text-align: left !important; font-weight: bold !important; }
+            .analysis-name-input::placeholder { color: transparent; } /* 列印時隱藏 placeholder */
         }
     </style>
 </head>
@@ -142,7 +152,7 @@
 </header>
 
 <div class="container">
-    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v19.2 精確解析度優化版</span></h1>
+    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v19.3 專案分析報表版</span></h1>
     
     <div class="helper-tool">
         <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em;"><span>🧮 <strong>軸孔浮動間隙計算機 (Asm Shift Helper)</strong></span></div>
@@ -209,7 +219,11 @@
         </div>
     </div>
 
-    <h2>📝 尺寸鍊明細與分析表</h2>
+    <div class="section-header">
+        <h2>📝 尺寸鍊明細與分析表</h2>
+        <input type="text" class="analysis-name-input" placeholder="請輸入此次分析專案名稱 (例如：Mini PC 機殼組裝分析)...">
+    </div>
+
     <table id="ta-table">
         <thead>
             <tr>
@@ -570,7 +584,6 @@
             }
 
             const variance = Math.pow(sigma, 2);
-            // 改良重點：提高小數點解析度，標準差5位，變異數6位
             row.querySelector('.sigma').textContent = sigma > 0 ? sigma.toFixed(5) : "0.00000";
             row.querySelector('.variance').textContent = variance > 0 ? variance.toFixed(6) : "0.000000";
             
@@ -605,7 +618,7 @@
 
         document.getElementById('out-nominal').textContent = dimSum.toFixed(3) + ' mm';
         document.getElementById('out-wc').textContent = '± ' + worstCase.toFixed(3) + ' mm';
-        document.getElementById('out-sys-sigma').textContent = sysSigma.toFixed(5) + ' mm'; // 總系統標準差一併放寬精度
+        document.getElementById('out-sys-sigma').textContent = sysSigma.toFixed(5) + ' mm'; 
         document.getElementById('out-zscore').textContent = zScore.toFixed(3);
         document.getElementById('out-yield').textContent = yieldPercent.toFixed(3) + ' %';
         document.getElementById('out-dpmo').textContent = dpmo.toFixed(0);
