@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尺寸鍊統計公差分析系統 (V19.5)</title>
+    <title>尺寸鍊統計公差分析系統 (V19.6)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,8 +31,8 @@
 
         /* 標題與專案名稱輸入框樣式 */
         .section-header { display: flex; align-items: center; gap: 15px; margin-top: 20px; margin-bottom: 10px; }
-        .section-header h2 { margin: 0; }
-        .analysis-name-input { font-size: 1.1em; padding: 6px 12px; border: 1px dashed #3498db; border-radius: 4px; width: 380px; font-weight: bold; color: #2c3e50; background-color: #fff; }
+        .section-header h2 { margin: 0; white-space: nowrap; }
+        .analysis-name-input { font-size: 1.1em; padding: 6px 12px; border: 1px dashed #3498db; border-radius: 4px; flex-grow: 1; width: auto; font-weight: bold; color: #2c3e50; background-color: #fff; box-sizing: border-box; }
         .analysis-name-input:focus { border-style: solid; outline: none; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); }
 
         /* 設計判定卡片樣式 */
@@ -89,7 +89,6 @@
             body { background-color: #fff; padding: 0; margin: 0; font-size: 10pt; }
             .container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; margin: 0; }
             
-            /* 隱藏新增按鈕、儲存按鈕與列印按鈕等操作元件 */
             .instructions, #btn-add-row, #btn-save-state, .btn-print, .btn-del-th, .btn-del-td, hr { display: none !important; }
             header { display: none !important; } 
             
@@ -135,8 +134,8 @@
             .spec-item { white-space: nowrap !important; margin-bottom: 0 !important; display: flex !important; align-items: center !important; }
             .spec-tool input { display: inline-block !important; width: 60px !important; border-bottom: 1px solid #000 !important; margin: 0 5px !important; border-radius: 0 !important; }
 
-            .section-header { margin-top: 15px !important; margin-bottom: 5px !important; }
-            .analysis-name-input { border: none !important; border-bottom: 1px solid #000 !important; border-radius: 0 !important; font-size: 1.2em !important; padding: 0 5px !important; width: 400px !important; background: transparent !important; text-align: left !important; font-weight: bold !important; }
+            .section-header { margin-top: 15px !important; margin-bottom: 5px !important; display: flex !important; align-items: center !important; }
+            .analysis-name-input { border: none !important; border-bottom: 1px solid #000 !important; border-radius: 0 !important; font-size: 1.2em !important; padding: 0 5px !important; flex-grow: 1 !important; width: auto !important; background: transparent !important; text-align: left !important; font-weight: bold !important; }
             .analysis-name-input::placeholder { color: transparent; }
         }
     </style>
@@ -154,7 +153,7 @@
 </header>
 
 <div class="container">
-    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v19.5 快取記憶儲存版</span></h1>
+    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v19.6 全寬度標題版</span></h1>
     
     <div class="helper-tool">
         <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em;"><span>🧮 <strong>軸孔浮動間隙計算機 (Asm Shift Helper)</strong></span></div>
