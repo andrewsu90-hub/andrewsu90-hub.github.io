@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VESA 螺絲受力計算工具 | Andrew Design Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary-color: #000; --secondary-color: #666; --border-color: #e0e0e0;
+    --bg-light: #f9f9f9; --bg-white: #ffffff;
+    --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+    --accent: #1a1a2e; --warn: #c62828; --ok: #2e7d32;
+    --muted: #64748B; --border: #e0e0e0; 
+    --brand: #1a1a2e; --brand-50: #f0f0f5; --brand-100: #e0e0ee;
+    --warn-bg: #FFFBEB; --warn-bd: #FDE68A; --warn-tx: #92400E;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary-color: #fff; --secondary-color: #aaa; --border-color: #333;
+      --bg-light: #1a1a1a; --bg-white: #0d0d0d; --warn: #ef5350; --ok: #66bb6a;
+      --muted: #aaa; --border: #333;
+      --brand: #aaa; --brand-50: #1a1a1a; --brand-100: #222;
+      --warn-bg: #2a1a00; --warn-bd: #7a5000; --warn-tx: #ffd080;
+    }
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 300; color: var(--primary-color); background-color: var(--bg-white);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; font-size: 14px;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem 5%; border-bottom: 0.5px solid var(--border-color);
+    background-color: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+  }
+  @media (prefers-color-scheme: dark) { header { background-color: rgba(13,13,13,0.92); } }
+  .logo { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: 1px; text-decoration: none; color: var(--primary-color); }
+  .back-link { font-size: 14px; color: var(--secondary-color); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+  .back-link:hover { color: var(--primary-color); }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 4rem 5% 2rem; max-width: 1000px; margin: 0 auto; animation: fadeInDown 0.6s ease; }
+  .hero-label { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.75rem; }
+  .hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+  .hero p { font-size: 15px; color: var(--secondary-color); line-height: 1.8; }
+  .source-note { display: inline-block; margin-top: 0.75rem; font-size: 12px; color: var(--secondary-color); background-color: var(--bg-light); border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 4px 12px; }
+
+  /* ---------- Calc Section ---------- */
+  .calc-section { padding: 1rem 5% 5rem; max-width: 1000px; margin: 0 auto; animation: fadeInUp 0.7s ease; }
+
+  /* ---------- Tabs ---------- */
+  .tabs { display: flex; gap: 4px; margin-bottom: 1rem; border-bottom: 0.5px solid var(--border-color); overflow-x: auto; scrollbar-width: thin; }
+  .tab { padding: 10px 16px; border: none; background: transparent; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--secondary-color); border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; user-select: none; }
+  .tab:hover { color: var(--primary-color); }
+  .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+
+  /* ---------- Card ---------- */
+  .card { background-color: var(--bg-light); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); margin-bottom: 1rem; overflow: hidden; }
+  .card-head { padding: 14px 18px; border-bottom: 0.5px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .card-head h3 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: .2px; }
+  .card-head .meta { color: var(--secondary-color); font-size: 12.5px; }
+  .card-body { padding: 16px 18px; }
+
+  /* ---------- Grids ---------- */
+  .grid { display: grid; gap: 14px; }
+  .g-4 { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .g-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .g-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .g-6 { grid-template-columns: repeat(6,minmax(0,1fr)); }
+  @media (max-width:1000px){.g-4,.g-6{grid-template-columns:repeat(2,minmax(0,1fr))}.g-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:560px){.g-4,.g-3,.g-2,.g-6{grid-template-columns:1fr}}
+
+  /* ---------- Input Field ---------- */
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--secondary-color); margin-bottom: 6px; letter-spacing: 0.3px; }
+  .field select, .field input {
+    width: 100%; padding: 9px 12px;
+    border: 0.5px solid var(--border-color); border-radius: var(--radius-sm);
+    background: var(--bg-white); font: inherit; color: var(--primary-color);
+    transition: border-color .15s; appearance: none; -webkit-appearance: none;
+  }
+  .field select {
+    padding-right: 34px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  .field select:focus, .field input:focus { outline: none; border-color: var(--primary-color); }
+
+  /* ---------- Result Stat ---------- */
+  .stat { background: var(--bg-white); border: 0.5px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 14px; min-height: 72px; display: flex; flex-direction: column; justify-content: center; }
+  .stat.accent { background: var(--brand-50); border-color: var(--brand-100); }
+  .stat .k { color: var(--secondary-color); font-size: 11.5px; font-weight: 600; margin-bottom: 4px; letter-spacing: .3px; }
+  .stat .v { font-size: 22px; font-weight: 700; color: var(--primary-color); line-height: 1.1; }
+  .stat .v .u { font-size: 12px; color: var(--secondary-color); margin-left: 4px; font-weight: 500; }
+  .stat.dim .v { color: var(--secondary-color); }
+  .stat.final { background: rgba(46,125,50,0.08); border-color: rgba(46,125,50,0.3); }
+  .stat.final .v { color: var(--ok); }
+  .stat.warn { background: rgba(198,40,40,0.08); border-color: rgba(198,40,40,0.3); }
+  .stat.warn .v { color: var(--warn); }
+  @media (prefers-color-scheme: dark) { 
+    .stat.final { background: rgba(102,187,106,0.1); border-color: rgba(102,187,106,0.3); }
+    .stat.warn { background: rgba(239,83,80,0.1); border-color: rgba(239,83,80,0.3); }
+  }
+
+  /* ---------- Warning banner ---------- */
+  .banner { display: flex; gap: 10px; align-items: flex-start; background: var(--warn-bg); border: 0.5px solid var(--warn-bd); border-radius: var(--radius-md); padding: 10px 14px; color: var(--warn-tx); font-size: 12.8px; margin-bottom: 18px; }
+  .banner .ico { flex: 0 0 auto; font-weight: 700; }
+
+  /* ---------- Formula box ---------- */
+  .formula { display: inline-block; background: var(--bg-light); border: 1px dashed var(--border-color); border-radius: var(--radius-sm); padding: 4px 10px; font-family: "Consolas","Menlo",monospace; color: var(--primary-color); font-size: 12.5px; }
+
+  /* ---------- Page title + badge ---------- */
+  .page-title { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; }
+  .page-title h2 { font-size: 18px; margin: 0; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--bg-light); color: var(--secondary-color); border: 0.5px solid var(--border-color); font-size: 11.5px; font-weight: 600; letter-spacing: .3px; }
+
+  /* ---------- Footer ---------- */
+  footer { padding: 1.5rem 5%; border-top: 0.5px solid var(--border-color); text-align: center; font-size: 13px; color: var(--secondary-color); }
+  .row-line { height: 1px; background: var(--border-color); margin: 12px 0; }
+
+  @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<header>
+    <a href="../index.html" class="logo">Andrew Design Studio</a>
+    <a href="engineering-calculators.html" class="back-link">← 返回工具選單</a>
+</header>
+
+<section class="hero">
+    <div class="hero-label">工程計算工具</div>
+    <h1>🖥️ VESA 螺絲受力計算工具</h1>
+    <p>針對壁掛或機台，計算螺絲在受扭轉、剪力與拉力下的合力與安全係數。包含單顆螺絲剪力、降伏應力及三柱容許應力算法。</p>
+    <span class="source-note">參考文獻：機械設計手冊 (新版) 第2卷</span>
+</section>
+
+<section class="calc-section">
+
+<div class="tabs">
+  <div class="tab active" data-tab="t1">方法 1：合力與剪力計算</div>
+  <div class="tab" data-tab="t2">方法 2：降伏正應力 (拉力)</div>
+  <div class="tab" data-tab="t3">方法 3&4：三柱容許應力 (面積/直徑)</div>
+</div>
+
+<div>
+
+<div class="card">
+  <div class="card-head">
+    <h3>系統與負載參數</h3>
+    <div class="meta">貫穿所有計算方法的基礎設定</div>
+  </div>
+  <div class="card-body">
+    <div class="grid g-4">
+      <div class="field">
+        <label>機台重量 (kg)</label>
+        <input type="number" id="inptWeight" value="8" step="0.1">
+      </div>
+      <div class="field">
+        <label>重量規範倍數</label>
+        <input type="number" id="inptMultiplier" value="3" step="0.5">
+      </div>
+      <div class="field">
+        <label>螺栓總數量</label>
+        <input type="number" id="inptBolts" value="4" step="1">
+      </div>
+      <div class="field">
+        <label>扭矩力臂 D (mm)</label>
+        <input type="number" id="inptArm" value="270" step="1">
+      </div>
+    </div>
+    <div class="row-line"></div>
+    <div class="grid g-4">
+      <div class="field">
+        <label>螺絲規格</label>
+        <select id="inptSpec"></select>
+      </div>
+      <div class="field">
+        <label>螺絲中心距 a (mm)</label>
+        <input type="number" id="inptSpaceA" value="50" step="1">
+      </div>
+      <div class="field">
+        <label>螺絲中心距 b (mm)</label>
+        <input type="number" id="inptSpaceB" value="50" step="1">
+      </div>
+      <div class="field">
+        <label>基準強度 HV min (N/mm²)</label>
+        <input type="number" id="inptHv" value="250" step="10">
+      </div>
+    </div>
+    <div class="row-line"></div>
+    <div class="grid g-4">
+      <div class="stat dim"><div class="k">系統總力 P</div><div class="v" id="valP">–<span class="u">N</span></div></div>
+      <div class="stat dim"><div class="k">等效半徑 r</div><div class="v" id="valR">–<span class="u">mm</span></div></div>
+      <div class="stat dim"><div class="k">螺栓截面積 As</div><div class="v" id="valAs">–<span class="u">mm²</span></div></div>
+      <div class="stat dim"><div class="k">螺絲直徑 D</div><div class="v" id="valDia">–<span class="u">mm</span></div></div>
+    </div>
+  </div>
+</div>
+
+<section id="t1" class="panel">
+  <div class="page-title">
+    <h2>方法 1：單顆螺絲剪力計算</h2>
+    <span class="badge">比較合力矩與螺絲剪應力</span>
+  </div>
+
+  <div class="banner">
+    <div class="ico">ⓘ</div>
+    <div>
+      計算單顆螺栓在垂直載重與扭矩作用下的最大合力。 <br>合力公式：<span class="formula">N合力 = √(Fv² + Ft² + 2·Fv·Ft·cosθ)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>受力分析</h3></div>
+    <div class="card-body">
+      <div class="grid g-4">
+        <div class="stat"><div class="k">Tz 扭轉力矩</div><div class="v" id="m1Tz">–<span class="u">N·mm</span></div></div>
+        <div class="stat"><div class="k">單顆承受重量 Fv</div><div class="v" id="m1Fv">–<span class="u">N</span></div></div>
+        <div class="stat"><div class="k">單顆承受扭轉力 Ft</div><div class="v" id="m1Ft">–<span class="u">N</span></div></div>
+        <div class="stat accent"><div class="k">最大合力 F_total</div><div class="v" id="m1Ftotal">–<span class="u">N</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>剪應力與安全係數評估</h3><div class="meta">建議安全係數 SF > 4</div></div>
+    <div class="card-body">
+      <div class="grid g-4">
+        <div class="stat"><div class="k">剪降伏應力 τ_yp (HV/2)</div><div class="v" id="m1TauYp">–<span class="u">N/mm²</span></div></div>
+        <div class="stat"><div class="k">實際剪應力 (合力/As)</div><div class="v" id="m1TauAct">–<span class="u">N/mm²</span></div></div>
+        <div class="stat" id="m1SfBox"><div class="k">安全係數 SF</div><div class="v" id="m1Sf">–</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="t2" class="panel" style="display:none">
+  <div class="page-title">
+    <h2>方法 2：降伏應力算法 (拉力)</h2>
+    <span class="badge">計算正應力</span>
+  </div>
+
+  <div class="banner">
+    <div class="ico">ⓘ</div>
+    <div>
+      評估螺絲自身降伏應力是否能承受機台重量。<br>屈服載荷：<span class="formula">As × HV_min</span>，軸力計算方式：軸力以螺栓耐力的 60% 算出 (K=0.6)。
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>輸入參數</h3></div>
+    <div class="card-body">
+      <div class="grid g-3">
+        <div class="field">
+          <label>K (軸力係數)</label>
+          <input type="number" id="inptK" value="0.6" step="0.1">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>承載力評估</h3></div>
+    <div class="card-body">
+      <div class="grid g-4">
+        <div class="stat"><div class="k">單顆屈服載荷</div><div class="v" id="m2Yield">–<span class="u">N</span></div></div>
+        <div class="stat"><div class="k">單顆容許載荷 (× 軸力係數)</div><div class="v" id="m2Allow">–<span class="u">N</span></div></div>
+        <div class="stat accent"><div class="k">系統總容許載荷</div><div class="v" id="m2TotalAllow">–<span class="u">N</span></div></div>
+      </div>
+      <div style="margin-top:12px" class="grid g-2">
+        <div class="stat"><div class="k">系統安全係數 (總載荷/P)</div><div class="v" id="m2SfTotal">–</div></div>
+        <div class="stat"><div class="k">單顆安全係數</div><div class="v" id="m2SfSingle">–</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="t3" class="panel" style="display:none">
+  <div class="page-title">
+    <h2>方法 3&4：三柱算法 (反覆單向震動)</h2>
+    <span class="badge">計算螺栓面積與直徑</span>
+  </div>
+
+  <div class="banner">
+    <div class="ico">ⓘ</div>
+    <div>
+      依據材質設定安全係數 α，計算所需之最小截面積 (As) 與螺絲直徑 (D)。<br>
+      鋼=5，ADC12/鑄鐵=6 (因較脆、有氣孔延展率小故提高係數)，銅=5。
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>安全係數設定</h3></div>
+    <div class="card-body">
+      <div class="grid g-3">
+        <div class="field">
+          <label>被鎖固物材質</label>
+          <select id="inptMaterial">
+            <option value="5">鋼 (α=5)</option>
+            <option value="6">ADC12、鑄鐵 (α=6)</option>
+            <option value="5">銅、鋁等柔軟金屬 (α=5)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>方法 3：容許正應力算法 (計算截面積)</h3></div>
+    <div class="card-body">
+      <div class="grid g-4">
+        <div class="stat"><div class="k">容許應力 σt (HV/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
+        <div class="stat accent"><div class="k">所需最小截面積 As</div><div class="v" id="m3ReqAs">–<span class="u">mm²</span></div></div>
+        <div class="stat final"><div class="k">建議螺栓規格 (依面積)</div><div class="v" id="m3RecSpec">–</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>方法 4：容許剪應力算法 (計算直徑)</h3><div class="meta">剪應力 τ = σ × 0.8</div></div>
+    <div class="card-body">
+      <div class="grid g-4">
+        <div class="stat"><div class="k">容許剪應力 τt</div><div class="v" id="m4TauT">–<span class="u">N/mm²</span></div></div>
+        <div class="stat accent"><div class="k">所需最小直徑 D</div><div class="v" id="m4ReqD">–<span class="u">mm</span></div></div>
+        <div class="stat final"><div class="k">建議螺栓規格 (依直徑)</div><div class="v" id="m4RecSpec">–</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><footer>依機械設計手冊與實務設計經驗實作 · 僅供參考，實際應用請依規範驗證</footer>
+
+</section><script>
+/* =========================================================
+   資料集
+   ========================================================= */
+const SCREW_TABLE = {
+  "M2": { As: 2.07, d: 2 },
+  "M2.5": { As: 3.39, d: 2.5 },
+  "M3": { As: 5.03, d: 3 },
+  "M4": { As: 8.78, d: 4 },
+  "M6": { As: 20.1, d: 6 },
+  "M8": { As: 36.6, d: 8 },
+  "M10": { As: 58.0, d: 10 }
+};
+const SCREW_LIST = Object.keys(SCREW_TABLE);
+
+/* ========================= 工具 ========================= */
+const $ = id => document.getElementById(id);
+const NA = "–";
+
+function r2(v){ return Math.round(v * 100) / 100; }
+function setStat(id, value, unit){
+  const el = $(id);
+  if(!el) return;
+  if(value === null || value === undefined || isNaN(value)){
+    el.innerHTML = `<span style="color:var(--secondary-color);font-size:14px">${NA}</span>`;
+    return;
+  }
+  el.innerHTML = (unit ? `${value}<span class="u">${unit}</span>` : `${value}`);
+}
+
+/* ========================= 初始化下拉 ========================= */
+function initSelect(){
+  const s = $("inptSpec");
+  SCREW_LIST.forEach(v => {
+    const o = document.createElement("option");
+    o.value = v; o.textContent = v;
+    s.appendChild(o);
+  });
+  s.value = "M4"; // 預設 M4
+}
+
+/* ========================= Tabs ========================= */
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const id = tab.dataset.tab;
+    document.querySelectorAll("section.panel").forEach(s => s.style.display="none");
+    $(id).style.display = "";
+  });
+});
+
+/* ========================= 計算核心 ========================= */
+function calc(){
+  // 1. 取得全局輸入
+  const weight = Number($("inptWeight").value) || 0;
+  const multi = Number($("inptMultiplier").value) || 0;
+  const bolts = Number($("inptBolts").value) || 1;
+  const arm = Number($("inptArm").value) || 0;
+  
+  const specKey = $("inptSpec").value;
+  const spaceA = Number($("inptSpaceA").value) || 0;
+  const spaceB = Number($("inptSpaceB").value) || 0;
+  const hvMin = Number($("inptHv").value) || 0;
+  const kFactor = Number($("inptK").value) || 0.6;
+  const alpha = Number($("inptMaterial").value) || 5;
+
+  const screw = SCREW_TABLE[specKey];
+  const As = screw.As;
+  const dia = screw.d;
+
+  // 2. 基礎計算
+  const P = weight * multi * 9.8; // N
+  // 依 Excel，c-r1 = 70.71 代表 r = sqrt(a^2 + b^2)
+  const r = Math.sqrt(spaceA*spaceA + spaceB*spaceB); 
+  
+  setStat("valP", r2(P), "N");
+  setStat("valR", r2(r), "mm");
+  setStat("valAs", As, "mm²");
+  setStat("valDia", dia, "mm");
+
+  // ------------------------------------
+  // 方法 1：合力與剪力
+  // ------------------------------------
+  const Tz = P * arm; // N.mm
+  const Fv = P / bolts; // 單顆垂直力
+  const Ft = Tz / (bolts * r); // 單顆扭轉力
+  
+  // 考慮極端狀況角度為 45 度 (cos 45 = 0.7071)
+  const angleRad = 45 * (Math.PI / 180);
+  const F_total = Math.sqrt(Fv*Fv + Ft*Ft + 2*Fv*Ft*Math.cos(angleRad));
+
+  const tau_yp = hvMin / 2;
+  const tau_act = F_total / As;
+  const sf_m1 = tau_yp / tau_act;
+
+  setStat("m1Tz", r2(Tz), "N·mm");
+  setStat("m1Fv", r2(Fv), "N");
+  setStat("m1Ft", r2(Ft), "N");
+  setStat("m1Ftotal", r2(F_total), "N");
+  setStat("m1TauYp", r2(tau_yp), "N/mm²");
+  setStat("m1TauAct", r2(tau_act), "N/mm²");
+  setStat("m1Sf", r2(sf_m1));
+  
+  // 安全係數判斷特效
+  const sfBox = $("m1SfBox");
+  if(sf_m1 > 4) { sfBox.className = "stat final"; } 
+  else { sfBox.className = "stat warn"; }
+
+  // ------------------------------------
+  // 方法 2：降伏拉力
+  // ------------------------------------
+  const yieldLoad = hvMin * As;
+  const allowLoad = yieldLoad * kFactor;
+  const totalAllow = allowLoad * bolts;
+  const sf_m2_tot = totalAllow / P;
+  const sf_m2_single = allowLoad / P; // Excel 中的單顆除以總負載寫法
+
+  setStat("m2Yield", r2(yieldLoad), "N");
+  setStat("m2Allow", r2(allowLoad), "N");
+  setStat("m2TotalAllow", r2(totalAllow), "N");
+  setStat("m2SfTotal", r2(sf_m2_tot));
+  setStat("m2SfSingle", r2(sf_m2_single));
+
+  // ------------------------------------
+  // 方法 3 & 4：三柱算法
+  // ------------------------------------
+  // M3 面積算法
+  const sigma_t = hvMin / alpha;
+  const req_As = P / sigma_t;
+  
+  // 找尋大於需求面積的最小螺絲
+  let recSpecAs = NA;
+  for(let key of SCREW_LIST){
+    if(SCREW_TABLE[key].As >= req_As){ recSpecAs = key; break; }
+  }
+
+  // M4 直徑算法
+  const tau_all = (hvMin * 0.8) / alpha;
+  const req_D = Math.sqrt((4 * P) / (Math.PI * tau_all));
+  
+  let recSpecD = NA;
+  for(let key of SCREW_LIST){
+    if(SCREW_TABLE[key].d >= req_D){ recSpecD = key; break; }
+  }
+
+  setStat("m3SigmaT", r2(sigma_t), "N/mm²");
+  setStat("m3ReqAs", r2(req_As), "mm²");
+  setStat("m3RecSpec", recSpecAs);
+
+  setStat("m4TauT", r2(tau_all), "N/mm²");
+  setStat("m4ReqD", r2(req_D), "mm");
+  setStat("m4RecSpec", recSpecD);
+}
+
+// 綁定事件
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("input", calc);
+  el.addEventListener("change", calc);
+});
+
+// 初始化
+initSelect();
+calc();
+</script>
+</body>
+</html>
