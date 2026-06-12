@@ -184,11 +184,11 @@
         <select id="inptSpec"></select>
       </div>
       <div class="field">
-        <label>螺絲中心距 a (mm)</label>
+        <label>螺絲中心距 a (mm)：水平距離</label>
         <input type="number" id="inptSpaceA" value="50" step="1">
       </div>
       <div class="field">
-        <label>螺絲中心距 b (mm)</label>
+        <label>螺絲中心距 b (mm)：垂直距離</label>
         <input type="number" id="inptSpaceB" value="50" step="1">
       </div>
       <div class="field">
@@ -232,18 +232,22 @@
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>剪應力與安全係數評估</h3><div class="meta">建議安全係數 SF > 4</div></div>
+    <div class="card-head"><h3>剪應力與安全係數評估</h3><div class="meta">判定輸入之螺絲規格是否合格</div></div>
     <div class="card-body">
       <div class="grid g-4">
+        <div class="field" style="display:flex; flex-direction:column; justify-content:center;">
+          <label style="color:var(--primary-color);">目標安全係數 (SF)</label>
+          <input type="number" id="inptTargetSfM1" value="4" step="0.5" style="border-color:var(--primary-color); font-weight:700;">
+        </div>
         <div class="stat"><div class="k">剪降伏應力 τ_yp (HV/2)</div><div class="v" id="m1TauYp">–<span class="u">N/mm²</span></div></div>
         <div class="stat"><div class="k">實際剪應力 (合力/As)</div><div class="v" id="m1TauAct">–<span class="u">N/mm²</span></div></div>
-        <div class="stat" id="m1SfBox"><div class="k">安全係數 SF</div><div class="v" id="m1Sf">–</div></div>
+        <div class="stat" id="m1SfBox"><div class="k">實際安全係數 SF</div><div class="v" id="m1Sf">–</div></div>
       </div>
     </div>
   </div>
 
   <div class="card" style="margin-top: 1rem;">
-    <div class="card-head"><h3>進階推算：由最大合力反推螺栓需求</h3><div class="meta">以目標安全係數 SF = 4 進行反向推算</div></div>
+    <div class="card-head"><h3>進階推算：由最大合力反推螺栓需求</h3><div class="meta" id="m1AdvMeta">以目標安全係數 SF = 4 進行反向推算</div></div>
     <div class="card-body">
       <div class="grid g-4">
         <div class="stat"><div class="k">目標容許剪應力</div><div class="v" id="m1TargetTau">–<span class="u">N/mm²</span></div></div>
@@ -253,7 +257,6 @@
       </div>
     </div>
   </div>
-
 </section>
 
 <section id="t2" class="panel" style="display:none">
@@ -270,12 +273,16 @@
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>輸入參數</h3></div>
+    <div class="card-head"><h3>參數設定</h3></div>
     <div class="card-body">
-      <div class="grid g-3">
+      <div class="grid g-2">
         <div class="field">
           <label>K (軸力係數)</label>
           <input type="number" id="inptK" value="0.6" step="0.1">
+        </div>
+        <div class="field">
+          <label style="color:var(--primary-color);">目標安全係數 (SF)</label>
+          <input type="number" id="inptTargetSfM2" value="4" step="0.5" style="border-color:var(--primary-color); font-weight:700;">
         </div>
       </div>
     </div>
@@ -290,8 +297,8 @@
         <div class="stat accent"><div class="k">系統總容許載荷</div><div class="v" id="m2TotalAllow">–<span class="u">N</span></div></div>
       </div>
       <div style="margin-top:12px" class="grid g-2">
-        <div class="stat"><div class="k">系統安全係數 (總載荷/P)</div><div class="v" id="m2SfTotal">–</div></div>
-        <div class="stat"><div class="k">單顆安全係數</div><div class="v" id="m2SfSingle">–</div></div>
+        <div class="stat" id="m2SfTotalBox"><div class="k">系統安全係數 (總載荷/P)</div><div class="v" id="m2SfTotal">–</div></div>
+        <div class="stat" id="m2SfSingleBox"><div class="k">單顆安全係數</div><div class="v" id="m2SfSingle">–</div></div>
       </div>
     </div>
   </div>
@@ -306,32 +313,37 @@
   <div class="banner">
     <div class="ico">ⓘ</div>
     <div>
-      依據材質設定安全係數 α，計算所需之最小截面積 (As) 與螺絲直徑 (D)。<br>
-      鋼=5，ADC12/鑄鐵=6 (因較脆、有氣孔延展率小故提高係數)，銅=5。
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-head"><h3>安全係數設定</h3></div>
-    <div class="card-body">
-      <div class="grid g-3">
-        <div class="field">
-          <label>被鎖固物材質</label>
-          <select id="inptMaterial">
-            <option value="5">鋼 (α=5)</option>
-            <option value="6">ADC12、鑄鐵 (α=6)</option>
-            <option value="5">銅、鋁等柔軟金屬 (α=5)</option>
-          </select>
-        </div>
-      </div>
+      依據《機械設計手冊》安全係數表設定 α 值，計算所需之最小截面積 (As) 與螺絲直徑 (D)。
     </div>
   </div>
 
   <div class="card">
     <div class="card-head"><h3>方法 3：容許正應力算法 (計算截面積)</h3></div>
     <div class="card-body">
+      <div class="grid g-3">
+        <div class="field">
+          <label style="color:var(--primary-color);">正應力安全係數 (α)</label>
+          <select id="inptAlphaM3" style="border-color:var(--primary-color); font-weight:700;">
+            <optgroup label="鋼 / 銅 (延展性佳)">
+              <option value="5">單向(單震) - α=5</option>
+              <option value="8">雙向(雙震) - α=8</option>
+              <option value="12">衝擊 - α=12</option>
+            </optgroup>
+            <optgroup label="鑄鐵 / ADC12 (較脆)">
+              <option value="6">單向(單震) - α=6</option>
+              <option value="10">雙向(雙震) - α=10</option>
+              <option value="15">衝擊 - α=15</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field" style="grid-column: span 2;">
+          <label>備註 / 文字說明 (供報告截圖使用)</label>
+          <input type="text" id="inptM3Note" placeholder="例如：ADC12 降伏強度 130 N/mm² / 建議安全係數 α=6 (因較脆延展率小)">
+        </div>
+      </div>
+      <div class="row-line"></div>
       <div class="grid g-4">
-        <div class="stat"><div class="k">容許應力 σt (HV/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
+        <div class="stat"><div class="k">容許正應力 σt (HV/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
         <div class="stat accent"><div class="k">所需最小截面積 As</div><div class="v" id="m3ReqAs">–<span class="u">mm²</span></div></div>
         <div class="stat final"><div class="k">建議螺栓規格 (依面積)</div><div class="v" id="m3RecSpec">–</div></div>
       </div>
@@ -339,8 +351,30 @@
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>方法 4：容許剪應力算法 (計算直徑)</h3><div class="meta">剪應力 τ = σ × 0.8</div></div>
+    <div class="card-head"><h3>方法 4：容許剪應力算法 (計算直徑)</h3><div class="meta">剪應力 τ = 正應力 × 轉換係數</div></div>
     <div class="card-body">
+      <div class="grid g-3">
+        <div class="field">
+          <label style="color:var(--primary-color);">剪應力轉換係數</label>
+          <input type="number" id="inptShearRatio" value="0.8" step="0.05" style="border-color:var(--primary-color); font-weight:700;">
+        </div>
+        <div class="field">
+          <label style="color:var(--primary-color);">容許剪應力安全係數 (α)</label>
+          <select id="inptAlphaM4" style="border-color:var(--primary-color); font-weight:700;">
+            <optgroup label="鋼 / 銅 (延展性佳)">
+              <option value="5">單向(單震) - α=5</option>
+              <option value="8">雙向(雙震) - α=8</option>
+              <option value="12">衝擊 - α=12</option>
+            </optgroup>
+            <optgroup label="鑄鐵 / ADC12 (較脆)">
+              <option value="6">單向(單震) - α=6</option>
+              <option value="10">雙向(雙震) - α=10</option>
+              <option value="15">衝擊 - α=15</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="row-line"></div>
       <div class="grid g-4">
         <div class="stat"><div class="k">容許剪應力 τt</div><div class="v" id="m4TauT">–<span class="u">N/mm²</span></div></div>
         <div class="stat accent"><div class="k">所需最小直徑 D</div><div class="v" id="m4ReqD">–<span class="u">mm</span></div></div>
@@ -373,7 +407,6 @@ const NA = "–";
 
 function r2(v){ return Math.round(v * 100) / 100; }
 
-// 修正：加入 typeof value === 'number' 判斷，確保正確顯示字串 (如 M4)
 function setStat(id, value, unit){
   const el = $(id);
   if(!el) return;
@@ -392,7 +425,7 @@ function initSelect(){
     o.value = v; o.textContent = v;
     s.appendChild(o);
   });
-  s.value = "M4"; // 預設 M4
+  s.value = "M4"; 
 }
 
 /* ========================= Tabs ========================= */
@@ -419,16 +452,20 @@ function calc(){
   const spaceB = Number($("inptSpaceB").value) || 0;
   const hvMin = Number($("inptHv").value) || 0;
   const kFactor = Number($("inptK").value) || 0.6;
-  const alpha = Number($("inptMaterial").value) || 5;
+
+  // 取得目標安全係數與獨立輸入值
+  const targetSfM1 = Number($("inptTargetSfM1").value) || 4;
+  const targetSfM2 = Number($("inptTargetSfM2").value) || 4;
+  const alphaM3 = Number($("inptAlphaM3").value) || 5;
+  const shearRatio = Number($("inptShearRatio").value) || 0.8;
+  const alphaM4 = Number($("inptAlphaM4").value) || 5;
 
   const screw = SCREW_TABLE[specKey];
   const As = screw.As;
   const dia = screw.d;
 
-  // 2. 基礎計算 (重力加速度取 9.81 N/kg 更精準)
+  // 2. 基礎計算
   const P = weight * multi * 9.81; 
-  
-  // 修正：計算幾何中心到螺栓的真實旋轉半徑
   const halfA = spaceA / 2;
   const halfB = spaceB / 2;
   const r_true = Math.sqrt(halfA * halfA + halfB * halfB); 
@@ -441,11 +478,10 @@ function calc(){
   // ------------------------------------
   // 方法 1：合力與剪力
   // ------------------------------------
-  const Tz = P * arm; // N.mm
-  const Fv = P / bolts; // 單顆垂直均分力
-  const Ft = Tz / (bolts * r_true); // 使用真實半徑計算單顆扭轉切線力
+  const Tz = P * arm; 
+  const Fv = P / bolts; 
+  const Ft = Tz / (bolts * r_true); 
   
-  // 計算最危險位置螺絲的垂直力與切線力夾角 cos 值
   const cosTheta = (r_true === 0) ? 0 : (halfA / r_true); 
   const F_total = Math.sqrt(Fv * Fv + Ft * Ft + 2 * Fv * Ft * cosTheta);
 
@@ -459,28 +495,28 @@ function calc(){
   setStat("m1Ftotal", r2(F_total), "N");
   setStat("m1TauYp", r2(tau_yp), "N/mm²");
   setStat("m1TauAct", r2(tau_act), "N/mm²");
-  setStat("m1Sf", r2(sf_m1));
   
-  // 安全係數判斷特效
-  const sfBox = $("m1SfBox");
-  if(sf_m1 > 4) { sfBox.className = "stat final"; } 
-  else { sfBox.className = "stat warn"; }
+  const sfBoxM1 = $("m1SfBox");
+  if(sf_m1 >= targetSfM1) { 
+    sfBoxM1.className = "stat final"; 
+    $("m1Sf").innerHTML = `${r2(sf_m1)} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
+  } else { 
+    sfBoxM1.className = "stat warn"; 
+    $("m1Sf").innerHTML = `${r2(sf_m1)} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
+  }
 
-  // ------------------------------------
-  // 進階推算：由最大合力反推螺栓直徑
-  // ------------------------------------
-  const target_SF = 4; // 目標安全係數設定為 4
-  const tau_allow = tau_yp / target_SF;
+  const m1AdvMeta = $("m1AdvMeta");
+  if(m1AdvMeta) m1AdvMeta.innerText = `以目標安全係數 SF = ${targetSfM1} 進行反向推算`;
+
+  const tau_allow = tau_yp / targetSfM1;
   const req_As_from_force = F_total / tau_allow;
   const req_D_from_force = Math.sqrt((4 * req_As_from_force) / Math.PI);
   
-  // 查表比對建議的 M 規格螺栓
   let recSpecFinal = NA;
   for(let key of SCREW_LIST){
     if(SCREW_TABLE[key].d >= req_D_from_force){ recSpecFinal = key; break; }
   }
 
-  // 輸出至畫面
   setStat("m1TargetTau", r2(tau_allow), "N/mm²");
   setStat("m1ReqAs", r2(req_As_from_force), "mm²");
   setStat("m1ReqD", r2(req_D_from_force), "mm");
@@ -498,14 +534,29 @@ function calc(){
   setStat("m2Yield", r2(yieldLoad), "N");
   setStat("m2Allow", r2(allowLoad), "N");
   setStat("m2TotalAllow", r2(totalAllow), "N");
-  setStat("m2SfTotal", r2(sf_m2_tot));
-  setStat("m2SfSingle", r2(sf_m2_single));
+
+  const sfBoxTot = $("m2SfTotalBox");
+  if (sf_m2_tot >= targetSfM2) {
+      sfBoxTot.className = "stat final";
+      $("m2SfTotal").innerHTML = `${r2(sf_m2_tot)} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
+  } else {
+      sfBoxTot.className = "stat warn";
+      $("m2SfTotal").innerHTML = `${r2(sf_m2_tot)} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
+  }
+
+  const sfBoxSin = $("m2SfSingleBox");
+  if (sf_m2_single >= targetSfM2) {
+      sfBoxSin.className = "stat final";
+      $("m2SfSingle").innerHTML = `${r2(sf_m2_single)} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
+  } else {
+      sfBoxSin.className = "stat warn";
+      $("m2SfSingle").innerHTML = `${r2(sf_m2_single)} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
+  }
 
   // ------------------------------------
-  // 方法 3 & 4：三柱算法
+  // 方法 3：三柱正應力算法
   // ------------------------------------
-  // M3 面積算法
-  const sigma_t = hvMin / alpha;
+  const sigma_t = hvMin / alphaM3;
   const req_As = P / sigma_t;
   
   let recSpecAs = NA;
@@ -513,18 +564,20 @@ function calc(){
     if(SCREW_TABLE[key].As >= req_As){ recSpecAs = key; break; }
   }
 
-  // M4 直徑算法
-  const tau_all = (hvMin * 0.8) / alpha;
+  setStat("m3SigmaT", r2(sigma_t), "N/mm²");
+  setStat("m3ReqAs", r2(req_As), "mm²");
+  setStat("m3RecSpec", recSpecAs);
+
+  // ------------------------------------
+  // 方法 4：三柱剪應力算法
+  // ------------------------------------
+  const tau_all = (hvMin * shearRatio) / alphaM4;
   const req_D = Math.sqrt((4 * P) / (Math.PI * tau_all));
   
   let recSpecD = NA;
   for(let key of SCREW_LIST){
     if(SCREW_TABLE[key].d >= req_D){ recSpecD = key; break; }
   }
-
-  setStat("m3SigmaT", r2(sigma_t), "N/mm²");
-  setStat("m3ReqAs", r2(req_As), "mm²");
-  setStat("m3RecSpec", recSpecAs);
 
   setStat("m4TauT", r2(tau_all), "N/mm²");
   setStat("m4ReqD", r2(req_D), "mm");
