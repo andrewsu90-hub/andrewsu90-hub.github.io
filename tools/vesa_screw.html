@@ -139,7 +139,7 @@
 <section class="hero">
     <div class="hero-label">工程計算工具</div>
     <h1>🖥️ VESA 螺絲受力計算工具</h1>
-    <p>針對壁掛或機台，計算螺絲在受扭轉、剪力與拉力下的合力與安全係數。包含單顆螺絲剪力、降伏應力及三柱容許應力算法。</p>
+    <p>針對壁掛或機台，計算螺栓群在受偏心扭矩、剪力與拉力下的合力與安全係數。已依據 Shigley's 標準力學修正旋轉半徑與夾角計算。</p>
     <span class="source-note">參考文獻：機械設計手冊 (新版) 第2卷</span>
 </section>
 
@@ -199,7 +199,7 @@
     <div class="row-line"></div>
     <div class="grid g-4">
       <div class="stat dim"><div class="k">系統總力 P</div><div class="v" id="valP">–<span class="u">N</span></div></div>
-      <div class="stat dim"><div class="k">等效半徑 r</div><div class="v" id="valR">–<span class="u">mm</span></div></div>
+      <div class="stat dim"><div class="k">真實等效半徑 r</div><div class="v" id="valR">–<span class="u">mm</span></div></div>
       <div class="stat dim"><div class="k">螺栓截面積 As</div><div class="v" id="valAs">–<span class="u">mm²</span></div></div>
       <div class="stat dim"><div class="k">螺絲直徑 D</div><div class="v" id="valDia">–<span class="u">mm</span></div></div>
     </div>
@@ -241,6 +241,19 @@
       </div>
     </div>
   </div>
+
+  <div class="card" style="margin-top: 1rem;">
+    <div class="card-head"><h3>進階推算：由最大合力反推螺栓需求</h3><div class="meta">以目標安全係數 SF = 4 進行反向推算</div></div>
+    <div class="card-body">
+      <div class="grid g-4">
+        <div class="stat"><div class="k">目標容許剪應力</div><div class="v" id="m1TargetTau">–<span class="u">N/mm²</span></div></div>
+        <div class="stat"><div class="k">最小需求截面積</div><div class="v" id="m1ReqAs">–<span class="u">mm²</span></div></div>
+        <div class="stat accent"><div class="k">最小需求直徑</div><div class="v" id="m1ReqD">–<span class="u">mm</span></div></div>
+        <div class="stat final"><div class="k">建議螺栓規格</div><div class="v" id="m1RecSpec">–</div></div>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 <section id="t2" class="panel" style="display:none">
@@ -359,10 +372,12 @@ const $ = id => document.getElementById(id);
 const NA = "–";
 
 function r2(v){ return Math.round(v * 100) / 100; }
+
+// 修正：加入 typeof value === 'number' 判斷，確保正確顯示字串 (如 M4)
 function setStat(id, value, unit){
   const el = $(id);
   if(!el) return;
-  if(value === null || value === undefined || isNaN(value)){
+  if(value === null || value === undefined || value === NA || (typeof value === 'number' && isNaN(value))){
     el.innerHTML = `<span style="color:var(--secondary-color);font-size:14px">${NA}</span>`;
     return;
   }
@@ -410,13 +425,16 @@ function calc(){
   const As = screw.As;
   const dia = screw.d;
 
-  // 2. 基礎計算
-  const P = weight * multi * 9.8; // N
-  // 依 Excel，c-r1 = 70.71 代表 r = sqrt(a^2 + b^2)
-  const r = Math.sqrt(spaceA*spaceA + spaceB*spaceB); 
+  // 2. 基礎計算 (重力加速度取 9.81 N/kg 更精準)
+  const P = weight * multi * 9.81; 
+  
+  // 修正：計算幾何中心到螺栓的真實旋轉半徑
+  const halfA = spaceA / 2;
+  const halfB = spaceB / 2;
+  const r_true = Math.sqrt(halfA * halfA + halfB * halfB); 
   
   setStat("valP", r2(P), "N");
-  setStat("valR", r2(r), "mm");
+  setStat("valR", r2(r_true), "mm");
   setStat("valAs", As, "mm²");
   setStat("valDia", dia, "mm");
 
@@ -424,12 +442,12 @@ function calc(){
   // 方法 1：合力與剪力
   // ------------------------------------
   const Tz = P * arm; // N.mm
-  const Fv = P / bolts; // 單顆垂直力
-  const Ft = Tz / (bolts * r); // 單顆扭轉力
+  const Fv = P / bolts; // 單顆垂直均分力
+  const Ft = Tz / (bolts * r_true); // 使用真實半徑計算單顆扭轉切線力
   
-  // 考慮極端狀況角度為 45 度 (cos 45 = 0.7071)
-  const angleRad = 45 * (Math.PI / 180);
-  const F_total = Math.sqrt(Fv*Fv + Ft*Ft + 2*Fv*Ft*Math.cos(angleRad));
+  // 計算最危險位置螺絲的垂直力與切線力夾角 cos 值
+  const cosTheta = (r_true === 0) ? 0 : (halfA / r_true); 
+  const F_total = Math.sqrt(Fv * Fv + Ft * Ft + 2 * Fv * Ft * cosTheta);
 
   const tau_yp = hvMin / 2;
   const tau_act = F_total / As;
@@ -449,13 +467,33 @@ function calc(){
   else { sfBox.className = "stat warn"; }
 
   // ------------------------------------
+  // 進階推算：由最大合力反推螺栓直徑
+  // ------------------------------------
+  const target_SF = 4; // 目標安全係數設定為 4
+  const tau_allow = tau_yp / target_SF;
+  const req_As_from_force = F_total / tau_allow;
+  const req_D_from_force = Math.sqrt((4 * req_As_from_force) / Math.PI);
+  
+  // 查表比對建議的 M 規格螺栓
+  let recSpecFinal = NA;
+  for(let key of SCREW_LIST){
+    if(SCREW_TABLE[key].d >= req_D_from_force){ recSpecFinal = key; break; }
+  }
+
+  // 輸出至畫面
+  setStat("m1TargetTau", r2(tau_allow), "N/mm²");
+  setStat("m1ReqAs", r2(req_As_from_force), "mm²");
+  setStat("m1ReqD", r2(req_D_from_force), "mm");
+  setStat("m1RecSpec", recSpecFinal);
+
+  // ------------------------------------
   // 方法 2：降伏拉力
   // ------------------------------------
   const yieldLoad = hvMin * As;
   const allowLoad = yieldLoad * kFactor;
   const totalAllow = allowLoad * bolts;
   const sf_m2_tot = totalAllow / P;
-  const sf_m2_single = allowLoad / P; // Excel 中的單顆除以總負載寫法
+  const sf_m2_single = allowLoad / P;
 
   setStat("m2Yield", r2(yieldLoad), "N");
   setStat("m2Allow", r2(allowLoad), "N");
@@ -470,7 +508,6 @@ function calc(){
   const sigma_t = hvMin / alpha;
   const req_As = P / sigma_t;
   
-  // 找尋大於需求面積的最小螺絲
   let recSpecAs = NA;
   for(let key of SCREW_LIST){
     if(SCREW_TABLE[key].As >= req_As){ recSpecAs = key; break; }
