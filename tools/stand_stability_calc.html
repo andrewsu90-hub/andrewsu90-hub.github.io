@@ -17,6 +17,7 @@
     --muted: #64748B; --border: #e0e0e0;
     --brand: #1a1a2e; --brand-50: #f0f0f5; --brand-100: #e0e0ee;
     --warn-bg: #FFFBEB; --warn-bd: #FDE68A; --warn-tx: #92400E;
+    --caution: #b45309; --caution-bg: rgba(245,158,11,0.08); --caution-bd: rgba(245,158,11,0.35);
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -25,6 +26,7 @@
       --muted: #aaa; --border: #333;
       --brand: #aaa; --brand-50: #1a1a1a; --brand-100: #222;
       --warn-bg: #2a1a00; --warn-bd: #7a5000; --warn-tx: #ffd080;
+      --caution: #fbbf24; --caution-bg: rgba(251,191,36,0.1); --caution-bd: rgba(251,191,36,0.3);
     }
   }
   html { scroll-behavior: smooth; }
@@ -93,6 +95,8 @@
   .stat.final .v { color: var(--ok); }
   .stat.fail { background: rgba(198,40,40,0.08); border-color: rgba(198,40,40,0.3); }
   .stat.fail .v { color: var(--warn); }
+  .stat.caution { background: var(--caution-bg); border-color: var(--caution-bd); }
+  .stat.caution .v { color: var(--caution); }
   @media (prefers-color-scheme: dark) {
     .stat.final { background: rgba(102,187,106,0.1); border-color: rgba(102,187,106,0.3); }
     .stat.fail  { background: rgba(239,83,80,0.1);  border-color: rgba(239,83,80,0.3); }
@@ -109,9 +113,6 @@
   .page-title { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; }
   .page-title h2 { font-size: 18px; margin: 0; }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--bg-light); color: var(--secondary-color); border: 0.5px solid var(--border-color); font-size: 11.5px; font-weight: 600; letter-spacing: .3px; }
-
-  /* ---------- Row divider ---------- */
-  .row-line { height: 1px; background: var(--border-color); margin: 12px 0; }
 
   /* ---------- Footer ---------- */
   footer { padding: 1.5rem 5%; border-top: 0.5px solid var(--border-color); text-align: center; font-size: 13px; color: var(--secondary-color); }
@@ -135,6 +136,31 @@
 </section>
 
 <section class="calc-section">
+
+  <!-- 傾覆角度判斷 -->
+  <div class="page-title">
+    <h2>傾覆角度判斷</h2>
+    <span class="badge">3D 設計值驗證</span>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <h3>最大極限傾斜角度（3D 設計值）</h3>
+      <div class="meta">≤ 10° 危險 ／ 11°–14° 警告 ／ ≥ 15° 安全</div>
+    </div>
+    <div class="card-body">
+      <div class="grid g-2">
+        <div class="field">
+          <label>最大極限傾斜角度 (°)</label>
+          <input type="number" id="max_tilt_design" placeholder="例：15.5" step="0.1" min="0">
+          <div style="font-size:11px;color:#888;margin-top:4px;">3D 模型推算之臨界傾倒角</div>
+        </div>
+        <div class="stat dim" id="card-tilt-verdict" style="align-self:end;">
+          <div class="k">判定結果</div>
+          <div class="v" id="verdict-tilt">–</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Banner -->
   <div class="banner">
@@ -163,11 +189,11 @@
           <input type="number" id="height_cm" placeholder="例：33.3" step="0.1" min="0">
         </div>
         <div class="field">
-          <label>重心距 <span style="color:#2e7d32;font-weight:700;">前緣</span> 距離 (cm)</label>
+          <label>重心距 <span style="color:#2e7d32;font-weight:700;">後緣</span> 距離 (cm)<br><span style="font-size:11px;font-weight:400;color:#999;">FRONT 向後傾覆支點</span></label>
           <input type="number" id="cg_front" placeholder="例：9.357" step="0.001" min="0">
         </div>
         <div class="field">
-          <label>重心距 <span style="color:#1565c0;font-weight:700;">後緣</span> 距離 (cm)</label>
+          <label>重心距 <span style="color:#1565c0;font-weight:700;">前緣</span> 距離 (cm)<br><span style="font-size:11px;font-weight:400;color:#999;">BACK 向前傾覆支點</span></label>
           <input type="number" id="cg_back" placeholder="例：13.143" step="0.001" min="0">
         </div>
       </div>
@@ -178,21 +204,22 @@
   <div class="card">
     <div class="card-head">
       <h3>計算參數</h3>
-      <div class="meta">可依標準或專案需求調整</div>
+      <div class="meta">IEC 62368-1 標準固定值</div>
     </div>
     <div class="card-body">
       <div class="grid g-3">
         <div class="field">
           <label>重力加速度 g (m/s²)</label>
-          <input type="number" id="g_factor" value="10" step="0.01" min="1">
-        </div>
-        <div class="field">
-          <label>施力比例（佔 W %）</label>
-          <input type="number" id="force_pct" value="20" step="1" min="1" max="100">
+          <input type="number" id="g_factor" value="9.81" disabled style="cursor:not-allowed;opacity:0.7;">
         </div>
         <div class="field">
           <label>施力上限 F_max (N)</label>
-          <input type="number" id="force_cap" value="250" step="1" min="0">
+          <input type="number" id="force_cap" value="250" disabled style="cursor:not-allowed;opacity:0.7;">
+        </div>
+        <div class="field">
+          <label>實際施力 F (N) <span style="font-weight:400;color:#aaa;">= MIN(W × 20%, 250)</span></label>
+          <div style="background:var(--bg-white);border:0.5px solid var(--border-color);border-radius:6px;padding:9px 12px;font-size:20px;font-weight:700;color:var(--primary-color);min-height:40px;" id="param-f">–</div>
+          <div style="font-size:11px;color:#888;margin-top:4px;">機台重量(N) × 0.2，超過 250 以 250 計算</div>
         </div>
       </div>
     </div>
@@ -206,8 +233,8 @@
     <div class="card-body">
       <div class="grid g-4">
         <div class="stat dim"><div class="k">機台重量 W(N)</div><div class="v" id="sum-w">–<span class="u">N</span></div></div>
-        <div class="stat dim"><div class="k">F_raw = W × 比例%</div><div class="v" id="sum-f-raw">–<span class="u">N</span></div></div>
-        <div class="stat accent"><div class="k">實際施力 F = MIN(上限, F_raw)</div><div class="v" id="sum-f">–<span class="u">N</span></div></div>
+        <div class="stat dim"><div class="k">F_raw = W × 20%</div><div class="v" id="sum-f-raw">–<span class="u">N</span></div></div>
+        <div class="stat accent"><div class="k">實際施力 F = MIN(250, F_raw)</div><div class="v" id="sum-f">–<span class="u">N</span></div></div>
         <div class="stat dim"><div class="k">機台高度 H（力臂）</div><div class="v" id="sum-h">–<span class="u">cm</span></div></div>
       </div>
     </div>
@@ -215,13 +242,13 @@
 
   <!-- FRONT 結果 -->
   <div class="page-title" style="margin-top:1.5rem;">
-    <h2>FRONT — 向前傾覆</h2>
-    <span class="badge">以前緣為支點</span>
+    <h2>FRONT — 向後傾覆</h2>
+    <span class="badge">以後緣為支點</span>
   </div>
   <div class="card">
     <div class="card-body">
       <div class="grid g-5">
-        <div class="stat dim"><div class="k">重心距前緣 d_front</div><div class="v" id="r-front-d">–<span class="u">cm</span></div></div>
+        <div class="stat dim"><div class="k">重心距後緣 d_back</div><div class="v" id="r-front-d">–<span class="u">cm</span></div></div>
         <div class="stat"><div class="k">Ms 穩定力矩</div><div class="v" id="r-front-ms">–<span class="u">N·cm</span></div></div>
         <div class="stat"><div class="k">Mt 傾覆力矩</div><div class="v" id="r-front-mt">–<span class="u">N·cm</span></div></div>
         <div class="stat accent"><div class="k">K = Ms / Mt</div><div class="v" id="r-front-k">–</div></div>
@@ -232,13 +259,13 @@
 
   <!-- BACK 結果 -->
   <div class="page-title" style="margin-top:1rem;">
-    <h2>BACK — 向後傾覆</h2>
-    <span class="badge">以後緣為支點</span>
+    <h2>BACK — 向前傾覆</h2>
+    <span class="badge">以前緣為支點</span>
   </div>
   <div class="card">
     <div class="card-body">
       <div class="grid g-5">
-        <div class="stat dim"><div class="k">重心距後緣 d_back</div><div class="v" id="r-back-d">–<span class="u">cm</span></div></div>
+        <div class="stat dim"><div class="k">重心距前緣 d_front</div><div class="v" id="r-back-d">–<span class="u">cm</span></div></div>
         <div class="stat"><div class="k">Ms 穩定力矩</div><div class="v" id="r-back-ms">–<span class="u">N·cm</span></div></div>
         <div class="stat"><div class="k">Mt 傾覆力矩</div><div class="v" id="r-back-mt">–<span class="u">N·cm</span></div></div>
         <div class="stat accent"><div class="k">K = Ms / Mt</div><div class="v" id="r-back-k">–</div></div>
@@ -246,6 +273,7 @@
       </div>
     </div>
   </div>
+
 
 </section>
 
@@ -268,53 +296,74 @@
     el.innerHTML = unit ? `${value}<span class="u">${unit}</span>` : `${value}`;
   }
 
-  function calc() {
-    const wkg      = parseFloat($("weight_kg").value);
-    const h        = parseFloat($("height_cm").value);
-    const cf       = parseFloat($("cg_front").value);
-    const cb       = parseFloat($("cg_back").value);
-    const g        = parseFloat($("g_factor").value)  || 10;
-    const fp       = parseFloat($("force_pct").value) || 20;
-    const fc       = parseFloat($("force_cap").value);
+  // 傾覆角度判斷：單一輸入，三段閾值
+  function calcTilt() {
+    const angle = parseFloat($("max_tilt_design").value);
+    const vEl   = $("card-tilt-verdict");
 
-    // 中間值
-    const W      = isFinite(wkg) ? wkg * g : NaN;
-    const F_raw  = isFinite(W)   ? W * (fp / 100) : NaN;
-    const F      = (isFinite(F_raw) && isFinite(fc)) ? Math.min(F_raw, fc) : F_raw;
+    if (!isFinite(angle)) {
+      vEl.className = "stat dim";
+      setStat("verdict-tilt", null);
+      return;
+    }
+
+    if (angle >= 15) {
+      vEl.className = "stat final";
+      $("verdict-tilt").innerHTML = `OK <span class="u" style="color:var(--ok);font-weight:700;margin-left:6px;">安全</span>`;
+    } else if (angle > 10) {
+      vEl.className = "stat caution";
+      $("verdict-tilt").innerHTML = `⚠ <span class="u" style="color:var(--caution);font-weight:700;margin-left:6px;">警告</span>`;
+    } else {
+      vEl.className = "stat fail";
+      $("verdict-tilt").innerHTML = `NG <span class="u" style="color:var(--warn);font-weight:700;margin-left:6px;">危險</span>`;
+    }
+  }
+
+  // 穩定性計算（g 與 F 硬編碼，不讀取 disabled 欄位）
+  function calc() {
+    const wkg = parseFloat($("weight_kg").value);
+    const h   = parseFloat($("height_cm").value);
+    const cf  = parseFloat($("cg_front").value);
+    const cb  = parseFloat($("cg_back").value);
+    const g   = 9.81;
+    const fc  = 250;
+
+    const W     = isFinite(wkg) ? wkg * g : NaN;
+    const F_raw = isFinite(W)   ? W * 0.2 : NaN;
+    const F     = isFinite(F_raw) ? Math.min(F_raw, fc) : NaN;
 
     setStat("sum-w",     isFinite(W)     ? r1(W)     : null, "N");
     setStat("sum-f-raw", isFinite(F_raw) ? r1(F_raw) : null, "N");
     setStat("sum-f",     isFinite(F)     ? r1(F)     : null, "N");
     setStat("sum-h",     isFinite(h)     ? h         : null, "cm");
 
-    // FRONT
+    // 計算參數區 — 施力顯示
+    const paramF = $("param-f");
+    if (paramF) paramF.textContent = isFinite(F) ? r1(F) + " N" : "–";
+
     calcDir(cf, h, W, F, "front");
-    // BACK
     calcDir(cb, h, W, F, "back");
   }
 
   function calcDir(cg, h, W, F, dir) {
     const has = isFinite(cg) && isFinite(h) && isFinite(W) && isFinite(F) && F > 0;
-
     if (!has) {
       setStat(`r-${dir}-d`,  null);
       setStat(`r-${dir}-ms`, null);
       setStat(`r-${dir}-mt`, null);
       setStat(`r-${dir}-k`,  null);
-      const vEl = $(`card-${dir}-verdict`);
-      vEl.className = "stat dim";
+      $(`card-${dir}-verdict`).className = "stat dim";
       setStat(`verdict-${dir}`, null);
       return;
     }
-
-    const Ms = W * cg;
-    const Mt = F * h;
-    const K  = Ms / Mt;
+    const Ms   = W * cg;
+    const Mt   = F * h;
+    const K    = Ms / Mt;
     const pass = K >= 1;
 
-    setStat(`r-${dir}-d`,  cg,       "cm");
-    setStat(`r-${dir}-ms`, r1(Ms),   "N·cm");
-    setStat(`r-${dir}-mt`, r1(Mt),   "N·cm");
+    setStat(`r-${dir}-d`,  cg,     "cm");
+    setStat(`r-${dir}-ms`, r1(Ms), "N·cm");
+    setStat(`r-${dir}-mt`, r1(Mt), "N·cm");
     setStat(`r-${dir}-k`,  r3(K));
 
     const vEl = $(`card-${dir}-verdict`);
@@ -327,11 +376,11 @@
     }
   }
 
-  // 綁定所有輸入
-  ["weight_kg","height_cm","cg_front","cg_back","g_factor","force_pct","force_cap"]
-    .forEach(id => $( id).addEventListener("input", calc));
+  ["weight_kg","height_cm","cg_front","cg_back"].forEach(id => $(id).addEventListener("input", calc));
+  $("max_tilt_design").addEventListener("input", calcTilt);
 
   calc();
+  calcTilt();
 </script>
 </body>
 </html>
