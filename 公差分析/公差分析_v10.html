@@ -109,6 +109,10 @@
             .rss-card .rss-value { color: #000 !important; font-size: 1.5em; margin-top: 5px; }
             
             .dashboard-section { gap: 10px; margin-bottom: 10px; }
+            #stackup-container { page-break-inside: avoid; border: 1px solid #000 !important; }
+            #stackup-mode, #stackup-mode-hint { display: none !important; }
+            #stackup-diagram { min-width: 0 !important; }
+            #stackup-container > div[style*="overflow"] { overflow: visible !important; }
             h1 { font-size: 1.4em; margin-bottom: 10px; }
             h2 { font-size: 1.2em; margin-bottom: 5px; margin-top: 10px;}
             h3 { font-size: 1.1em; margin-bottom: 5px; margin-top: 5px;}
@@ -273,6 +277,27 @@
     </div>
 
     <div class="dashboard-section">
+        <div class="chart-container" id="stackup-container">
+            <h3>📐 尺寸鍊堆疊圖 (Dimension Stack-up Diagram)</h3>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+                <div style="font-size: 0.85em; color: #7f8c8d;">
+                    <span style="color:#27ae60; font-weight:bold;">增環 (+) 向右</span>、<span style="color:#2980b9; font-weight:bold;">減環 (−) 向左</span>；色條為公差帶。
+                </div>
+                <div style="margin-left:auto; display:flex; align-items:center; gap:6px;">
+                    <label style="font-size:0.85em; color:#2c3e50; font-weight:bold;">顯示模式：</label>
+                    <select id="stackup-mode" style="padding:4px 8px; border:1px solid #3498db; border-radius:4px; font-weight:bold; background:#fff;">
+                        <option value="auto">自動 (Auto)</option>
+                        <option value="position">絕對位置 (Positional)</option>
+                        <option value="tolerance">公差貢獻 (Tolerance)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="stackup-mode-hint" style="font-size:0.8em; color:#95a5a6; margin-bottom:8px;"></div>
+            <div style="overflow-x: auto;">
+                <svg id="stackup-diagram" style="width: 100%; height: auto; min-width: 700px;"></svg>
+            </div>
+        </div>
+
         <div class="chart-container">
             <h3>📈 預測組裝良率常態分佈與 Worst Case 對比圖</h3>
             <svg id="norm-dist-chart" viewBox="0 0 800 400" style="width: 100%; height: auto;"></svg>
@@ -355,7 +380,12 @@
             });
         });
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch(e) {
+            alert("無法儲存：瀏覽器封鎖了本機儲存空間 (localStorage)。請確認非無痕模式或允許網站儲存資料。");
+            return;
+        }
         
         // 視覺回饋
         const btn = document.getElementById('btn-save-state');
@@ -370,7 +400,9 @@
 
     // 載入之前儲存的設定
     function loadSavedState() {
-        const saved = localStorage.getItem(STORAGE_KEY);
+        let saved = null;
+        try { saved = localStorage.getItem(STORAGE_KEY); }
+        catch(e) { console.warn("localStorage 無法存取，略過載入。", e); return false; }
         if (saved) {
             try {
                 const state = JSON.parse(saved);
@@ -713,11 +745,222 @@
         svg.innerHTML = axes + elements + wcElements;
     }
 
+    /* ============================================================
+       尺寸鍊堆疊圖 (Stack-up Diagram) — SVG 動態繪製
+       兩種顯示模式：
+       1. 絕對位置 (positional)：依向量累加呈現實際空間位置，
+          適合各環尺寸相近 (如截圖：2~5mm 等級)。
+       2. 公差貢獻 (tolerance)：各環以共同零點對齊，僅按比例
+          呈現公差帶，適合含大尺寸 (如 140mm) 但需比較 sub-mm 公差時。
+       auto：當位置擺動遠大於公差量級時自動切換為公差模式。
+       ============================================================ */
+    function drawStackUpDiagram(chainData, dimSum, sysSigma, nominalTarget, lsl, usl) {
+        const svg = document.getElementById('stackup-diagram');
+        const hint = document.getElementById('stackup-mode-hint');
+        svg.innerHTML = '';
+
+        if (!chainData || chainData.length === 0) {
+            svg.setAttribute('viewBox', '0 0 700 80');
+            svg.innerHTML = `<text x="350" y="45" font-size="14" fill="#7f8c8d" text-anchor="middle">尚無有效尺寸鍊資料，請於上方表格輸入增環/減環尺寸。</text>`;
+            if (hint) hint.textContent = '';
+            return;
+        }
+
+        const modeSel = document.getElementById('stackup-mode');
+        let mode = modeSel ? modeSel.value : 'auto';
+
+        let cumTmp = 0, lo = 0, hi = 0, maxTol = 0;
+        chainData.forEach(d => { cumTmp += d.vector; lo = Math.min(lo, cumTmp); hi = Math.max(hi, cumTmp); maxTol = Math.max(maxTol, d.tol); });
+        const swing = hi - lo;
+        const tolScale = Math.max(maxTol, 3 * sysSigma, 1e-6);
+
+        if (mode === 'auto') mode = (swing > tolScale * 20) ? 'tolerance' : 'position';
+
+        if (hint) {
+            hint.textContent = (mode === 'tolerance')
+                ? `📏 公差貢獻模式：各環以共同零點對齊，便於比較 sub-mm 公差帶（位置擺動 ${swing.toFixed(1)}mm 遠大於公差量級）。`
+                : `📐 絕對位置模式：依向量累加呈現實際空間位置。`;
+        }
+
+        if (mode === 'tolerance') drawStackUpTolerance(svg, chainData, dimSum, sysSigma, lsl, usl, nominalTarget);
+        else drawStackUpPosition(svg, chainData, dimSum, sysSigma, lsl, usl, nominalTarget);
+    }
+
+    // ---- 模式 1：絕對位置 ----
+    function drawStackUpPosition(svg, chainData, dimSum, sysSigma, lsl, usl, nominalTarget) {
+        const rowH = 46, topPad = 50, botPad = 70, leftPad = 240, rightPad = 90, plotW = 620;
+        const width = leftPad + plotW + rightPad;
+        const height = topPad + chainData.length * rowH + botPad;
+        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+        let cum = 0, minPos = 0, maxPos = 0;
+        chainData.forEach(d => {
+            const s = cum; cum += d.vector; const e = cum;
+            minPos = Math.min(minPos, s, e, e - d.tol);
+            maxPos = Math.max(maxPos, s, e, e + d.tol);
+        });
+        const specLo = lsl + (cum - dimSum);
+        const specHi = usl + (cum - dimSum);
+        const rangeRaw = Math.max(maxPos - minPos, 1e-6);
+        if (Math.abs(specLo - cum) < rangeRaw * 3) minPos = Math.min(minPos, specLo);
+        if (Math.abs(specHi - cum) < rangeRaw * 3) maxPos = Math.max(maxPos, specHi);
+
+        const span = Math.max(maxPos - minPos, 1e-6);
+        const margin = span * 0.08;
+        const xMin = minPos - margin, xMax = maxPos + margin;
+        const X = v => leftPad + ((v - xMin) / (xMax - xMin)) * plotW;
+
+        let out = '';
+        const axisY = topPad - 18;
+        out += `<line x1="${leftPad}" y1="${axisY}" x2="${leftPad + plotW}" y2="${axisY}" stroke="#bdc3c7" stroke-width="1"/>`;
+        out += `<line x1="${X(0)}" y1="${axisY - 5}" x2="${X(0)}" y2="${height - botPad + 10}" stroke="#95a5a6" stroke-width="1" stroke-dasharray="3,3"/>`;
+        out += `<text x="${X(0)}" y="${axisY - 8}" font-size="11" fill="#7f8c8d" text-anchor="middle">基準 0</text>`;
+        out += `<line x1="${X(cum)}" y1="${axisY - 5}" x2="${X(cum)}" y2="${height - botPad + 10}" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+        out += `<text x="${X(cum)}" y="${axisY - 8}" font-size="11" fill="#27ae60" text-anchor="middle" font-weight="bold">累計終點</text>`;
+
+        cum = 0;
+        chainData.forEach((d, i) => {
+            const rowY = topPad + i * rowH + rowH / 2;
+            const s = cum; cum += d.vector; const e = cum;
+            const xStart = X(s), xEnd = X(e);
+            const isPlus = d.vector >= 0;
+            const color = isPlus ? '#27ae60' : '#2980b9';
+
+            out += `<line x1="0" y1="${topPad + i * rowH}" x2="${width}" y2="${topPad + i * rowH}" stroke="#f0f0f0" stroke-width="1"/>`;
+            let label = d.desc.length > 26 ? d.desc.slice(0, 25) + '…' : d.desc;
+            out += `<text x="${leftPad - 12}" y="${rowY - 4}" font-size="12" fill="#2c3e50" text-anchor="end" font-weight="bold">${escapeXml(label)}</text>`;
+            const tagText = (d.isPlus ? '增環(+)' : d.isMinus ? '減環(−)' : '公差項') + ` · ${d.dist}`;
+            out += `<text x="${leftPad - 12}" y="${rowY + 11}" font-size="10" fill="${color}" text-anchor="end">${tagText}</text>`;
+
+            if (Math.abs(d.vector) > 1e-9) {
+                const dir = isPlus ? 1 : -1, aLen = 6;
+                out += `<line x1="${xStart}" y1="${rowY}" x2="${xEnd}" y2="${rowY}" stroke="${color}" stroke-width="2"/>`;
+                out += `<path d="M ${xEnd} ${rowY} L ${xEnd - dir * aLen} ${rowY - 4} L ${xEnd - dir * aLen} ${rowY + 4} Z" fill="${color}"/>`;
+                out += `<line x1="${xStart}" y1="${rowY - 5}" x2="${xStart}" y2="${rowY + 5}" stroke="${color}" stroke-width="1.5"/>`;
+            } else {
+                out += `<circle cx="${xStart}" cy="${rowY}" r="3" fill="${color}"/>`;
+            }
+
+            if (d.tol > 0) {
+                const xTolLo = X(e - d.tol), xTolHi = X(e + d.tol);
+                out += `<rect x="${xTolLo}" y="${rowY - 7}" width="${Math.max(1, xTolHi - xTolLo)}" height="14" fill="${color}" opacity="0.15" rx="2"/>`;
+                out += `<line x1="${xTolLo}" y1="${rowY - 7}" x2="${xTolLo}" y2="${rowY + 7}" stroke="${color}" stroke-width="1" opacity="0.6"/>`;
+                out += `<line x1="${xTolHi}" y1="${rowY - 7}" x2="${xTolHi}" y2="${rowY + 7}" stroke="${color}" stroke-width="1" opacity="0.6"/>`;
+            }
+
+            const dimText = (d.vector >= 0 ? '+' : '') + d.vector.toFixed(2);
+            const valLabel = (Math.abs(d.vector) > 1e-9 ? `${dimText} ` : '') + `±${d.tol.toFixed(2)}`;
+            out += `<text x="${leftPad + plotW + 12}" y="${rowY + 4}" font-size="11" fill="#2c3e50" text-anchor="start" font-weight="bold">${valLabel}</text>`;
+
+            if (i < chainData.length - 1) {
+                out += `<line x1="${xEnd}" y1="${rowY}" x2="${xEnd}" y2="${topPad + (i + 1) * rowH + rowH / 2}" stroke="${color}" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>`;
+            }
+        });
+
+        out += renderSumBand(X, cum, dimSum, sysSigma, lsl, usl, specLo, specHi, height, botPad, topPad, leftPad, plotW, xMin, xMax);
+        svg.innerHTML = out;
+    }
+
+    // ---- 模式 2：公差貢獻 (共同零點對齊) ----
+    function drawStackUpTolerance(svg, chainData, dimSum, sysSigma, lsl, usl, nominalTarget) {
+        const rowH = 46, topPad = 50, botPad = 70, leftPad = 240, rightPad = 110, plotW = 600;
+        const width = leftPad + plotW + rightPad;
+        const height = topPad + chainData.length * rowH + botPad;
+        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+        let maxTol = 0;
+        chainData.forEach(d => { maxTol = Math.max(maxTol, d.tol); });
+        const half = Math.max(maxTol, 3 * sysSigma, 1e-6) * 1.15;
+        const xMin = -half, xMax = half;
+        const cx = leftPad + plotW / 2;
+        const X = v => leftPad + ((v - xMin) / (xMax - xMin)) * plotW;
+
+        let out = '';
+        const axisY = topPad - 18;
+        out += `<line x1="${leftPad}" y1="${axisY}" x2="${leftPad + plotW}" y2="${axisY}" stroke="#bdc3c7" stroke-width="1"/>`;
+        out += `<line x1="${cx}" y1="${axisY - 5}" x2="${cx}" y2="${height - botPad + 10}" stroke="#95a5a6" stroke-width="1" stroke-dasharray="3,3"/>`;
+        out += `<text x="${cx}" y="${axisY - 8}" font-size="11" fill="#7f8c8d" text-anchor="middle">各環中心 (0)</text>`;
+
+        chainData.forEach((d, i) => {
+            const rowY = topPad + i * rowH + rowH / 2;
+            const isPlus = d.vector >= 0;
+            const color = Math.abs(d.vector) < 1e-9 ? '#8e44ad' : (isPlus ? '#27ae60' : '#2980b9');
+
+            out += `<line x1="0" y1="${topPad + i * rowH}" x2="${width}" y2="${topPad + i * rowH}" stroke="#f0f0f0" stroke-width="1"/>`;
+            let label = d.desc.length > 26 ? d.desc.slice(0, 25) + '…' : d.desc;
+            out += `<text x="${leftPad - 12}" y="${rowY - 4}" font-size="12" fill="#2c3e50" text-anchor="end" font-weight="bold">${escapeXml(label)}</text>`;
+            const tagText = (d.isPlus ? '增環(+)' : d.isMinus ? '減環(−)' : '公差項') + ` · ${d.dist}`;
+            out += `<text x="${leftPad - 12}" y="${rowY + 11}" font-size="10" fill="${color}" text-anchor="end">${tagText}</text>`;
+
+            if (d.tol > 0) {
+                const xLo = X(-d.tol), xHi = X(d.tol);
+                out += `<rect x="${xLo}" y="${rowY - 8}" width="${Math.max(1, xHi - xLo)}" height="16" fill="${color}" opacity="0.2" rx="3"/>`;
+                out += `<line x1="${xLo}" y1="${rowY - 8}" x2="${xLo}" y2="${rowY + 8}" stroke="${color}" stroke-width="1.5"/>`;
+                out += `<line x1="${xHi}" y1="${rowY - 8}" x2="${xHi}" y2="${rowY + 8}" stroke="${color}" stroke-width="1.5"/>`;
+                out += `<line x1="${xLo}" y1="${rowY}" x2="${xHi}" y2="${rowY}" stroke="${color}" stroke-width="1" opacity="0.5"/>`;
+            } else {
+                out += `<circle cx="${cx}" cy="${rowY}" r="3" fill="${color}"/>`;
+            }
+
+            const dimText = Math.abs(d.vector) > 1e-9 ? ((d.vector >= 0 ? '+' : '') + d.vector.toFixed(2) + ' / ') : '';
+            out += `<text x="${leftPad + plotW + 12}" y="${rowY + 4}" font-size="11" fill="#2c3e50" text-anchor="start" font-weight="bold">${dimText}±${d.tol.toFixed(3)}</text>`;
+        });
+
+        const sumY = height - botPad + 30;
+        const x3sLo = X(-3 * sysSigma), x3sHi = X(3 * sysSigma);
+        out += `<rect x="${x3sLo}" y="${sumY - 9}" width="${Math.max(1, x3sHi - x3sLo)}" height="18" fill="#f39c12" opacity="0.3" rx="3"/>`;
+        out += `<line x1="${x3sLo}" y1="${sumY - 11}" x2="${x3sLo}" y2="${sumY + 11}" stroke="#e67e22" stroke-width="2"/>`;
+        out += `<line x1="${x3sHi}" y1="${sumY - 11}" x2="${x3sHi}" y2="${sumY + 11}" stroke="#e67e22" stroke-width="2"/>`;
+        out += `<circle cx="${cx}" cy="${sumY}" r="4" fill="#27ae60"/>`;
+        out += `<text x="${leftPad - 12}" y="${sumY + 4}" font-size="12" fill="#2c3e50" text-anchor="end" font-weight="bold">系統累計 (RSS ±3σ)</text>`;
+        out += `<text x="${leftPad + plotW + 12}" y="${sumY + 4}" font-size="11" fill="#27ae60" text-anchor="start" font-weight="bold">±${(3 * sysSigma).toFixed(3)}</text>`;
+
+        const specHalfLo = (lsl - dimSum), specHalfHi = (usl - dimSum);
+        if (specHalfLo >= xMin && specHalfLo <= xMax) {
+            out += `<line x1="${X(specHalfLo)}" y1="${topPad - 25}" x2="${X(specHalfLo)}" y2="${sumY + 20}" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+            out += `<text x="${X(specHalfLo)}" y="${sumY + 34}" font-size="10" fill="#c0392b" text-anchor="middle" font-weight="bold">LSL ${lsl.toFixed(3)}</text>`;
+        }
+        if (specHalfHi >= xMin && specHalfHi <= xMax) {
+            out += `<line x1="${X(specHalfHi)}" y1="${topPad - 25}" x2="${X(specHalfHi)}" y2="${sumY + 20}" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+            out += `<text x="${X(specHalfHi)}" y="${sumY + 34}" font-size="10" fill="#c0392b" text-anchor="middle" font-weight="bold">USL ${usl.toFixed(3)}</text>`;
+        }
+
+        svg.innerHTML = out;
+    }
+
+    // 共用：絕對位置模式的底部累計帶
+    function renderSumBand(X, cum, dimSum, sysSigma, lsl, usl, specLo, specHi, height, botPad, topPad, leftPad, plotW, xMin, xMax) {
+        const sumY = height - botPad + 30;
+        const x3sLo = X(cum - 3 * sysSigma), x3sHi = X(cum + 3 * sysSigma), xCum = X(cum);
+        let out = '';
+        if (specLo >= xMin && specLo <= xMax) {
+            out += `<line x1="${X(specLo)}" y1="${topPad - 25}" x2="${X(specLo)}" y2="${sumY + 20}" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+            out += `<text x="${X(specLo)}" y="${sumY + 34}" font-size="10" fill="#c0392b" text-anchor="middle" font-weight="bold">LSL ${lsl.toFixed(3)}</text>`;
+        }
+        if (specHi >= xMin && specHi <= xMax) {
+            out += `<line x1="${X(specHi)}" y1="${topPad - 25}" x2="${X(specHi)}" y2="${sumY + 20}" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+            out += `<text x="${X(specHi)}" y="${sumY + 34}" font-size="10" fill="#c0392b" text-anchor="middle" font-weight="bold">USL ${usl.toFixed(3)}</text>`;
+        }
+        out += `<rect x="${x3sLo}" y="${sumY - 8}" width="${Math.max(1, x3sHi - x3sLo)}" height="16" fill="#f39c12" opacity="0.25" rx="3"/>`;
+        out += `<line x1="${x3sLo}" y1="${sumY - 10}" x2="${x3sLo}" y2="${sumY + 10}" stroke="#e67e22" stroke-width="1.5"/>`;
+        out += `<line x1="${x3sHi}" y1="${sumY - 10}" x2="${x3sHi}" y2="${sumY + 10}" stroke="#e67e22" stroke-width="1.5"/>`;
+        out += `<circle cx="${xCum}" cy="${sumY}" r="4" fill="#27ae60"/>`;
+        out += `<text x="${leftPad - 12}" y="${sumY + 4}" font-size="12" fill="#2c3e50" text-anchor="end" font-weight="bold">累計疊加 (±3σ)</text>`;
+        out += `<text x="${leftPad + plotW + 12}" y="${sumY + 4}" font-size="11" fill="#27ae60" text-anchor="start" font-weight="bold">${dimSum.toFixed(3)} ±${(3 * sysSigma).toFixed(3)}</text>`;
+        return out;
+    }
+
+    // XML 文字轉義 (避免描述含 < > & 破壞 SVG)
+    function escapeXml(s) {
+        return String(s).replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
+    }
+
     function calculateTolerance() {
         let dimSum = 0; let worstCase = 0;
         let varNormal = 0;  
         let varUniform = 0; 
         let eqA_sq = 0;     
+        const chainData = [];
         
         const nominalTarget = parseFloat(document.getElementById('nominal-target').value) || 0;
         const specUpper = Math.abs(parseFloat(document.getElementById('spec-upper').value)) || 0;
@@ -729,7 +972,8 @@
         document.getElementById('txt-lsl').textContent = lsl.toFixed(3);
         document.getElementById('txt-usl').textContent = usl.toFixed(3);
 
-        document.querySelectorAll('#ta-table tbody tr').forEach(row => {
+        document.querySelectorAll('#ta-table tbody tr').forEach((row, idx) => {
+            const desc = row.querySelector('.desc').value || `項目 ${idx + 1}`;
             const plus = parseFloat(row.querySelector('.plus').value) || 0;
             const minus = parseFloat(row.querySelector('.minus').value) || 0;
             const tol = parseFloat(row.querySelector('.tol').value) || 0;
@@ -751,7 +995,14 @@
             row.querySelector('.sigma').textContent = sigma > 0 ? sigma.toFixed(5) : "0.00000";
             row.querySelector('.variance').textContent = variance > 0 ? variance.toFixed(6) : "0.000000";
             
-            dimSum += (plus - minus); worstCase += Math.abs(tol);
+            // 此環的有效向量值 (增環為正、減環為負)
+            const vector = plus - minus;
+            // 僅將「有尺寸或有公差」的環納入堆疊圖
+            if (plus !== 0 || minus !== 0 || tol > 0) {
+                chainData.push({ desc, vector, tol: Math.abs(tol), dist, isPlus: plus !== 0, isMinus: minus !== 0 });
+            }
+
+            dimSum += vector; worstCase += Math.abs(tol);
         });
 
         const totalVariance = varNormal + varUniform;
@@ -834,6 +1085,7 @@
         }
 
         drawNormalDistribution(dimSum, sysSigma, worstCase, lsl, usl, trueLimit, nominalTarget);
+        drawStackUpDiagram(chainData, dimSum, sysSigma, nominalTarget, lsl, usl);
     }
 
     window.onload = function() {
@@ -861,6 +1113,7 @@
         document.getElementById('nominal-target').addEventListener('input', calculateTolerance);
         document.getElementById('spec-upper').addEventListener('input', calculateTolerance);
         document.getElementById('spec-lower').addEventListener('input', calculateTolerance);
+        document.getElementById('stackup-mode').addEventListener('change', calculateTolerance);
         
         calcAsmShift();
         calculateTolerance();
