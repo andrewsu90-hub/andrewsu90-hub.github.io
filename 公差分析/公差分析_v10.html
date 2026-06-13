@@ -274,7 +274,7 @@
 
     <div class="dashboard-section">
         <div class="chart-container">
-            <h3>📈 預測組裝良率常態分佈與 Worse Case 對比圖</h3>
+            <h3>📈 預測組裝良率常態分佈與 Worst Case 對比圖</h3>
             <svg id="norm-dist-chart" viewBox="0 0 800 400" style="width: 100%; height: auto;"></svg>
         </div>
         
@@ -282,7 +282,7 @@
             <h2>📊 尺寸鍊評估報告 Summary</h2>
             <div class="summary-grid">
                 <div class="summary-card"><div>實際疊加平均值 (Mean)</div><div class="value" id="out-nominal">0.000 mm</div></div>
-                <div class="summary-card"><div>極值法公差 (Worse Case)</div><div class="value" id="out-wc">± 0.000 mm</div></div>
+                <div class="summary-card"><div>極值法公差 (Worst Case)</div><div class="value" id="out-wc">± 0.000 mm</div></div>
                 <div class="summary-card"><div>系統總標準差 (1σ)</div><div class="value" id="out-sys-sigma">0.000 mm</div></div>
                 <div class="summary-card"><div>預估能力指標 (Z-score)</div><div class="value" id="out-zscore" style="color:#d35400;">0.000</div></div>
             </div>
@@ -587,15 +587,14 @@
         return (low + high) / 2;
     }
 
-    function drawNormalDistribution(mean, sigma, worseCase, lsl, usl, trueLimit, nominalTarget) {
+    function drawNormalDistribution(mean, sigma, worstCase, lsl, usl, trueLimit, nominalTarget) {
         const svg = document.getElementById('norm-dist-chart');
         svg.innerHTML = ''; 
         const width = 800; const height = 300; const padding = 50;
         
         // 防呆，若變異為 0 給予極小值畫圖
         if (sigma <= 0) sigma = 0.001; 
-        const maxRange = Math.max(4.5 * sigma, worse
-                                  Case * 1.15, trueLimit * 1.15, Math.abs(mean - lsl) * 1.15, Math.abs(mean - usl) * 1.15);
+        const maxRange = Math.max(4.5 * sigma, worstCase * 1.15, trueLimit * 1.15, Math.abs(mean - lsl) * 1.15, Math.abs(mean - usl) * 1.15);
         const xMin = mean - maxRange; const xMax = mean + maxRange;
 
         function getXPixel(xVal) { return padding + ((xVal - xMin) / (xMax - xMin)) * (width - 2 * padding); }
@@ -685,7 +684,7 @@
         const sigma3Plus = mean + 3 * sigma; const sigma3Minus = mean - 3 * sigma;
         elements += `<circle cx="${getXPixel(sigma3Plus)}" cy="${getYPixel(gaussian(sigma3Plus))}" r="4" fill="#bdc3c7"/><text x="${getXPixel(sigma3Plus)+5}" y="${getYPixel(gaussian(sigma3Plus))-5}" font-size="10" fill="#7f8c8d">+3σ (${sigma3Plus.toFixed(3)})</text><circle cx="${getXPixel(sigma3Minus)}" cy="${getYPixel(gaussian(sigma3Minus))}" r="4" fill="#bdc3c7"/><text x="${getXPixel(sigma3Minus)-5}" y="${getYPixel(gaussian(sigma3Minus))-5}" font-size="10" fill="#7f8c8d" text-anchor="end">-3σ (${sigma3Minus.toFixed(3)})</text>`;
         
-        const wcMinus = mean - worseCase; const wcPlus = mean + worseCase;
+        const wcMinus = mean - worstCase; const wcPlus = mean + worstCase;
         const wcY = height - padding + 55; const barH = 16;
         let wcElements = ``;
         
@@ -708,14 +707,14 @@
             <line x1="${getXPixel(wcPlus)}" y1="${wcY-4}" x2="${getXPixel(wcPlus)}" y2="${wcY+barH+4}" stroke="#2c3e50" stroke-width="2"/>
             <text x="${getXPixel(wcMinus)}" y="${wcY+barH+18}" font-size="11" fill="#2c3e50" text-anchor="middle" font-weight="bold">${wcMinus.toFixed(3)}</text>
             <text x="${getXPixel(wcPlus)}" y="${wcY+barH+18}" font-size="11" fill="#2c3e50" text-anchor="middle" font-weight="bold">${wcPlus.toFixed(3)}</text>
-            <text x="${getXPixel(mean)}" y="${wcY-8}" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="bold">極值法 Worse Case 區間帶 (±${worseCase.toFixed(3)})</text>
+            <text x="${getXPixel(mean)}" y="${wcY-8}" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="bold">極值法 Worst Case 區間帶 (±${worstCase.toFixed(3)})</text>
         `;
 
         svg.innerHTML = axes + elements + wcElements;
     }
 
     function calculateTolerance() {
-        let dimSum = 0; let worseCase = 0;
+        let dimSum = 0; let worstCase = 0;
         let varNormal = 0;  
         let varUniform = 0; 
         let eqA_sq = 0;     
@@ -752,7 +751,7 @@
             row.querySelector('.sigma').textContent = sigma > 0 ? sigma.toFixed(5) : "0.00000";
             row.querySelector('.variance').textContent = variance > 0 ? variance.toFixed(6) : "0.000000";
             
-            dimSum += (plus - minus); worseCase += Math.abs(tol);
+            dimSum += (plus - minus); worstCase += Math.abs(tol);
         });
 
         const totalVariance = varNormal + varUniform;
@@ -782,7 +781,7 @@
         let trueLimit = findTrueLimit(sigmaN, eqA);
 
         document.getElementById('out-nominal').textContent = dimSum.toFixed(3) + ' mm';
-        document.getElementById('out-wc').textContent = '± ' + worseCase.toFixed(3) + ' mm';
+        document.getElementById('out-wc').textContent = '± ' + worstCase.toFixed(3) + ' mm';
         document.getElementById('out-sys-sigma').textContent = sysSigma.toFixed(5) + ' mm'; 
         document.getElementById('out-zscore').textContent = zScore.toFixed(3);
         document.getElementById('out-yield').textContent = yieldPercent.toFixed(3) + ' %';
@@ -834,7 +833,7 @@
             jMsg.innerHTML = `目標規格公差範圍不足！實際疊加統計邊界 (${actualLowerBoundary.toFixed(3)} ~ ${actualUpperBoundary.toFixed(3)}) 已超出規格限制 (${lsl.toFixed(3)} ~ ${usl.toFixed(3)})。<br>預計每百萬台有 ${dpmo.toFixed(0)} 台不良 (DPMO)，請檢討幾何或緊縮尺寸鍊公差。`;
         }
 
-        drawNormalDistribution(dimSum, sysSigma, worseCase, lsl, usl, trueLimit, nominalTarget);
+        drawNormalDistribution(dimSum, sysSigma, worstCase, lsl, usl, trueLimit, nominalTarget);
     }
 
     window.onload = function() {
