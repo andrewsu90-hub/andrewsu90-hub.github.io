@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尺寸鍊統計公差分析系統 (V19.6)</title>
+    <title>尺寸鍊統計公差分析系統 (v11)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -153,7 +153,7 @@
 </header>
 
 <div class="container">
-    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v19.6 全寬度標題版</span></h1>
+    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v11</span></h1>
     
     <div class="helper-tool">
         <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em;"><span>🧮 <strong>軸孔浮動間隙計算機 (Asm Shift Helper)</strong></span></div>
@@ -173,8 +173,15 @@
         </div>
         
         <div style="width: 100%; margin-top: 10px; padding-top: 15px; border-top: 1px dashed #f39c12;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+                <span style="font-weight: bold; color: #2c3e50;">緊固模式 (Fastener Mode):</span>
+                <select id="asm-mode" style="padding: 5px 10px; border: 1px solid #f39c12; border-radius: 4px; font-weight: bold; background-color: #fff;">
+                    <option value="floating">Floating (浮動) — 包含名目間隙</option>
+                    <option value="shifted">Shifted to Center (定位銷) — 不含名目間隙</option>
+                </select>
+            </div>
             <span style="color:#7f8c8d; font-size:0.9em;">💡 <strong>半徑 1/2 轉換原則</strong>：公差迴路為中心線到邊緣，故直徑總變異須除以 2 轉為半徑。</span><br>
-            <span style="margin-top:10px; display:inline-block; font-weight: bold; color: #2c3e50;">👉 請將以下三項新增至您的尺寸鍊明細表：</span>
+            <span style="margin-top:10px; display:inline-block; font-weight: bold; color: #2c3e50;">👉 請將以下項目新增至您的尺寸鍊明細表：</span>
             
             <table style="width: 100%; margin-top: 8px; background-color: #fff; border: 1px solid #f39c12;">
                 <tr style="background-color: #fdfae6;">
@@ -195,13 +202,16 @@
                     <td style="padding: 6px; border: 1px solid #f39c12;">常態</td>
                     <td style="padding: 6px; border: 1px solid #f39c12; font-size: 0.85em; color: #7f8c8d;">軸直徑公差 ÷ 2</td>
                 </tr>
-                <tr>
+                <tr id="asm-row-nomgap">
                     <td style="padding: 6px; border: 1px solid #f39c12;">AS_名目間隙 (半徑)</td>
                     <td style="padding: 6px; border: 1px solid #f39c12; font-weight: bold; color: #2980b9;" id="out-as-nom-gap">0.050</td>
                     <td style="padding: 6px; border: 1px solid #f39c12; font-weight: bold;">均勻</td>
                     <td style="padding: 6px; border: 1px solid #f39c12; font-size: 0.85em; color: #7f8c8d;">(孔公稱 - 軸公稱) ÷ 2</td>
                 </tr>
             </table>
+            <div style="margin-top: 10px; text-align: right;">
+                <button type="button" id="btn-append-asm" class="btn-add" style="padding: 8px 16px; font-size: 0.95em;">⬇️ 一鍵新增到尺寸鍊明細表</button>
+            </div>
         </div>
     </div>
 
@@ -245,6 +255,7 @@
     <div class="action-bar">
         <button type="button" id="btn-add-row" class="btn-add">➕ 新增一列 (Add Row)</button>
         <button type="button" id="btn-save-state" class="btn-save">💾 儲存當前設定 (Save Data)</button>
+        <button type="button" id="btn-clear-state" class="btn-del" style="padding: 10px 20px; font-size: 1em;">🗑️ 清除存檔並重置</button>
         <button type="button" id="btn-print-report" class="btn-print" onclick="window.print()">📄 輸出工程報表 (Print PDF)</button>
     </div>
 
@@ -253,8 +264,9 @@
     <div class="judgment-card" id="judgement-panel">
         <h3 id="judgement-title">✅ 設計判定 (Design Judgment)</h3>
         <div class="judgement-row">
-            <span class="sigma-display">等效單邊所需空間 (真實界線圖包絡估算): <span id="judgement-3sigma" style="color: #2980b9;">0.000</span> mm</span>
-            <span class="compare-sign" id="compare-sign">≥</span>
+            <span class="sigma-display">等效單邊所需空間: <span id="judgement-3sigma" style="color: #2980b9;">0.000</span> mm</span>
+            <span class="compare-sign" id="compare-sign">≤</span>
+            <span class="sigma-display">可用單邊規格: <span id="judgement-spec-avail" style="color: #2980b9;">0.000</span> mm</span>
             <span class="badge" id="judgement-badge">OK</span>
         </div>
         <div class="judgement-msg" id="judgement-msg">計算中...</div>
@@ -278,7 +290,7 @@
             <div class="summary-grid" style="grid-template-columns: repeat(3, 1fr);">
                 <div class="summary-card" style="background:#eafaf1; border-color:#2ecc71;"><div>組裝合格率 (Yield)</div><div class="value" id="out-yield" style="color:#27ae60;">100.000 %</div></div>
                 <div class="summary-card" style="background:#fdf3f2; border-color:#e74c3c;"><div>每百萬不良數 (DPMO)</div><div class="value" id="out-dpmo" style="color:#c0392b;">0.000</div></div>
-                <div class="summary-card" id="card-cpk"><div>製程能力指數 (Cpk)</div><div class="value" id="out-cpk" style="font-size: 1.8em;">0.00</div></div>
+                <div class="summary-card" id="card-cpk"><div>製程能力指數 (Cpk) <span style="font-size:0.7em; color:#7f8c8d;">常態近似</span></div><div class="value" id="out-cpk" style="font-size: 1.8em;">0.00</div></div>
             </div>
 
             <h3>🎯 傳統製程品質預測 (純高斯還原指標)</h3>
@@ -299,23 +311,26 @@
 </div>
 
 <script>
-    let currentRowCount = 8;
     const defaultData = [
-        { desc: "Pane中心到lcd bkt側壁尺寸", plus: "140.0", minus: "", tol: "0.15", dist: "常態" },
+        { desc: "Panel 中心到 lcd bkt 側壁尺寸", plus: "140.0", minus: "", tol: "0.15", dist: "常態" },
         { desc: "Chassis Hole距離lcd bkt側壁：【位置度】", plus: "5.0", minus: "", tol: "0.10", dist: "常態" },
         { desc: "Asm shift lcd bkt hole-screw", plus: "", minus: "", tol: "0.25", dist: "均勻" },
         { desc: "M圈(MMC)", plus: "", minus: "", tol: "0.05", dist: "常態" },
         { desc: "前框Boss Hole到中心距離尺寸", plus: "", minus: "145.0", tol: "0.15", dist: "常態" }
     ];
 
+    const STORAGE_KEY = 'anzuToleranceState_v11';
+
     // 儲存當前設定到 LocalStorage
     function saveCurrentState() {
         const state = {
+            version: 'v11',
             helper: {
                 holeNom: document.getElementById('calc-hole-nom').value,
                 holeUp: document.getElementById('calc-hole-up').value,
                 shaftNom: document.getElementById('calc-shaft-nom').value,
-                shaftLow: document.getElementById('calc-shaft-low').value
+                shaftLow: document.getElementById('calc-shaft-low').value,
+                asmMode: document.getElementById('asm-mode').value
             },
             spec: {
                 nominalTarget: document.getElementById('nominal-target').value,
@@ -340,7 +355,7 @@
             });
         });
 
-        localStorage.setItem('anzuToleranceState', JSON.stringify(state));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         
         // 視覺回饋
         const btn = document.getElementById('btn-save-state');
@@ -355,7 +370,7 @@
 
     // 載入之前儲存的設定
     function loadSavedState() {
-        const saved = localStorage.getItem('anzuToleranceState');
+        const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             try {
                 const state = JSON.parse(saved);
@@ -365,6 +380,7 @@
                     document.getElementById('calc-hole-up').value = state.helper.holeUp;
                     document.getElementById('calc-shaft-nom').value = state.helper.shaftNom;
                     document.getElementById('calc-shaft-low').value = state.helper.shaftLow;
+                    if (state.helper.asmMode) document.getElementById('asm-mode').value = state.helper.asmMode;
                 }
                 if(state.spec) {
                     document.getElementById('nominal-target').value = state.spec.nominalTarget;
@@ -379,10 +395,8 @@
                 if(state.tableData && state.tableData.length > 0) {
                     const tbody = document.getElementById('table-body');
                     tbody.innerHTML = '';
-                    currentRowCount = 0;
                     state.tableData.forEach(data => {
                         tbody.insertAdjacentHTML('beforeend', createRowHTML(data));
-                        currentRowCount++;
                     });
                     return true;
                 }
@@ -446,7 +460,6 @@
     function deleteRow(btn) { btn.closest('tr').remove(); updateRowNumbers(); calculateTolerance(); }
 
     function addNewRow() {
-        currentRowCount++;
         const tbody = document.getElementById('table-body');
         tbody.insertAdjacentHTML('beforeend', createRowHTML({ desc: "", plus: "", minus: "", tol: "", dist: "常態" }));
         tbody.lastElementChild.querySelectorAll('input, select').forEach(input => {
@@ -460,12 +473,17 @@
         const holeUp = Math.abs(parseFloat(document.getElementById('calc-hole-up').value)) || 0; 
         const shaftNom = parseFloat(document.getElementById('calc-shaft-nom').value) || 0;
         const shaftLow = Math.abs(parseFloat(document.getElementById('calc-shaft-low').value)) || 0; 
+        const mode = document.getElementById('asm-mode').value;
         
         let holeMax = holeNom > 0 ? (holeNom + holeUp) : 0;
         let shaftMin = shaftNom > 0 ? (shaftNom - shaftLow) : 0;
         
         document.getElementById('out-hole-max').textContent = holeMax.toFixed(3);
         document.getElementById('out-shaft-min').textContent = shaftMin.toFixed(3);
+        
+        // Shifted to Center 模式不需顯示 nominal gap 那一列
+        const nomGapRow = document.getElementById('asm-row-nomgap');
+        if (nomGapRow) nomGapRow.style.display = (mode === 'shifted') ? 'none' : '';
         
         if (holeNom > 0 && shaftNom > 0) {
             let holeRadTol = holeUp / 2;
@@ -481,6 +499,51 @@
             document.getElementById('out-shaft-rad-tol').textContent = "0.000";
             document.getElementById('out-as-nom-gap').textContent = "0.000";
         }
+    }
+
+    // 一鍵將 Asm Shift 分解項新增到尺寸鍊明細表
+    function appendAsmShiftToTable() {
+        const mode = document.getElementById('asm-mode').value;
+        const holeRadTol = parseFloat(document.getElementById('out-hole-rad-tol').textContent) || 0;
+        const shaftRadTol = parseFloat(document.getElementById('out-shaft-rad-tol').textContent) || 0;
+        const asNomGap = parseFloat(document.getElementById('out-as-nom-gap').textContent) || 0;
+        
+        if (holeRadTol <= 0 && shaftRadTol <= 0) {
+            alert("請先在上方輸入有效的孔與軸尺寸。");
+            return;
+        }
+        
+        const tbody = document.getElementById('table-body');
+        const rows = [
+            { desc: "Hole_加工變異 (半徑)", plus: "", minus: "", tol: holeRadTol.toFixed(3), dist: "常態" },
+            { desc: "Shaft_加工變異 (半徑)", plus: "", minus: "", tol: shaftRadTol.toFixed(3), dist: "常態" }
+        ];
+        if (mode === 'floating') {
+            rows.push({ desc: "AS_名目間隙 (半徑)", plus: "", minus: "", tol: asNomGap.toFixed(3), dist: "均勻" });
+        }
+        
+        rows.forEach(r => {
+            tbody.insertAdjacentHTML('beforeend', createRowHTML(r));
+            tbody.lastElementChild.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('input', calculateTolerance);
+                input.addEventListener('change', calculateTolerance);
+            });
+        });
+        updateRowNumbers();
+        calculateTolerance();
+        
+        // 視覺回饋
+        const btn = document.getElementById('btn-append-asm');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `✅ 已新增 ${rows.length} 列`;
+        setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+    }
+
+    // 清除存檔並重置
+    function clearStateAndReset() {
+        if (!confirm("確定要清除所有存檔並重置為預設值嗎？此動作無法復原。")) return;
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
     }
 
     function erf(x) {
@@ -521,7 +584,7 @@
             let area = mixedCDF(mid, 0, sigmaN, a) - mixedCDF(-mid, 0, sigmaN, a);
             if (area < targetArea) low = mid; else high = mid;
         }
-        return low;
+        return (low + high) / 2;
     }
 
     function drawNormalDistribution(mean, sigma, worstCase, lsl, usl, trueLimit, nominalTarget) {
@@ -688,7 +751,7 @@
             row.querySelector('.sigma').textContent = sigma > 0 ? sigma.toFixed(5) : "0.00000";
             row.querySelector('.variance').textContent = variance > 0 ? variance.toFixed(6) : "0.000000";
             
-            dimSum += (plus - minus); worstCase += tol;
+            dimSum += (plus - minus); worstCase += Math.abs(tol);
         });
 
         const totalVariance = varNormal + varUniform;
@@ -742,9 +805,13 @@
 
         let actualUpperBoundary = dimSum + trueLimit;
         let actualLowerBoundary = dimSum - trueLimit;
+        // 等效單邊所需空間：實際統計邊界相對於 nominalTarget 的最大偏移
         let maxRequiredSpace = Math.max(Math.abs(actualUpperBoundary - nominalTarget), Math.abs(actualLowerBoundary - nominalTarget));
+        // 可用單邊規格：取上下限中較緊的一邊（保守判定）
+        let availableSpec = Math.min(specUpper, specLower);
         
         document.getElementById('judgement-3sigma').textContent = maxRequiredSpace.toFixed(3);
+        document.getElementById('judgement-spec-avail').textContent = availableSpec.toFixed(3);
         
         const jPanel = document.getElementById('judgement-panel');
         const jBadge = document.getElementById('judgement-badge');
@@ -755,13 +822,13 @@
         if (actualUpperBoundary <= usl && actualLowerBoundary >= lsl) {
             jPanel.className = 'judgment-card';
             jBadge.className = 'badge'; jBadge.textContent = 'OK';
-            jSign.textContent = '≥'; jSign.style.color = '#2ecc71';
+            jSign.textContent = '≤'; jSign.style.color = '#2ecc71';
             jTitle.innerHTML = '✅ 設計判定 (Design Judgment) - 合格';
-            jMsg.innerHTML = `實際疊加統計範圍 (${actualLowerBoundary.toFixed(3)} ~ ${actualUpperBoundary.toFixed(3)}) 完全落在目標規格 (${lsl.toFixed(3)} ~ ${usl.toFixed(3)}) 之內。<br>量產組裝不良機率極低，預估 Cpk 達 ${Math.max(0, cpk).toFixed(2)}。`;
+            jMsg.innerHTML = `實際疊加統計範圍 (${actualLowerBoundary.toFixed(3)} ~ ${actualUpperBoundary.toFixed(3)}) 完全落在目標規格 (${lsl.toFixed(3)} ~ ${usl.toFixed(3)}) 之內。<br>量產組裝不良機率極低，預估 Cpk 達 ${Math.max(0, cpk).toFixed(2)}（常態近似）。`;
         } else {
             jPanel.className = 'judgment-card ng';
             jBadge.className = 'badge ng'; jBadge.textContent = 'NG';
-            jSign.textContent = '<'; jSign.style.color = '#e74c3c';
+            jSign.textContent = '>'; jSign.style.color = '#e74c3c';
             jTitle.innerHTML = '❌ 設計判定 (Design Judgment) - 不合格';
             jMsg.innerHTML = `目標規格公差範圍不足！實際疊加統計邊界 (${actualLowerBoundary.toFixed(3)} ~ ${actualUpperBoundary.toFixed(3)}) 已超出規格限制 (${lsl.toFixed(3)} ~ ${usl.toFixed(3)})。<br>預計每百萬台有 ${dpmo.toFixed(0)} 台不良 (DPMO)，請檢討幾何或緊縮尺寸鍊公差。`;
         }
@@ -784,9 +851,12 @@
         });
 
         ['calc-hole-nom', 'calc-hole-up', 'calc-shaft-nom', 'calc-shaft-low'].forEach(id => { document.getElementById(id).addEventListener('input', calcAsmShift); });
+        document.getElementById('asm-mode').addEventListener('change', calcAsmShift);
+        document.getElementById('btn-append-asm').addEventListener('click', appendAsmShiftToTable);
         
         document.getElementById('btn-add-row').addEventListener('click', addNewRow);
-        document.getElementById('btn-save-state').addEventListener('click', saveCurrentState); // 綁定儲存按鈕
+        document.getElementById('btn-save-state').addEventListener('click', saveCurrentState);
+        document.getElementById('btn-clear-state').addEventListener('click', clearStateAndReset);
         
         document.getElementById('nominal-target').addEventListener('input', calculateTolerance);
         document.getElementById('spec-upper').addEventListener('input', calculateTolerance);
