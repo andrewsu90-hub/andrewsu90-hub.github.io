@@ -139,7 +139,7 @@
 <section class="hero">
     <div class="hero-label">工程計算工具</div>
     <h1>🖥️ VESA 螺絲受力計算工具</h1>
-    <p>針對壁掛或機台，計算螺栓群在受偏心扭矩、剪力與拉力下的合力與安全係數。已依據 Shigley's 標準力學修正旋轉半徑與夾角計算。</p>
+    <p>針對壁掛或機台，計算螺栓群在受偏心扭矩、剪力與拉力下的合力與安全係數。已整合碳鋼螺絲降伏強度推算，並依據 Shigley's 標準力學修正旋轉半徑與夾角計算。</p>
     <span class="source-note">參考文獻：機械設計手冊 (新版) 第2卷</span>
 </section>
 
@@ -184,16 +184,27 @@
         <select id="inptSpec"></select>
       </div>
       <div class="field">
+        <label>強度等級</label>
+        <select id="inptGrade"></select>
+      </div>
+      <div class="field">
+        <label>螺絲長度 L (mm)</label>
+        <input type="number" id="inptLength" value="10" step="1">
+      </div>
+      <div class="field">
+        <label>降伏強度 δy (N/mm²)</label>
+        <input type="text" id="inptYield" value="-" readonly style="background-color: var(--brand-50); border-color: var(--brand-100); font-weight: 700; color: var(--brand);">
+      </div>
+    </div>
+    <div class="row-line"></div>
+    <div class="grid g-2">
+      <div class="field">
         <label>螺絲中心距 a (mm)：水平距離</label>
         <input type="number" id="inptSpaceA" value="100" step="1">
       </div>
       <div class="field">
         <label>螺絲中心距 b (mm)：垂直距離</label>
         <input type="number" id="inptSpaceB" value="100" step="1">
-      </div>
-      <div class="field">
-        <label>基準強度 HV min (N/mm²)</label>
-        <input type="number" id="inptHv" value="250" step="10">
       </div>
     </div>
     <div class="row-line"></div>
@@ -239,7 +250,7 @@
           <label style="color:var(--primary-color);">目標安全係數 (SF)</label>
           <input type="number" id="inptTargetSfM1" value="4" step="0.5" style="border-color:var(--primary-color); font-weight:700;">
         </div>
-        <div class="stat"><div class="k">剪降伏應力 τ_yp (HV/2)</div><div class="v" id="m1TauYp">–<span class="u">N/mm²</span></div></div>
+        <div class="stat"><div class="k">剪降伏應力 τ_yp (δy/2)</div><div class="v" id="m1TauYp">–<span class="u">N/mm²</span></div></div>
         <div class="stat"><div class="k">實際剪應力 (合力/As)</div><div class="v" id="m1TauAct">–<span class="u">N/mm²</span></div></div>
         <div class="stat" id="m1SfBox"><div class="k">實際安全係數 SF</div><div class="v" id="m1Sf">–</div></div>
       </div>
@@ -268,7 +279,7 @@
   <div class="banner">
     <div class="ico">ⓘ</div>
     <div>
-      評估螺絲自身降伏應力是否能承受機台重量。<br>屈服載荷：<span class="formula">As × HV_min</span>，軸力計算方式：軸力以螺栓耐力的 60% 算出 (K=0.6)。
+      評估螺絲自身降伏應力是否能承受機台重量。<br>屈服載荷：<span class="formula">As × δy</span>，軸力計算方式：軸力以螺栓耐力的 60% 算出 (K=0.6)。
     </div>
   </div>
 
@@ -343,7 +354,7 @@
       </div>
       <div class="row-line"></div>
       <div class="grid g-4">
-        <div class="stat"><div class="k">容許正應力 σt (HV/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
+        <div class="stat"><div class="k">容許正應力 σt (δy/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
         <div class="stat accent"><div class="k">所需最小截面積 As</div><div class="v" id="m3ReqAs">–<span class="u">mm²</span></div></div>
         <div class="stat final"><div class="k">建議螺栓規格 (依面積)</div><div class="v" id="m3RecSpec">–</div></div>
       </div>
@@ -391,15 +402,26 @@
    資料集
    ========================================================= */
 const SCREW_TABLE = {
-  "M2": { As: 2.07, d: 2 },
   "M2.5": { As: 3.39, d: 2.5 },
   "M3": { As: 5.03, d: 3 },
   "M4": { As: 8.78, d: 4 },
-  "M6": { As: 20.1, d: 6 },
-  "M8": { As: 36.6, d: 8 },
-  "M10": { As: 58.0, d: 10 }
+  "M6": { As: 20.1, d: 6 }
 };
 const SCREW_LIST = Object.keys(SCREW_TABLE);
+
+// 強度等級對照（來源：screw-torque-calculator.html）
+const GRADES = {
+  '3.6':  { rm_nom: 300, rm_min: 330, hv_min: 95,  hv_max: 250, b14: 0.6 },
+  '4.6':  { rm_nom: 400, rm_min: 400, hv_min: 120, hv_max: 250, b14: 0.6 },
+  '4.8':  { rm_nom: 400, rm_min: 420, hv_min: 130, hv_max: 250, b14: 0.8 },
+  '5.6':  { rm_nom: 500, rm_min: 500, hv_min: 155, hv_max: 250, b14: 0.6 },
+  '5.8':  { rm_nom: 500, rm_min: 520, hv_min: 160, hv_max: 250, b14: 0.8 },
+  '6.8':  { rm_nom: 600, rm_min: 600, hv_min: 190, hv_max: 250, b14: 0.8 },
+  '8.8':  { rm_nom: 800, rm_min: 800, hv_min: 250, hv_max: 320, b14: 0.8 },
+  '9.8':  { rm_nom: 900, rm_min: 900, hv_min: 290, hv_max: 360, b14: 0.8 },
+  '10.9': { rm_nom: 1000,rm_min: 1040,hv_min: 320, hv_max: 380, b14: 0.9 },
+  '12.9': { rm_nom: 1200,rm_min: 1220,hv_min: 385, hv_max: 435, b14: 0.9 },
+};
 
 /* ========================= 工具 ========================= */
 const $ = id => document.getElementById(id);
@@ -419,13 +441,23 @@ function setStat(id, value, unit){
 
 /* ========================= 初始化下拉 ========================= */
 function initSelect(){
+  // 限制螺絲規格：M2.5 到 M6
   const s = $("inptSpec");
   SCREW_LIST.forEach(v => {
     const o = document.createElement("option");
     o.value = v; o.textContent = v;
     s.appendChild(o);
   });
-  s.value = "M4"; 
+  s.value = "M3"; // 依圖片設定為 M3
+
+  // 初始化強度等級
+  const g = $("inptGrade");
+  Object.keys(GRADES).forEach(k => {
+    const o = document.createElement("option");
+    o.value = k; o.textContent = k;
+    g.appendChild(o);
+  });
+  g.value = "8.8"; // 依圖片設定為 8.8
 }
 
 /* ========================= Tabs ========================= */
@@ -448,9 +480,10 @@ function calc(){
   const arm = Number($("inptArm").value) || 0;
   
   const specKey = $("inptSpec").value;
+  const gradeKey = $("inptGrade").value;
+  const length = Number($("inptLength").value) || 10;
   const spaceA = Number($("inptSpaceA").value) || 0;
   const spaceB = Number($("inptSpaceB").value) || 0;
-  const hvMin = Number($("inptHv").value) || 0;
   const kFactor = Number($("inptK").value) || 0.6;
 
   // 取得目標安全係數與獨立輸入值
@@ -463,6 +496,24 @@ function calc(){
   const screw = SCREW_TABLE[specKey];
   const As = screw.As;
   const dia = screw.d;
+
+  // ------------------------------------
+  // 計算降伏強度 (取代原 hvMin)
+  // ------------------------------------
+  const G = GRADES[gradeKey];
+  let deltaY;
+  // 邏輯: L ≥ 2.5d 使用 Rm nom 值計算，否則使用 HV max 值計算
+  if (length >= 2.5 * dia) {
+      deltaY = Math.max(G.rm_nom * G.b14, 200);
+  } else {
+      deltaY = G.hv_max;
+  }
+  
+  // 更新前端唯讀欄位
+  $("inptYield").value = deltaY;
+
+  // 將推導出來的降伏強度(δy)代入至原本使用 hvMin 計算的變數中
+  const hvMin = deltaY;
 
   // 2. 基礎計算
   const P = weight * multi * 9.81; 
