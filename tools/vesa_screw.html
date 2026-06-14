@@ -80,18 +80,21 @@
 
   /* ---------- Input Field ---------- */
   .field label { display: block; font-size: 12px; font-weight: 600; color: var(--secondary-color); margin-bottom: 6px; letter-spacing: 0.3px; }
-  .field select, .field input {
+  .field select, .field input, .field textarea {
     width: 100%; padding: 9px 12px;
     border: 0.5px solid var(--border-color); border-radius: var(--radius-sm);
     background: var(--bg-white); font: inherit; color: var(--primary-color);
     transition: border-color .15s; appearance: none; -webkit-appearance: none;
+  }
+  .field textarea {
+    resize: vertical; min-height: 80px; line-height: 1.5;
   }
   .field select {
     padding-right: 34px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 12px center;
   }
-  .field select:focus, .field input:focus { outline: none; border-color: var(--primary-color); }
+  .field select:focus, .field input:focus, .field textarea:focus { outline: none; border-color: var(--primary-color); }
 
   /* ---------- Result Stat ---------- */
   .stat { background: var(--bg-white); border: 0.5px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 14px; min-height: 72px; display: flex; flex-direction: column; justify-content: center; }
@@ -178,37 +181,22 @@
       </div>
     </div>
     <div class="row-line"></div>
-    <div class="grid g-3">
+    <div class="grid g-4">
       <div class="field">
         <label>螺絲規格</label>
         <select id="inptSpec"></select>
       </div>
       <div class="field">
-        <label>強度等級</label>
-        <select id="inptGrade"></select>
+        <label>螺絲中心距 a (mm)</label>
+        <input type="number" id="inptSpaceA" value="50" step="1">
       </div>
       <div class="field">
-        <label>螺絲長度 L (mm)</label>
-        <input type="number" id="inptLength" value="10" min="2" step="1">
-      </div>
-    </div>
-    <div class="row-line"></div>
-    <div class="grid g-4">
-      <div class="field">
-        <label>螺絲中心距 a (mm)：水平距離</label>
-        <input type="number" id="inptSpaceA" value="100" step="1">
+        <label>螺絲中心距 b (mm)</label>
+        <input type="number" id="inptSpaceB" value="50" step="1">
       </div>
       <div class="field">
-        <label>螺絲中心距 b (mm)：垂直距離</label>
-        <input type="number" id="inptSpaceB" value="100" step="1">
-      </div>
-      <div class="stat accent">
-        <div class="k">降伏強度 δy (自動)</div>
-        <div class="v" id="valDeltaY">–<span class="u">N/mm²</span></div>
-      </div>
-      <div class="stat dim">
-        <div class="k">取用模式</div>
-        <div class="v" id="valMode" style="font-size:13px;">–</div>
+        <label>基準強度 HV min (N/mm²)</label>
+        <input type="number" id="inptHv" value="250" step="10">
       </div>
     </div>
     <div class="row-line"></div>
@@ -235,6 +223,15 @@
   </div>
 
   <div class="card">
+    <div class="card-head">
+      <h3>VESA 鎖固受力幾何 (前視圖)</h3>
+      <div class="meta">右下角最危險螺栓之向量疊加關係</div>
+    </div>
+    <div class="card-body" style="text-align: center; background-color: var(--bg-white); padding: 24px;">
+      <img src="vesa_front_view.png" alt="【請將您的受力前視圖解命名為 vesa_front_view.png 並放在同一資料夾中】" style="max-width: 100%; max-height: 420px; object-fit: contain; border-radius: var(--radius-md); border: 1px dashed var(--border-color); padding: 10px;">
+    </div>
+  </div>
+  <div class="card">
     <div class="card-head"><h3>受力分析</h3></div>
     <div class="card-body">
       <div class="grid g-4">
@@ -247,7 +244,7 @@
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>剪應力與安全係數評估(建議至少大於3)</h3><div class="meta">判定輸入之螺絲規格是否合格</div></div>
+    <div class="card-head"><h3>剪應力與安全係數評估</h3><div class="meta">判定輸入之螺絲規格是否合格</div></div>
     <div class="card-body">
       <div class="grid g-4">
         <div class="field" style="display:flex; flex-direction:column; justify-content:center;">
@@ -335,21 +332,20 @@
     <div class="ico">ⓘ</div>
     <div>
       依據《機械設計手冊》安全係數表設定 α 值，計算所需之最小截面積 (As) 與螺絲直徑 (D)。<br>
-      1. 假設當容許應力安全係數 = 5，得到螺栓截面積 = 4.704；取 <strong>M3</strong> = 5.03<br>
-      2. 假設當容許應力安全係數 = 6，得到螺栓截面積 = 5.6448；取 <strong>M4</strong> = 8.78<br>
-      3. 以三柱【反覆荷重單震】方式，結果與【單顆螺絲剪力計算】差不多，都是選 <strong>M4</strong>。<br>
-      4. <strong>ADC12</strong> 我歸類在【鑄鐵】；因 ADC12 較脆、有氣孔且延伸率小，所以安全係數提高。<br>
-      5. VESA 壁掛設定為<strong>單震。<br>
-      6. 容許應力σt=<strong>(降伏應力)基準強度/安全係數α</strong>。
+      • 當安全係數 = 5，得到螺栓截面積 = 4.704；取 <strong>M3</strong> = 5.03<br>
+      • 當安全係數 = 6，得到螺栓截面積 = 5.6448；取 <strong>M4</strong> = 8.78<br>
+      • 以三柱【反覆荷重單震】方式，結果與【單顆螺絲剪力計算】差不多，都是選 <strong>M4</strong>。<br>
+      • <strong>ADC12</strong> 我歸類在【鑄鐵】；因 ADC12 較脆、有氣孔且延伸率小，所以安全係數提高。<br>
+      • VESA 壁掛設定為<strong>單震</strong>。
     </div>
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>方法 3：容許應力算法 (計算截面積)</h3></div>
+    <div class="card-head"><h3>方法 3：容許正應力算法 (計算截面積)</h3></div>
     <div class="card-body">
       <div class="grid g-3">
         <div class="field">
-          <label style="color:var(--primary-color);">容許應力安全係數 (α)</label>
+          <label style="color:var(--primary-color);">正應力安全係數 (α)</label>
           <select id="inptAlphaM3" style="border-color:var(--primary-color); font-weight:700;">
             <optgroup label="鋼 / 銅 (延展性佳)">
               <option value="5">單向(單震) - α=5</option>
@@ -365,12 +361,12 @@
         </div>
         <div class="field" style="grid-column: span 2;">
           <label>備註 / 文字說明 (供報告截圖使用)</label>
-          <input type="text" id="inptM3Note" placeholder="例如：ADC12 降伏強度 130 N/mm² / 建議安全係數 α=6 (因較脆延展率小)">
+          <textarea id="inptM3Note" placeholder="例如：ADC12 降伏強度 130 N/mm²&#10;建議安全係數 α=6 (因較脆延展率小)"></textarea>
         </div>
       </div>
       <div class="row-line"></div>
       <div class="grid g-4">
-        <div class="stat"><div class="k">容許應力 σt (HV/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
+        <div class="stat"><div class="k">容許正應力 σt (HV/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
         <div class="stat accent"><div class="k">所需最小截面積 As</div><div class="v" id="m3ReqAs">–<span class="u">mm²</span></div></div>
         <div class="stat final"><div class="k">建議螺栓規格 (依面積)</div><div class="v" id="m3RecSpec">–</div></div>
       </div>
@@ -378,15 +374,15 @@
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>方法 4：容許剪應力算法 (計算直徑)</h3><div class="meta">剪應力 τ = 降伏應力 × 安全係數</div></div>
+    <div class="card-head"><h3>方法 4：容許剪應力算法 (計算直徑)</h3><div class="meta">剪應力 τ = 正應力 × 轉換係數</div></div>
     <div class="card-body">
       <div class="grid g-3">
         <div class="field">
-          <label style="color:var(--primary-color);">剪應力安全係數</label>
+          <label style="color:var(--primary-color);">剪應力轉換係數</label>
           <input type="number" id="inptShearRatio" value="0.8" step="0.05" style="border-color:var(--primary-color); font-weight:700;">
         </div>
         <div class="field">
-          <label style="color:var(--primary-color);">容許(剪)應力安全係數 (α)</label>
+          <label style="color:var(--primary-color);">容許剪應力安全係數 (α)</label>
           <select id="inptAlphaM4" style="border-color:var(--primary-color); font-weight:700;">
             <optgroup label="鋼 / 銅 (延展性佳)">
               <option value="5">單向(單震) - α=5</option>
@@ -418,29 +414,15 @@
    資料集
    ========================================================= */
 const SCREW_TABLE = {
-  "M2.5": { As: 3.39, d: 2.5, P: 0.45 },
-  "M3":   { As: 5.03, d: 3,   P: 0.5  },
-  "M3.5": { As: 6.78, d: 3.5, P: 0.6  },
-  "M4":   { As: 8.78, d: 4,   P: 0.7  },
-  "M5":   { As: 14.2, d: 5,   P: 0.8  },
-  "M6":   { As: 20.1, d: 6,   P: 1    }
+  "M2": { As: 2.07, d: 2 },
+  "M2.5": { As: 3.39, d: 2.5 },
+  "M3": { As: 5.03, d: 3 },
+  "M4": { As: 8.78, d: 4 },
+  "M6": { As: 20.1, d: 6 },
+  "M8": { As: 36.6, d: 8 },
+  "M10": { As: 58.0, d: 10 }
 };
 const SCREW_LIST = Object.keys(SCREW_TABLE);
-
-/* 強度等級對照（CNS 3934 / JIS B 1051） */
-const GRADES = {
-  '3.6':  { rm_nom: 300, rm_min: 330, hv_min: 95,  hv_max: 250, r02_nom: null, r02_min: null, sp: 180, b14: 0.6 },
-  '4.6':  { rm_nom: 400, rm_min: 400, hv_min: 120, hv_max: 250, r02_nom: null, r02_min: null, sp: 225, b14: 0.6 },
-  '4.8':  { rm_nom: 400, rm_min: 420, hv_min: 130, hv_max: 250, r02_nom: null, r02_min: null, sp: 310, b14: 0.8 },
-  '5.6':  { rm_nom: 500, rm_min: 500, hv_min: 155, hv_max: 250, r02_nom: null, r02_min: null, sp: 280, b14: 0.6 },
-  '5.8':  { rm_nom: 500, rm_min: 520, hv_min: 160, hv_max: 250, r02_nom: null, r02_min: null, sp: 380, b14: 0.8 },
-  '6.8':  { rm_nom: 600, rm_min: 600, hv_min: 190, hv_max: 250, r02_nom: null, r02_min: null, sp: 440, b14: 0.8 },
-  '8.8':  { rm_nom: 800, rm_min: 800, hv_min: 250, hv_max: 320, r02_nom: 640, r02_min: 640, sp: 580, b14: 0.8 },
-  '9.8':  { rm_nom: 900, rm_min: 900, hv_min: 290, hv_max: 360, r02_nom: 720, r02_min: 720, sp: 650, b14: 0.8 },
-  '10.9': { rm_nom: 1000,rm_min: 1040,hv_min: 320, hv_max: 380, r02_nom: 900, r02_min: 940, sp: 830, b14: 0.9 },
-  '12.9': { rm_nom: 1200,rm_min: 1220,hv_min: 385, hv_max: 435, r02_nom: 1080,r02_min: 1100,sp: 970, b14: 0.9 },
-};
-const GRADE_LIST = Object.keys(GRADES);
 
 /* ========================= 工具 ========================= */
 const $ = id => document.getElementById(id);
@@ -466,15 +448,7 @@ function initSelect(){
     o.value = v; o.textContent = v;
     s.appendChild(o);
   });
-  s.value = "M4";
-
-  const g = $("inptGrade");
-  GRADE_LIST.forEach(v => {
-    const o = document.createElement("option");
-    o.value = v; o.textContent = v;
-    g.appendChild(o);
-  });
-  g.value = "8.8";
+  s.value = "M4"; 
 }
 
 /* ========================= Tabs ========================= */
@@ -499,12 +473,8 @@ function calc(){
   const specKey = $("inptSpec").value;
   const spaceA = Number($("inptSpaceA").value) || 0;
   const spaceB = Number($("inptSpaceB").value) || 0;
+  const hvMin = Number($("inptHv").value) || 0;
   const kFactor = Number($("inptK").value) || 0.6;
-
-  // 強度等級與螺絲長度
-  const gradeKey = $("inptGrade").value;
-  const G = GRADES[gradeKey];
-  const L = Number($("inptLength").value) || 0;
 
   // 取得目標安全係數與獨立輸入值
   const targetSfM1 = Number($("inptTargetSfM1").value) || 4;
@@ -516,18 +486,6 @@ function calc(){
   const screw = SCREW_TABLE[specKey];
   const As = screw.As;
   const dia = screw.d;
-
-  // δy 取用邏輯（同碳鋼螺絲扭力計算工具）
-  let mode, hvMin;
-  if (L >= 2.5 * dia) {
-    mode = 'Rm_nom';
-    hvMin = Math.max(G.rm_nom * G.b14, 200);
-  } else {
-    mode = 'HV_max';
-    hvMin = G.hv_max;
-  }
-  setStat("valDeltaY", r2(hvMin), "N/mm²");
-  $("valMode").textContent = mode === 'HV_max' ? 'HV max' : 'Rm nom';
 
   // 2. 基礎計算
   const P = weight * multi * 9.81; 
@@ -650,7 +608,7 @@ function calc(){
 }
 
 // 綁定事件
-document.querySelectorAll("input, select").forEach(el => {
+document.querySelectorAll("input, select, textarea").forEach(el => {
   el.addEventListener("input", calc);
   el.addEventListener("change", calc);
 });
