@@ -335,8 +335,8 @@
     <div class="ico">ⓘ</div>
     <div>
       依據《機械設計手冊》安全係數表設定 α 值，計算所需之最小截面積 (As) 與螺絲直徑 (D)。<br>
-      1. 假設當安全係數 = 5，得到螺栓截面積 = 4.704；取 <strong>M3</strong> = 5.03<br>
-      2. 假設當安全係數 = 6，得到螺栓截面積 = 5.6448；取 <strong>M4</strong> = 8.78<br>
+      1. 假設當容許應力安全係數 = 5，得到螺栓截面積 = 4.704；取 <strong>M3</strong> = 5.03<br>
+      2. 假設當容許應力安全係數 = 6，得到螺栓截面積 = 5.6448；取 <strong>M4</strong> = 8.78<br>
       3. 以三柱【反覆荷重單震】方式，結果與【單顆螺絲剪力計算】差不多，都是選 <strong>M4</strong>。<br>
       4. <strong>ADC12</strong> 我歸類在【鑄鐵】；因 ADC12 較脆、有氣孔且延伸率小，所以安全係數提高。<br>
       5. VESA 壁掛設定為<strong>單震</strong>。
@@ -344,11 +344,11 @@
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>方法 3：容許正應力算法 (計算截面積)</h3></div>
+    <div class="card-head"><h3>方法 3：容許應力算法 (計算截面積)</h3></div>
     <div class="card-body">
       <div class="grid g-3">
         <div class="field">
-          <label style="color:var(--primary-color);">正應力安全係數 (α)</label>
+          <label style="color:var(--primary-color);">容許應力安全係數 (α)</label>
           <select id="inptAlphaM3" style="border-color:var(--primary-color); font-weight:700;">
             <optgroup label="鋼 / 銅 (延展性佳)">
               <option value="5">單向(單震) - α=5</option>
@@ -369,7 +369,7 @@
       </div>
       <div class="row-line"></div>
       <div class="grid g-4">
-        <div class="stat"><div class="k">容許正應力 σt (HV/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
+        <div class="stat"><div class="k">容許應力 σt (HV/α)</div><div class="v" id="m3SigmaT">–<span class="u">N/mm²</span></div></div>
         <div class="stat accent"><div class="k">所需最小截面積 As</div><div class="v" id="m3ReqAs">–<span class="u">mm²</span></div></div>
         <div class="stat final"><div class="k">建議螺栓規格 (依面積)</div><div class="v" id="m3RecSpec">–</div></div>
       </div>
