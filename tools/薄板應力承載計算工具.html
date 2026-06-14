@@ -1,158 +1,294 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>薄板應力承載計算工具</title>
+<title>薄板應力承載計算工具 | Andrew Design Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #f5f6f8;
-  --surface: #fff;
-  --border: #d0d4dc;
-  --text: #1a1d24;
-  --text2: #5a6070;
-  --accent: #2c5aa0;
-  --accent2: #1a7a5a;
-  --warn: #c0392b;
-  --ok: #27ae60;
-  --header-bg: #2c3e50;
-  --row-alt: #f8f9fb;
-  --input-bg: #fff;
-  --section-bg: #eef1f6;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; background:var(--bg); color:var(--text); font-size:13px; line-height:1.5; }
-.container { max-width:1400px; margin:0 auto; padding:12px; }
-h1 { font-size:18px; font-weight:700; color:var(--header-bg); margin-bottom:4px; }
-h1 small { font-size:12px; color:var(--text2); font-weight:400; }
-h2 { font-size:14px; font-weight:600; margin:12px 0 6px; color:var(--accent); border-bottom:2px solid var(--accent); padding-bottom:3px; }
-h3 { font-size:13px; font-weight:600; margin:8px 0 4px; color:var(--header-bg); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary-color: #000; --secondary-color: #666; --border-color: #e0e0e0;
+    --bg-light: #f9f9f9; --bg-white: #ffffff;
+    --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+    --accent: #1a1a2e; --warn: #c62828; --ok: #2e7d32;
+    --muted: #64748B; --border: #e0e0e0; 
+    --brand: #1a1a2e; --brand-50: #f0f0f5; --brand-100: #e0e0ee;
+    --warn-bg: #FFFBEB; --warn-bd: #FDE68A; --warn-tx: #92400E;
+    --table-header: #f1f5f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary-color: #fff; --secondary-color: #aaa; --border-color: #333;
+      --bg-light: #1a1a1a; --bg-white: #0d0d0d; --warn: #ef5350; --ok: #66bb6a;
+      --muted: #aaa; --border: #333;
+      --brand: #aaa; --brand-50: #1a1a1a; --brand-100: #222;
+      --warn-bg: #2a1a00; --warn-bd: #7a5000; --warn-tx: #ffd080;
+      --table-header: #1e293b;
+    }
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 300; color: var(--primary-color); background-color: var(--bg-white);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; font-size: 14px;
+  }
 
-.input-panel { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:12px; margin-bottom:12px; display:flex; flex-wrap:wrap; gap:16px; }
-.input-group { display:flex; flex-direction:column; gap:4px; }
-.input-group label { font-size:11px; color:var(--text2); font-weight:600; }
-.input-group input, .input-group select { border:1px solid var(--border); border-radius:4px; padding:4px 8px; font-size:13px; width:140px; background:var(--input-bg); }
-.input-group input:focus, .input-group select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 2px rgba(44,90,160,0.15); }
-.params-display { background:var(--section-bg); border-radius:4px; padding:8px 12px; font-size:12px; display:flex; flex-wrap:wrap; gap:8px 20px; }
-.params-display span { white-space:nowrap; }
-.params-display .val { font-weight:600; color:var(--accent); }
+  /* ---------- Header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem 5%; border-bottom: 0.5px solid var(--border-color);
+    background-color: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+  }
+  @media (prefers-color-scheme: dark) { header { background-color: rgba(13,13,13,0.92); } }
+  .logo { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: 1px; text-decoration: none; color: var(--primary-color); }
+  .back-link { font-size: 14px; color: var(--secondary-color); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+  .back-link:hover { color: var(--primary-color); }
 
-.results-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-@media(max-width:900px){ .results-grid{grid-template-columns:1fr;} }
+  /* ---------- Hero ---------- */
+  .hero { padding: 4rem 5% 2rem; max-width: 1200px; margin: 0 auto; animation: fadeInDown 0.6s ease; }
+  .hero-label { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.75rem; }
+  .hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+  .hero p { font-size: 15px; color: var(--secondary-color); line-height: 1.8; }
+  .source-note { display: inline-block; margin-top: 0.75rem; font-size: 12px; color: var(--secondary-color); background-color: var(--bg-light); border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 4px 12px; }
 
-.result-block { background:var(--surface); border:1px solid var(--border); border-radius:6px; overflow:hidden; }
-.result-block .block-header { background:var(--header-bg); color:#fff; padding:6px 10px; font-size:13px; font-weight:600; }
-.result-block .block-header.uniform { background:#2c5aa0; }
-.result-block .block-header.concentrated { background:#1a7a5a; }
+  /* ---------- Calc Section ---------- */
+  .calc-section { padding: 1rem 5% 5rem; max-width: 1200px; margin: 0 auto; animation: fadeInUp 0.7s ease; }
 
-.bc-section { border-bottom:1px solid var(--border); padding:8px 10px; }
-.bc-section:last-child { border-bottom:none; }
-.bc-title { font-size:12px; font-weight:700; color:var(--header-bg); margin-bottom:4px; display:flex; align-items:center; gap:6px; }
-.bc-title .tag { font-size:10px; padding:1px 6px; border-radius:3px; color:#fff; }
-.bc-title .tag.clamp { background:#8e44ad; }
-.bc-title .tag.mixed { background:#e67e22; }
-.bc-title .tag.simple { background:#16a085; }
+  /* ---------- Tabs ---------- */
+  .tabs { display: flex; gap: 4px; margin-bottom: 1rem; border-bottom: 0.5px solid var(--border-color); overflow-x: auto; scrollbar-width: thin; }
+  .tab { padding: 10px 16px; border: none; background: transparent; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--secondary-color); border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; user-select: none; }
+  .tab:hover { color: var(--primary-color); }
+  .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
 
-table.calc { width:100%; border-collapse:collapse; font-size:12px; margin:4px 0; }
-table.calc th { background:var(--section-bg); padding:3px 6px; text-align:center; font-weight:600; font-size:11px; border:1px solid var(--border); white-space:nowrap; }
-table.calc td { padding:3px 6px; text-align:center; border:1px solid var(--border); }
-table.calc td.label { text-align:left; font-weight:500; white-space:nowrap; color:var(--text2); font-size:11px; }
-table.calc td.result { font-weight:700; }
-table.calc td.defl { color:var(--accent); }
-table.calc td.stress { color:var(--warn); }
-table.calc td.ok { color:var(--ok); }
+  /* ---------- Card ---------- */
+  .card { background-color: var(--bg-light); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); margin-bottom: 1rem; overflow: hidden; }
+  .card-head { padding: 14px 18px; border-bottom: 0.5px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .card-head h3 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: .2px; display: flex; align-items: center; gap: 8px;}
+  .card-head .meta { color: var(--secondary-color); font-size: 12.5px; }
+  .card-body { padding: 16px 18px; }
 
-.coeff-editor { background:var(--surface); border:1px solid var(--border); border-radius:6px; margin-top:12px; }
-.coeff-toggle { padding:8px 12px; cursor:pointer; font-weight:600; font-size:13px; color:var(--accent); user-select:none; }
-.coeff-toggle:hover { background:var(--section-bg); }
-.coeff-content { display:none; padding:8px 12px; }
-.coeff-content.open { display:block; }
-table.coeff { border-collapse:collapse; font-size:11px; margin:4px 0; }
-table.coeff th, table.coeff td { border:1px solid var(--border); padding:2px 6px; text-align:center; }
-table.coeff th { background:var(--section-bg); font-weight:600; }
-table.coeff input { width:60px; border:1px solid var(--border); border-radius:3px; padding:1px 4px; text-align:center; font-size:11px; }
+  /* ---------- Grids ---------- */
+  .grid { display: grid; gap: 14px; }
+  .g-4 { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .g-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .g-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  @media (max-width:1000px){.g-4{grid-template-columns:repeat(2,minmax(0,1fr))}.g-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:560px){.g-4,.g-3,.g-2{grid-template-columns:1fr}}
 
-.note { font-size:11px; color:var(--text2); margin-top:4px; padding:4px 8px; background:#fff8e1; border-radius:3px; border-left:3px solid #f0c040; }
-.summary-box { background:#e8f5e9; border:1px solid #a5d6a7; border-radius:4px; padding:8px 12px; margin:8px 0; font-size:12px; }
-.summary-box.warn { background:#fce4ec; border-color:#ef9a9a; }
+  /* ---------- Input Field ---------- */
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--secondary-color); margin-bottom: 6px; letter-spacing: 0.3px; }
+  .field select, .field input {
+    width: 100%; padding: 9px 12px;
+    border: 0.5px solid var(--border-color); border-radius: var(--radius-sm);
+    background: var(--bg-white); font: inherit; color: var(--primary-color);
+    transition: border-color .15s; appearance: none; -webkit-appearance: none;
+  }
+  .field select {
+    padding-right: 34px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  .field select:focus, .field input:focus { outline: none; border-color: var(--primary-color); }
+
+  /* ---------- Result Stat ---------- */
+  .stat { background: var(--bg-white); border: 0.5px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 14px; min-height: 72px; display: flex; flex-direction: column; justify-content: center; }
+  .stat.accent { background: var(--brand-50); border-color: var(--brand-100); }
+  .stat .k { color: var(--secondary-color); font-size: 11.5px; font-weight: 600; margin-bottom: 4px; letter-spacing: .3px; }
+  .stat .v { font-size: 20px; font-weight: 700; color: var(--primary-color); line-height: 1.1; }
+  .stat .v .u { font-size: 12px; color: var(--secondary-color); margin-left: 4px; font-weight: 500; }
+  .stat.dim .v { color: var(--secondary-color); font-size: 16px; }
+  .stat.final { background: rgba(46,125,50,0.08); border-color: rgba(46,125,50,0.3); }
+  .stat.final .v { color: var(--ok); }
+  .stat.warn { background: rgba(198,40,40,0.08); border-color: rgba(198,40,40,0.3); }
+  .stat.warn .v { color: var(--warn); }
+  @media (prefers-color-scheme: dark) { 
+    .stat.final { background: rgba(102,187,106,0.1); border-color: rgba(102,187,106,0.3); }
+    .stat.warn { background: rgba(239,83,80,0.1); border-color: rgba(239,83,80,0.3); }
+  }
+
+  /* ---------- Table for thin plate ---------- */
+  table.calc, table.coeff { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0; background: var(--bg-white); }
+  table.calc th, table.coeff th { background: var(--table-header); padding: 8px 10px; text-align: center; font-weight: 600; border: 0.5px solid var(--border-color); color: var(--primary-color); }
+  table.calc td, table.coeff td { padding: 8px 10px; text-align: center; border: 0.5px solid var(--border-color); }
+  table.calc td.label { text-align: left; font-weight: 600; color: var(--secondary-color); background: var(--bg-light); width: 120px; }
+  table.calc td.result { font-family: "Consolas","Menlo",monospace; font-weight: 700; }
+  table.calc td.defl { color: var(--primary-color); }
+  table.calc td.stress { color: var(--warn); }
+  table.calc td.ok { color: var(--ok); }
+  
+  table.coeff input { width: 60px; padding: 4px; border: 1px solid var(--border-color); background: var(--bg-white); color: var(--primary-color); text-align: center; border-radius: var(--radius-sm); font-size: 12px;}
+
+  /* ---------- Badges ---------- */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--bg-light); color: var(--secondary-color); border: 0.5px solid var(--border-color); font-size: 11.5px; font-weight: 600; letter-spacing: .3px; }
+  .badge.clamp { background-color: rgba(142, 68, 173, 0.1); color: #8e44ad; border-color: rgba(142, 68, 173, 0.3); }
+  .badge.mixed { background-color: rgba(230, 126, 34, 0.1); color: #e67e22; border-color: rgba(230, 126, 34, 0.3); }
+  .badge.simple { background-color: rgba(22, 160, 133, 0.1); color: #16a085; border-color: rgba(22, 160, 133, 0.3); }
+  @media (prefers-color-scheme: dark) {
+      .badge.clamp { color: #d7bde2; }
+      .badge.mixed { color: #f5cba7; }
+      .badge.simple { color: #a3e4d7; }
+  }
+
+  .banner { display: flex; gap: 10px; align-items: flex-start; background: var(--warn-bg); border: 0.5px solid var(--warn-bd); border-radius: var(--radius-md); padding: 10px 14px; color: var(--warn-tx); font-size: 12.8px; margin-bottom: 18px; }
+  .banner.info { background: var(--brand-50); border-color: var(--brand-100); color: var(--primary-color); }
+
+  .page-title { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; }
+  .page-title h2 { font-size: 18px; margin: 0; }
+  .row-line { height: 1px; background: var(--border-color); margin: 12px 0; }
+  
+  footer { padding: 1.5rem 5%; border-top: 0.5px solid var(--border-color); text-align: center; font-size: 13px; color: var(--secondary-color); }
+
+  @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-<div class="container">
-<h1>薄板應力承載計算工具 <small>均佈載荷 q ＆ 板面中心集中力 F</small></h1>
 
-<div class="input-panel">
-  <div class="input-group">
-    <label>材料</label>
-    <select id="material" onchange="onMaterialChange()">
-      <option value="SECC" selected>SECC (E=210000, ν=0.3)</option>
-      <option value="SUS304">SUS304 (E=193000, ν=0.29)</option>
-      <option value="AL6061">AL6061-T6 (E=68900, ν=0.33)</option>
-      <option value="CUSTOM">自訂</option>
-    </select>
-  </div>
-  <div class="input-group">
-    <label>E 彈性係數 (N/mm²)</label>
-    <input type="number" id="E" value="210000" onchange="calc()">
-  </div>
-  <div class="input-group">
-    <label>ν 蒲松比</label>
-    <input type="number" id="nu" value="0.3" step="0.01" onchange="calc()">
-  </div>
-  <div class="input-group">
-    <label>a 長邊 (mm)</label>
-    <input type="number" id="a" value="200" onchange="calc()">
-  </div>
-  <div class="input-group">
-    <label>b 短邊 (mm)</label>
-    <input type="number" id="b" value="120" onchange="calc()">
-  </div>
-  <div class="input-group">
-    <label>t 板厚 (mm)</label>
-    <input type="number" id="t" value="1.2" step="0.1" onchange="calc()">
-  </div>
-  <div class="input-group">
-    <label>載重 (kg)</label>
-    <input type="number" id="load_kg" value="18" step="0.1" onchange="calc()">
-  </div>
-  <div class="input-group">
-    <label>安全係數</label>
-    <input type="number" id="sf" value="3" step="0.5" onchange="calc()">
-  </div>
-  <div class="input-group">
-    <label>r' Wall Mount Boss (mm)</label>
-    <input type="number" id="rp" value="8" step="0.5" onchange="calc()">
-  </div>
-  <div class="input-group">
-    <label>降伏強度 σy (MPa)</label>
-    <input type="number" id="yield_str" value="270" onchange="calc()">
-  </div>
+<header>
+    <a href="../index.html" class="logo">Andrew Design Studio</a>
+    <a href="engineering-calculators.html" class="back-link">← 返回工具選單</a>
+</header>
+
+<section class="hero">
+    <div class="hero-label">工程計算工具</div>
+    <h1>🔲 薄板應力承載計算工具</h1>
+    <p>計算薄板結構在均佈載荷或受中心集中力作用下之最大撓度與應力。支援多種邊界條件（四邊固定、簡支與混合邊界），自動整合與比對多本機械設計手冊之係數，提供結構設計參考。</p>
+    <span class="source-note">參考文獻：機械設計手冊、現代機械設計手冊、Shigley's (Budynas)</span>
+</section>
+
+<section class="calc-section">
+
+<div class="tabs">
+  <div class="tab active" data-tab="t_input">參數設定與摘要</div>
+  <div class="tab" data-tab="t_uniform">均佈載荷 q 評估</div>
+  <div class="tab" data-tab="t_concentrate">集中力 F 評估</div>
+  <div class="tab" data-tab="t_coeff">係數表編輯</div>
 </div>
 
-<div class="params-display" id="paramsDisplay"></div>
+<div>
 
-<div class="results-grid">
-  <div class="result-block">
-    <div class="block-header uniform">整個板面均佈載荷 q</div>
-    <div id="uniformResults"></div>
+<section id="t_input" class="panel">
+  <div class="card">
+    <div class="card-head">
+      <h3>輸入參數</h3>
+      <div class="meta">材料特性與幾何尺寸設定</div>
+    </div>
+    <div class="card-body">
+      <div class="grid g-4">
+        <div class="field">
+          <label>材料</label>
+          <select id="material" onchange="onMaterialChange()">
+            <option value="SECC" selected>SECC (E=210000, ν=0.3)</option>
+            <option value="SUS304">SUS304 (E=193000, ν=0.29)</option>
+            <option value="AL6061">AL6061-T6 (E=68900, ν=0.33)</option>
+            <option value="CUSTOM">自訂</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>E 彈性係數 (N/mm²)</label>
+          <input type="number" id="E" value="210000">
+        </div>
+        <div class="field">
+          <label>ν 蒲松比</label>
+          <input type="number" id="nu" value="0.3" step="0.01">
+        </div>
+        <div class="field">
+          <label>降伏強度 σy (MPa)</label>
+          <input type="number" id="yield_str" value="270">
+        </div>
+      </div>
+      <div class="row-line"></div>
+      <div class="grid g-4">
+        <div class="field">
+          <label>a 長邊 (mm)</label>
+          <input type="number" id="a" value="200">
+        </div>
+        <div class="field">
+          <label>b 短邊 (mm)</label>
+          <input type="number" id="b" value="120">
+        </div>
+        <div class="field">
+          <label>t 板厚 (mm)</label>
+          <input type="number" id="t" value="1.2" step="0.1">
+        </div>
+        <div class="field">
+          <label>r' Wall Mount Boss (mm)</label>
+          <input type="number" id="rp" value="8" step="0.5">
+        </div>
+      </div>
+      <div class="row-line"></div>
+      <div class="grid g-4">
+        <div class="field">
+          <label>載重 (kg)</label>
+          <input type="number" id="load_kg" value="18" step="0.1">
+        </div>
+        <div class="field" style="display:flex; flex-direction:column; justify-content:center;">
+          <label style="color:var(--primary-color);">安全係數</label>
+          <input type="number" id="sf" value="3" step="0.5" style="border-color:var(--primary-color); font-weight:700;">
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="result-block">
-    <div class="block-header concentrated">板面中心作用集中力 F</div>
-    <div id="concentratedResults"></div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>系統推算參數</h3>
+      <div class="meta">中間推導與剛度數據</div>
+    </div>
+    <div class="card-body">
+      <div class="grid g-4">
+        <div class="stat dim"><div class="k">安全載重力 F (kg×SF)</div><div class="v" id="valF_N">–<span class="u">N</span></div></div>
+        <div class="stat dim"><div class="k">均佈力 q</div><div class="v" id="val_q">–<span class="u">N/mm²</span></div></div>
+        <div class="stat dim"><div class="k">長寬比 a/b</div><div class="v" id="val_ab">–</div></div>
+        <div class="stat dim"><div class="k">寬長比 b/a</div><div class="v" id="val_ba">–</div></div>
+        <div class="stat dim"><div class="k">抗彎剛度 D</div><div class="v" id="val_D">–</div></div>
+        <div class="stat dim"><div class="k">E·t³ 乘積</div><div class="v" id="val_Et3">–</div></div>
+        <div class="stat dim"><div class="k">寬厚比平方 (b/t)²</div><div class="v" id="val_bt2">–</div></div>
+        <div class="stat dim accent"><div class="k">降伏強度 σy</div><div class="v" id="val_sy">–<span class="u">MPa</span></div></div>
+      </div>
+    </div>
   </div>
+  
+  <div id="summaryBox"></div>
+</section>
+
+<section id="t_uniform" class="panel" style="display:none">
+  <div class="page-title">
+    <h2>整個板面均佈載荷 q</h2>
+    <span class="badge">各邊界條件比對</span>
+  </div>
+  <div id="uniformResults"></div>
+</section>
+
+<section id="t_concentrate" class="panel" style="display:none">
+  <div class="page-title">
+    <h2>板面中心作用集中力 F</h2>
+    <span class="badge">各邊界條件比對</span>
+  </div>
+  <div id="concentratedResults"></div>
+</section>
+
+<section id="t_coeff" class="panel" style="display:none">
+  <div class="page-title">
+    <h2>係數表手動編輯</h2>
+    <span class="badge">Timoshenko 標準值</span>
+  </div>
+  <div class="banner info">
+    <div class="ico">ⓘ</div>
+    <div>以下為 Timoshenko 標準值，系統根據 a/b 或 b/a 線性插值。可手動修改任何值，修改後會即時重新計算。</div>
+  </div>
+  <div id="coeffTables"></div>
+</section>
+
 </div>
 
-<div id="summaryBox"></div>
+<footer>依機械設計手冊與實務設計經驗實作 · 僅供參考，實際應用請依規範驗證</footer>
 
-<div class="coeff-editor">
-  <div class="coeff-toggle" onclick="toggleCoeff()">▶ 係數表編輯（點擊展開）</div>
-  <div class="coeff-content" id="coeffContent">
-    <p class="note">以下為 Timoshenko 標準值，根據 a/b 線性插值。可手動修改任何值後按 Enter 重新計算。</p>
-    <div id="coeffTables"></div>
-  </div>
-</div>
-
-</div>
+</section>
 
 <script>
 // ============ Material Presets ============
@@ -164,72 +300,42 @@ const MATERIALS = {
 };
 
 // ============ Coefficient Tables (Timoshenko standard values) ============
-// Keys: a/b ratio → coefficient values
-// These are standard values; user can override via the editor
-
 const COEFF_TABLES = {
-  // === 四邊固定 (All edges clamped) ===
   clamped_uniform: {
-    // a/b values as keys
     ratios: [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0, 4.0, 5.0],
-    // Deflection coefficient (same for all 3 sources)
     defl:   [0.0138, 0.0188, 0.0226, 0.0251, 0.0267, 0.0277, 0.0291, 0.0297, 0.0302, 0.0305],
-    // 機械設計手冊 C4 (σ at center, short span direction)
     C4:     [0.1386, 0.1794, 0.2094, 0.2208, 0.2280, 0.2286, 0.2298, 0.2298, 0.2298, 0.2298],
-    // 機械設計手冊 C5 (σ at center, long span direction)
     C5:     [0.1386, 0.1332, 0.1260, 0.1224, 0.1194, 0.1176, 0.1152, 0.1140, 0.1134, 0.1128],
-    // α (max bending stress, used by 現代機械 and Budynas β1)
     alpha:  [0.3078, 0.3834, 0.4356, 0.4680, 0.4872, 0.4974, 0.5088, 0.5124, 0.5148, 0.5160],
-    // Budynas β2 (stress at center of long edge)
     beta2:  [0.3078, 0.2682, 0.2448, 0.2286, 0.2160, 0.2064, 0.1902, 0.1848, 0.1812, 0.1800],
-    // 機械設計手冊 C6 (edge stress) - same as α
     C6:     [0.3078, 0.3834, 0.4356, 0.4680, 0.4872, 0.4974, 0.5088, 0.5124, 0.5148, 0.5160],
   },
   clamped_concentrated: {
     ratios: [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0, 4.0, 5.0],
     defl:   [0.0611, 0.0706, 0.0754, 0.0777, 0.0786, 0.0790, 0.0795, 0.0798, 0.0799, 0.0800],
-    // C9 / α for stress (F/t²)
     C9:     [0.7542, 0.8940, 0.9594, 0.9906, 1.0050, 1.0128, 1.0218, 1.0254, 1.0272, 1.0284],
-    // Budynas β1 for ln formula
     beta1:  [0.0900, 0.0680, 0.0580, 0.0530, 0.0500, 0.0480, 0.0460, 0.0450, 0.0440, 0.0435],
-    // β2 (stress at center of long edge) = same as C9
     beta2:  [0.7542, 0.8940, 0.9594, 0.9906, 1.0050, 1.0128, 1.0218, 1.0254, 1.0272, 1.0284],
   },
-
-  // === 四邊簡支 (All edges simply supported) ===
   simple_uniform: {
     ratios: [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0, 4.0, 5.0],
     defl:   [0.0443, 0.0530, 0.0578, 0.0616, 0.0636, 0.0646, 0.0668, 0.0674, 0.0680, 0.0682],
-    // C1 / α (center stress, short span)
     C1:     [0.2874, 0.3762, 0.4530, 0.5172, 0.5688, 0.6102, 0.6924, 0.7476, 0.8124, 0.8430],
-    // C2 (center stress, long span)
     C2:     [0.2874, 0.2550, 0.2382, 0.2958, 0.2406, 0.2286, 0.2100, 0.2004, 0.1932, 0.1908],
-    // Budynas β (same as C1 for max stress at center)
     beta:   [0.2874, 0.3762, 0.4530, 0.5172, 0.5688, 0.6102, 0.6924, 0.7476, 0.8124, 0.8430],
-    // γ (Budynas correction)
     gamma:  [0.4350, 0.4560, 0.4750, 0.4910, 0.5030, 0.5120, 0.5280, 0.5360, 0.5430, 0.5450],
   },
   simple_concentrated: {
     ratios: [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 3.0, 4.0, 5.0],
     defl:   [0.1160, 0.1353, 0.1432, 0.1478, 0.1504, 0.1520, 0.1540, 0.1548, 0.1555, 0.1558],
-    // C7 / β for stress
     C7:     [0.1160, 0.1353, 0.1432, 0.1478, 0.1504, 0.1520, 0.1540, 0.1548, 0.1555, 0.1558],
-    // R = 0.64b for 機械/現代 stress formula
-    // Budynas β for ln formula
     beta_b: [0.4350, 0.5020, 0.5600, 0.6500, 0.6800, 0.7000, 0.7300, 0.7500, 0.7700, 0.7800],
   },
-
-  // === 混合邊界 ===
-  // 機械設計手冊: 兩對邊簡支一邊固定一邊自由 (b/a ratio used)
   mixed_uniform: {
     ratios: [0.5, 0.6, 0.75, 1.0, 1.5, 2.0],
-    // 機械: α for deflection (uses b/a, formula: f = α·qb⁴/Et³)
     alpha_mech: [0.260, 0.366, 0.500, 0.660, 0.810, 0.880],
-    // 現代: β for deflection (a/b ratio, different BC)
     beta_mod:   [0.0200, 0.0273, 0.0364, 0.0479, 0.0570, 0.0610],
-    // α for deflection (Budynas), same as 現代 β
     alpha_bud:  [0.0200, 0.0273, 0.0364, 0.0479, 0.0570, 0.0610],
-    // Stress coefficients
     beta1_mech: [0.240, 0.335, 0.450, 0.580, 0.700, 0.780],
     alpha_stress_mod: [0.3600, 0.4968, 0.6400, 0.7800, 0.9000, 0.9600],
     beta_stress_bud:  [0.3600, 0.4968, 0.6400, 0.7800, 0.9000, 0.9600],
@@ -244,7 +350,9 @@ const COEFF_TABLES = {
   },
 };
 
-// ============ Linear Interpolation ============
+const $ = id => document.getElementById(id);
+function R(v, d=2) { return isNaN(v) ? '—' : Number(v.toFixed(d)); }
+
 function lerp(table, ratio, key) {
   const ratios = table.ratios;
   const vals = table[key];
@@ -260,34 +368,60 @@ function lerp(table, ratio, key) {
   return vals[vals.length-1];
 }
 
-// ============ Material Change ============
 function onMaterialChange() {
-  const sel = document.getElementById('material').value;
+  const sel = $('material').value;
   const m = MATERIALS[sel];
   if (m) {
-    document.getElementById('E').value = m.E;
-    document.getElementById('nu').value = m.nu;
-    document.getElementById('yield_str').value = m.sy;
+    $('E').value = m.E;
+    $('nu').value = m.nu;
+    $('yield_str').value = m.sy;
   }
   calc();
 }
 
-// ============ Round helper ============
-function R(v, d=2) { return isNaN(v) ? '—' : Number(v.toFixed(d)); }
+/* ========================= Tabs ========================= */
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const id = tab.dataset.tab;
+    document.querySelectorAll("section.panel").forEach(s => s.style.display="none");
+    $(id).style.display = "";
+  });
+});
 
-// ============ Main Calculation ============
+/* ========================= UI Helpers ========================= */
+function setStat(id, value, unit){
+  const el = $(id);
+  if(!el) return;
+  el.innerHTML = (unit ? `${value}<span class="u">${unit}</span>` : `${value}`);
+}
+
+function bcCard(type, title, content) {
+  return `
+    <div class="card">
+      <div class="card-head">
+        <h3><span class="badge ${type}">${type==='clamp'?'固定':type==='mixed'?'混合':'簡支'}</span> ${title}</h3>
+      </div>
+      <div class="card-body" style="overflow-x:auto;">
+        ${content}
+      </div>
+    </div>`;
+}
+
+/* ========================= Main Calc ========================= */
 function calc() {
-  const E  = parseFloat(document.getElementById('E').value);
-  const nu = parseFloat(document.getElementById('nu').value);
-  const a  = parseFloat(document.getElementById('a').value);
-  const b  = parseFloat(document.getElementById('b').value);
-  const t  = parseFloat(document.getElementById('t').value);
-  const kg = parseFloat(document.getElementById('load_kg').value);
-  const sf = parseFloat(document.getElementById('sf').value);
-  const rp = parseFloat(document.getElementById('rp').value);
-  const sy = parseFloat(document.getElementById('yield_str').value);
+  const E  = parseFloat($('E').value);
+  const nu = parseFloat($('nu').value);
+  const a  = parseFloat($('a').value);
+  const b  = parseFloat($('b').value);
+  const t  = parseFloat($('t').value);
+  const kg = parseFloat($('load_kg').value);
+  const sf = parseFloat($('sf').value);
+  const rp = parseFloat($('rp').value);
+  const sy = parseFloat($('yield_str').value);
 
-  const F_N = kg * 9.8 * sf;
+  const F_N = kg * 9.81 * sf;
   const q = F_N / (a * b);
   const D = (E * Math.pow(t, 3)) / (12 * (1 - nu * nu));
   const ab = a / b;
@@ -295,26 +429,23 @@ function calc() {
   const qb4 = q * Math.pow(b, 4);
   const Et3 = E * Math.pow(t, 3);
   const qb2 = q * Math.pow(b, 2);
-  const Fb2 = F_N * Math.pow(b, 2);
   const bt2 = Math.pow(b / t, 2);
   const at2 = Math.pow(a / t, 2);
 
-  // Display params
-  document.getElementById('paramsDisplay').innerHTML = `
-    <span>載重×安全係數: <span class="val">${R(kg)}kg × ${sf} = ${R(kg*sf)}kg = ${R(F_N)}N</span></span>
-    <span>q = <span class="val">${R(q,6)} N/mm²</span></span>
-    <span>a/b = <span class="val">${R(ab,2)}</span></span>
-    <span>b/a = <span class="val">${R(ba,2)}</span></span>
-    <span>D = <span class="val">${R(D,2)}</span></span>
-    <span>E·t³ = <span class="val">${R(Et3,0)}</span></span>
-    <span>(b/t)² = <span class="val">${R(bt2,2)}</span></span>
-    <span>σy = <span class="val">${sy} MPa</span></span>
-  `;
+  // Update System Params
+  setStat("valF_N", R(F_N), "N");
+  setStat("val_q", R(q, 6), "N/mm²");
+  setStat("val_ab", R(ab, 2));
+  setStat("val_ba", R(ba, 2));
+  setStat("val_D", R(D, 2));
+  setStat("val_Et3", R(Et3, 0));
+  setStat("val_bt2", R(bt2, 2));
+  setStat("val_sy", sy, "MPa");
 
   // ===== UNIFORM LOAD q =====
   let uHTML = '';
 
-  // --- 四邊固定 ---
+  // --- Clamped ---
   const cu = COEFF_TABLES.clamped_uniform;
   const cu_defl = lerp(cu, ab, 'defl');
   const cu_C4 = lerp(cu, ab, 'C4');
@@ -325,12 +456,10 @@ function calc() {
 
   const cu_f = cu_defl * qb4 / Et3;
   const cu_s_C4 = cu_C4 * bt2 * q;
-  const cu_s_C5 = cu_C5 * bt2 * q;
-  const cu_s_C6 = cu_C6 * bt2 * q;
   const cu_s_alpha = cu_alpha * bt2 * q;
   const cu_s_beta2 = cu_beta2 * qb2 / (t*t);
 
-  uHTML += bcSection('clamp', '四邊固定 All Edges Clamped', `
+  uHTML += bcCard('clamp', '四邊固定 All Edges Clamped', `
     <table class="calc">
       <tr><th></th><th>機械設計手冊</th><th>現代機械手冊</th><th>Budynas</th></tr>
       <tr><td class="label">撓度係數</td><td>C3=${R(cu_defl,4)}</td><td>β=${R(cu_defl,4)}</td><td>α=${R(cu_defl,4)}</td></tr>
@@ -341,10 +470,9 @@ function calc() {
         <td class="result ${cu_s_alpha>sy?'stress':'ok'}">${R(cu_s_alpha)}</td>
         <td class="result ${cu_s_alpha>sy?'stress':'ok'}">β1: ${R(cu_s_alpha)}<br>β2: ${R(cu_s_beta2)}</td>
       </tr>
-      <tr><td class="label">機械 C5/C6</td><td>C5=${R(cu_C5,4)} → ${R(cu_s_C5)} MPa<br>C6=${R(cu_C6,4)} → -${R(cu_s_C6)} MPa</td><td colspan="2"></td></tr>
     </table>`);
 
-  // --- 混合邊界 (uniform) ---
+  // --- Mixed ---
   const mu = COEFF_TABLES.mixed_uniform;
   const mu_alpha = lerp(mu, ba, 'alpha_mech');
   const mu_beta = lerp(mu, ba, 'beta_mod');
@@ -354,14 +482,12 @@ function calc() {
 
   const mu_beta1 = lerp(mu, ba, 'beta1_mech');
   const mu_alpha_s = lerp(mu, ba, 'alpha_stress_mod');
-  const mu_beta2m = lerp(mu, ba, 'beta2_mech');
   const mu_s_b1 = mu_beta1 * at2 * q;
   const mu_s_alpha = mu_alpha_s * bt2 * q;
-  const mu_s_b2 = mu_beta2m * bt2 * q;
 
-  uHTML += bcSection('mixed', '混合邊界（兩對邊簡支＋一邊固定一邊自由 / 長邊固定短邊簡支）', `
+  uHTML += bcCard('mixed', '混合邊界（兩對邊簡支＋一邊固定一邊自由）', `
     <table class="calc">
-      <tr><th></th><th>機械設計手冊<br><small>(b/a=${R(ba,2)}查表)</small></th><th>現代機械手冊<br><small>(a/b=${R(ab,2)}查表)</small></th><th>Budynas</th></tr>
+      <tr><th></th><th>機械設計手冊 (b/a=${R(ba,2)})</th><th>現代機械手冊 (a/b=${R(ab,2)})</th><th>Budynas</th></tr>
       <tr><td class="label">撓度係數</td><td>α=${R(mu_alpha,4)}</td><td>β=${R(mu_beta,4)}</td><td>α=${R(mu_beta,4)}</td></tr>
       <tr><td class="label">ƒ (mm)</td><td class="result defl">${R(mu_f_mech)}</td><td class="result defl">${R(mu_f_mod)}</td><td class="result defl">${R(mu_f_bud)}</td></tr>
       <tr><td class="label">應力係數</td><td>β1=${R(mu_beta1,4)}</td><td>α=${R(mu_alpha_s,4)}</td><td>β=${R(mu_alpha_s,4)}</td></tr>
@@ -370,23 +496,19 @@ function calc() {
         <td class="result ${mu_s_alpha>sy?'stress':'ok'}">${R(mu_s_alpha)}</td>
         <td class="result ${mu_s_alpha>sy?'stress':'ok'}">${R(mu_s_alpha)}</td>
       </tr>
-      <tr><td class="label">機械 β2</td><td>β2=${R(mu_beta2m,4)} → ${R(mu_s_b2)} MPa</td><td colspan="2"></td></tr>
     </table>`);
 
-  // --- 四邊簡支 ---
+  // --- Simple ---
   const su = COEFF_TABLES.simple_uniform;
   const su_defl = lerp(su, ab, 'defl');
   const su_C1 = lerp(su, ab, 'C1');
-  const su_C2 = lerp(su, ab, 'C2');
   const su_beta = lerp(su, ab, 'beta');
-  const su_gamma = lerp(su, ab, 'gamma');
 
   const su_f = su_defl * qb4 / Et3;
   const su_s_C1 = su_C1 * bt2 * q;
-  const su_s_C2 = su_C2 * bt2 * q;
   const su_s_beta = su_beta * bt2 * q;
 
-  uHTML += bcSection('simple', '四邊簡支 All Edges Simply Supported', `
+  uHTML += bcCard('simple', '四邊簡支 All Edges Simply Supported', `
     <table class="calc">
       <tr><th></th><th>機械設計手冊</th><th>現代機械手冊</th><th>Budynas</th></tr>
       <tr><td class="label">撓度係數</td><td>C0=${R(su_defl,4)}</td><td>β=${R(su_defl,4)}</td><td>α=${R(su_defl,4)}</td></tr>
@@ -397,43 +519,39 @@ function calc() {
         <td class="result ${su_s_C1>sy?'stress':'ok'}">${R(su_s_C1)}</td>
         <td class="result ${su_s_beta>sy?'stress':'ok'}">${R(su_s_beta)}</td>
       </tr>
-      <tr><td class="label">機械 C2 / Bud γ</td><td>C2=${R(su_C2,4)} → ${R(su_s_C2)} MPa</td><td></td><td>γ=${R(su_gamma,4)}</td></tr>
     </table>`);
 
-  document.getElementById('uniformResults').innerHTML = uHTML;
+  $('uniformResults').innerHTML = uHTML;
 
   // ===== CONCENTRATED FORCE F =====
   let cHTML = '';
 
-  // --- 四邊固定 ---
+  // --- Clamped ---
   const cc = COEFF_TABLES.clamped_concentrated;
   const cc_defl = lerp(cc, ab, 'defl');
   const cc_C9 = lerp(cc, ab, 'C9');
   const cc_b1 = lerp(cc, ab, 'beta1');
-  const cc_b2 = lerp(cc, ab, 'beta2');
 
   const cc_f = cc_defl * F_N * b * b / Et3;
   const cc_s_C9 = cc_C9 * F_N / (t * t);
-  // Excel: LN(2*b/PI()*r') = LN((2b/π)·r') due to operator precedence
   const cc_s_bud = (3 * F_N / (2 * Math.PI * t * t)) * ((1 + nu) * Math.log((2 * b / Math.PI) * rp) + cc_b1);
-  const cc_s_b2 = cc_b2 * F_N / (t * t);
 
-  cHTML += bcSection('clamp', '四邊固定 All Edges Clamped', `
+  cHTML += bcCard('clamp', '四邊固定 All Edges Clamped', `
     <table class="calc">
-      <tr><th></th><th>機械設計手冊</th><th>現代機械手冊</th><th>Budynas</th></tr>
-      <tr><td class="label">撓度係數</td><td>C8=${R(cc_defl,4)}</td><td>β=${R(cc_defl,4)}</td><td>α=${R(cc_defl,4)}</td></tr>
-      <tr><td class="label">ƒmax (mm)</td><td class="result defl">${R(cc_f)}</td><td class="result defl">${R(cc_f)}</td><td class="result defl">${R(cc_f)}</td></tr>
-      <tr><td class="label">應力係數</td><td>C9=${R(cc_C9,4)}</td><td>α=${R(cc_C9,4)}</td><td>β1=${R(cc_b1,4)} (ln公式)</td></tr>
-      <tr><td class="label">σ (MPa)</td>
-        <td class="result ${cc_s_C9>sy?'stress':'ok'}">C9·F/t²: ${R(cc_s_C9)}</td>
-        <td class="result ${cc_s_C9>sy?'stress':'ok'}">α·F/t²: ${R(cc_s_C9)}</td>
-        <td class="result ${cc_s_bud>sy?'stress':'ok'}">ln公式: ${R(cc_s_bud)}</td>
+      <tr><th></th><th>機械設計手冊</th><th>現代/Budynas</th></tr>
+      <tr><td class="label">撓度係數</td><td>C8=${R(cc_defl,4)}</td><td>β/α=${R(cc_defl,4)}</td></tr>
+      <tr><td class="label">ƒmax (mm)</td><td class="result defl">${R(cc_f)}</td><td class="result defl">${R(cc_f)}</td></tr>
+      <tr><td class="label">應力公式</td>
+        <td><small>C9·F/t²</small></td>
+        <td><small>ln公式: 3F/(2πt²)·[(1+ν)·ln(2b/πr')+β1]</small></td>
       </tr>
-      <tr><td class="label">β2 長邊中心</td><td colspan="2">-β2·F/t² = -${R(cc_s_b2)} MPa</td><td></td></tr>
-    </table>
-    <div class="note">Budynas: σ = 3F/(2πt²)·[(1+ν)·ln(2b/πr') + β1]，r'=${rp}mm</div>`);
+      <tr><td class="label">σ (MPa)</td>
+        <td class="result ${cc_s_C9>sy?'stress':'ok'}">${R(cc_s_C9)}</td>
+        <td class="result ${cc_s_bud>sy?'stress':'ok'}">${R(cc_s_bud)}</td>
+      </tr>
+    </table>`);
 
-  // --- 混合邊界 (concentrated) ---
+  // --- Mixed ---
   const mc = COEFF_TABLES.mixed_concentrated;
   const mc_const = lerp(mc, ba, 'const_mech');
   const mc_beta = lerp(mc, ba, 'beta_mod');
@@ -445,41 +563,30 @@ function calc() {
   const mc_s_mech = mc_cs * F_N / (t * t);
   const mc_s_mod = mc_as * F_N / (t * t);
 
-  cHTML += bcSection('mixed', '混合邊界（自由邊中心受集中載荷）', `
+  cHTML += bcCard('mixed', '混合邊界（自由邊中心受集中載荷）', `
     <table class="calc">
-      <tr><th></th><th>機械設計手冊<br><small>(b/a=${R(ba,2)}查表)</small></th><th>現代機械手冊<br><small>(a/b=${R(ab,2)}查表)</small></th><th>Budynas</th></tr>
-      <tr><td class="label">撓度係數</td><td>常數=${R(mc_const,4)}</td><td>β=${R(mc_beta,4)}</td><td>—</td></tr>
-      <tr><td class="label">ƒ (mm)</td><td class="result defl">${R(mc_f_mech)}</td><td class="result defl">${R(mc_f_mod)}</td><td class="result">待確認</td></tr>
-      <tr><td class="label">應力係數</td><td>常數=${R(mc_cs,4)}</td><td>α=${R(mc_as,4)}</td><td>—</td></tr>
+      <tr><th></th><th>機械設計手冊 (b/a=${R(ba,2)})</th><th>現代機械手冊 (a/b=${R(ab,2)})</th></tr>
+      <tr><td class="label">ƒ (mm)</td><td class="result defl">${R(mc_f_mech)}</td><td class="result defl">${R(mc_f_mod)}</td></tr>
       <tr><td class="label">σ (MPa)</td>
         <td class="result ${mc_s_mech>sy?'stress':'ok'}">${R(mc_s_mech)}</td>
         <td class="result ${mc_s_mod>sy?'stress':'ok'}">${R(mc_s_mod)}</td>
-        <td class="result">待確認</td>
       </tr>
     </table>`);
 
-  // --- 四邊簡支 (concentrated) ---
+  // --- Simple ---
   const sc = COEFF_TABLES.simple_concentrated;
   const sc_defl = lerp(sc, ab, 'defl');
   const sc_beta_b = lerp(sc, ab, 'beta_b');
   const sc_f = sc_defl * F_N * b * b / Et3;
-
-  // 機械/現代: R = 0.64b
   const R_val = 0.64 * b;
   const sc_s_mech = (F_N / (t*t)) * 0.63 * Math.log(R_val / t + 1.16);
   const sc_s_mod = (1.153 + 0.631 * Math.log(R_val / t)) * F_N / (t*t);
   const sc_s_bud = (3 * F_N / (2 * Math.PI * t * t)) * ((1 + nu) * Math.log((2 * b / Math.PI) * rp) + sc_beta_b);
 
-  cHTML += bcSection('simple', '四邊簡支 All Edges Simply Supported', `
+  cHTML += bcCard('simple', '四邊簡支 All Edges Simply Supported', `
     <table class="calc">
       <tr><th></th><th>機械設計手冊</th><th>現代機械手冊</th><th>Budynas</th></tr>
-      <tr><td class="label">撓度係數</td><td>C7=${R(sc_defl,4)}</td><td>β=${R(sc_defl,4)}</td><td>α=${R(sc_defl,4)}</td></tr>
       <tr><td class="label">ƒmax (mm)</td><td class="result defl">${R(sc_f)}</td><td class="result defl">${R(sc_f)}</td><td class="result defl">${R(sc_f)}</td></tr>
-      <tr><td class="label">應力公式</td>
-        <td><small>0.63·ln(R/t+1.16)·F/t²<br>R=0.64b=${R(R_val)}mm</small></td>
-        <td><small>(1.153+0.631·ln(R/t))·F/t²</small></td>
-        <td><small>3F/(2πt²)·[(1+ν)·ln(2b/πr')+β]<br>β=${R(sc_beta_b,4)}</small></td>
-      </tr>
       <tr><td class="label">σ (MPa)</td>
         <td class="result ${sc_s_mech>sy?'stress':'ok'}">${R(sc_s_mech)}</td>
         <td class="result ${sc_s_mod>sy?'stress':'ok'}">${R(sc_s_mod)}</td>
@@ -487,35 +594,22 @@ function calc() {
       </tr>
     </table>`);
 
-  document.getElementById('concentratedResults').innerHTML = cHTML;
+  $('concentratedResults').innerHTML = cHTML;
 
-  // ===== Summary =====
-  // Key result: 四邊固定 concentrated (the reference case from Excel notes)
-  const maxDefl = cc_f;
-  const maxStress = cc_s_C9;
-  const pass = maxStress < sy;
-  document.getElementById('summaryBox').innerHTML = `
-    <div class="summary-box ${pass ? '' : 'warn'}">
-      <strong>設計參考（四邊固定 + 集中力，×${sf}倍安全係數）：</strong>
-      最大撓度 ${R(maxDefl)} mm ｜ 承受應力 ${R(maxStress)} MPa ${pass ? '＜' : '＞'} ${sy} MPa → <strong>${pass ? '✓ OK' : '✗ NG'}</strong>
+  // ===== Summary Banner =====
+  const pass = cc_s_C9 < sy;
+  $('summaryBox').innerHTML = `
+    <div class="card" style="margin-top: 1rem;">
+      <div class="card-head"><h3>設計結果評估基準</h3><div class="meta">以四邊固定＋集中力為指標</div></div>
+      <div class="card-body">
+         <div class="stat ${pass ? 'final' : 'warn'}">
+            <div class="k">判定結果 (降伏強度 ${sy} MPa 基準)</div>
+            <div class="v">最大應力 ${R(cc_s_C9)} MPa ${pass ? '＜' : '＞'} 容許值 ${sy} MPa → ${pass ? '✓ 安全' : '✗ 超出極限'}</div>
+         </div>
+      </div>
     </div>`;
 
-  // Build coefficient tables display
   buildCoeffDisplay(ab, ba);
-}
-
-function bcSection(type, title, content) {
-  return `<div class="bc-section">
-    <div class="bc-title"><span class="tag ${type}">${type==='clamp'?'固定':type==='mixed'?'混合':'簡支'}</span> ${title}</div>
-    ${content}
-  </div>`;
-}
-
-function toggleCoeff() {
-  const el = document.getElementById('coeffContent');
-  const toggle = el.previousElementSibling;
-  el.classList.toggle('open');
-  toggle.textContent = el.classList.contains('open') ? '▼ 係數表編輯（點擊收合）' : '▶ 係數表編輯（點擊展開）';
 }
 
 function buildCoeffDisplay(ab, ba) {
@@ -531,20 +625,24 @@ function buildCoeffDisplay(ab, ba) {
 
   for (const [key, label, ratio] of tables) {
     const tbl = COEFF_TABLES[key];
-    html += `<h3>${label} <small>(查表比值=${R(ratio,2)})</small></h3><table class="coeff"><tr><th>比值</th>`;
+    html += `
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-head"><h3>${label}</h3> <div class="meta">當前查表比值 = ${R(ratio,2)}</div></div>
+      <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table class="coeff"><tr><th>比值</th>`;
     for (const r of tbl.ratios) html += `<th>${r}</th>`;
-    html += `<th style="background:#e3f2fd;font-weight:700">插值結果</th></tr>`;
+    html += `<th style="background:var(--brand-50);font-weight:700">即時插值</th></tr>`;
     for (const k of Object.keys(tbl)) {
       if (k === 'ratios') continue;
-      html += `<tr><td style="text-align:left;font-weight:600">${k}</td>`;
+      html += `<tr><td style="text-align:left;font-weight:600;background:var(--bg-light)">${k}</td>`;
       for (let i = 0; i < tbl.ratios.length; i++) {
         html += `<td><input value="${tbl[k][i]}" data-table="${key}" data-key="${k}" data-idx="${i}" onchange="updateCoeff(this)"></td>`;
       }
-      html += `<td style="background:#e3f2fd;font-weight:700">${R(lerp(tbl, ratio, k), 4)}</td></tr>`;
+      html += `<td style="background:var(--brand-50);font-weight:700">${R(lerp(tbl, ratio, k), 4)}</td></tr>`;
     }
-    html += '</table>';
+    html += '</table></div></div>';
   }
-  document.getElementById('coeffTables').innerHTML = html;
+  $('coeffTables').innerHTML = html;
 }
 
 function updateCoeff(el) {
@@ -554,6 +652,12 @@ function updateCoeff(el) {
   COEFF_TABLES[table][key][idx] = parseFloat(el.value);
   calc();
 }
+
+// 綁定事件
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("input", calc);
+  el.addEventListener("change", calc);
+});
 
 // Initial calculation
 calc();
