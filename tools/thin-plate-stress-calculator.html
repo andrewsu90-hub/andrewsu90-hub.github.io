@@ -351,7 +351,7 @@
 
   <div class="page-title"><h2>矩形板常見邊界組合（Budynas Table 11.4）</h2></div>
   <div id="caseListTable"></div>
-  <p style="font-size:12px; color:var(--secondary-color); margin-top:10px;">註：原書 Table 11.4 尚有「案例 4：三邊簡支，一長邊固定」，因不在本工具需求清單內，故未列入案例選單。</p>
+  <p style="font-size:12px; color:var(--secondary-color); margin-top:10px;">註：以上案例對應原書 Table 11.4 編號，共 11 種邊界組合。</p>
 </section>
 
 </div>
@@ -410,6 +410,16 @@ const CASES = {
     rows: [
       { key:'beta',  label:'β — 最大應力係數', loc:'σmax = β·q·b²/t²',      vals:[0.50,0.67,0.73,0.74,0.75,0.75,0.75] },
       { key:'alpha', label:'α — 最大撓度係數', loc:'y_max = α·q·b⁴/(E·t³)', vals:[0.030,0.071,0.101,0.122,0.132,0.137,0.139] },
+    ],
+  },
+  4: {
+    title: '案例 4：三邊簡支，一長邊固定',
+    en: 'Three edges simply supported, one long edge (a) fixed',
+    nu: 0.3,
+    ratios: [1,1.5,2.0,2.5,3.0,3.5,4.0],
+    rows: [
+      { key:'beta',  label:'β — 最大應力係數', loc:'σmax = β·q·b²/t²',      vals:[0.50,0.66,0.73,0.74,0.75,0.75,0.75] },
+      { key:'alpha', label:'α — 最大撓度係數', loc:'y_max = α·q·b⁴/(E·t³)', vals:[0.030,0.046,0.054,0.056,0.057,0.058,0.058] },
     ],
   },
   5: {
@@ -720,6 +730,7 @@ function renderCaseDiagram(caseId) {
     '1':  simply('top')  + simply('bottom')  + simply('left')  + simply('right'),
     '2':  simply('top')  + simply('bottom')  + simply('left')  + free('right'),
     '3':  simply('top')  + simply('bottom')  + simply('left')  + fixed('right'),
+    '4':  simply('top')  + fixed('bottom')   + simply('left')  + simply('right'),
     '5':  simply('top')  + simply('bottom')  + fixed('left')   + fixed('right'),
     '6':  fixed('top')   + fixed('bottom')   + simply('left')  + simply('right'),
     '7':  fixed('top')   + free('bottom')    + simply('left')  + simply('right'),
@@ -734,6 +745,7 @@ function renderCaseDiagram(caseId) {
     '1':  '四邊簡支',
     '2':  '三邊簡支，右邊（b）自由',
     '3':  '三邊簡支，右邊（b）固定',
+    '4':  '三邊簡支，下邊（a）固定',
     '5':  '兩長邊簡支，兩短邊固定',
     '6':  '兩長邊固定，兩短邊簡支',
     '7':  '上邊固定，下邊自由，兩側簡支',
@@ -807,6 +819,7 @@ function miniCaseSVG(caseId) {
     '1':  simply('top')+simply('bottom')+simply('left')+simply('right'),
     '2':  simply('top')+simply('bottom')+simply('left')+free('right'),
     '3':  simply('top')+simply('bottom')+simply('left')+fixed('right'),
+    '4':  simply('top')+fixed('bottom')+simply('left')+simply('right'),
     '5':  simply('top')+simply('bottom')+fixed('left')+fixed('right'),
     '6':  fixed('top')+fixed('bottom')+simply('left')+simply('right'),
     '7':  fixed('top')+free('bottom')+simply('left')+simply('right'),
@@ -824,6 +837,7 @@ function buildCaseListTable() {
     {id:'1',  zh:'四邊簡支',                            en:'All edges simply supported'},
     {id:'2',  zh:'三邊簡支，一邊自由',                    en:'Three edges simply supported, one edge free'},
     {id:'3',  zh:'三邊簡支，一短邊固定',                  en:'Three edges simply supported, one short edge fixed'},
+    {id:'4',  zh:'三邊簡支，一長邊固定',                  en:'Three edges simply supported, one long edge fixed'},
     {id:'5',  zh:'兩長邊簡支，兩短邊固定',                en:'Two long edges simply supported, two short edges fixed'},
     {id:'6',  zh:'兩長邊固定，兩短邊簡支',                en:'Two long edges fixed, two short edges simply supported'},
     {id:'7',  zh:'一邊固定，對邊自由，其餘兩邊簡支',        en:'One edge fixed, opposite edge free, remaining edges simply supported'},
