@@ -350,19 +350,7 @@
   <div class="row-line"></div>
 
   <div class="page-title"><h2>矩形板常見邊界組合（Budynas Table 11.4）</h2></div>
-  <table class="case-list">
-    <tr><th class="num">案例</th><th>邊界組合</th><th>說明</th></tr>
-    <tr><td class="num">1</td><td>四邊簡支</td><td>All edges simply supported</td></tr>
-    <tr><td class="num">2</td><td>三邊簡支，一邊自由</td><td>Three edges simply supported, one edge free</td></tr>
-    <tr><td class="num">3</td><td>三邊簡支，一短邊固定</td><td>Three edges simply supported, one short edge fixed</td></tr>
-    <tr><td class="num">5</td><td>兩長邊簡支，兩短邊固定</td><td>Two long edges simply supported, two short edges fixed</td></tr>
-    <tr><td class="num">6</td><td>兩長邊固定，兩短邊簡支</td><td>Two long edges fixed, two short edges simply supported</td></tr>
-    <tr><td class="num">7</td><td>一邊固定，對邊自由，其餘兩邊簡支</td><td>One edge fixed, opposite edge free, remaining edges simply supported</td></tr>
-    <tr><td class="num">8</td><td>四邊固定</td><td>All edges fixed</td></tr>
-    <tr><td class="num">9</td><td>三邊固定，一邊簡支</td><td>Three edges fixed, one edge simply supported</td></tr>
-    <tr><td class="num">10</td><td>三邊固定，一邊自由</td><td>Three edges fixed, one edge free</td></tr>
-    <tr><td class="num">11</td><td>相鄰兩邊固定，其餘兩邊自由</td><td>Two adjacent edges fixed, two remaining edges free</td></tr>
-  </table>
+  <div id="caseListTable"></div>
   <p style="font-size:12px; color:var(--secondary-color); margin-top:10px;">註：原書 Table 11.4 尚有「案例 4：三邊簡支，一長邊固定」，因不在本工具需求清單內，故未列入案例選單。</p>
 </section>
 
@@ -773,6 +761,92 @@ function renderCaseDiagram(caseId) {
     </div>`;
 }
 
+/* ========================= Mini Case Diagram for Info Tab ========================= */
+function miniCaseSVG(caseId) {
+  const VW=130, VH=95;
+  const px=28, py=18, pw=70, ph=50;
+  const HT=6;
+  const C={fix:'#94a3b8',fixS:'#475569',ss:'#1e40af',free:'#ef4444',plate:'#dbeafe',plateS:'#1e40af',dim:'#64748b'};
+
+  function fixed(side){
+    let r='',l='';
+    const n=side==='top'||side==='bottom'?Math.floor(pw/6):Math.floor(ph/6);
+    if(side==='top'){r=`<rect x="${px}" y="${py-HT}" width="${pw}" height="${HT}" fill="${C.fix}" stroke="${C.fixS}" stroke-width=".8"/>`; const sp=pw/n; for(let i=0;i<=n;i++) l+=`<line x1="${px+i*sp}" y1="${py}" x2="${px+i*sp-HT}" y2="${py-HT}" stroke="${C.fixS}" stroke-width=".6"/>`;}
+    else if(side==='bottom'){r=`<rect x="${px}" y="${py+ph}" width="${pw}" height="${HT}" fill="${C.fix}" stroke="${C.fixS}" stroke-width=".8"/>`; const sp=pw/n; for(let i=0;i<=n;i++) l+=`<line x1="${px+i*sp}" y1="${py+ph}" x2="${px+i*sp+HT}" y2="${py+ph+HT}" stroke="${C.fixS}" stroke-width=".6"/>`;}
+    else if(side==='left'){r=`<rect x="${px-HT}" y="${py}" width="${HT}" height="${ph}" fill="${C.fix}" stroke="${C.fixS}" stroke-width=".8"/>`; const sp=ph/n; for(let i=0;i<=n;i++) l+=`<line x1="${px}" y1="${py+i*sp}" x2="${px-HT}" y2="${py+i*sp-HT}" stroke="${C.fixS}" stroke-width=".6"/>`;}
+    else if(side==='right'){r=`<rect x="${px+pw}" y="${py}" width="${HT}" height="${ph}" fill="${C.fix}" stroke="${C.fixS}" stroke-width=".8"/>`; const sp=ph/n; for(let i=0;i<=n;i++) l+=`<line x1="${px+pw}" y1="${py+i*sp}" x2="${px+pw+HT}" y2="${py+i*sp-HT}" stroke="${C.fixS}" stroke-width=".6"/>`;}
+    return r+l;
+  }
+  function simply(side){
+    let o='',bl=''; const r=3.5,sp=10;
+    if(side==='top'){const n=Math.floor(pw/sp),g=pw/n; for(let i=0;i<=n;i++){const x=px+i*g; o+=`<polygon points="${x},${py} ${x-r},${py-r*1.6} ${x+r},${py-r*1.6}" fill="${C.ss}" stroke="${C.ss}" stroke-width=".4"/>`;} bl=`<line x1="${px-r}" y1="${py-r*1.6}" x2="${px+pw+r}" y2="${py-r*1.6}" stroke="${C.ss}" stroke-width=".8"/>`;}
+    else if(side==='bottom'){const n=Math.floor(pw/sp),g=pw/n; for(let i=0;i<=n;i++){const x=px+i*g; o+=`<polygon points="${x},${py+ph} ${x-r},${py+ph+r*1.6} ${x+r},${py+ph+r*1.6}" fill="${C.ss}" stroke="${C.ss}" stroke-width=".4"/>`;} bl=`<line x1="${px-r}" y1="${py+ph+r*1.6}" x2="${px+pw+r}" y2="${py+ph+r*1.6}" stroke="${C.ss}" stroke-width=".8"/>`;}
+    else if(side==='left'){const n=Math.floor(ph/sp),g=ph/n; for(let i=0;i<=n;i++){const y=py+i*g; o+=`<polygon points="${px},${y} ${px-r*1.6},${y-r} ${px-r*1.6},${y+r}" fill="${C.ss}" stroke="${C.ss}" stroke-width=".4"/>`;} bl=`<line x1="${px-r*1.6}" y1="${py-r}" x2="${px-r*1.6}" y2="${py+ph+r}" stroke="${C.ss}" stroke-width=".8"/>`;}
+    else if(side==='right'){const n=Math.floor(ph/sp),g=ph/n; for(let i=0;i<=n;i++){const y=py+i*g; o+=`<polygon points="${px+pw},${y} ${px+pw+r*1.6},${y-r} ${px+pw+r*1.6},${y+r}" fill="${C.ss}" stroke="${C.ss}" stroke-width=".4"/>`;} bl=`<line x1="${px+pw+r*1.6}" y1="${py-r}" x2="${px+pw+r*1.6}" y2="${py+ph+r}" stroke="${C.ss}" stroke-width=".8"/>`;}
+    return o+bl;
+  }
+  function free(side){
+    const d='stroke-dasharray="4,2"',sw='stroke-width="1.5"',col=`stroke="${C.free}"`;
+    if(side==='top')    return `<line x1="${px}" y1="${py}" x2="${px+pw}" y2="${py}" ${col} ${sw} ${d}/>`;
+    if(side==='bottom') return `<line x1="${px}" y1="${py+ph}" x2="${px+pw}" y2="${py+ph}" ${col} ${sw} ${d}/>`;
+    if(side==='left')   return `<line x1="${px}" y1="${py}" x2="${px}" y2="${py+ph}" ${col} ${sw} ${d}/>`;
+    if(side==='right')  return `<line x1="${px+pw}" y1="${py}" x2="${px+pw}" y2="${py+ph}" ${col} ${sw} ${d}/>`;
+    return '';
+  }
+  const plate=`<rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="${C.plate}" stroke="${C.plateS}" stroke-width="1.2"/>`;
+  const cx=px+pw/2, cy=py+ph/2;
+  const dims=`
+    <defs><marker id="ma${caseId}" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 Z" fill="${C.dim}"/></marker>
+    <marker id="mb${caseId}" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto-start-reverse"><path d="M0,0 L4,2 L0,4 Z" fill="${C.dim}"/></marker></defs>
+    <line x1="${px+3}" y1="${py+ph+12}" x2="${px+pw-3}" y2="${py+ph+12}" stroke="${C.dim}" stroke-width=".7" marker-start="url(#mb${caseId})" marker-end="url(#ma${caseId})"/>
+    <text x="${cx}" y="${py+ph+22}" text-anchor="middle" font-size="9" fill="${C.dim}" font-style="italic">a</text>
+    <line x1="${px+pw+12}" y1="${py+3}" x2="${px+pw+12}" y2="${py+ph-3}" stroke="${C.dim}" stroke-width=".7" marker-start="url(#mb${caseId})" marker-end="url(#ma${caseId})"/>
+    <text x="${px+pw+20}" y="${cy+3}" text-anchor="middle" font-size="9" fill="${C.dim}" font-style="italic">b</text>`;
+
+  const B={
+    '1':  simply('top')+simply('bottom')+simply('left')+simply('right'),
+    '2':  simply('top')+simply('bottom')+simply('left')+free('right'),
+    '3':  simply('top')+simply('bottom')+simply('left')+fixed('right'),
+    '5':  simply('top')+simply('bottom')+fixed('left')+fixed('right'),
+    '6':  fixed('top')+fixed('bottom')+simply('left')+simply('right'),
+    '7':  fixed('top')+free('bottom')+simply('left')+simply('right'),
+    '8':  fixed('top')+fixed('bottom')+fixed('left')+fixed('right'),
+    '9':  fixed('top')+fixed('bottom')+fixed('left')+simply('right'),
+    '10': fixed('top')+fixed('bottom')+fixed('left')+free('right'),
+    '11': fixed('top')+free('bottom')+fixed('left')+free('right'),
+  };
+
+  return `<svg width="${VW}" height="${VH}" viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg">${dims}${B[caseId]||''}${plate}</svg>`;
+}
+
+function buildCaseListTable() {
+  const data = [
+    {id:'1',  zh:'四邊簡支',                            en:'All edges simply supported'},
+    {id:'2',  zh:'三邊簡支，一邊自由',                    en:'Three edges simply supported, one edge free'},
+    {id:'3',  zh:'三邊簡支，一短邊固定',                  en:'Three edges simply supported, one short edge fixed'},
+    {id:'5',  zh:'兩長邊簡支，兩短邊固定',                en:'Two long edges simply supported, two short edges fixed'},
+    {id:'6',  zh:'兩長邊固定，兩短邊簡支',                en:'Two long edges fixed, two short edges simply supported'},
+    {id:'7',  zh:'一邊固定，對邊自由，其餘兩邊簡支',        en:'One edge fixed, opposite edge free, remaining edges simply supported'},
+    {id:'8',  zh:'四邊固定',                            en:'All edges fixed'},
+    {id:'9',  zh:'三邊固定，一邊簡支',                    en:'Three edges fixed, one edge simply supported'},
+    {id:'10', zh:'三邊固定，一邊自由',                    en:'Three edges fixed, one edge free'},
+    {id:'11', zh:'相鄰兩邊固定，其餘兩邊自由',             en:'Two adjacent edges fixed, two remaining edges free'},
+  ];
+  let html = `<table class="case-list">
+    <tr><th class="num">案例</th><th style="width:140px;">示意圖</th><th>邊界組合</th><th>說明</th></tr>`;
+  data.forEach(c => {
+    html += `<tr>
+      <td class="num">${c.id}</td>
+      <td style="text-align:center;padding:6px;">${miniCaseSVG(c.id)}</td>
+      <td>${c.zh}</td>
+      <td>${c.en}</td>
+    </tr>`;
+  });
+  html += '</table>';
+  const el = $('caseListTable');
+  if (el) el.innerHTML = html;
+}
+
 /* ========================= Westergaard equivalent radius ========================= */
 function equivRadius(r0, t) {
   if (r0 < 0.5 * t) {
@@ -1015,6 +1089,7 @@ function calcConcentrated(cs, caseId, p) {
 // 綁定事件
 buildCaseSelect();
 renderCaseDiagram($('caseSel').value);
+buildCaseListTable();
 document.querySelectorAll("input:not(#load_direct), select").forEach(el => {
   el.addEventListener("input", calc);
   el.addEventListener("change", calc);
