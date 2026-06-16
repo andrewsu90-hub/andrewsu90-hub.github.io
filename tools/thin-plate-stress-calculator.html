@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>薄板應力承載計算工具 |  Anzû Design Studio</title>
+<title>薄板應力承載計算工具 | Anzû Design Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
@@ -138,6 +138,7 @@
   .page-title { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; }
   .page-title h2 { font-size: 18px; margin: 0; }
   .row-line { height: 1px; background: var(--border-color); margin: 12px 0; }
+  .section-divider { height: 1px; background: var(--border-color); margin: 36px 0 24px; border: none; }
 
   /* ---------- Boundary condition reference ---------- */
   .bc-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; }
@@ -176,14 +177,13 @@
 <section class="calc-section">
 
 <div class="tabs">
-  <div class="tab active" data-tab="t_input">參數設定</div>
-  <div class="tab" data-tab="t_result">案例計算結果</div>
+  <div class="tab active" data-tab="t_main">參數與計算結果</div>
   <div class="tab" data-tab="t_info">邊界條件說明</div>
 </div>
 
 <div>
 
-<section id="t_input" class="panel">
+<section id="t_main" class="panel">
   <div class="card">
     <div class="card-head">
       <h3>材料與幾何參數</h3>
@@ -211,7 +211,7 @@
         <div class="field">
           <label>降伏強度 σy (MPa)</label>
           <input type="number" id="yield_str" value="270" readonly style="background:var(--brand-50);cursor:default;">
-          <div class="hint" id="sy_hint">SECC：270 MPa　SUS304：205 MPa　AL6061-T6：276 MPa</div>
+          <div class="hint" id="sy_hint">SECC：270 MPa SUS304：205 MPa AL6061-T6：276 MPa</div>
         </div>
       </div>
       <div class="row-line"></div>
@@ -236,7 +236,6 @@
         </div>
       </div>
       <div class="row-line"></div>
-      <!-- 案例邊界條件示意圖 -->
       <div>
         <label style="display:block;font-size:12px;font-weight:600;color:var(--secondary-color);margin-bottom:10px;letter-spacing:0.3px;">邊界條件示意圖</label>
         <div id="caseDiagram" style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;"></div>
@@ -246,7 +245,7 @@
         <div class="field">
           <label>載荷類型 Loading</label>
           <select id="loadType" onchange="calc()"></select>
-          <div class="hint">a：整個板面均佈載荷；b：中心小圓面集中力（僅案例 1、8 提供）</div>
+          <div class="hint">a：整個板面均佈載荷；b：中心小圓面集中力（因理論收斂限制，僅對稱之案例 1、8 提供集中力查表）</div>
         </div>
         <div class="field" id="rcField" style="display:none">
           <label>rc 接觸半徑 (mm)</label>
@@ -308,9 +307,9 @@
       </div>
     </div>
   </div>
-</section>
 
-<section id="t_result" class="panel" style="display:none">
+  <hr class="section-divider">
+  
   <div class="page-title">
     <h2 id="resultTitle">案例計算結果</h2>
     <span class="badge" id="resultBadge">Table 11.4</span>
@@ -318,6 +317,7 @@
   <div id="rangeWarn" class="banner" style="display:none;"></div>
   <div id="caseResults"></div>
   <div id="summaryBox"></div>
+
 </section>
 
 <section id="t_info" class="panel" style="display:none">
@@ -352,6 +352,15 @@
   <div class="page-title"><h2>矩形板常見邊界組合（Budynas Table 11.4）</h2></div>
   <div id="caseListTable"></div>
   <p style="font-size:12px; color:var(--secondary-color); margin-top:10px;">註：以上案例對應原書 Table 11.4 編號，共 11 種邊界組合。</p>
+
+  <div class="row-line"></div>
+
+  <div class="page-title"><h2>常見問題 (FAQ)</h2></div>
+  <div class="banner info" style="display:block; line-height: 1.8;">
+    <strong>Q：為何只有「案例 1」與「案例 8」可以選擇中心集中力？</strong><br>
+    A：本工具依循傳統工程手冊之解析解製表。案例 1（四邊簡支）與案例 8（四邊固定）具備完美的對稱性，偏微分方程式可有效收斂為單純的查表係數（α、β）。<br><br>
+    其他非對稱邊界（如三邊固定、一邊自由等）若承受局部集中力，最大應力與撓度發生點會隨長寬比游移，且數學解析解為極複雜的無窮級數，無法被標準化為簡單表格。實務上，針對非對稱邊界的局部集中載荷，建議直接利用如 Creo 等有限元素分析（FEA）軟體進行應力模擬，以求得最精確的結果。
+  </div>
 </section>
 
 </div>
@@ -614,12 +623,12 @@ function onCaseChange() {
 /**
  * 依 Budynas Table 11.4 各案例圖示，以 SVG 繪製邊界條件示意圖。
  * 座標定義（與書中一致）：
- *   a = 水平方向長邊（上邊、下邊）
- *   b = 垂直方向短邊（左邊、右邊）
+ * a = 水平方向長邊（上邊、下邊）
+ * b = 垂直方向短邊（左邊、右邊）
  * 邊界符號：
- *   固定 Fixed   → 斜線填充矩形（書中 hatch 符號）
- *   簡支 S.S.    → 三角形支座排列
- *   自由 Free    → 紅色虛線
+ * 固定 Fixed   → 斜線填充矩形（書中 hatch 符號）
+ * 簡支 S.S.    → 三角形支座排列
+ * 自由 Free    → 紅色虛線
  */
 function renderCaseDiagram(caseId) {
   const wrap = $('caseDiagram');
@@ -978,7 +987,7 @@ function calc() {
 
   // ===== Render result table =====
   $('resultTitle').innerHTML = `${cs.title}`;
-  $('resultBadge').textContent = `a/b = ${R(ab,2)}　ν = ${cs.nu}`;
+  $('resultBadge').textContent = `a/b = ${R(ab,2)} ν = ${cs.nu}`;
 
   let html = `
     <div class="card">
@@ -1033,7 +1042,7 @@ function calcConcentrated(cs, caseId, p) {
   const logTerm = Math.log((2 * b) / (Math.PI * r0p));
 
   $('resultTitle').innerHTML = `${cc.title}`;
-  $('resultBadge').textContent = `a/b = ${R(ab,2)}　rc = ${R(rc,2)} mm`;
+  $('resultBadge').textContent = `a/b = ${R(ab,2)} rc = ${R(rc,2)} mm`;
 
   const alpha = lerp(cc.ratios, cc.alpha, ab);
   const yMax = alpha * W * b * b / Et3;
@@ -1069,7 +1078,7 @@ function calcConcentrated(cs, caseId, p) {
     <div class="card">
       <div class="card-head">
         <h3>${cc.title}<span class="badge" style="margin-left:8px;">${cc.en}</span></h3>
-        <div class="meta">查表比值 a/b = ${R(ab,3)}　r0 = ${R(rc,3)} mm　r0′（等效半徑） = ${R(r0p,4)} mm ${rc < 0.5*t ? '（r0 &lt; 0.5t，已套用 Westergaard 等效半徑公式）' : '（r0 ≥ 0.5t，直接使用實際半徑）'}</div>
+        <div class="meta">查表比值 a/b = ${R(ab,3)} r0 = ${R(rc,3)} mm r0′（等效半徑） = ${R(r0p,4)} mm ${rc < 0.5*t ? '（r0 &lt; 0.5t，已套用 Westergaard 等效半徑公式）' : '（r0 ≥ 0.5t，直接使用實際半徑）'}</div>
       </div>
       <div class="card-body" style="overflow-x:auto;">
         <table class="calc">
