@@ -235,12 +235,17 @@
         </div>
       </div>
       <div class="row-line"></div>
+      <!-- 案例邊界條件示意圖 -->
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--secondary-color);margin-bottom:10px;letter-spacing:0.3px;">邊界條件示意圖</label>
+        <div id="caseDiagram" style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="row-line"></div>
       <div class="grid g-4">
         <div class="field">
           <label>載荷類型 Loading</label>
           <select id="loadType" onchange="calc()"></select>
           <div class="hint">a：整個板面均佈載荷；b：中心小圓面集中力（僅案例 1、8 提供）</div>
-          <div id="loadTypeHint" class="banner" style="display:none; margin-top:8px; margin-bottom:0; font-size:12px;"></div>
         </div>
         <div class="field" id="rcField" style="display:none">
           <label>rc 接觸半徑 (mm)</label>
@@ -517,17 +522,6 @@ const CASES = {
 const $ = id => document.getElementById(id);
 function R(v, d=2) { return (v===null || v===undefined || isNaN(v)) ? '—' : Number(v.toFixed(d)); }
 
-/**
- * 線性內插（Linear Interpolation）
- *
- * Table 11.4 僅列出有限的離散 a/b 比值（如 1.0, 1.2, 1.4…），
- * 當實際 a/b 落於兩表值之間時，以線性內插估算係數。
- *
- * 誤差說明：
- *   α、β 係數本質來自偏微分方程的 Navier 級數解，與 a/b 的關係為非線性曲線。
- *   線性內插以直線近似曲線，在節點密集處（曲率小）誤差通常 < 1%，工程上可接受。
- *   若 a/b 恰等於表中列出的比值，內插結果 = 書中精確值，無差距。
- */
 function lerp(ratios, vals, ratio) {
   if (ratio <= ratios[0]) return vals[0];
   if (ratio >= ratios[ratios.length-1]) return vals[vals.length-1];
@@ -576,19 +570,7 @@ function buildCaseSelect() {
   buildLoadTypeSelect();
 }
 
-/**
- * 為何僅案例 1（四邊簡支）與案例 8（四邊固定）提供中心集中力（type b）選項？
- *
- * 案例 1 與 8 具備完美的邊界對稱性，複雜的變形方程式可有效收斂，
- * 得以簡化為可查表的標準係數（α、β）。
- *
- * 其餘非對稱邊界（如三邊固定等）在承受局部集中力時，
- * 最大應力與撓度的發生位置會隨長寬比游移，
- * 其數學解析解為極複雜的無窮級數，無法簡化為標準表格。
- *
- * 針對此類非對稱邊界的局部受力評估，
- * 實務上建議使用 Creo、ANSYS 等有限元素分析（FEA）軟體進行精確模擬。
- */
+/* ========================= Build loading-type dropdown ========================= */
 function buildLoadTypeSelect() {
   const caseId = $('caseSel').value;
   const cs = CASES[caseId];
@@ -607,22 +589,173 @@ function buildLoadTypeSelect() {
   }
   sel.value = (prev === 'b' && cs && cs.concentrated) ? 'b' : 'a';
   $('rcField').style.display = (sel.value === 'b') ? '' : 'none';
-
-  // 非對稱案例：動態顯示 FEA 建議提示
-  const hintEl = $('loadTypeHint');
-  if (hintEl) {
-    if (cs && !cs.concentrated) {
-      hintEl.innerHTML = `⚠ 本案例邊界非對稱，集中力解析解為複雜無窮級數，無法製成標準表格，僅提供均佈載荷。<br>如需局部集中力評估，建議使用 FEA（如 Creo Simulate）進行模擬。`;
-      hintEl.style.display = '';
-    } else {
-      hintEl.style.display = 'none';
-    }
-  }
 }
 
 function onCaseChange() {
   buildLoadTypeSelect();
+  renderCaseDiagram($('caseSel').value);
   calc();
+}
+
+/* ========================= Case Boundary Diagram ========================= */
+/**
+ * 依 Budynas Table 11.4 各案例圖示，以 SVG 繪製邊界條件示意圖。
+ * 座標定義（與書中一致）：
+ *   a = 水平方向長邊（上邊、下邊）
+ *   b = 垂直方向短邊（左邊、右邊）
+ * 邊界符號：
+ *   固定 Fixed   → 斜線填充矩形（書中 hatch 符號）
+ *   簡支 S.S.    → 三角形支座排列
+ *   自由 Free    → 紅色虛線
+ */
+function renderCaseDiagram(caseId) {
+  const wrap = $('caseDiagram');
+  if (!wrap) return;
+
+  // ── 尺寸設定 ──────────────────────────────────────
+  const VW = 220, VH = 190;
+  const px = 50, py = 36;       // 板件左上角
+  const pw = 110, ph = 80;      // 板件 (a方向=水平=pw, b方向=垂直=ph)
+  const cx = px + pw/2, cy = py + ph/2;
+  const HT = 9;                 // fixed hatch 厚度
+  const SS_R = 5.5, SS_SP = 14; // simply supported 三角大小 / 間距
+
+  // ── 色彩 ──────────────────────────────────────────
+  const C = {
+    plate:  '#dbeafe', plateS: '#1e40af',
+    fix:    '#94a3b8', fixS:   '#475569',
+    ss:     '#1e40af',
+    free:   '#ef4444',
+    dim:    '#64748b',
+    label:  '#1e293b',
+  };
+
+  // ── 工具：固定邊 ───────────────────────────────────
+  function fixed(side) {
+    let rect='', lines='';
+    const n = side==='top'||side==='bottom' ? Math.floor(pw/7) : Math.floor(ph/7);
+    if (side==='top') {
+      rect=`<rect x="${px}" y="${py-HT}" width="${pw}" height="${HT}" fill="${C.fix}" stroke="${C.fixS}" stroke-width="1"/>`;
+      const sp=pw/n;
+      for(let i=0;i<=n;i++) lines+=`<line x1="${px+i*sp}" y1="${py}" x2="${px+i*sp-HT}" y2="${py-HT}" stroke="${C.fixS}" stroke-width="0.8"/>`;
+    } else if (side==='bottom') {
+      rect=`<rect x="${px}" y="${py+ph}" width="${pw}" height="${HT}" fill="${C.fix}" stroke="${C.fixS}" stroke-width="1"/>`;
+      const sp=pw/n;
+      for(let i=0;i<=n;i++) lines+=`<line x1="${px+i*sp}" y1="${py+ph}" x2="${px+i*sp+HT}" y2="${py+ph+HT}" stroke="${C.fixS}" stroke-width="0.8"/>`;
+    } else if (side==='left') {
+      rect=`<rect x="${px-HT}" y="${py}" width="${HT}" height="${ph}" fill="${C.fix}" stroke="${C.fixS}" stroke-width="1"/>`;
+      const sp=ph/n;
+      for(let i=0;i<=n;i++) lines+=`<line x1="${px}" y1="${py+i*sp}" x2="${px-HT}" y2="${py+i*sp-HT}" stroke="${C.fixS}" stroke-width="0.8"/>`;
+    } else if (side==='right') {
+      rect=`<rect x="${px+pw}" y="${py}" width="${HT}" height="${ph}" fill="${C.fix}" stroke="${C.fixS}" stroke-width="1"/>`;
+      const sp=ph/n;
+      for(let i=0;i<=n;i++) lines+=`<line x1="${px+pw}" y1="${py+i*sp}" x2="${px+pw+HT}" y2="${py+i*sp-HT}" stroke="${C.fixS}" stroke-width="0.8"/>`;
+    }
+    return rect+lines;
+  }
+
+  // ── 工具：簡支邊 ───────────────────────────────────
+  function simply(side) {
+    let out='', baseLine='';
+    const r=SS_R, sp=SS_SP;
+    if (side==='top') {
+      const n=Math.floor(pw/sp), g=pw/n;
+      for(let i=0;i<=n;i++){const x=px+i*g; out+=`<polygon points="${x},${py} ${x-r},${py-r*1.7} ${x+r},${py-r*1.7}" fill="${C.ss}" stroke="${C.ss}" stroke-width="0.5"/>`;}
+      baseLine=`<line x1="${px-r}" y1="${py-r*1.7}" x2="${px+pw+r}" y2="${py-r*1.7}" stroke="${C.ss}" stroke-width="1.2"/>`;
+    } else if (side==='bottom') {
+      const n=Math.floor(pw/sp), g=pw/n;
+      for(let i=0;i<=n;i++){const x=px+i*g; out+=`<polygon points="${x},${py+ph} ${x-r},${py+ph+r*1.7} ${x+r},${py+ph+r*1.7}" fill="${C.ss}" stroke="${C.ss}" stroke-width="0.5"/>`;}
+      baseLine=`<line x1="${px-r}" y1="${py+ph+r*1.7}" x2="${px+pw+r}" y2="${py+ph+r*1.7}" stroke="${C.ss}" stroke-width="1.2"/>`;
+    } else if (side==='left') {
+      const n=Math.floor(ph/sp), g=ph/n;
+      for(let i=0;i<=n;i++){const y=py+i*g; out+=`<polygon points="${px},${y} ${px-r*1.7},${y-r} ${px-r*1.7},${y+r}" fill="${C.ss}" stroke="${C.ss}" stroke-width="0.5"/>`;}
+      baseLine=`<line x1="${px-r*1.7}" y1="${py-r}" x2="${px-r*1.7}" y2="${py+ph+r}" stroke="${C.ss}" stroke-width="1.2"/>`;
+    } else if (side==='right') {
+      const n=Math.floor(ph/sp), g=ph/n;
+      for(let i=0;i<=n;i++){const y=py+i*g; out+=`<polygon points="${px+pw},${y} ${px+pw+r*1.7},${y-r} ${px+pw+r*1.7},${y+r}" fill="${C.ss}" stroke="${C.ss}" stroke-width="0.5"/>`;}
+      baseLine=`<line x1="${px+pw+r*1.7}" y1="${py-r}" x2="${px+pw+r*1.7}" y2="${py+ph+r}" stroke="${C.ss}" stroke-width="1.2"/>`;
+    }
+    return out+baseLine;
+  }
+
+  // ── 工具：自由邊 ───────────────────────────────────
+  function free(side) {
+    const d='stroke-dasharray="5,3"', sw='stroke-width="2"', col=`stroke="${C.free}"`;
+    if(side==='top')    return `<line x1="${px}" y1="${py}" x2="${px+pw}" y2="${py}" ${col} ${sw} ${d}/>`;
+    if(side==='bottom') return `<line x1="${px}" y1="${py+ph}" x2="${px+pw}" y2="${py+ph}" ${col} ${sw} ${d}/>`;
+    if(side==='left')   return `<line x1="${px}" y1="${py}" x2="${px}" y2="${py+ph}" ${col} ${sw} ${d}/>`;
+    if(side==='right')  return `<line x1="${px+pw}" y1="${py}" x2="${px+pw}" y2="${py+ph}" ${col} ${sw} ${d}/>`;
+    return '';
+  }
+
+  // ── 板件本體 ──────────────────────────────────────
+  const plate = `<rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="${C.plate}" stroke="${C.plateS}" stroke-width="1.5"/>`;
+
+  // ── 尺寸標註 ──────────────────────────────────────
+  const dimOffset = 18;
+  const dims = `
+    <defs><marker id="da" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="${C.dim}"/></marker>
+    <marker id="da2" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto-start-reverse"><path d="M0,0 L5,2.5 L0,5 Z" fill="${C.dim}"/></marker></defs>
+    <line x1="${px+4}" y1="${py+ph+dimOffset}" x2="${px+pw-4}" y2="${py+ph+dimOffset}" stroke="${C.dim}" stroke-width="0.9" marker-start="url(#da2)" marker-end="url(#da)"/>
+    <text x="${cx}" y="${py+ph+dimOffset+11}" text-anchor="middle" font-size="12" fill="${C.dim}" font-style="italic" font-family="Georgia,serif">a</text>
+    <line x1="${px+pw+dimOffset}" y1="${py+4}" x2="${px+pw+dimOffset}" y2="${py+ph-4}" stroke="${C.dim}" stroke-width="0.9" marker-start="url(#da2)" marker-end="url(#da)"/>
+    <text x="${px+pw+dimOffset+11}" y="${cy+4}" text-anchor="middle" font-size="12" fill="${C.dim}" font-style="italic" font-family="Georgia,serif">b</text>`;
+
+  // ── 圖例 ──────────────────────────────────────────
+  const legendY = VH - 22;
+  const legend = `
+    <rect x="2" y="${legendY}" width="9" height="9" fill="${C.fix}" stroke="${C.fixS}" stroke-width="0.8"/>
+    <text x="14" y="${legendY+8}" font-size="9.5" fill="${C.dim}" font-family="sans-serif">固定</text>
+    <polygon points="58,${legendY+9} 53,${legendY+1} 63,${legendY+1}" fill="${C.ss}" stroke="${C.ss}" stroke-width="0.5"/>
+    <text x="67" y="${legendY+8}" font-size="9.5" fill="${C.dim}" font-family="sans-serif">簡支</text>
+    <line x1="106" y1="${legendY+5}" x2="122" y2="${legendY+5}" stroke="${C.free}" stroke-width="2" stroke-dasharray="4,2"/>
+    <text x="126" y="${legendY+8}" font-size="9.5" fill="${C.dim}" font-family="sans-serif">自由</text>`;
+
+  // ── 各案例正確邊界配置（對應書中圖示）────────────
+  // 邊的意義：top/bottom = a邊（長邊水平）；left/right = b邊（短邊垂直）
+  const BOUNDARIES = {
+    '1':  simply('top')  + simply('bottom')  + simply('left')  + simply('right'),
+    '2':  simply('top')  + simply('bottom')  + simply('left')  + free('right'),
+    '3':  simply('top')  + simply('bottom')  + simply('left')  + fixed('right'),
+    '5':  simply('top')  + simply('bottom')  + fixed('left')   + fixed('right'),
+    '6':  fixed('top')   + fixed('bottom')   + simply('left')  + simply('right'),
+    '7':  fixed('top')   + free('bottom')    + simply('left')  + simply('right'),
+    '8':  fixed('top')   + fixed('bottom')   + fixed('left')   + fixed('right'),
+    '9':  fixed('top')   + fixed('bottom')   + fixed('left')   + simply('right'),
+    '10': fixed('top')   + fixed('bottom')   + fixed('left')   + free('right'),
+    '11': fixed('top')   + free('bottom')    + fixed('left')   + free('right'),
+  };
+
+  // ── 案例說明文字 ──────────────────────────────────
+  const DESC = {
+    '1':  '四邊簡支',
+    '2':  '三邊簡支，右邊（b）自由',
+    '3':  '三邊簡支，右邊（b）固定',
+    '5':  '兩長邊簡支，兩短邊固定',
+    '6':  '兩長邊固定，兩短邊簡支',
+    '7':  '上邊固定，下邊自由，兩側簡支',
+    '8':  '四邊固定',
+    '9':  '三邊固定，右邊（a）簡支',
+    '10': '三邊固定，右邊（a）自由',
+    '11': '相鄰兩邊固定（上+左），其餘兩邊自由',
+  };
+
+  const boundary = BOUNDARIES[caseId] || '';
+  const desc = DESC[caseId] || '';
+
+  const svg = `<svg width="${VW}" height="${VH}" viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg">
+    ${dims}
+    ${boundary}
+    ${plate}
+    ${legend}
+  </svg>`;
+
+  wrap.innerHTML = `
+    <div>${svg}</div>
+    <div style="font-size:12.5px;color:var(--secondary-color);max-width:200px;line-height:1.6;padding-top:8px;">
+      <div style="font-weight:700;color:var(--primary-color);margin-bottom:4px;">案例 ${caseId}</div>
+      ${desc}
+    </div>`;
 }
 
 /* ========================= Westergaard equivalent radius ========================= */
@@ -853,6 +986,7 @@ function calcConcentrated(cs, caseId, p) {
 
 // 綁定事件
 buildCaseSelect();
+renderCaseDiagram($('caseSel').value);
 document.querySelectorAll("input:not(#load_direct), select").forEach(el => {
   el.addEventListener("input", calc);
   el.addEventListener("change", calc);
