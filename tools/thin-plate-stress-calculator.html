@@ -158,6 +158,9 @@
 
   @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .btn-text { background:none; border:none; color:var(--secondary-color); font-size:11.5px; cursor:pointer; text-decoration:underline; font-family:inherit; transition: color 0.2s;}
+  .btn-text:hover { color:var(--primary-color); }
 </style>
 </head>
 <body>
@@ -247,17 +250,32 @@
           <select id="loadType" onchange="calc()"></select>
           <div class="hint">a：整個板面均佈載荷；b：中心小圓面集中力（因理論收斂限制，僅對稱之案例 1、8 提供集中力查表）</div>
         </div>
+        
         <div class="field" id="rcField" style="display:none">
-          <label>rc 接觸半徑 (mm)</label>
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            <span>rc 接觸半徑 (mm)</span>
+            <button type="button" class="btn-text" onclick="toggleRectTool()">使用矩形換算</button>
+          </label>
           <input type="number" id="rc" value="5" step="0.5">
           <div class="hint">集中力實際接觸半徑；若 rc &lt; 0.5t 將自動換算等效半徑 r₀′</div>
+          
+          <div id="rectToolBox" style="display:none; margin-top:10px; padding:10px; border:1px dashed var(--border-color); border-radius:var(--radius-sm); background:var(--bg-light);">
+             <div style="font-size:11.5px; font-weight:600; color:var(--primary-color); margin-bottom:6px;">📐 矩形底面換算等效半徑</div>
+             <div style="display:flex; gap:6px; align-items:center;">
+                <input type="number" id="rect_w" placeholder="長 (mm)" style="padding:6px; font-size:13px;" oninput="calcRcFromRect()">
+                <span style="color:var(--secondary-color); font-size:12px;">×</span>
+                <input type="number" id="rect_l" placeholder="寬 (mm)" style="padding:6px; font-size:13px;" oninput="calcRcFromRect()">
+             </div>
+             <div class="hint" style="margin-top:6px;">系統將自動套用等效面積公式 rc = √(長×寬 / π)</div>
+          </div>
         </div>
+        
         <div class="field">
           <label>載重 (kg)</label>
           <input type="number" id="load_kg" value="18" step="0.1">
           <div class="hint">質量輸入；設計力 = 載重 × g × 安全係數</div>
         </div>
-        <div class="field" style="display:flex; flex-direction:column; justify-content:center;">
+        <div class="field" style="display:flex; flex-direction:column; justify-content:flex-start;">
           <label style="color:var(--primary-color);">安全係數 SF</label>
           <input type="number" id="sf" value="3" step="0.5" style="border-color:var(--primary-color); font-weight:700;">
         </div>
@@ -619,17 +637,24 @@ function onCaseChange() {
   calc();
 }
 
+/* ========================= Toggle Rect Tool ========================= */
+function toggleRectTool() {
+  const box = $('rectToolBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+/* ========================= Calc RC from Rect ========================= */
+function calcRcFromRect() {
+  const w = parseFloat($('rect_w').value);
+  const l = parseFloat($('rect_l').value);
+  if (!isNaN(w) && !isNaN(l) && w > 0 && l > 0) {
+    const eqRc = Math.sqrt((w * l) / Math.PI);
+    $('rc').value = Number(eqRc.toFixed(3));
+    calc();
+  }
+}
+
 /* ========================= Case Boundary Diagram ========================= */
-/**
- * 依 Budynas Table 11.4 各案例圖示，以 SVG 繪製邊界條件示意圖。
- * 座標定義（與書中一致）：
- * a = 水平方向長邊（上邊、下邊）
- * b = 垂直方向短邊（左邊、右邊）
- * 邊界符號：
- * 固定 Fixed   → 斜線填充矩形（書中 hatch 符號）
- * 簡支 S.S.    → 三角形支座排列
- * 自由 Free    → 紅色虛線
- */
 function renderCaseDiagram(caseId) {
   const wrap = $('caseDiagram');
   if (!wrap) return;
@@ -652,7 +677,6 @@ function renderCaseDiagram(caseId) {
     label:  '#1e293b',
   };
 
-  // ── 工具：固定邊 ───────────────────────────────────
   function fixed(side) {
     let rect='', lines='';
     const n = side==='top'||side==='bottom' ? Math.floor(pw/7) : Math.floor(ph/7);
@@ -676,7 +700,6 @@ function renderCaseDiagram(caseId) {
     return rect+lines;
   }
 
-  // ── 工具：簡支邊 ───────────────────────────────────
   function simply(side) {
     let out='', baseLine='';
     const r=SS_R, sp=SS_SP;
@@ -700,7 +723,6 @@ function renderCaseDiagram(caseId) {
     return out+baseLine;
   }
 
-  // ── 工具：自由邊 ───────────────────────────────────
   function free(side) {
     const d='stroke-dasharray="5,3"', sw='stroke-width="2"', col=`stroke="${C.free}"`;
     if(side==='top')    return `<line x1="${px}" y1="${py}" x2="${px+pw}" y2="${py}" ${col} ${sw} ${d}/>`;
@@ -710,10 +732,8 @@ function renderCaseDiagram(caseId) {
     return '';
   }
 
-  // ── 板件本體 ──────────────────────────────────────
   const plate = `<rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="${C.plate}" stroke="${C.plateS}" stroke-width="1.5"/>`;
 
-  // ── 尺寸標註 ──────────────────────────────────────
   const dimOffset = 18;
   const dims = `
     <defs><marker id="da" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="${C.dim}"/></marker>
@@ -723,7 +743,6 @@ function renderCaseDiagram(caseId) {
     <line x1="${px+pw+dimOffset}" y1="${py+4}" x2="${px+pw+dimOffset}" y2="${py+ph-4}" stroke="${C.dim}" stroke-width="0.9" marker-start="url(#da2)" marker-end="url(#da)"/>
     <text x="${px+pw+dimOffset+11}" y="${cy+4}" text-anchor="middle" font-size="12" fill="${C.dim}" font-style="italic" font-family="Georgia,serif">b</text>`;
 
-  // ── 圖例 ──────────────────────────────────────────
   const legendY = VH - 22;
   const legend = `
     <rect x="2" y="${legendY}" width="9" height="9" fill="${C.fix}" stroke="${C.fixS}" stroke-width="0.8"/>
@@ -733,8 +752,6 @@ function renderCaseDiagram(caseId) {
     <line x1="106" y1="${legendY+5}" x2="122" y2="${legendY+5}" stroke="${C.free}" stroke-width="2" stroke-dasharray="4,2"/>
     <text x="126" y="${legendY+8}" font-size="9.5" fill="${C.dim}" font-family="sans-serif">自由</text>`;
 
-  // ── 各案例正確邊界配置（對應書中圖示）────────────
-  // 邊的意義：top/bottom = a邊（長邊水平）；left/right = b邊（短邊垂直）
   const BOUNDARIES = {
     '1':  simply('top')  + simply('bottom')  + simply('left')  + simply('right'),
     '2':  simply('top')  + simply('bottom')  + simply('left')  + free('right'),
@@ -749,7 +766,6 @@ function renderCaseDiagram(caseId) {
     '11': fixed('top')   + free('bottom')    + fixed('left')   + free('right'),
   };
 
-  // ── 案例說明文字 ──────────────────────────────────
   const DESC = {
     '1':  '四邊簡支',
     '2':  '三邊簡支，右邊（b）自由',
@@ -922,7 +938,7 @@ function calc() {
   setStat("val_sy", R(allowSy,2), "MPa");
   setStat("val_case", `案例 ${caseId}${loadType === 'b' ? 'b' : 'a'}`);
 
-  // a/b 是否超出查表範圍 → 警示（lerp 會 clamp 至端點值，結果僅供參考）
+  // a/b 是否超出查表範圍 → 警示
   const rng = cs.ratios;
   const lo = rng[0], hi = rng[rng.length - 1];
   const rw = $('rangeWarn');
@@ -941,7 +957,7 @@ function calc() {
     $('concLoadField').style.display = '';
     $('load_direct_conc').value = R(W, 2) + ' N';
     $('design_load_k').textContent = '設計集中力 W = 載重 × g × SF';
-    $('design_load_v').innerHTML = `${R(W,2)}<span class="u">N</span>`;
+    $('design_load_v').innerHTML = `${R(W,2)}<span class=\"u\">N</span>`;
     calcConcentrated(cs, caseId, { E, nu, a, b, t, sf, sy, allowSy, ab, Et3, F_N: W });
     return;
   }
@@ -957,7 +973,7 @@ function calc() {
   $('load_direct').value = R(q, 6) + ' N/mm²';
   $('design_load_hint').textContent = `q = (${kg} kg × ${sf} × 9.81) ÷ (${a} × ${b}) = ${R(q,6)} N/mm²`;
   $('design_load_k').textContent = '均佈載荷 q = W ÷ (a × b)';
-  $('design_load_v').innerHTML = `${R(q,6)}<span class="u">N/mm²</span>`;
+  $('design_load_v').innerHTML = `${R(q,6)}<span class=\"u\">N/mm²</span>`;
 
   // ===== Compute each coefficient row =====
   let maxAbsSigma = -Infinity;
