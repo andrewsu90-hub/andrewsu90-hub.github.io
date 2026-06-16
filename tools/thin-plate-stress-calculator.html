@@ -240,6 +240,7 @@
           <label>載荷類型 Loading</label>
           <select id="loadType" onchange="calc()"></select>
           <div class="hint">a：整個板面均佈載荷；b：中心小圓面集中力（僅案例 1、8 提供）</div>
+          <div id="loadTypeHint" class="banner" style="display:none; margin-top:8px; margin-bottom:0; font-size:12px;"></div>
         </div>
         <div class="field" id="rcField" style="display:none">
           <label>rc 接觸半徑 (mm)</label>
@@ -516,6 +517,17 @@ const CASES = {
 const $ = id => document.getElementById(id);
 function R(v, d=2) { return (v===null || v===undefined || isNaN(v)) ? '—' : Number(v.toFixed(d)); }
 
+/**
+ * 線性內插（Linear Interpolation）
+ *
+ * Table 11.4 僅列出有限的離散 a/b 比值（如 1.0, 1.2, 1.4…），
+ * 當實際 a/b 落於兩表值之間時，以線性內插估算係數。
+ *
+ * 誤差說明：
+ *   α、β 係數本質來自偏微分方程的 Navier 級數解，與 a/b 的關係為非線性曲線。
+ *   線性內插以直線近似曲線，在節點密集處（曲率小）誤差通常 < 1%，工程上可接受。
+ *   若 a/b 恰等於表中列出的比值，內插結果 = 書中精確值，無差距。
+ */
 function lerp(ratios, vals, ratio) {
   if (ratio <= ratios[0]) return vals[0];
   if (ratio >= ratios[ratios.length-1]) return vals[vals.length-1];
@@ -564,7 +576,19 @@ function buildCaseSelect() {
   buildLoadTypeSelect();
 }
 
-/* ========================= Build loading-type dropdown ========================= */
+/**
+ * 為何僅案例 1（四邊簡支）與案例 8（四邊固定）提供中心集中力（type b）選項？
+ *
+ * 案例 1 與 8 具備完美的邊界對稱性，複雜的變形方程式可有效收斂，
+ * 得以簡化為可查表的標準係數（α、β）。
+ *
+ * 其餘非對稱邊界（如三邊固定等）在承受局部集中力時，
+ * 最大應力與撓度的發生位置會隨長寬比游移，
+ * 其數學解析解為極複雜的無窮級數，無法簡化為標準表格。
+ *
+ * 針對此類非對稱邊界的局部受力評估，
+ * 實務上建議使用 Creo、ANSYS 等有限元素分析（FEA）軟體進行精確模擬。
+ */
 function buildLoadTypeSelect() {
   const caseId = $('caseSel').value;
   const cs = CASES[caseId];
@@ -583,6 +607,17 @@ function buildLoadTypeSelect() {
   }
   sel.value = (prev === 'b' && cs && cs.concentrated) ? 'b' : 'a';
   $('rcField').style.display = (sel.value === 'b') ? '' : 'none';
+
+  // 非對稱案例：動態顯示 FEA 建議提示
+  const hintEl = $('loadTypeHint');
+  if (hintEl) {
+    if (cs && !cs.concentrated) {
+      hintEl.innerHTML = `⚠ 本案例邊界非對稱，集中力解析解為複雜無窮級數，無法製成標準表格，僅提供均佈載荷。<br>如需局部集中力評估，建議使用 FEA（如 Creo Simulate）進行模擬。`;
+      hintEl.style.display = '';
+    } else {
+      hintEl.style.display = 'none';
+    }
+  }
 }
 
 function onCaseChange() {
