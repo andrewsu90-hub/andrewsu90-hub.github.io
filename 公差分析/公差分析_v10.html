@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尺寸鍊統計公差分析系統 (v11)</title>
-    
+    <title>尺寸鍊統計公差分析系統 (v11 - API版)</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
-    
+
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
         .container { max-width: 1250px; margin: 30px auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         h1, h2, h3 { color: #2c3e50; }
-        
+
         /* 輔助計算機樣式 */
         .helper-tool { background-color: #fdfae6; border: 1px dashed #f39c12; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; flex-direction: column; }
         .calc-row { display: flex; align-items: center; gap: 10px; width: 100%; margin-bottom: 8px; }
@@ -50,7 +50,7 @@
 
         .dashboard-section { display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px; }
         .chart-container { background: #fdfdfd; border: 1px solid #ddd; border-radius: 6px; padding: 15px; text-align: center; }
-        
+
         table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: 6px; text-align: center; vertical-align: middle; word-wrap: break-word; }
         th { background-color: #34495e; color: white; font-size: 0.9em; padding: 10px 4px; }
@@ -58,7 +58,7 @@
         input:placeholder-shown.table-input { background-color: #fdfcf7; border-color: #bdc3c7; font-weight: normal; }
         input[type="text"].desc { text-align: left; width: 95%; }
         .protected { background-color: #ecf0f1; color: #7f8c8d; font-weight: bold; font-family: monospace; font-size: 1.05em; }
-        
+
         .action-bar { display: flex; align-items: center; gap: 10px; margin-top: 10px; margin-bottom: 25px; }
         .btn-add { background-color: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 6px; cursor: pointer; }
         .btn-add:hover { background-color: #2ecc71; }
@@ -83,23 +83,27 @@
         .footer-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #2c3e50; }
         .footer-group textarea { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px; background-color: #fff9e6; font-family: inherit; font-size: 1em; resize: vertical; box-sizing: border-box; }
 
+        .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .api-status.loading { background: #fdfae6; color: #d35400; }
+        .api-status.error { background: #fdf3f2; color: #c0392b; }
+
         /* ======== 報表列印防裁切與排版優化 ======== */
         @page { size: A4 portrait; margin: 10mm; }
         @media print {
             body { background-color: #fff; padding: 0; margin: 0; font-size: 10pt; }
             .container { box-shadow: none; max-width: 100%; width: 100%; padding: 0; margin: 0; }
-            
-            .instructions, #btn-add-row, #btn-save-state, .btn-print, .btn-del-th, .btn-del-td, hr { display: none !important; }
-            header { display: none !important; } 
-            
+
+            .instructions, #btn-add-row, #btn-save-state, .btn-print, .btn-del-th, .btn-del-td, hr, .api-status { display: none !important; }
+            header { display: none !important; }
+
             table { width: 100%; table-layout: fixed; font-size: 9pt; border-collapse: collapse; }
             th, td { padding: 4px 2px; word-wrap: break-word; overflow: hidden; }
-            
+
             input, select { background-color: transparent !important; border: none !important; box-shadow: none !important; appearance: none; -webkit-appearance: none; color: #000 !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-sizing: border-box !important; font-size: 9pt !important; text-align: center; }
             input[type="text"].desc { text-align: left; }
-            
+
             textarea { width: 100% !important; box-sizing: border-box !important; border: 1px solid #ccc !important; background: #fff !important; height: auto; font-size: 10pt !important; text-align: left !important; padding: 8px !important; }
-            
+
             .summary-grid { gap: 10px; margin-bottom: 10px; }
             .summary-card { border: 1px solid #000; padding: 10px; }
             .summary-card .value { font-size: 1.2em; margin-top: 5px; }
@@ -107,7 +111,7 @@
             .rss-card { color: #000 !important; border: 2px solid #000; background: transparent !important; padding: 10px; }
             .rss-3 { border-color: #27ae60; } .rss-45 { border-color: #f39c12; } .rss-6 { border-color: #c0392b; }
             .rss-card .rss-value { color: #000 !important; font-size: 1.5em; margin-top: 5px; }
-            
+
             .dashboard-section { gap: 10px; margin-bottom: 10px; }
             #stackup-container { page-break-inside: avoid; border: 1px solid #000 !important; }
             #stackup-mode, #stackup-mode-hint { display: none !important; }
@@ -117,14 +121,14 @@
             h2 { font-size: 1.2em; margin-bottom: 5px; margin-top: 10px;}
             h3 { font-size: 1.1em; margin-bottom: 5px; margin-top: 5px;}
             .report-footer { padding: 10px; border: none; }
-            
+
             .judgment-card { border: 2px solid #000; padding: 10px; margin-bottom: 10px; }
             .judgment-card h3 { color: #000 !important; font-size: 1.2em; margin-bottom: 5px; }
-            
+
             .judgement-row { flex-wrap: nowrap !important; align-items: center !important; gap: 5px !important; }
             .judgement-row label { white-space: nowrap !important; }
             .sigma-display { padding: 0 !important; background: transparent !important; }
-            
+
             .badge { padding: 4px 12px; border: 2px solid #000; color: #000 !important; font-size: 1.2em; background: transparent !important; }
             .judgement-msg { border-left: none; padding: 5px; font-weight: bold; }
 
@@ -157,8 +161,8 @@
 </header>
 
 <div class="container">
-    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v11</span></h1>
-    
+    <h1>尺寸鍊統計公差分析系統 <span style="color:#7f8c8d; font-size: 0.6em;">v11 - API版</span></h1>
+
     <div class="helper-tool">
         <div style="width: 100%; margin-bottom: 10px; font-size: 1.1em;"><span>🧮 <strong>軸孔浮動間隙計算機 (Asm Shift Helper)</strong></span></div>
         <div class="calc-row">
@@ -175,7 +179,7 @@
             <input type="number" id="calc-shaft-low" placeholder="直徑公差" value="0.05" step="0.01">
             <span class="calc-mini-out">➔ 最小軸徑: <span id="out-shaft-min">1.950</span></span>
         </div>
-        
+
         <div style="width: 100%; margin-top: 10px; padding-top: 15px; border-top: 1px dashed #f39c12;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
                 <span style="font-weight: bold; color: #2c3e50;">緊固模式 (Fastener Mode):</span>
@@ -186,7 +190,7 @@
             </div>
             <span style="color:#7f8c8d; font-size:0.9em;">💡 <strong>半徑 1/2 轉換原則</strong>：公差迴路為中心線到邊緣，故直徑總變異須除以 2 轉為半徑。</span><br>
             <span style="margin-top:10px; display:inline-block; font-weight: bold; color: #2c3e50;">👉 請將以下項目新增至您的尺寸鍊明細表：</span>
-            
+
             <table style="width: 100%; margin-top: 8px; background-color: #fff; border: 1px solid #f39c12;">
                 <tr style="background-color: #fdfae6;">
                     <th style="padding: 6px; border: 1px solid #f39c12; color: #ffffff;">變量描述</th>
@@ -255,7 +259,7 @@
         </thead>
         <tbody id="table-body"></tbody>
     </table>
-    
+
     <div class="action-bar">
         <button type="button" id="btn-add-row" class="btn-add">➕ 新增一列 (Add Row)</button>
         <button type="button" id="btn-save-state" class="btn-save">💾 儲存當前設定 (Save Data)</button>
@@ -264,7 +268,7 @@
     </div>
 
     <hr>
-    
+
     <div class="judgment-card" id="judgement-panel">
         <h3 id="judgement-title">✅ 設計判定 (Design Judgment)</h3>
         <div class="judgement-row">
@@ -302,7 +306,7 @@
             <h3>📈 預測組裝良率常態分佈與 Worst Case 對比圖</h3>
             <svg id="norm-dist-chart" viewBox="0 0 800 400" style="width: 100%; height: auto;"></svg>
         </div>
-        
+
         <div>
             <h2>📊 尺寸鍊評估報告 Summary</h2>
             <div class="summary-grid">
@@ -311,7 +315,7 @@
                 <div class="summary-card"><div>系統總標準差 (1σ)</div><div class="value" id="out-sys-sigma">0.000 mm</div></div>
                 <div class="summary-card"><div>預估能力指標 (Z-score)</div><div class="value" id="out-zscore" style="color:#d35400;">0.000</div></div>
             </div>
-            
+
             <div class="summary-grid" style="grid-template-columns: repeat(3, 1fr);">
                 <div class="summary-card" style="background:#eafaf1; border-color:#2ecc71;"><div>組裝合格率 (Yield)</div><div class="value" id="out-yield" style="color:#27ae60;">100.000 %</div></div>
                 <div class="summary-card" style="background:#fdf3f2; border-color:#e74c3c;"><div>每百萬不良數 (DPMO)</div><div class="value" id="out-dpmo" style="color:#c0392b;">0.000</div></div>
@@ -326,7 +330,7 @@
             </div>
         </div>
     </div>
-    
+
     <hr>
     <h2>📝 結論與對策 (Conclusion & Solution)</h2>
     <div class="report-footer">
@@ -335,7 +339,15 @@
     </div>
 </div>
 
+<div class="api-status" id="api-status" style="display:none;">計算中...</div>
+
 <script>
+    // ============================================================
+    // 公差計算 API（公式已搬到伺服器端，前端不再含計算邏輯）
+    // 部署後請把這裡換成你的正式 API 網址，例如 "https://your-api.onrender.com"
+    // ============================================================
+    const API_BASE_URL = "https://anzu-calc-api.onrender.com";
+
     const defaultData = [
         { desc: "Panel 中心到 lcd bkt 側壁尺寸", plus: "140.0", minus: "", tol: "0.15", dist: "常態" },
         { desc: "Chassis Hole距離lcd bkt側壁：【位置度】", plus: "5.0", minus: "", tol: "0.10", dist: "常態" },
@@ -345,6 +357,14 @@
     ];
 
     const STORAGE_KEY = 'anzuToleranceState_v11';
+
+    function setApiStatus(state, msg) {
+        const el = document.getElementById('api-status');
+        el.style.display = 'block';
+        el.className = 'api-status' + (state ? ' ' + state : '');
+        el.textContent = msg || (state === 'loading' ? '計算中...' : state === 'error' ? '⚠ API 連線失敗' : '✓ 已連線');
+        if (state === 'ok') setTimeout(() => { el.style.display = 'none'; }, 1200);
+    }
 
     // 儲存當前設定到 LocalStorage
     function saveCurrentState() {
@@ -386,7 +406,7 @@
             alert("無法儲存：瀏覽器封鎖了本機儲存空間 (localStorage)。請確認非無痕模式或允許網站儲存資料。");
             return;
         }
-        
+
         // 視覺回饋
         const btn = document.getElementById('btn-save-state');
         const originalText = btn.innerHTML;
@@ -406,7 +426,7 @@
         if (saved) {
             try {
                 const state = JSON.parse(saved);
-                
+
                 if(state.helper) {
                     document.getElementById('calc-hole-nom').value = state.helper.holeNom;
                     document.getElementById('calc-hole-up').value = state.helper.holeUp;
@@ -500,36 +520,44 @@
         updateRowNumbers();
     }
 
+    // ────────────────────────────────────────────────────────────
+    // 軸孔浮動間隙計算機：改為呼叫後端 API（原本本地公式已移除）
+    // ────────────────────────────────────────────────────────────
+    let asmShiftTimer = null;
     function calcAsmShift() {
+        clearTimeout(asmShiftTimer);
+        asmShiftTimer = setTimeout(doCalcAsmShift, 200);
+    }
+
+    async function doCalcAsmShift() {
         const holeNom = parseFloat(document.getElementById('calc-hole-nom').value) || 0;
-        const holeUp = Math.abs(parseFloat(document.getElementById('calc-hole-up').value)) || 0; 
+        const holeUp = parseFloat(document.getElementById('calc-hole-up').value) || 0;
         const shaftNom = parseFloat(document.getElementById('calc-shaft-nom').value) || 0;
-        const shaftLow = Math.abs(parseFloat(document.getElementById('calc-shaft-low').value)) || 0; 
+        const shaftLow = parseFloat(document.getElementById('calc-shaft-low').value) || 0;
         const mode = document.getElementById('asm-mode').value;
-        
-        let holeMax = holeNom > 0 ? (holeNom + holeUp) : 0;
-        let shaftMin = shaftNom > 0 ? (shaftNom - shaftLow) : 0;
-        
-        document.getElementById('out-hole-max').textContent = holeMax.toFixed(3);
-        document.getElementById('out-shaft-min').textContent = shaftMin.toFixed(3);
-        
-        // Shifted to Center 模式不需顯示 nominal gap 那一列
+
         const nomGapRow = document.getElementById('asm-row-nomgap');
-        if (nomGapRow) nomGapRow.style.display = (mode === 'shifted') ? 'none' : '';
-        
-        if (holeNom > 0 && shaftNom > 0) {
-            let holeRadTol = holeUp / 2;
-            document.getElementById('out-hole-rad-tol').textContent = holeRadTol.toFixed(3);
-            
-            let shaftRadTol = shaftLow / 2;
-            document.getElementById('out-shaft-rad-tol').textContent = shaftRadTol.toFixed(3);
-            
-            let asNomGap = (holeNom - shaftNom) / 2;
-            document.getElementById('out-as-nom-gap').textContent = Math.max(0, asNomGap).toFixed(3); 
-        } else {
-            document.getElementById('out-hole-rad-tol').textContent = "0.000";
-            document.getElementById('out-shaft-rad-tol').textContent = "0.000";
-            document.getElementById('out-as-nom-gap').textContent = "0.000";
+
+        try {
+            setApiStatus('loading');
+            const res = await fetch(`${API_BASE_URL}/api/asm-shift`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ holeNom, holeUp, shaftNom, shaftLow, mode })
+            });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            const data = await res.json();
+
+            document.getElementById('out-hole-max').textContent = data.holeMax.toFixed(3);
+            document.getElementById('out-shaft-min').textContent = data.shaftMin.toFixed(3);
+            document.getElementById('out-hole-rad-tol').textContent = data.holeRadTol.toFixed(3);
+            document.getElementById('out-shaft-rad-tol').textContent = data.shaftRadTol.toFixed(3);
+            document.getElementById('out-as-nom-gap').textContent = data.asNomGap.toFixed(3);
+            if (nomGapRow) nomGapRow.style.display = data.showNomGapRow ? '' : 'none';
+            setApiStatus('ok');
+        } catch (err) {
+            console.error('calcAsmShift API 失敗', err);
+            setApiStatus('error');
         }
     }
 
@@ -539,12 +567,12 @@
         const holeRadTol = parseFloat(document.getElementById('out-hole-rad-tol').textContent) || 0;
         const shaftRadTol = parseFloat(document.getElementById('out-shaft-rad-tol').textContent) || 0;
         const asNomGap = parseFloat(document.getElementById('out-as-nom-gap').textContent) || 0;
-        
+
         if (holeRadTol <= 0 && shaftRadTol <= 0) {
             alert("請先在上方輸入有效的孔與軸尺寸。");
             return;
         }
-        
+
         const tbody = document.getElementById('table-body');
         const rows = [
             { desc: "Hole_加工變異 (半徑)", plus: "", minus: "", tol: holeRadTol.toFixed(3), dist: "常態" },
@@ -553,7 +581,7 @@
         if (mode === 'floating') {
             rows.push({ desc: "AS_名目間隙 (半徑)", plus: "", minus: "", tol: asNomGap.toFixed(3), dist: "均勻" });
         }
-        
+
         rows.forEach(r => {
             tbody.insertAdjacentHTML('beforeend', createRowHTML(r));
             tbody.lastElementChild.querySelectorAll('input, select').forEach(input => {
@@ -563,7 +591,7 @@
         });
         updateRowNumbers();
         calculateTolerance();
-        
+
         // 視覺回饋
         const btn = document.getElementById('btn-append-asm');
         const originalText = btn.innerHTML;
@@ -578,54 +606,13 @@
         location.reload();
     }
 
-    function erf(x) {
-        const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
-        const sign = (x < 0) ? -1 : 1; x = Math.abs(x);
-        const t = 1.0 / (1.0 + p * x);
-        const y = 1.0 - (((((a5 * t + a4) * t) + a3 * t + a2) * t + a1) * t * Math.exp(-x * x));
-        return sign * y;
-    }
-
-    function normCDF(x, mean, sigma) {
-        return 0.5 * (1 + erf((x - mean) / (sigma * Math.sqrt(2))));
-    }
-
-    function mixedCDF(x, mean, sigmaN, a) {
-        if (a <= 0.001) return normCDF(x, mean, sigmaN);
-        let integrationSum = 0;
-        const steps = 120;
-        const tMin = x - a; const tMax = x + a;
-        const dt = (tMax - tMin) / steps;
-        
-        for (let i = 0; i <= steps; i++) {
-            let t = tMin + i * dt;
-            let cdfVal = normCDF(t, mean, sigmaN);
-            let weight = (i === 0 || i === steps) ? 1 : (i % 2 === 1) ? 4 : 2;
-            integrationSum += weight * cdfVal;
-        }
-        return (integrationSum * dt / 3) / (2 * a);
-    }
-
-    function findTrueLimit(sigmaN, a) {
-        let low = 0;
-        let high = 4 * sigmaN + a*1.2;
-        const targetArea = 0.9973002; 
-        
-        for (let k = 0; k < 40; k++) {
-            let mid = (low + high) / 2;
-            let area = mixedCDF(mid, 0, sigmaN, a) - mixedCDF(-mid, 0, sigmaN, a);
-            if (area < targetArea) low = mid; else high = mid;
-        }
-        return (low + high) / 2;
-    }
-
     function drawNormalDistribution(mean, sigma, worstCase, lsl, usl, trueLimit, nominalTarget) {
         const svg = document.getElementById('norm-dist-chart');
-        svg.innerHTML = ''; 
+        svg.innerHTML = '';
         const width = 800; const height = 300; const padding = 50;
-        
+
         // 防呆，若變異為 0 給予極小值畫圖
-        if (sigma <= 0) sigma = 0.001; 
+        if (sigma <= 0) sigma = 0.001;
         const maxRange = Math.max(4.5 * sigma, worstCase * 1.15, trueLimit * 1.15, Math.abs(mean - lsl) * 1.15, Math.abs(mean - usl) * 1.15);
         const xMin = mean - maxRange; const xMax = mean + maxRange;
 
@@ -638,7 +625,7 @@
         axes += `<text x="${getXPixel(mean)}" y="${height-padding+20}" font-size="12" text-anchor="middle" font-weight="bold" fill="#7f8c8d">實際平均值 Mean: ${mean.toFixed(3)}</text>`;
 
         const samples = 200; const dx = (xMax - xMin) / samples;
-        
+
         let pathD_ok = ""; let fillD_ok = "";
         let pathD_ng_l = ""; let fillD_ng_l = "";
         let pathD_ng_r = ""; let fillD_ng_r = "";
@@ -715,11 +702,11 @@
 
         const sigma3Plus = mean + 3 * sigma; const sigma3Minus = mean - 3 * sigma;
         elements += `<circle cx="${getXPixel(sigma3Plus)}" cy="${getYPixel(gaussian(sigma3Plus))}" r="4" fill="#bdc3c7"/><text x="${getXPixel(sigma3Plus)+5}" y="${getYPixel(gaussian(sigma3Plus))-5}" font-size="10" fill="#7f8c8d">+3σ (${sigma3Plus.toFixed(3)})</text><circle cx="${getXPixel(sigma3Minus)}" cy="${getYPixel(gaussian(sigma3Minus))}" r="4" fill="#bdc3c7"/><text x="${getXPixel(sigma3Minus)-5}" y="${getYPixel(gaussian(sigma3Minus))-5}" font-size="10" fill="#7f8c8d" text-anchor="end">-3σ (${sigma3Minus.toFixed(3)})</text>`;
-        
+
         const wcMinus = mean - worstCase; const wcPlus = mean + worstCase;
         const wcY = height - padding + 55; const barH = 16;
         let wcElements = ``;
-        
+
         if (wcMinus < lsl) {
             const xStart = getXPixel(wcMinus); const xEnd = getXPixel(Math.min(wcPlus, lsl));
             wcElements += `<rect x="${xStart}" y="${wcY}" width="${Math.max(0, xEnd - xStart)}" height="${barH}" fill="rgba(231, 76, 60, 0.6)" rx="2"/>`;
@@ -732,7 +719,7 @@
             const xStart = getXPixel(Math.max(wcMinus, usl)); const xEnd = getXPixel(wcPlus);
             wcElements += `<rect x="${xStart}" y="${wcY}" width="${Math.max(0, xEnd - xStart)}" height="${barH}" fill="rgba(231, 76, 60, 0.6)" rx="2"/>`;
         }
-        
+
         wcElements += `
             <rect x="${getXPixel(wcMinus)}" y="${wcY}" width="${getXPixel(wcPlus) - getXPixel(wcMinus)}" height="${barH}" fill="none" stroke="#2c3e50" stroke-width="1.5" rx="2"/>
             <line x1="${getXPixel(wcMinus)}" y1="${wcY-4}" x2="${getXPixel(wcMinus)}" y2="${wcY+barH+4}" stroke="#2c3e50" stroke-width="2"/>
@@ -955,137 +942,107 @@
         return String(s).replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
     }
 
+    // ────────────────────────────────────────────────────────────
+    // 核心統計公差計算：改為呼叫後端 API
+    // （原本本地的 erf / normCDF / mixedCDF / findTrueLimit /
+    //   RSS合成 / Zscore / Cpk / DPMO 計算邏輯已全部移除，
+    //   只保留把輸入打包送出、把回傳結果畫成圖表這兩件事）
+    // ────────────────────────────────────────────────────────────
+    let taTimer = null;
     function calculateTolerance() {
-        let dimSum = 0; let worstCase = 0;
-        let varNormal = 0;  
-        let varUniform = 0; 
-        let eqA_sq = 0;     
-        const chainData = [];
-        
+        clearTimeout(taTimer);
+        taTimer = setTimeout(doCalculateTolerance, 250); // 防止每個按鍵都打 API，做 250ms 防彈跳
+    }
+
+    async function doCalculateTolerance() {
         const nominalTarget = parseFloat(document.getElementById('nominal-target').value) || 0;
-        const specUpper = Math.abs(parseFloat(document.getElementById('spec-upper').value)) || 0;
-        const specLower = Math.abs(parseFloat(document.getElementById('spec-lower').value)) || 0;
+        const specUpper = parseFloat(document.getElementById('spec-upper').value) || 0;
+        const specLower = parseFloat(document.getElementById('spec-lower').value) || 0;
 
-        const usl = nominalTarget + specUpper;
-        const lsl = nominalTarget - specLower;
+        const rowEls = Array.from(document.querySelectorAll('#ta-table tbody tr'));
+        const rows = rowEls.map((row, idx) => ({
+            desc: row.querySelector('.desc').value || `項目 ${idx + 1}`,
+            plus: parseFloat(row.querySelector('.plus').value) || 0,
+            minus: parseFloat(row.querySelector('.minus').value) || 0,
+            tol: parseFloat(row.querySelector('.tol').value) || 0,
+            dist: row.querySelector('.dist').value
+        }));
 
-        document.getElementById('txt-lsl').textContent = lsl.toFixed(3);
-        document.getElementById('txt-usl').textContent = usl.toFixed(3);
+        let data;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(`${API_BASE_URL}/api/tolerance-analysis`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nominalTarget, specUpper, specLower, rows })
+            });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            data = await res.json();
+            setApiStatus('ok');
+        } catch (err) {
+            console.error('calculateTolerance API 失敗', err);
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+            return;
+        }
 
-        document.querySelectorAll('#ta-table tbody tr').forEach((row, idx) => {
-            const desc = row.querySelector('.desc').value || `項目 ${idx + 1}`;
-            const plus = parseFloat(row.querySelector('.plus').value) || 0;
-            const minus = parseFloat(row.querySelector('.minus').value) || 0;
-            const tol = parseFloat(row.querySelector('.tol').value) || 0;
-            const dist = row.querySelector('.dist').value;
-
-            let sigma = 0;
-            if (tol > 0) { 
-                if (dist === '均勻') {
-                    sigma = tol / Math.sqrt(3);
-                    varUniform += Math.pow(sigma, 2);
-                    eqA_sq += Math.pow(tol, 2);
-                } else {
-                    sigma = tol / 3;
-                    varNormal += Math.pow(sigma, 2);
-                }
-            }
-
-            const variance = Math.pow(sigma, 2);
-            row.querySelector('.sigma').textContent = sigma > 0 ? sigma.toFixed(5) : "0.00000";
-            row.querySelector('.variance').textContent = variance > 0 ? variance.toFixed(6) : "0.000000";
-            
-            // 此環的有效向量值 (增環為正、減環為負)
-            const vector = plus - minus;
-            // 僅將「有尺寸或有公差」的環納入堆疊圖
-            if (plus !== 0 || minus !== 0 || tol > 0) {
-                chainData.push({ desc, vector, tol: Math.abs(tol), dist, isPlus: plus !== 0, isMinus: minus !== 0 });
-            }
-
-            dimSum += vector; worstCase += Math.abs(tol);
+        // 回填每一列的 sigma / variance（API 依輸入順序回傳，與表格列一一對應）
+        rowEls.forEach((row, idx) => {
+            const r = data.rowResults[idx];
+            row.querySelector('.sigma').textContent = r && r.sigma > 0 ? r.sigma.toFixed(5) : "0.00000";
+            row.querySelector('.variance').textContent = r && r.variance > 0 ? r.variance.toFixed(6) : "0.000000";
         });
 
-        const totalVariance = varNormal + varUniform;
-        const sysSigma = Math.sqrt(totalVariance);
-        const sigmaN = Math.max(Math.sqrt(varNormal), 1e-8); 
-        const eqA = Math.sqrt(eqA_sq); 
+        document.getElementById('txt-lsl').textContent = data.lsl.toFixed(3);
+        document.getElementById('txt-usl').textContent = data.usl.toFixed(3);
 
-        // 防呆保護：若總變異趨近於零，避免出現 NaN 或 Infinity
-        let cpk = 0, zScore = 0;
-        if (sysSigma > 1e-6) {
-            let zScoreUpper = (usl - dimSum) / sysSigma;
-            let zScoreLower = (dimSum - lsl) / sysSigma;
-            zScore = Math.min(zScoreUpper, zScoreLower);
-            cpk = zScore / 3;
-        } else {
-            zScore = 99.99; 
-            cpk = 33.33; 
-        }
-
-        let yieldFraction = 1; let dpmo = 0;
-        if (sysSigma > 1e-6) {
-            yieldFraction = mixedCDF(usl, dimSum, sigmaN, eqA) - mixedCDF(lsl, dimSum, sigmaN, eqA);
-            dpmo = Math.max(0, (1 - yieldFraction) * 1000000);
-        }
-        let yieldPercent = Math.max(0, Math.min(100, yieldFraction * 100));
-        
-        let trueLimit = findTrueLimit(sigmaN, eqA);
-
-        document.getElementById('out-nominal').textContent = dimSum.toFixed(3) + ' mm';
-        document.getElementById('out-wc').textContent = '± ' + worstCase.toFixed(3) + ' mm';
-        document.getElementById('out-sys-sigma').textContent = sysSigma.toFixed(5) + ' mm'; 
-        document.getElementById('out-zscore').textContent = zScore.toFixed(3);
-        document.getElementById('out-yield').textContent = yieldPercent.toFixed(3) + ' %';
-        document.getElementById('out-dpmo').textContent = dpmo.toFixed(0);
+        document.getElementById('out-nominal').textContent = data.dimSum.toFixed(3) + ' mm';
+        document.getElementById('out-wc').textContent = '± ' + data.worstCase.toFixed(3) + ' mm';
+        document.getElementById('out-sys-sigma').textContent = data.sysSigma.toFixed(5) + ' mm';
+        document.getElementById('out-zscore').textContent = data.zScore.toFixed(3);
+        document.getElementById('out-yield').textContent = data.yieldPercent.toFixed(3) + ' %';
+        document.getElementById('out-dpmo').textContent = data.dpmo.toFixed(0);
 
         let cpkEl = document.getElementById('out-cpk');
         let cardCpk = document.getElementById('card-cpk');
-        cpkEl.textContent = Math.max(0, cpk).toFixed(2);
-        
-        if (cpk >= 1.33) {
+        cpkEl.textContent = data.cpk.toFixed(2);
+
+        if (data.cpk >= 1.33) {
             cpkEl.style.color = '#27ae60'; cardCpk.style.borderColor = '#2ecc71'; cardCpk.style.background = '#eafaf1';
-        } else if (cpk >= 1.0) {
+        } else if (data.cpk >= 1.0) {
             cpkEl.style.color = '#f39c12'; cardCpk.style.borderColor = '#f39c12'; cardCpk.style.background = '#fdfae6';
         } else {
             cpkEl.style.color = '#c0392b'; cardCpk.style.borderColor = '#e74c3c'; cardCpk.style.background = '#fdf3f2';
         }
 
-        document.getElementById('out-3sigma').textContent = '± ' + (sysSigma * 3).toFixed(3) + ' mm';
-        document.getElementById('out-45sigma').textContent = '± ' + (sysSigma * 4.5).toFixed(3) + ' mm';
-        document.getElementById('out-6sigma').textContent = '± ' + (sysSigma * 6).toFixed(3) + ' mm';
+        document.getElementById('out-3sigma').textContent = '± ' + data.sigma3.toFixed(3) + ' mm';
+        document.getElementById('out-45sigma').textContent = '± ' + data.sigma45.toFixed(3) + ' mm';
+        document.getElementById('out-6sigma').textContent = '± ' + data.sigma6.toFixed(3) + ' mm';
 
-        let actualUpperBoundary = dimSum + trueLimit;
-        let actualLowerBoundary = dimSum - trueLimit;
-        // 等效單邊所需空間：實際統計邊界相對於 nominalTarget 的最大偏移
-        let maxRequiredSpace = Math.max(Math.abs(actualUpperBoundary - nominalTarget), Math.abs(actualLowerBoundary - nominalTarget));
-        // 可用單邊規格：取上下限中較緊的一邊（保守判定）
-        let availableSpec = Math.min(specUpper, specLower);
-        
-        document.getElementById('judgement-3sigma').textContent = maxRequiredSpace.toFixed(3);
-        document.getElementById('judgement-spec-avail').textContent = availableSpec.toFixed(3);
-        
+        document.getElementById('judgement-3sigma').textContent = data.maxRequiredSpace.toFixed(3);
+        document.getElementById('judgement-spec-avail').textContent = data.availableSpec.toFixed(3);
+
         const jPanel = document.getElementById('judgement-panel');
         const jBadge = document.getElementById('judgement-badge');
         const jSign = document.getElementById('compare-sign');
         const jMsg = document.getElementById('judgement-msg');
         const jTitle = document.getElementById('judgement-title');
 
-        if (actualUpperBoundary <= usl && actualLowerBoundary >= lsl) {
+        if (data.judgment === 'OK') {
             jPanel.className = 'judgment-card';
             jBadge.className = 'badge'; jBadge.textContent = 'OK';
             jSign.textContent = '≤'; jSign.style.color = '#2ecc71';
             jTitle.innerHTML = '✅ 設計判定 (Design Judgment) - 合格';
-            jMsg.innerHTML = `實際疊加統計範圍 (${actualLowerBoundary.toFixed(3)} ~ ${actualUpperBoundary.toFixed(3)}) 完全落在目標規格 (${lsl.toFixed(3)} ~ ${usl.toFixed(3)}) 之內。<br>量產組裝不良機率極低，預估 Cpk 達 ${Math.max(0, cpk).toFixed(2)}（常態近似）。`;
+            jMsg.innerHTML = `實際疊加統計範圍 (${data.actualLowerBoundary.toFixed(3)} ~ ${data.actualUpperBoundary.toFixed(3)}) 完全落在目標規格 (${data.lsl.toFixed(3)} ~ ${data.usl.toFixed(3)}) 之內。<br>量產組裝不良機率極低，預估 Cpk 達 ${data.cpk.toFixed(2)}（常態近似）。`;
         } else {
             jPanel.className = 'judgment-card ng';
             jBadge.className = 'badge ng'; jBadge.textContent = 'NG';
             jSign.textContent = '>'; jSign.style.color = '#e74c3c';
             jTitle.innerHTML = '❌ 設計判定 (Design Judgment) - 不合格';
-            jMsg.innerHTML = `目標規格公差範圍不足！實際疊加統計邊界 (${actualLowerBoundary.toFixed(3)} ~ ${actualUpperBoundary.toFixed(3)}) 已超出規格限制 (${lsl.toFixed(3)} ~ ${usl.toFixed(3)})。<br>預計每百萬台有 ${dpmo.toFixed(0)} 台不良 (DPMO)，請檢討幾何或緊縮尺寸鍊公差。`;
+            jMsg.innerHTML = `目標規格公差範圍不足！實際疊加統計邊界 (${data.actualLowerBoundary.toFixed(3)} ~ ${data.actualUpperBoundary.toFixed(3)}) 已超出規格限制 (${data.lsl.toFixed(3)} ~ ${data.usl.toFixed(3)})。<br>預計每百萬台有 ${data.dpmo.toFixed(0)} 台不良 (DPMO)，請檢討幾何或緊縮尺寸鍊公差。`;
         }
 
-        drawNormalDistribution(dimSum, sysSigma, worstCase, lsl, usl, trueLimit, nominalTarget);
-        drawStackUpDiagram(chainData, dimSum, sysSigma, nominalTarget, lsl, usl);
+        drawNormalDistribution(data.dimSum, data.sysSigma, data.worstCase, data.lsl, data.usl, data.trueLimit, nominalTarget);
+        drawStackUpDiagram(data.chainData, data.dimSum, data.sysSigma, nominalTarget, data.lsl, data.usl);
     }
 
     window.onload = function() {
@@ -1097,28 +1054,28 @@
         }
 
         // 為所有表格欄位綁定計算事件
-        document.querySelectorAll('#ta-table input, #ta-table select').forEach(input => { 
-            input.addEventListener('input', calculateTolerance); 
-            input.addEventListener('change', calculateTolerance); 
+        document.querySelectorAll('#ta-table input, #ta-table select').forEach(input => {
+            input.addEventListener('input', calculateTolerance);
+            input.addEventListener('change', calculateTolerance);
         });
 
         ['calc-hole-nom', 'calc-hole-up', 'calc-shaft-nom', 'calc-shaft-low'].forEach(id => { document.getElementById(id).addEventListener('input', calcAsmShift); });
         document.getElementById('asm-mode').addEventListener('change', calcAsmShift);
         document.getElementById('btn-append-asm').addEventListener('click', appendAsmShiftToTable);
-        
+
         document.getElementById('btn-add-row').addEventListener('click', addNewRow);
         document.getElementById('btn-save-state').addEventListener('click', saveCurrentState);
         document.getElementById('btn-clear-state').addEventListener('click', clearStateAndReset);
-        
+
         document.getElementById('nominal-target').addEventListener('input', calculateTolerance);
         document.getElementById('spec-upper').addEventListener('input', calculateTolerance);
         document.getElementById('spec-lower').addEventListener('input', calculateTolerance);
         document.getElementById('stackup-mode').addEventListener('change', calculateTolerance);
-        
+
         calcAsmShift();
         calculateTolerance();
     };
 </script>
 
 </body>
-</html>
+</h
