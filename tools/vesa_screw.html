@@ -14,7 +14,7 @@
     --bg-light: #f9f9f9; --bg-white: #ffffff;
     --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
     --accent: #1a1a2e; --warn: #c62828; --ok: #2e7d32;
-    --muted: #64748B; --border: #e0e0e0; 
+    --muted: #64748B; --border: #e0e0e0;
     --brand: #1a1a2e; --brand-50: #f0f0f5; --brand-100: #e0e0ee;
     --warn-bg: #FFFBEB; --warn-bd: #FDE68A; --warn-tx: #92400E;
   }
@@ -107,7 +107,7 @@
   .stat.final .v { color: var(--ok); }
   .stat.warn { background: rgba(198,40,40,0.08); border-color: rgba(198,40,40,0.3); }
   .stat.warn .v { color: var(--warn); }
-  @media (prefers-color-scheme: dark) { 
+  @media (prefers-color-scheme: dark) {
     .stat.final { background: rgba(102,187,106,0.1); border-color: rgba(102,187,106,0.3); }
     .stat.warn { background: rgba(239,83,80,0.1); border-color: rgba(239,83,80,0.3); }
   }
@@ -130,6 +130,10 @@
 
   @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .api-status.loading { background: #fdfae6; color: #d35400; }
+  .api-status.error { background: #fdf3f2; color: #c0392b; }
 </style>
 </head>
 <body>
@@ -409,26 +413,29 @@
 
 </div><footer>依機械設計手冊與實務設計經驗實作 · 僅供參考，實際應用請依規範驗證</footer>
 
-</section><script>
-/* =========================================================
-   資料集
-   ========================================================= */
-const SCREW_TABLE = {
-  "M2": { As: 2.07, d: 2 },
-  "M2.5": { As: 3.39, d: 2.5 },
-  "M3": { As: 5.03, d: 3 },
-  "M4": { As: 8.78, d: 4 },
-  "M6": { As: 20.1, d: 6 },
-  "M8": { As: 36.6, d: 8 },
-  "M10": { As: 58.0, d: 10 }
-};
-const SCREW_LIST = Object.keys(SCREW_TABLE);
+</section>
 
-/* ========================= 工具 ========================= */
+<div class="api-status" id="api-status" style="display:none;">計算中...</div>
+
+<script>
+/* =========================================================
+   計算邏輯已搬到伺服器端，前端只送輸入、收結果並渲染
+   部署後請把這裡換成你的正式 API 網址
+   ========================================================= */
+const API_BASE_URL = "https://anzu-calc-api.onrender.com";
+
 const $ = id => document.getElementById(id);
 const NA = "–";
+let debounceTimer = null;
+let SCREW_LIST = [];
 
-function r2(v){ return Math.round(v * 100) / 100; }
+function setApiStatus(state, msg) {
+  const el = $("api-status");
+  el.style.display = 'block';
+  el.className = 'api-status' + (state ? ' ' + state : '');
+  el.textContent = msg || (state === 'loading' ? '計算中...' : state === 'error' ? '⚠ API 連線失敗' : '✓ 已連線');
+  if (state === 'ok') setTimeout(() => { el.style.display = 'none'; }, 1200);
+}
 
 function setStat(id, value, unit){
   const el = $(id);
@@ -440,15 +447,22 @@ function setStat(id, value, unit){
   el.innerHTML = (unit ? `${value}<span class="u">${unit}</span>` : `${value}`);
 }
 
-/* ========================= 初始化下拉 ========================= */
-function initSelect(){
-  const s = $("inptSpec");
-  SCREW_LIST.forEach(v => {
-    const o = document.createElement("option");
-    o.value = v; o.textContent = v;
-    s.appendChild(o);
-  });
-  s.value = "M4"; 
+/* ========================= 初始化下拉（從 API 取規格清單） ========================= */
+async function initSelect(){
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/vesa-screw/table`);
+    const data = await res.json();
+    SCREW_LIST = data.specs;
+    const s = $("inptSpec");
+    SCREW_LIST.forEach(v => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = v;
+      s.appendChild(o);
+    });
+    s.value = "M4";
+  } catch (err) {
+    console.error('載入螺絲規格清單失敗', err);
+  }
 }
 
 /* ========================= Tabs ========================= */
@@ -462,160 +476,122 @@ document.querySelectorAll(".tab").forEach(tab => {
   });
 });
 
-/* ========================= 計算核心 ========================= */
-function calc(){
-  // 1. 取得全局輸入
+/* ========================= 計算（呼叫 API） ========================= */
+async function calc(){
   const weight = Number($("inptWeight").value) || 0;
-  const multi = Number($("inptMultiplier").value) || 0;
+  const multiplier = Number($("inptMultiplier").value) || 0;
   const bolts = Number($("inptBolts").value) || 1;
   const arm = Number($("inptArm").value) || 0;
-  
+
   const specKey = $("inptSpec").value;
   const spaceA = Number($("inptSpaceA").value) || 0;
   const spaceB = Number($("inptSpaceB").value) || 0;
   const hvMin = Number($("inptHv").value) || 0;
   const kFactor = Number($("inptK").value) || 0.6;
 
-  // 取得目標安全係數與獨立輸入值
   const targetSfM1 = Number($("inptTargetSfM1").value) || 4;
   const targetSfM2 = Number($("inptTargetSfM2").value) || 4;
   const alphaM3 = Number($("inptAlphaM3").value) || 5;
   const shearRatio = Number($("inptShearRatio").value) || 0.8;
   const alphaM4 = Number($("inptAlphaM4").value) || 5;
 
-  const screw = SCREW_TABLE[specKey];
-  const As = screw.As;
-  const dia = screw.d;
+  let data;
+  try {
+    setApiStatus('loading');
+    const res = await fetch(`${API_BASE_URL}/api/vesa-screw`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        weight, multiplier, bolts, arm, specKey, spaceA, spaceB, hvMin, kFactor,
+        targetSfM1, targetSfM2, alphaM3, shearRatio, alphaM4
+      })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    data = await res.json();
+    setApiStatus('ok');
+  } catch (err) {
+    console.error('vesa-screw API 失敗', err);
+    setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+    return;
+  }
 
-  // 2. 基礎計算
-  const P = weight * multi * 9.81; 
-  const halfA = spaceA / 2;
-  const halfB = spaceB / 2;
-  const r_true = Math.sqrt(halfA * halfA + halfB * halfB); 
-  
-  setStat("valP", r2(P), "N");
-  setStat("valR", r2(r_true), "mm");
-  setStat("valAs", As, "mm²");
-  setStat("valDia", dia, "mm");
+  setStat("valP", data.p, "N");
+  setStat("valR", data.rTrue, "mm");
+  setStat("valAs", data.as_, "mm²");
+  setStat("valDia", data.dia, "mm");
 
-  // ------------------------------------
-  // 方法 1：合力與剪力
-  // ------------------------------------
-  const Tz = P * arm; 
-  const Fv = P / bolts; 
-  const Ft = Tz / (bolts * r_true); 
-  
-  const cosTheta = (r_true === 0) ? 0 : (halfA / r_true); 
-  const F_total = Math.sqrt(Fv * Fv + Ft * Ft + 2 * Fv * Ft * cosTheta);
+  const m1 = data.m1;
+  setStat("m1Tz", m1.tz, "N·mm");
+  setStat("m1Fv", m1.fv, "N");
+  setStat("m1Ft", m1.ft, "N");
+  setStat("m1Ftotal", m1.fTotal, "N");
+  setStat("m1TauYp", m1.tauYp, "N/mm²");
+  setStat("m1TauAct", m1.tauAct, "N/mm²");
 
-  const tau_yp = hvMin / 2;
-  const tau_act = F_total / As;
-  const sf_m1 = tau_yp / tau_act;
-
-  setStat("m1Tz", r2(Tz), "N·mm");
-  setStat("m1Fv", r2(Fv), "N");
-  setStat("m1Ft", r2(Ft), "N");
-  setStat("m1Ftotal", r2(F_total), "N");
-  setStat("m1TauYp", r2(tau_yp), "N/mm²");
-  setStat("m1TauAct", r2(tau_act), "N/mm²");
-  
   const sfBoxM1 = $("m1SfBox");
-  if(sf_m1 >= targetSfM1) { 
-    sfBoxM1.className = "stat final"; 
-    $("m1Sf").innerHTML = `${r2(sf_m1)} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
-  } else { 
-    sfBoxM1.className = "stat warn"; 
-    $("m1Sf").innerHTML = `${r2(sf_m1)} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
+  if (m1.sfPass) {
+    sfBoxM1.className = "stat final";
+    $("m1Sf").innerHTML = `${m1.sf} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
+  } else {
+    sfBoxM1.className = "stat warn";
+    $("m1Sf").innerHTML = `${m1.sf} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
   }
 
   const m1AdvMeta = $("m1AdvMeta");
-  if(m1AdvMeta) m1AdvMeta.innerText = `以目標安全係數 SF = ${targetSfM1} 進行反向推算`;
+  if (m1AdvMeta) m1AdvMeta.innerText = `以目標安全係數 SF = ${targetSfM1} 進行反向推算`;
 
-  const tau_allow = tau_yp / targetSfM1;
-  const req_As_from_force = F_total / tau_allow;
-  const req_D_from_force = Math.sqrt((4 * req_As_from_force) / Math.PI);
-  
-  let recSpecFinal = NA;
-  for(let key of SCREW_LIST){
-    if(SCREW_TABLE[key].d >= req_D_from_force){ recSpecFinal = key; break; }
-  }
+  setStat("m1TargetTau", m1.targetTau, "N/mm²");
+  setStat("m1ReqAs", m1.reqAs, "mm²");
+  setStat("m1ReqD", m1.reqD, "mm");
+  setStat("m1RecSpec", m1.recSpec || NA);
 
-  setStat("m1TargetTau", r2(tau_allow), "N/mm²");
-  setStat("m1ReqAs", r2(req_As_from_force), "mm²");
-  setStat("m1ReqD", r2(req_D_from_force), "mm");
-  setStat("m1RecSpec", recSpecFinal);
-
-  // ------------------------------------
-  // 方法 2：降伏拉力
-  // ------------------------------------
-  const yieldLoad = hvMin * As;
-  const allowLoad = yieldLoad * kFactor;
-  const totalAllow = allowLoad * bolts;
-  const sf_m2_tot = totalAllow / P;
-  const sf_m2_single = allowLoad / P;
-
-  setStat("m2Yield", r2(yieldLoad), "N");
-  setStat("m2Allow", r2(allowLoad), "N");
-  setStat("m2TotalAllow", r2(totalAllow), "N");
+  const m2 = data.m2;
+  setStat("m2Yield", m2.yield_, "N");
+  setStat("m2Allow", m2.allow, "N");
+  setStat("m2TotalAllow", m2.totalAllow, "N");
 
   const sfBoxTot = $("m2SfTotalBox");
-  if (sf_m2_tot >= targetSfM2) {
-      sfBoxTot.className = "stat final";
-      $("m2SfTotal").innerHTML = `${r2(sf_m2_tot)} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
+  if (m2.sfTotalPass) {
+    sfBoxTot.className = "stat final";
+    $("m2SfTotal").innerHTML = `${m2.sfTotal} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
   } else {
-      sfBoxTot.className = "stat warn";
-      $("m2SfTotal").innerHTML = `${r2(sf_m2_tot)} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
+    sfBoxTot.className = "stat warn";
+    $("m2SfTotal").innerHTML = `${m2.sfTotal} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
   }
 
   const sfBoxSin = $("m2SfSingleBox");
-  if (sf_m2_single >= targetSfM2) {
-      sfBoxSin.className = "stat final";
-      $("m2SfSingle").innerHTML = `${r2(sf_m2_single)} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
+  if (m2.sfSinglePass) {
+    sfBoxSin.className = "stat final";
+    $("m2SfSingle").innerHTML = `${m2.sfSingle} <span class="u" style="color:var(--ok); font-weight:700; margin-left:8px;">合格</span>`;
   } else {
-      sfBoxSin.className = "stat warn";
-      $("m2SfSingle").innerHTML = `${r2(sf_m2_single)} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
+    sfBoxSin.className = "stat warn";
+    $("m2SfSingle").innerHTML = `${m2.sfSingle} <span class="u" style="color:var(--warn); font-weight:700; margin-left:8px;">不合格</span>`;
   }
 
-  // ------------------------------------
-  // 方法 3：三柱正應力算法
-  // ------------------------------------
-  const sigma_t = hvMin / alphaM3;
-  const req_As = P / sigma_t;
-  
-  let recSpecAs = NA;
-  for(let key of SCREW_LIST){
-    if(SCREW_TABLE[key].As >= req_As){ recSpecAs = key; break; }
-  }
+  const m3 = data.m3;
+  setStat("m3SigmaT", m3.sigmaT, "N/mm²");
+  setStat("m3ReqAs", m3.reqAs, "mm²");
+  setStat("m3RecSpec", m3.recSpec || NA);
 
-  setStat("m3SigmaT", r2(sigma_t), "N/mm²");
-  setStat("m3ReqAs", r2(req_As), "mm²");
-  setStat("m3RecSpec", recSpecAs);
+  const m4 = data.m4;
+  setStat("m4TauT", m4.tauT, "N/mm²");
+  setStat("m4ReqD", m4.reqD, "mm");
+  setStat("m4RecSpec", m4.recSpec || NA);
+}
 
-  // ------------------------------------
-  // 方法 4：三柱剪應力算法
-  // ------------------------------------
-  const tau_all = (hvMin * shearRatio) / alphaM4;
-  const req_D = Math.sqrt((4 * P) / (Math.PI * tau_all));
-  
-  let recSpecD = NA;
-  for(let key of SCREW_LIST){
-    if(SCREW_TABLE[key].d >= req_D){ recSpecD = key; break; }
-  }
-
-  setStat("m4TauT", r2(tau_all), "N/mm²");
-  setStat("m4ReqD", r2(req_D), "mm");
-  setStat("m4RecSpec", recSpecD);
+function debouncedCalc() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(calc, 250);
 }
 
 // 綁定事件
 document.querySelectorAll("input, select, textarea").forEach(el => {
-  el.addEventListener("input", calc);
-  el.addEventListener("change", calc);
+  el.addEventListener("input", debouncedCalc);
+  el.addEventListener("change", debouncedCalc);
 });
 
 // 初始化
-initSelect();
-calc();
+initSelect().then(calc);
 </script>
 </body>
 </html>

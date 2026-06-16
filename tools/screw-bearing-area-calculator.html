@@ -95,6 +95,10 @@
             .selector-grid { grid-template-columns: 1fr 1fr; }
             .result-grid { grid-template-columns: 1fr 1fr; }
         }
+
+        .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .api-status.loading { background: #fdfae6; color: #d35400; }
+        .api-status.error { background: #fdf3f2; color: #c0392b; }
     </style>
 </head>
 <body>
@@ -270,7 +274,25 @@
         <p>&copy; 2026 Anzû Mechanical & Product Design Studio. All rights reserved.</p>
     </footer>
 
+    <div class="api-status" id="api-status" style="display:none;">計算中...</div>
+
     <script>
+    /* =========================================================
+       計算邏輯已搬到伺服器端，前端只送輸入、收結果並渲染
+       部署後請把這裡換成你的正式 API 網址
+       ========================================================= */
+    const API_BASE_URL = "https://anzu-calc-api.onrender.com";
+
+    let debounceTimer = null;
+
+    function setApiStatus(state, msg) {
+        const el = document.getElementById('api-status');
+        el.style.display = 'block';
+        el.className = 'api-status' + (state ? ' ' + state : '');
+        el.textContent = msg || (state === 'loading' ? '計算中...' : state === 'error' ? '⚠ API 連線失敗' : '✓ 已連線');
+        if (state === 'ok') setTimeout(() => { el.style.display = 'none'; }, 1200);
+    }
+
     // ============================================================
     // Tab 切換
     // ============================================================
@@ -281,113 +303,78 @@
         document.getElementById(id).classList.add('active');
     }
 
-    function round(v, n=2) { return Math.round(v * 10**n) / 10**n; }
+    // ============================================================
+    // 資料表（只放規格清單與通孔表，不含面積/判定公式 — 由 API 計算）
+    // ============================================================
+    let PAN_DATA = {};
+    let HEX_DATA = {};
+    let HOLE_DH = {};
+
+    async function loadTables() {
+        const res = await fetch(`${API_BASE_URL}/api/screw-bearing-area/tables`);
+        const data = await res.json();
+        HOLE_DH = data.holeDh;
+
+        data.pan.forEach(r => {
+            PAN_DATA[r.name] = { d: r.d, As: r.as_, dw: r.dw, refRatio: r.refRatio };
+        });
+        data.hex.forEach(r => {
+            HEX_DATA[r.name] = { d: r.d, As: r.as_, S: r.s, refRatio: r.refRatio };
+        });
+
+        // 下拉選單
+        const panSpecSel = document.getElementById('pan-spec');
+        Object.keys(PAN_DATA).forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k; opt.textContent = k;
+            if (k === 'M4') opt.selected = true;
+            panSpecSel.appendChild(opt);
+        });
+
+        const hexSpecSel = document.getElementById('hex-spec');
+        Object.keys(HEX_DATA).forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k; opt.textContent = k;
+            if (k === 'M4') opt.selected = true;
+            hexSpecSel.appendChild(opt);
+        });
+
+        // 盤頭參考表
+        const panRefTbody = document.getElementById('pan-ref-tbody');
+        data.pan.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.id = 'pan-row-' + r.name;
+            tr.innerHTML = `<td>${r.name}</td><td>${r.d}</td><td>${r.as_}</td><td>${r.dw}</td>
+                <td>${r.dhFine ?? '—'}</td><td>${r.dhMid ?? '—'}</td><td>${r.dhCoarse ?? '—'}</td>
+                <td>${r.refRatio}</td>`;
+            panRefTbody.appendChild(tr);
+        });
+
+        // 六角頭參考表
+        const hexRefTbody = document.getElementById('hex-ref-tbody');
+        data.hex.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.id = 'hex-row-' + r.name;
+            tr.innerHTML = `<td>${r.name}</td><td>${r.d}</td><td>${r.as_}</td><td>${r.s}</td>
+                <td>${r.dhMid ?? '—'}</td><td>${r.abStd ?? '—'}</td><td>${r.refRatio}</td>`;
+            hexRefTbody.appendChild(tr);
+        });
+
+        onPanSpecChange();
+        onHexSpecChange();
+    }
 
     // ============================================================
-    // 資料表
-    // ============================================================
-
-    // 通孔直徑 dh（GB5277）
-    const HOLE_DH = {
-        'M1.6': { 精: 1.7, 中等: 1.8, 粗: 2.0 },
-        'M2':   { 精: 2.2, 中等: 2.4, 粗: 2.6 },
-        'M2.5': { 精: 2.7, 中等: 2.9, 粗: 3.1 },
-        'M3':   { 精: 3.2, 中等: 3.4, 粗: 3.6 },
-        'M4':   { 精: 4.3, 中等: 4.5, 粗: 4.8 },
-        'M5':   { 精: 5.3, 中等: 5.5, 粗: 5.8 },
-        'M6':   { 精: 6.4, 中等: 6.6, 粗: 7.0 },
-        'M8':   { 精: 8.4, 中等: 9.0, 粗: 10.0 },
-        'M10':  { 精: 10.5, 中等: 11.0, 粗: 12.0 },
-        'M12':  { 精: 13.0, 中等: 13.5, 粗: 14.5 },
-        'M16':  { 精: 17.0, 中等: 17.5, 粗: 18.5 },
-    };
-
-    // 盤頭螺釘（GB67/GB818 dwmax；GBT 16823-1 表5 Ab/As 參考值）
-    const PAN_DATA = {
-        'M1.6': { d: 1.6, P: 0.35, As: 1.27, dw: 3.2,  refRatio: 4.3 },
-        'M2':   { d: 2,   P: 0.4,  As: 2.07, dw: 4.0,  refRatio: 3.9 },
-        'M2.5': { d: 2.5, P: 0.45, As: 3.39, dw: 5.0,  refRatio: 3.8 },
-        'M3':   { d: 3,   P: 0.5,  As: 5.03, dw: 5.6,  refRatio: 3.1 },
-        'M4':   { d: 4,   P: 0.7,  As: 8.78, dw: 8.0,  refRatio: 3.9 },
-        'M5':   { d: 5,   P: 0.8,  As: 14.2, dw: 9.5,  refRatio: 3.3 },
-        'M6':   { d: 6,   P: 1.0,  As: 20.1, dw: 12.0, refRatio: 3.9 },
-        'M8':   { d: 8,   P: 1.25, As: 36.6, dw: 16.0, refRatio: 3.7 },
-        'M10':  { d: 10,  P: 1.5,  As: 58.0, dw: 20.0, refRatio: 3.8 },
-    };
-
-    // 六角頭（GB3104 標準系列 Smax；GBT 16823-1 表4 Ab/As 參考值）
-    const HEX_DATA = {
-        'M3':  { d: 3,  P: 0.5,  As: 5.03,  S: 5.5,  refRatio: 3.4 },
-        'M4':  { d: 4,  P: 0.7,  As: 8.78,  S: 7.0,  refRatio: 3.0 },
-        'M5':  { d: 5,  P: 0.8,  As: 14.2,  S: 8.0,  refRatio: 2.2 },
-        'M6':  { d: 6,  P: 1.0,  As: 20.1,  S: 10.0, refRatio: 2.6 },
-        'M7':  { d: 7,  P: 1.0,  As: 28.9,  S: 11.0, refRatio: 2.1 },
-        'M8':  { d: 8,  P: 1.25, As: 36.6,  S: 13.0, refRatio: 2.3 },
-        'M10': { d: 10, P: 1.5,  As: 58.0,  S: 16.0, refRatio: 2.2 },
-        'M12': { d: 12, P: 1.75, As: 84.3,  S: 18.0, refRatio: 1.6 },
-        'M14': { d: 14, P: 2.0,  As: 115,   S: 21.0, refRatio: 1.7 },
-        'M16': { d: 16, P: 2.0,  As: 157,   S: 24.0, refRatio: 1.6 },
-        'M18': { d: 18, P: 2.5,  As: 192,   S: 27.0, refRatio: 1.7 },
-        'M20': { d: 20, P: 2.5,  As: 245,   S: 30.0, refRatio: 1.6 },
-        'M22': { d: 22, P: 2.5,  As: 303,   S: 34.0, refRatio: 1.8 },
-        'M24': { d: 24, P: 3.0,  As: 353,   S: 36.0, refRatio: 1.7 },
-    };
-
-    // ============================================================
-    // 初始化下拉 & 參考表
-    // ============================================================
-    const panSpecSel = document.getElementById('pan-spec');
-    Object.keys(PAN_DATA).forEach(k => {
-        const opt = document.createElement('option');
-        opt.value = k; opt.textContent = k;
-        if (k === 'M4') opt.selected = true;
-        panSpecSel.appendChild(opt);
-    });
-
-    const hexSpecSel = document.getElementById('hex-spec');
-    Object.keys(HEX_DATA).forEach(k => {
-        const opt = document.createElement('option');
-        opt.value = k; opt.textContent = k;
-        if (k === 'M4') opt.selected = true;
-        hexSpecSel.appendChild(opt);
-    });
-
-    // 盤頭 參考表
-    const panRefTbody = document.getElementById('pan-ref-tbody');
-    Object.entries(PAN_DATA).forEach(([name, s]) => {
-        const dh = HOLE_DH[name] || {};
-        const tr = document.createElement('tr');
-        tr.id = 'pan-row-' + name;
-        tr.innerHTML = `<td>${name}</td><td>${s.d}</td><td>${s.As}</td><td>${s.dw}</td>
-            <td>${dh.精 ?? '—'}</td><td>${dh.中等 ?? '—'}</td><td>${dh.粗 ?? '—'}</td>
-            <td>${s.refRatio}</td>`;
-        panRefTbody.appendChild(tr);
-    });
-
-    // 六角頭 參考表
-    const hexRefTbody = document.getElementById('hex-ref-tbody');
-    Object.entries(HEX_DATA).forEach(([name, s]) => {
-        const dh = HOLE_DH[name];
-        const dhMid = dh ? dh.中等 : null;
-        const AbStd = dhMid ? round(0.866 * s.S * s.S - Math.PI / 4 * dhMid * dhMid, 1) : '—';
-        const tr = document.createElement('tr');
-        tr.id = 'hex-row-' + name;
-        tr.innerHTML = `<td>${name}</td><td>${s.d}</td><td>${s.As}</td><td>${s.S}</td>
-            <td>${dhMid ?? '—'}</td><td>${AbStd}</td><td>${s.refRatio}</td>`;
-        hexRefTbody.appendChild(tr);
-    });
-
-    // ============================================================
-    // 盤頭螺釘 計算
+    // 盤頭螺釘
     // ============================================================
     function onPanSpecChange() {
-        const specName = panSpecSel.value;
+        const specName = document.getElementById('pan-spec').value;
         const spec = PAN_DATA[specName];
         const fit = document.getElementById('pan-fit').value;
         const dhTable = HOLE_DH[specName];
         const dhVal = dhTable ? dhTable[fit] : '';
         document.getElementById('pan-dh-table').value = dhVal;
-        document.getElementById('pan-dh-manual').value = dhVal;  // 預設同取表值，讓使用者自行修改
+        document.getElementById('pan-dh-manual').value = dhVal;
         document.getElementById('pan-dw').value = spec.dw;
         document.querySelectorAll('#pan-ref-tbody tr').forEach(r => r.classList.remove('highlighted'));
         const row = document.getElementById('pan-row-' + specName);
@@ -396,24 +383,24 @@
     }
 
     function onPanFitChange() {
-        const specName = panSpecSel.value;
+        const specName = document.getElementById('pan-spec').value;
         const fit = document.getElementById('pan-fit').value;
         const dhTable = HOLE_DH[specName];
         const dhVal = (dhTable && dhTable[fit] !== undefined) ? dhTable[fit] : '';
         document.getElementById('pan-dh-table').value = dhVal;
-        // 只更新取表值；手動輸入欄位保留使用者值（不自動覆蓋）
         calcPan();
     }
 
-    function calcPan() {
-        const specName = panSpecSel.value;
+    async function calcPan() {
+        const specName = document.getElementById('pan-spec').value;
         const spec = PAN_DATA[specName];
-        const dw        = parseFloat(document.getElementById('pan-dw').value) || 0;
-        const dhT       = parseFloat(document.getElementById('pan-dh-table').value) || 0;   // 取表
-        const dhM       = parseFloat(document.getElementById('pan-dh-manual').value) || 0;  // 手動
+        if (!spec) return;
+        const dw = parseFloat(document.getElementById('pan-dw').value) || 0;
+        const fit = document.getElementById('pan-fit').value;
+        const dhManual = parseFloat(document.getElementById('pan-dh-manual').value) || 0;
 
         document.getElementById('pan-derived').innerHTML =
-            `d=${spec.d} mm, P=${spec.P} mm, As=<strong style="color:var(--primary-color)">${spec.As}</strong> mm²　｜　標準 dw=${spec.dw} mm　｜　GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}`;
+            `d=${spec.d} mm, As=<strong style="color:var(--primary-color)">${spec.As}</strong> mm²　｜　標準 dw=${spec.dw} mm　｜　GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}`;
 
         if (!dw) {
             document.getElementById('pan-status').innerHTML = `<div class="status-bar neutral">請輸入盤頭外徑 dw</div>`;
@@ -422,37 +409,40 @@
             return;
         }
 
-        // Ab1：取表 dh
-        const hasAb1 = dhT > 0 && dw > dhT;
-        const Ab1    = hasAb1 ? round(Math.PI / 4 * (dw * dw - dhT * dhT), 2) : null;
-        const ratio1 = Ab1 !== null ? round(Ab1 / spec.As, 2) : null;
-        const ok1    = ratio1 !== null ? ratio1 >= spec.refRatio : null;
+        let data;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(`${API_BASE_URL}/api/screw-bearing-area/pan`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ specName, fit, dw, dhManual })
+            });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            data = await res.json();
+            setApiStatus('ok');
+        } catch (err) {
+            console.error('screw-bearing-area/pan API 失敗', err);
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+            return;
+        }
 
-        // Ab2：手動 dh
-        const hasAb2 = dhM > 0 && dw > dhM;
-        const Ab2    = hasAb2 ? round(Math.PI / 4 * (dw * dw - dhM * dhM), 2) : null;
-        const ratio2 = Ab2 !== null ? round(Ab2 / spec.As, 2) : null;
-        const ok2    = ratio2 !== null ? ratio2 >= spec.refRatio : null;
-
-        // 整體狀態
-        const anyNG  = (ok1 === false) || (ok2 === false);
-        const allOK  = (ok1 !== false) && (ok2 !== false) && (ok1 || ok2);
+        const dhT = data.dhTable;
+        const anyNG = (data.ok1 === false) || (data.ok2 === false);
+        const allOK = (data.ok1 !== false) && (data.ok2 !== false) && (data.ok1 || data.ok2);
         const statusClass = anyNG ? 'warn' : (allOK ? 'ok' : 'neutral');
-        const statusText  = anyNG ? '✗ NG — Ab/As 未達標準參考值' : (allOK ? '✓ OK — Ab/As 達標' : '請輸入通孔直徑 dh');
-        document.getElementById('pan-status').innerHTML =
-            `<div class="status-bar ${statusClass}">${statusText}</div>`;
+        const statusText = anyNG ? '✗ NG — Ab/As 未達標準參考值' : (allOK ? '✓ OK — Ab/As 達標' : '請輸入通孔直徑 dh');
+        document.getElementById('pan-status').innerHTML = `<div class="status-bar ${statusClass}">${statusText}</div>`;
 
-        // result items
-        const ab1HTML = Ab1 !== null ? `
-            <div class="result-item highlight"><div class="label">Ab1（dh 取表）</div><div class="value">${Ab1}</div><div class="unit">mm²</div></div>
-            <div class="result-item ${ok1 ? '' : 'warn'}"><div class="label">Ab1/As　dh取表判定</div><div class="value">${ratio1}</div><div class="unit">${ok1 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
+        const ab1HTML = data.ab1 !== null ? `
+            <div class="result-item highlight"><div class="label">Ab1（dh 取表）</div><div class="value">${data.ab1}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${data.ok1 ? '' : 'warn'}"><div class="label">Ab1/As　dh取表判定</div><div class="value">${data.ratio1}</div><div class="unit">${data.ok1 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
         ` : `
             <div class="result-item"><div class="label">Ab1（dh 取表）</div><div class="value">—</div><div class="unit">dh 取表無資料</div></div>
             <div class="result-item"><div class="label">Ab1/As　dh取表判定</div><div class="value">—</div><div class="unit"></div></div>
         `;
-        const ab2HTML = Ab2 !== null ? `
-            <div class="result-item highlight"><div class="label">Ab2（dh 手動）</div><div class="value">${Ab2}</div><div class="unit">mm²</div></div>
-            <div class="result-item ${ok2 ? '' : 'warn'}"><div class="label">Ab2/As　dh手動判定</div><div class="value">${ratio2}</div><div class="unit">${ok2 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
+        const ab2HTML = data.ab2 !== null ? `
+            <div class="result-item highlight"><div class="label">Ab2（dh 手動）</div><div class="value">${data.ab2}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${data.ok2 ? '' : 'warn'}"><div class="label">Ab2/As　dh手動判定</div><div class="value">${data.ratio2}</div><div class="unit">${data.ok2 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
         ` : `
             <div class="result-item"><div class="label">Ab2（dh 手動）</div><div class="value">—</div><div class="unit">請輸入 dh 手動值</div></div>
             <div class="result-item"><div class="label">Ab2/As　dh手動判定</div><div class="value">—</div><div class="unit"></div></div>
@@ -461,14 +451,14 @@
         document.getElementById('pan-result').innerHTML = `
             <div class="result-item"><div class="label">應力面積 As</div><div class="value">${spec.As}</div><div class="unit">mm²</div></div>
             <div class="result-item"><div class="label">dh 取表建議值</div><div class="value">${dhT || '—'}</div><div class="unit">mm</div></div>
-            <div class="result-item"><div class="label">dh 手動輸入</div><div class="value">${dhM || '—'}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">dh 手動輸入</div><div class="value">${dhManual || '—'}</div><div class="unit">mm</div></div>
             <div class="result-item"><div class="label">頭外徑 dw</div><div class="value">${dw}</div><div class="unit">mm</div></div>
             ${ab1HTML}
             ${ab2HTML}
         `;
 
-        const line1 = Ab1 !== null ? `Ab1 = π/4 × (${dw}² − ${dhT}²) = <strong>${Ab1}</strong> mm²　→　Ab1/As = ${ratio1}　${ok1 ? '✓ OK' : '✗ NG'}<br>` : '';
-        const line2 = Ab2 !== null ? `Ab2 = π/4 × (${dw}² − ${dhM}²) = <strong>${Ab2}</strong> mm²　→　Ab2/As = ${ratio2}　${ok2 ? '✓ OK' : '✗ NG'}<br>` : '';
+        const line1 = data.ab1 !== null ? `Ab1 = π/4 × (${dw}² − ${dhT}²) = <strong>${data.ab1}</strong> mm²　→　Ab1/As = ${data.ratio1}　${data.ok1 ? '✓ OK' : '✗ NG'}<br>` : '';
+        const line2 = data.ab2 !== null ? `Ab2 = π/4 × (${dw}² − ${dhManual}²) = <strong>${data.ab2}</strong> mm²　→　Ab2/As = ${data.ratio2}　${data.ok2 ? '✓ OK' : '✗ NG'}<br>` : '';
         document.getElementById('pan-tip').innerHTML = `
             <strong>📌 公式</strong>　Ab = π/4 × (dw² − dh²)　　判定：Ab/As ≥ ${spec.refRatio} → OK，否則 → NG<br>
             ${line1}${line2}
@@ -477,16 +467,16 @@
     }
 
     // ============================================================
-    // 六角頭 計算
+    // 六角頭
     // ============================================================
     function onHexSpecChange() {
-        const specName = hexSpecSel.value;
+        const specName = document.getElementById('hex-spec').value;
         const spec = HEX_DATA[specName];
         const fit = document.getElementById('hex-fit').value;
         const dhTable = HOLE_DH[specName];
         const dhVal = dhTable ? dhTable[fit] : '';
         document.getElementById('hex-dh-table').value = dhVal;
-        document.getElementById('hex-dh-manual').value = dhVal;  // 預設同取表值
+        document.getElementById('hex-dh-manual').value = dhVal;
         document.getElementById('hex-s').value = spec.S;
         document.querySelectorAll('#hex-ref-tbody tr').forEach(r => r.classList.remove('highlighted'));
         const row = document.getElementById('hex-row-' + specName);
@@ -495,64 +485,67 @@
     }
 
     function onHexFitChange() {
-        const specName = hexSpecSel.value;
+        const specName = document.getElementById('hex-spec').value;
         const fit = document.getElementById('hex-fit').value;
         const dhTable = HOLE_DH[specName];
         const dhVal = (dhTable && dhTable[fit] !== undefined) ? dhTable[fit] : '';
         document.getElementById('hex-dh-table').value = dhVal;
-        // 手動輸入欄位保留使用者值（不自動覆蓋）
         calcHex();
     }
 
-    function calcHex() {
-        const specName = hexSpecSel.value;
+    async function calcHex() {
+        const specName = document.getElementById('hex-spec').value;
         const spec = HEX_DATA[specName];
-        const S   = parseFloat(document.getElementById('hex-s').value) || 0;
-        const dhT = parseFloat(document.getElementById('hex-dh-table').value) || 0;   // 取表
-        const dhM = parseFloat(document.getElementById('hex-dh-manual').value) || 0;  // 手動
+        if (!spec) return;
+        const s = parseFloat(document.getElementById('hex-s').value) || 0;
+        const fit = document.getElementById('hex-fit').value;
+        const dhManual = parseFloat(document.getElementById('hex-dh-manual').value) || 0;
         const dhNote = HOLE_DH[specName] ? '通孔 dh 已查表' : '通孔 dh 無標準表值，請手動輸入';
 
         document.getElementById('hex-derived').innerHTML =
-            `d=${spec.d} mm, P=${spec.P} mm, As=<strong style="color:var(--primary-color)">${spec.As}</strong> mm²　｜　標準 S=${spec.S} mm　｜　${dhNote}　｜　GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}`;
+            `d=${spec.d} mm, As=<strong style="color:var(--primary-color)">${spec.As}</strong> mm²　｜　標準 S=${spec.S} mm　｜　${dhNote}　｜　GBT 16823-1 Ab/As 參考值 = ${spec.refRatio}`;
 
-        if (!S) {
+        if (!s) {
             document.getElementById('hex-status').innerHTML = `<div class="status-bar neutral">請輸入對邊寬度 S</div>`;
             document.getElementById('hex-result').innerHTML = '';
             document.getElementById('hex-tip').innerHTML = '';
             return;
         }
 
-        // Ab1：取表 dh
-        const hasAb1 = dhT > 0;
-        const Ab1    = hasAb1 ? round(0.866 * S * S - Math.PI / 4 * dhT * dhT, 2) : null;
-        const ratio1 = Ab1 !== null ? round(Ab1 / spec.As, 2) : null;
-        const ok1    = ratio1 !== null ? ratio1 >= spec.refRatio : null;
+        let data;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(`${API_BASE_URL}/api/screw-bearing-area/hex`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ specName, fit, s, dhManual })
+            });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            data = await res.json();
+            setApiStatus('ok');
+        } catch (err) {
+            console.error('screw-bearing-area/hex API 失敗', err);
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+            return;
+        }
 
-        // Ab2：手動 dh
-        const hasAb2 = dhM > 0;
-        const Ab2    = hasAb2 ? round(0.866 * S * S - Math.PI / 4 * dhM * dhM, 2) : null;
-        const ratio2 = Ab2 !== null ? round(Ab2 / spec.As, 2) : null;
-        const ok2    = ratio2 !== null ? ratio2 >= spec.refRatio : null;
-
-        // 整體狀態
-        const anyNG  = (ok1 === false) || (ok2 === false);
-        const allOK  = (ok1 !== false) && (ok2 !== false) && (ok1 || ok2);
+        const dhT = data.dhTable;
+        const anyNG = (data.ok1 === false) || (data.ok2 === false);
+        const allOK = (data.ok1 !== false) && (data.ok2 !== false) && (data.ok1 || data.ok2);
         const statusClass = anyNG ? 'warn' : (allOK ? 'ok' : 'neutral');
-        const statusText  = anyNG ? '✗ NG — Ab/As 未達標準參考值' : (allOK ? '✓ OK — Ab/As 達標' : '請輸入通孔直徑 dh');
-        document.getElementById('hex-status').innerHTML =
-            `<div class="status-bar ${statusClass}">${statusText}</div>`;
+        const statusText = anyNG ? '✗ NG — Ab/As 未達標準參考值' : (allOK ? '✓ OK — Ab/As 達標' : '請輸入通孔直徑 dh');
+        document.getElementById('hex-status').innerHTML = `<div class="status-bar ${statusClass}">${statusText}</div>`;
 
-        // result items
-        const ab1HTML = Ab1 !== null ? `
-            <div class="result-item highlight"><div class="label">Ab1（dh 取表）</div><div class="value">${Ab1}</div><div class="unit">mm²</div></div>
-            <div class="result-item ${ok1 ? '' : 'warn'}"><div class="label">Ab1/As　dh取表判定</div><div class="value">${ratio1}</div><div class="unit">${ok1 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
+        const ab1HTML = data.ab1 !== null ? `
+            <div class="result-item highlight"><div class="label">Ab1（dh 取表）</div><div class="value">${data.ab1}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${data.ok1 ? '' : 'warn'}"><div class="label">Ab1/As　dh取表判定</div><div class="value">${data.ratio1}</div><div class="unit">${data.ok1 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
         ` : `
             <div class="result-item"><div class="label">Ab1（dh 取表）</div><div class="value">—</div><div class="unit">dh 取表無資料</div></div>
             <div class="result-item"><div class="label">Ab1/As　dh取表判定</div><div class="value">—</div><div class="unit"></div></div>
         `;
-        const ab2HTML = Ab2 !== null ? `
-            <div class="result-item highlight"><div class="label">Ab2（dh 手動）</div><div class="value">${Ab2}</div><div class="unit">mm²</div></div>
-            <div class="result-item ${ok2 ? '' : 'warn'}"><div class="label">Ab2/As　dh手動判定</div><div class="value">${ratio2}</div><div class="unit">${ok2 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
+        const ab2HTML = data.ab2 !== null ? `
+            <div class="result-item highlight"><div class="label">Ab2（dh 手動）</div><div class="value">${data.ab2}</div><div class="unit">mm²</div></div>
+            <div class="result-item ${data.ok2 ? '' : 'warn'}"><div class="label">Ab2/As　dh手動判定</div><div class="value">${data.ratio2}</div><div class="unit">${data.ok2 ? '✓ OK' : '✗ NG'}（參考 ${spec.refRatio}）</div></div>
         ` : `
             <div class="result-item"><div class="label">Ab2（dh 手動）</div><div class="value">—</div><div class="unit">請輸入 dh 手動值</div></div>
             <div class="result-item"><div class="label">Ab2/As　dh手動判定</div><div class="value">—</div><div class="unit"></div></div>
@@ -561,14 +554,14 @@
         document.getElementById('hex-result').innerHTML = `
             <div class="result-item"><div class="label">應力面積 As</div><div class="value">${spec.As}</div><div class="unit">mm²</div></div>
             <div class="result-item"><div class="label">dh 取表建議值</div><div class="value">${dhT || '—'}</div><div class="unit">mm</div></div>
-            <div class="result-item"><div class="label">dh 手動輸入</div><div class="value">${dhM || '—'}</div><div class="unit">mm</div></div>
-            <div class="result-item"><div class="label">對邊寬度 S</div><div class="value">${S}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">dh 手動輸入</div><div class="value">${dhManual || '—'}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">對邊寬度 S</div><div class="value">${s}</div><div class="unit">mm</div></div>
             ${ab1HTML}
             ${ab2HTML}
         `;
 
-        const line1 = Ab1 !== null ? `Ab1 = 0.866 × ${S}² − π/4 × ${dhT}² = <strong>${Ab1}</strong> mm²　→　Ab1/As = ${ratio1}　${ok1 ? '✓ OK' : '✗ NG'}<br>` : '';
-        const line2 = Ab2 !== null ? `Ab2 = 0.866 × ${S}² − π/4 × ${dhM}² = <strong>${Ab2}</strong> mm²　→　Ab2/As = ${ratio2}　${ok2 ? '✓ OK' : '✗ NG'}<br>` : '';
+        const line1 = data.ab1 !== null ? `Ab1 = 0.866 × ${s}² − π/4 × ${dhT}² = <strong>${data.ab1}</strong> mm²　→　Ab1/As = ${data.ratio1}　${data.ok1 ? '✓ OK' : '✗ NG'}<br>` : '';
+        const line2 = data.ab2 !== null ? `Ab2 = 0.866 × ${s}² − π/4 × ${dhManual}² = <strong>${data.ab2}</strong> mm²　→　Ab2/As = ${data.ratio2}　${data.ok2 ? '✓ OK' : '✗ NG'}<br>` : '';
         document.getElementById('hex-tip').innerHTML = `
             <strong>📌 公式</strong>　Ab = 0.866 × S² − π/4 × dh²　　判定：Ab/As ≥ ${spec.refRatio} → OK，否則 → NG<br>
             ${line1}${line2}
@@ -577,8 +570,7 @@
     }
 
     // 初始化
-    onPanSpecChange();
-    onHexSpecChange();
+    loadTables();
     </script>
 </body>
 </html>

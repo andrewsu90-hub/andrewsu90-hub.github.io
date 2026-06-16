@@ -129,6 +129,10 @@
 
   @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .api-status.loading { background: #fdfae6; color: #d35400; }
+  .api-status.error { background: #fdf3f2; color: #c0392b; }
 </style>
 </head>
 <body>
@@ -355,87 +359,26 @@
 
 </section><!-- end .calc-section -->
 
+<div class="api-status" id="api-status" style="display:none;">計算中...</div>
+
 <script>
 /* =========================================================
-   資料（擷取自原 Excel 鎖定欄位）
+   計算邏輯已搬到伺服器端，前端只送輸入、收結果並渲染
+   部署後請把這裡換成你的正式 API 網址
    ========================================================= */
-const SPEC_TABLE = {
-  "M1":{d:1,p:0.25,As:0.46},"M1.2":{d:1.2,p:0.25,As:0.732},
-  "M1.4":{d:1.4,p:0.3,As:0.983},"M1.6":{d:1.6,p:0.35,As:1.27},
-  "M2":{d:2,p:0.4,As:2.07},"M2.5":{d:2.5,p:0.45,As:3.39},
-  "M3":{d:3,p:0.5,As:5.03},"M3.5":{d:3.5,p:0.6,As:6.78},
-  "M4":{d:4,p:0.7,As:8.78},"M5":{d:5,p:0.8,As:14.2},
-  "M6":{d:6,p:1,As:20.1},"M7":{d:7,p:1,As:28.9},
-  "M8":{d:8,p:1.25,As:36.6},"M10":{d:10,p:1.5,As:58},
-  "M12":{d:12,p:1.75,As:84.3},"M16":{d:16,p:2,As:157},
-  "M18":{d:18,p:2.5,As:192}
-};
-const SPEC_LIST = Object.keys(SPEC_TABLE);
+const API_BASE_URL = "https://anzu-calc-api.onrender.com";
 
-const GROUP_CATEGORY = {
-  "A1":"奧氏體","A2":"奧氏體","A3":"奧氏體","A4":"奧氏體","A5":"奧氏體",
-  "C1":"馬氏體","C3":"馬氏體","C4":"馬氏體","F1":"鐵素體"
-};
-const GROUP_LIST = Object.keys(GROUP_CATEGORY);
-
-const CLASS_LIST = [45,50,60,70,80,110];
-
-const STRESS_TABLE = {
-  "A1|50":210,"A2|50":210,"A3|50":210,"A4|50":210,"A5|50":210,
-  "A1|70":450,"A2|70":450,"A3|70":450,"A4|70":450,"A5|70":450,
-  "A1|80":600,"A2|80":600,"A3|80":600,"A4|80":600,"A5|80":600,
-  "C1|50":250,"C1|70":410,"C1|110":820,
-  "C3|80":640,"C4|50":250,"C4|70":410,
-  "F1|45":250,"F1|60":410
-};
-
-const BREAK_TORQUE = {
-  "M1.6":{50:0.15,70:0.2,80:0.24},"M2":{50:0.3,70:0.4,80:0.48},
-  "M2.5":{50:0.6,70:0.9,80:0.96},"M3":{50:1.1,70:1.6,80:1.8},
-  "M4":{50:2.7,70:3.8,80:4.3},"M5":{50:5.5,70:7.8,80:8.8},
-  "M6":{50:9.3,70:13,80:15},"M8":{50:23,70:32,80:37},
-  "M10":{50:46,70:65,80:74},"M12":{50:80,70:110,80:130},
-  "M16":{50:210,70:290,80:330}
-};
-
-const FF_LABEL = {0.7:"使用一般係數",0.65:"自定義係數",0.6:"使用 TONE 係數"};
-const FF_LIST  = [0.7,0.65,0.6];
-const SAFETY_LIST = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1];
-const Q_LIST     = [1.25,1.4,1.6,1.8];
-const SURFACE_LIST = ["鋼螺栓染黑處理油潤滑","鋼螺栓染黑處理無潤滑"];
-const MATERIAL_LIST = [
-  "AL-AL","AL-FC","AL-S10C","AL-SCM","AL-SUS",
-  "FC-AL","FC-FC","FC-S10C","FC-SCM","FC-SUS",
-  "S10C-AL","S10C-FC","S10C-S10C","S10C-SCM","S10C-SUS",
-  "SCM-AL","SCM-FC","SCM-S10C","SCM-SCM","SCM-SUS",
-  "SUS-AL","SUS-FC","SUS-S10C","SUS-SCM","SUS-SUS"
-];
-
-const K_TABLE = {
-  "鋼螺栓染黑處理油潤滑|SCM-FC":0.145,"鋼螺栓染黑處理油潤滑|FC-FC":0.145,"鋼螺栓染黑處理油潤滑|SUS-FC":0.145,
-  "鋼螺栓染黑處理油潤滑|S10C-FC":0.155,"鋼螺栓染黑處理油潤滑|SCM-S10C":0.155,"鋼螺栓染黑處理油潤滑|SCM-SCM":0.155,
-  "鋼螺栓染黑處理油潤滑|FC-S10C":0.155,"鋼螺栓染黑處理油潤滑|FC-SCM":0.155,
-  "鋼螺栓染黑處理油潤滑|SCM-SUS":0.165,"鋼螺栓染黑處理油潤滑|FC-SUS":0.165,"鋼螺栓染黑處理油潤滑|AL-FC":0.165,
-  "鋼螺栓染黑處理油潤滑|SUS-S10C":0.165,"鋼螺栓染黑處理油潤滑|SUS-SCM":0.165,"鋼螺栓染黑處理油潤滑|SUS-SUS":0.165,
-  "鋼螺栓染黑處理油潤滑|S10C-S10C":0.175,"鋼螺栓染黑處理油潤滑|S10C-SCM":0.175,"鋼螺栓染黑處理油潤滑|S10C-SUS":0.175,
-  "鋼螺栓染黑處理油潤滑|AL-S10C":0.175,"鋼螺栓染黑處理油潤滑|AL-SCM":0.175,
-  "鋼螺栓染黑處理油潤滑|SCM-AL":0.185,"鋼螺栓染黑處理油潤滑|FC-AL":0.185,"鋼螺栓染黑處理油潤滑|AL-SUS":0.185,
-  "鋼螺栓染黑處理油潤滑|S10C-AL":0.195,"鋼螺栓染黑處理油潤滑|SUS-AL":0.195,
-  "鋼螺栓染黑處理油潤滑|AL-AL":0.215,
-  "鋼螺栓染黑處理無潤滑|S10C-FC":0.25,"鋼螺栓染黑處理無潤滑|SCM-FC":0.25,"鋼螺栓染黑處理無潤滑|FC-FC":0.25,
-  "鋼螺栓染黑處理無潤滑|S10C-SCM":0.35,"鋼螺栓染黑處理無潤滑|SCM-SCM":0.35,"鋼螺栓染黑處理無潤滑|FC-S10C":0.35,
-  "鋼螺栓染黑處理無潤滑|FC-SCM":0.35,"鋼螺栓染黑處理無潤滑|AL-FC":0.35,
-  "鋼螺栓染黑處理無潤滑|S10C-S10C":0.45,"鋼螺栓染黑處理無潤滑|SCM-S10C":0.45,
-  "鋼螺栓染黑處理無潤滑|AL-S10C":0.45,"鋼螺栓染黑處理無潤滑|AL-SCM":0.45,
-  "鋼螺栓染黑處理無潤滑|SCM-AL":0.55,"鋼螺栓染黑處理無潤滑|FC-AL":0.55,"鋼螺栓染黑處理無潤滑|AL-AL":0.55
-};
-
-/* ========================= 工具 ========================= */
 const $ = id => document.getElementById(id);
 const NA = "N/A";
 
-function r2(v){return Math.round(v*100)/100}
-function r0(v){return Math.round(v)}
+function setApiStatus(state, msg) {
+  const el = $("api-status");
+  el.style.display = 'block';
+  el.className = 'api-status' + (state ? ' ' + state : '');
+  el.textContent = msg || (state === 'loading' ? '計算中...' : state === 'error' ? '⚠ API 連線失敗' : '✓ 已連線');
+  if (state === 'ok') setTimeout(() => { el.style.display = 'none'; }, 1200);
+}
+
 function fix(v,d){return (v===null||v===undefined||isNaN(v))?NA:Number(v).toFixed(d)}
 function show(id,html){$(id).innerHTML = html}
 
@@ -449,26 +392,30 @@ function fillSelect(id,items,defVal,labelFn){
   if(defVal!==undefined) s.value=defVal;
 }
 
-/* 顯示成 stat 的主值＋單位（如已有 .u 片段則只替換數值節點） */
 function setStat(id, value, unit){
   const el = $(id);
   if(!el) return;
-  if(value===null||value===undefined||isNaN(value)){
+  if(value===null||value===undefined||(typeof value === 'number' && isNaN(value))){
     el.innerHTML = `<span style="color:var(--secondary-color);font-size:14px">${NA}</span>`;
     return;
   }
   el.innerHTML = (unit ? `${value}<span class="u">${unit}</span>` : `${value}`);
 }
 
-/* ========================= 初始化下拉 ========================= */
-fillSelect("C7", SPEC_LIST, "M3");
-fillSelect("D7", GROUP_LIST, "A2");
-fillSelect("E7", CLASS_LIST, 70);
-fillSelect("C14", FF_LIST, 0.65, v=>`${v}（${FF_LABEL[v]}）`);
-fillSelect("B27", SURFACE_LIST, "鋼螺栓染黑處理油潤滑");
-fillSelect("C27", MATERIAL_LIST, "SUS-SCM");
-fillSelect("E27", Q_LIST, 1.4);
-fillSelect("C32", SAFETY_LIST, 1);
+/* ========================= 初始化下拉（從 API 取選項清單） ========================= */
+async function initSelects(){
+  const res = await fetch(`${API_BASE_URL}/api/screw-strength/options`);
+  const opt = await res.json();
+
+  fillSelect("C7", opt.specs, "M3");
+  fillSelect("D7", opt.groups, "A2");
+  fillSelect("E7", opt.classes, 70);
+  fillSelect("C14", opt.ffList.map(o=>o.value), 0.65, v => opt.ffList.find(o=>o.value===v).label);
+  fillSelect("B27", opt.surfaceList, "鋼螺栓染黑處理油潤滑");
+  fillSelect("C27", opt.materialList, "SUS-SCM");
+  fillSelect("E27", opt.qList, 1.4);
+  fillSelect("C32", opt.safetyList, 1);
+}
 
 /* ========================= Tabs ========================= */
 document.querySelectorAll(".tab").forEach(tab=>{
@@ -481,95 +428,78 @@ document.querySelectorAll(".tab").forEach(tab=>{
   });
 });
 
-/* ========================= 計算 ========================= */
-function calc(){
+/* ========================= 計算（呼叫 API） ========================= */
+async function calc(){
   const spec = $("C7").value;
   const group = $("D7").value;
   const cls = Number($("E7").value);
   const ffk = Number($("C14").value);
-
-  const row = SPEC_TABLE[spec];
-  const d  = row ? row.d  : null;
-  const p  = row ? row.p  : null;
-  const As = row ? row.As : null;
-
-  const delta_yp = STRESS_TABLE[group+"|"+cls] ?? null;
-  const tau_yp   = delta_yp!=null ? delta_yp/2 : null;
-  const tau_kgf  = tau_yp!=null ? r0(tau_yp/9.8) : null;
-  const cat      = GROUP_CATEGORY[group] || "–";
-
-  const H9 = (d!=null && p!=null && tau_kgf!=null)
-    ? r2(3.14*d*1*p*tau_kgf/2) : null;
-
-  const E16 = (delta_yp!=null && As!=null) ? r2(ffk*delta_yp*As) : null;
-  const E17 = E16!=null ? r2(E16/9.8) : null;
-  const I9  = (E17!=null && H9) ? Math.ceil(E17/H9) : null;
-
-  const I14 = d!=null ? d/1000 : null;
-  const I15 = (E16!=null && I14!=null) ? r2(0.2*E16*I14) : null;
-  const I16 = I15!=null ? r2(I15*100/9.8) : null;
-
-  /* ---- 共用輸入區 stat ---- */
-  setStat("G9", cat);
-  setStat("F7", d!=null?d:null, "mm");
-  setStat("F9", p!=null?p:null, "mm");
-  setStat("E14", As!=null?As:null, "mm²");
-
-  /* ---- 表 1 ---- */
-  $("C15").textContent = FF_LABEL[ffk] ? `軸力係數 ${ffk}（${FF_LABEL[ffk]}）` : "–";
-  setStat("G7", delta_yp, "N/mm²");
-  setStat("H7", tau_yp, "N/mm²");
-  setStat("I7", tau_kgf, "kgf/mm²");
-  setStat("H9", H9, "kgf");
-
-  setStat("E16", E16, "N");
-  setStat("E17", E17, "kgf");
-  setStat("I9",  I9,  "齒");
-
-  setStat("H14", E16);
-  setStat("I14", I14!=null ? Number(I14.toFixed(3)) : null);
-  show("I15", I15!=null ? fix(I15,2) : NA);
-  show("I16", I16!=null ? fix(I16,2) : NA);
-
-  /* ---- 表 2 ---- */
   const surface = $("B27").value;
   const matPair = $("C27").value;
-  const Q = Number($("E27").value);
-  const K = K_TABLE[surface+"|"+matPair] ?? null;
-  const F27 = delta_yp!=null ? Math.floor((delta_yp/0.98)/10) : null;
-  const H27 = d!=null ? r2(d/10) : null;
-  const I27 = (K!=null && Q && F27!=null && As!=null && H27!=null)
-    ? r2(0.35*K*(1+1/Q)*F27*As*H27) : null;
+  const q = Number($("E27").value);
+  const safety = Number($("C32").value);
 
-  setStat("D27", K);
-  setStat("F27", F27, "kgf/cm²");
-  setStat("G27", As, "mm²");
-  setStat("H27", H27, "cm");
-  show("I27", I27!=null ? fix(I27,2) : NA);
+  let data;
+  try {
+    setApiStatus('loading');
+    const res = await fetch(`${API_BASE_URL}/api/screw-strength/calc`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ spec, group, cls, ffk, surface, matPair, q, safety })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    data = await res.json();
+    setApiStatus('ok');
+  } catch (err) {
+    console.error('screw-strength API 失敗', err);
+    setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+    return;
+  }
+
+  /* ---- 共用輸入區 stat ---- */
+  setStat("G9", data.cat);
+  setStat("F7", data.d, "mm");
+  setStat("F9", data.p, "mm");
+  setStat("E14", data.as_, "mm²");
+
+  /* ---- 表 1 ---- */
+  $("C15").textContent = data.ffLabel ? `軸力係數 ${ffk}（${data.ffLabel}）` : "–";
+  setStat("G7", data.deltaYp, "N/mm²");
+  setStat("H7", data.tauYp, "N/mm²");
+  setStat("I7", data.tauKgf, "kgf/mm²");
+  setStat("H9", data.h9, "kgf");
+
+  setStat("E16", data.e16, "N");
+  setStat("E17", data.e17, "kgf");
+  setStat("I9",  data.i9,  "齒");
+
+  setStat("H14", data.e16);
+  setStat("I14", data.i14);
+  show("I15", data.i15!=null ? fix(data.i15,2) : NA);
+  show("I16", data.i16!=null ? fix(data.i16,2) : NA);
+
+  /* ---- 表 2 ---- */
+  setStat("D27", data.k);
+  setStat("F27", data.f27, "kgf/cm²");
+  setStat("G27", data.g27, "mm²");
+  setStat("H27", data.h27, "cm");
+  show("I27", data.i27!=null ? fix(data.i27,2) : NA);
 
   /* ---- 表 3 ---- */
   $("E7mirror").value = `${cls}（自共用輸入）`;
-  const safety = Number($("C32").value);
-  const B32 = (BREAK_TORQUE[spec] && BREAK_TORQUE[spec][cls]!=null)
-    ? BREAK_TORQUE[spec][cls] : null;
-  const D32 = B32!=null ? r2(B32*safety) : null;
-  const E32 = D32!=null ? r2(D32*100/9.8) : null;
-  const D35 = d!=null ? d/1000 : null;
-  const C35 = (D32!=null && D35) ? r2(D32/(0.2*D35)) : null;
-  const E34 = (C35!=null && H9) ? Math.ceil((C35/9.8)/H9) : null;
-
-  setStat("B32", B32, "N·m");
-  setStat("D32", D32, "N·m");
-  setStat("E32", E32, "kgf·cm");
-  setStat("C35", C35, "N");
-  setStat("D35", D35!=null ? Number(D35.toFixed(3)) : null);
-  show("E34", E34!=null ? String(E34) : NA);
+  setStat("B32", data.b32, "N·m");
+  setStat("D32", data.d32, "N·m");
+  setStat("E32", data.e32, "kgf·cm");
+  setStat("C35", data.c35, "N");
+  setStat("D35", data.d35);
+  show("E34", data.e34!=null ? String(data.e34) : NA);
 }
 
 ["C7","D7","E7","C14","B27","C27","E27","C32"].forEach(id=>{
   $(id).addEventListener("change", calc);
 });
-calc();
+
+initSelects().then(calc);
 </script>
 </body>
 </html>

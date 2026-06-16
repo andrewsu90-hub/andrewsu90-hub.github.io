@@ -119,6 +119,10 @@
 
   @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeInUp   { from { opacity: 0; transform: translateY(16px);  } to { opacity: 1; transform: translateY(0); } }
+
+  .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .api-status.loading { background: #fdfae6; color: #d35400; }
+  .api-status.error { background: #fdf3f2; color: #c0392b; }
 </style>
 </head>
 <body>
@@ -292,12 +296,26 @@
 
 <footer>依 IEC 62368-1 穩定性測試條件實作 · 僅供參考，實際應用請依規範驗證</footer>
 
+<div class="api-status" id="api-status" style="display:none;">計算中...</div>
+
 <script>
+  // ============================================================
+  // 穩定性公式已搬到伺服器端，前端只送輸入、收結果
+  // 部署後請把這裡換成你的正式 API 網址，例如 "https://anzu-calc-api.onrender.com"
+  // ============================================================
+  const API_BASE_URL = "https://anzu-calc-api.onrender.com";
+
   const $ = id => document.getElementById(id);
   const NA = "–";
+  let debounceTimer = null, tiltDebounceTimer = null;
 
-  function r3(v) { return Math.round(v * 1000) / 1000; }
-  function r1(v) { return Math.round(v * 10) / 10; }
+  function setApiStatus(state, msg) {
+    const el = $("api-status");
+    el.style.display = 'block';
+    el.className = 'api-status' + (state ? ' ' + state : '');
+    el.textContent = msg || (state === 'loading' ? '計算中...' : state === 'error' ? '⚠ API 連線失敗' : '✓ 已連線');
+    if (state === 'ok') setTimeout(() => { el.style.display = 'none'; }, 1200);
+  }
 
   function setStat(id, value, unit) {
     const el = $(id);
@@ -309,8 +327,73 @@
     el.innerHTML = unit ? `${value}<span class="u">${unit}</span>` : `${value}`;
   }
 
-  // 傾覆角度判斷：單一輸入，三段閾值
-  function calcTilt() {
+  function renderDir(dir, r) {
+    if (!r) {
+      setStat(`r-${dir}-d`,  null);
+      setStat(`r-${dir}-ms`, null);
+      setStat(`r-${dir}-mt`, null);
+      setStat(`r-${dir}-k`,  null);
+      $(`card-${dir}-verdict`).className = "stat dim";
+      setStat(`verdict-${dir}`, null);
+      return;
+    }
+    setStat(`r-${dir}-d`,  r.d,  "cm");
+    setStat(`r-${dir}-ms`, r.ms, "N·cm");
+    setStat(`r-${dir}-mt`, r.mt, "N·cm");
+    setStat(`r-${dir}-k`,  r.k);
+
+    const vEl = $(`card-${dir}-verdict`);
+    if (r.pass) {
+      vEl.className = "stat final";
+      $(`verdict-${dir}`).innerHTML = `OK <span class="u" style="color:var(--ok);font-weight:700;margin-left:6px;">穩定</span>`;
+    } else {
+      vEl.className = "stat fail";
+      $(`verdict-${dir}`).innerHTML = `NG <span class="u" style="color:var(--warn);font-weight:700;margin-left:6px;">有傾倒風險</span>`;
+    }
+  }
+
+  async function calc() {
+    const weightKg = parseFloat($("weight_kg").value);
+    const heightCm = parseFloat($("height_cm").value);
+    const cgFront  = parseFloat($("cg_front").value);
+    const cgBack   = parseFloat($("cg_back").value);
+
+    if (![weightKg, heightCm, cgFront, cgBack].every(isFinite)) {
+      setStat("sum-w", null); setStat("sum-f-raw", null); setStat("sum-f", null); setStat("sum-h", null);
+      $("param-f").textContent = "–";
+      renderDir("front", null);
+      renderDir("back", null);
+      return;
+    }
+
+    let data;
+    try {
+      setApiStatus('loading');
+      const res = await fetch(`${API_BASE_URL}/api/stand-stability`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weightKg, heightCm, cgFront, cgBack })
+      });
+      if (!res.ok) throw new Error('API error ' + res.status);
+      data = await res.json();
+      setApiStatus('ok');
+    } catch (err) {
+      console.error('stand-stability API 失敗', err);
+      setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+      return;
+    }
+
+    setStat("sum-w", data.w, "N");
+    setStat("sum-f-raw", data.fRaw, "N");
+    setStat("sum-f", data.f, "N");
+    setStat("sum-h", data.h, "cm");
+    $("param-f").textContent = data.f + " N";
+
+    renderDir("front", data.front);
+    renderDir("back", data.back);
+  }
+
+  async function calcTilt() {
     const angle = parseFloat($("max_tilt_design").value);
     const vEl   = $("card-tilt-verdict");
 
@@ -320,10 +403,24 @@
       return;
     }
 
-    if (angle >= 15) {
+    let data;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/stand-stability/tilt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ angle })
+      });
+      if (!res.ok) throw new Error('API error ' + res.status);
+      data = await res.json();
+    } catch (err) {
+      console.error('tilt API 失敗', err);
+      return;
+    }
+
+    if (data.verdict === "safe") {
       vEl.className = "stat final";
       $("verdict-tilt").innerHTML = `OK <span class="u" style="color:var(--ok);font-weight:700;margin-left:6px;">安全</span>`;
-    } else if (angle > 10) {
+    } else if (data.verdict === "caution") {
       vEl.className = "stat caution";
       $("verdict-tilt").innerHTML = `⚠ <span class="u" style="color:var(--caution);font-weight:700;margin-left:6px;">警告</span>`;
     } else {
@@ -332,68 +429,17 @@
     }
   }
 
-  // 穩定性計算（g 與 F 硬編碼，不讀取 disabled 欄位）
-  function calc() {
-    const wkg = parseFloat($("weight_kg").value);
-    const h   = parseFloat($("height_cm").value);
-    const cf  = parseFloat($("cg_front").value);
-    const cb  = parseFloat($("cg_back").value);
-    const g   = 9.81;
-    const fc  = 250;
-
-    const W     = isFinite(wkg) ? wkg * g : NaN;
-    const F_raw = isFinite(W)   ? W * 0.2 : NaN;
-    const F     = isFinite(F_raw) ? Math.min(F_raw, fc) : NaN;
-
-    setStat("sum-w",     isFinite(W)     ? r1(W)     : null, "N");
-    setStat("sum-f-raw", isFinite(F_raw) ? r1(F_raw) : null, "N");
-    setStat("sum-f",     isFinite(F)     ? r1(F)     : null, "N");
-    setStat("sum-h",     isFinite(h)     ? h         : null, "cm");
-
-    // 計算參數區 — 施力顯示
-    const paramF = $("param-f");
-    if (paramF) paramF.textContent = isFinite(F) ? r1(F) + " N" : "–";
-
-    calcDir(cf, h, W, F, "front");
-    calcDir(cb, h, W, F, "back");
+  function debouncedCalc() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(calc, 250);
+  }
+  function debouncedTilt() {
+    clearTimeout(tiltDebounceTimer);
+    tiltDebounceTimer = setTimeout(calcTilt, 250);
   }
 
-  function calcDir(cg, h, W, F, dir) {
-    const has = isFinite(cg) && isFinite(h) && isFinite(W) && isFinite(F) && F > 0;
-    if (!has) {
-      setStat(`r-${dir}-d`,  null);
-      setStat(`r-${dir}-ms`, null);
-      setStat(`r-${dir}-mt`, null);
-      setStat(`r-${dir}-k`,  null);
-      $(`card-${dir}-verdict`).className = "stat dim";
-      setStat(`verdict-${dir}`, null);
-      return;
-    }
-    const Ms   = W * cg;
-    const Mt   = F * h;
-    const K    = Ms / Mt;
-    const pass = K >= 1;
-
-    setStat(`r-${dir}-d`,  cg,     "cm");
-    setStat(`r-${dir}-ms`, r1(Ms), "N·cm");
-    setStat(`r-${dir}-mt`, r1(Mt), "N·cm");
-    setStat(`r-${dir}-k`,  r3(K));
-
-    const vEl = $(`card-${dir}-verdict`);
-    if (pass) {
-      vEl.className = "stat final";
-      $(`verdict-${dir}`).innerHTML = `OK <span class="u" style="color:var(--ok);font-weight:700;margin-left:6px;">穩定</span>`;
-    } else {
-      vEl.className = "stat fail";
-      $(`verdict-${dir}`).innerHTML = `NG <span class="u" style="color:var(--warn);font-weight:700;margin-left:6px;">有傾倒風險</span>`;
-    }
-  }
-
-  ["weight_kg","height_cm","cg_front","cg_back"].forEach(id => $(id).addEventListener("input", calc));
-  $("max_tilt_design").addEventListener("input", calcTilt);
-
-  calc();
-  calcTilt();
+  ["weight_kg","height_cm","cg_front","cg_back"].forEach(id => $(id).addEventListener("input", debouncedCalc));
+  $("max_tilt_design").addEventListener("input", debouncedTilt);
 </script>
 </body>
 </html>

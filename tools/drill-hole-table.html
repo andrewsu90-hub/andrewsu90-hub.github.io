@@ -118,6 +118,10 @@
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 600px) { .selector-grid { grid-template-columns: 1fr 1fr; } .result-grid { grid-template-columns: 1fr 1fr; } }
+
+        .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .api-status.loading { background: #fdfae6; color: #d35400; }
+        .api-status.error { background: #fdf3f2; color: #c0392b; }
     </style>
 </head>
 <body>
@@ -304,7 +308,23 @@
         <p>&copy; 2026 Anzû Mechanical & Product Design Studio. All rights reserved.</p>
     </footer>
 
+    <div class="api-status" id="api-status" style="display:none;">計算中...</div>
+
     <script>
+    // ============================================================
+    // 查表 / 計算邏輯已搬到伺服器端，前端只送查詢條件、收結果並渲染
+    // 部署後請把這裡換成你的正式 API 網址，例如 "https://anzu-calc-api.onrender.com"
+    // ============================================================
+    const API_BASE_URL = "https://anzu-calc-api.onrender.com";
+
+    function setApiStatus(state, msg) {
+        const el = document.getElementById('api-status');
+        el.style.display = 'block';
+        el.className = 'api-status' + (state ? ' ' + state : '');
+        el.textContent = msg || (state === 'loading' ? '計算中...' : state === 'error' ? '⚠ API 連線失敗' : '✓ 已連線');
+        if (state === 'ok') setTimeout(() => { el.style.display = 'none'; }, 1200);
+    }
+
     /* ── Source tab switching ── */
     function switchSource(idx) {
         document.querySelectorAll('.source-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
@@ -314,51 +334,55 @@
     /* ══════════════════════════════════════════
        SOURCE 0 ── 機械設計圖表便覽
     ══════════════════════════════════════════ */
-    const data0 = [
-        { spec: 'M3',   hole: 2.4,  steel_tap: 3,   steel_drill: 6,   ci_tap: 4.5, ci_drill: 7.5,  al_tap: 5.5, al_drill: 8.5  },
-        { spec: 'M3.5', hole: 2.9,  steel_tap: 3.5, steel_drill: 6.5, ci_tap: 5.5, ci_drill: 8.5,  al_tap: 6.5, al_drill: 9.5  },
-        { spec: 'M4',   hole: 3.25, steel_tap: 4,   steel_drill: 7,   ci_tap: 6,   ci_drill: 9,    al_tap: 7,   al_drill: 10   },
-        { spec: 'M4.5', hole: 3.75, steel_tap: 4.5, steel_drill: 7.5, ci_tap: 7,   ci_drill: 10,   al_tap: 8,   al_drill: 11   },
-        { spec: 'M5',   hole: 4.1,  steel_tap: 5,   steel_drill: 8.5, ci_tap: 8,   ci_drill: 11.5, al_tap: 9,   al_drill: 12.5 },
-        { spec: 'M5.5', hole: 4.6,  steel_tap: 5.5, steel_drill: 9,   ci_tap: 8,   ci_drill: 11.5, al_tap: 10,  al_drill: 13.5 },
-        { spec: 'M6',   hole: 5,    steel_tap: 6,   steel_drill: 10,  ci_tap: 9,   ci_drill: 13,   al_tap: 11,  al_drill: 15   },
-        { spec: 'M7',   hole: 6,    steel_tap: 7,   steel_drill: 11,  ci_tap: 11,  ci_drill: 15,   al_tap: 13,  al_drill: 17   },
-    ];
-    const matMultiplier0 = { '鋼': 1, '鑄鐵': 1.5, '鋁': 1.83 };
-
-    // Build table
-    (function() {
-        const tbody = document.getElementById('s0-tbody');
-        data0.forEach(row => {
-            const tr = document.createElement('tr');
-            tr.id = 's0-row-' + row.spec;
-            tr.innerHTML = `<td>${row.spec}</td><td>${row.hole}</td><td>${row.steel_tap}</td><td>${row.steel_drill}</td><td>${row.ci_tap}</td><td>${row.ci_drill}</td><td>${row.al_tap}</td><td>${row.al_drill}</td>`;
-            tbody.appendChild(tr);
-        });
+    (async function loadTable0() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/drill-hole/table0`);
+            const data = await res.json();
+            const tbody = document.getElementById('s0-tbody');
+            data.rows.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.id = 's0-row-' + row.spec;
+                tr.innerHTML = `<td>${row.spec}</td><td>${row.hole}</td><td>${row.steel_tap}</td><td>${row.steel_drill}</td><td>${row.ci_tap}</td><td>${row.ci_drill}</td><td>${row.al_tap}</td><td>${row.al_drill}</td>`;
+                tbody.appendChild(tr);
+            });
+        } catch (err) {
+            console.error('載入表格0失敗', err);
+        }
     })();
 
-    function query0() {
+    async function query0() {
         const spec = document.getElementById('s0-spec').value;
         const mat  = document.getElementById('s0-mat').value;
         document.querySelectorAll('#s0-tbody tr').forEach(r => r.classList.remove('highlighted'));
         if (!spec) { document.getElementById('s0-result').classList.remove('visible'); return; }
-        const row = data0.find(d => d.spec === spec);
-        if (!row) return;
-        const d = parseFloat(spec.replace('M', ''));
-        const engageDepth = parseFloat((d * matMultiplier0[mat]).toFixed(2));
-        let tapDepth, drillDepth;
-        if (mat === '鋼')       { tapDepth = row.steel_tap; drillDepth = row.steel_drill; }
-        else if (mat === '鑄鐵') { tapDepth = row.ci_tap;   drillDepth = row.ci_drill;   }
-        else                    { tapDepth = row.al_tap;   drillDepth = row.al_drill;   }
+
+        let data;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(`${API_BASE_URL}/api/drill-hole/source0`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ spec, mat })
+            });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            data = await res.json();
+            setApiStatus('ok');
+        } catch (err) {
+            console.error('query0 API 失敗', err);
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+            return;
+        }
+        if (!data.found) return;
+
         document.getElementById('s0-result-grid').innerHTML = `
-            <div class="result-item highlight"><div class="label">底孔直徑</div><div class="value">${row.hole}</div><div class="unit">mm</div></div>
-            <div class="result-item"><div class="label">攻牙深度</div><div class="value">${tapDepth}</div><div class="unit">mm</div></div>
-            <div class="result-item"><div class="label">鑽孔深度</div><div class="value">${drillDepth}</div><div class="unit">mm</div></div>
-            <div class="result-item"><div class="label">建議旋入深度</div><div class="value">${engageDepth}</div><div class="unit">mm（${spec} × ${matMultiplier0[mat]}）</div></div>`;
+            <div class="result-item highlight"><div class="label">底孔直徑</div><div class="value">${data.hole}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">攻牙深度</div><div class="value">${data.tap}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">鑽孔深度</div><div class="value">${data.drill}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">建議旋入深度</div><div class="value">${data.engage}</div><div class="unit">mm（${spec} × ${data.multiplier}）</div></div>`;
         document.getElementById('s0-tip').innerHTML = `
             <strong>📌 使用提示</strong><br>
-            螺絲長度 = 旋入深度（${engageDepth} mm）+ 機構板材厚度<br>
-            鑽孔深度（${drillDepth} mm）已含攻牙底部餘量，盲孔務必鑽至此深度再攻牙。<br>
+            螺絲長度 = 旋入深度（${data.engage} mm）+ 機構板材厚度<br>
+            鑽孔深度（${data.drill} mm）已含攻牙底部餘量，盲孔務必鑽至此深度再攻牙。<br>
             機械設計圖表便覽沒有建議的旋入深度尺寸。<br>
             以攻牙深度推算鋼類d×1倍，鑄鐵d×1.5倍，鋁d×1.83倍作為螺絲旋入深度的參考值。<br>
             青銅、鑄鋼、青銅鑄件等同鋼材質。`;
@@ -370,16 +394,6 @@
     /* ══════════════════════════════════════════
        SOURCE 1 ── 現代機械設計手冊
     ══════════════════════════════════════════ */
-    const data1 = [
-        { spec:'M3',  st:4,   sbe:3,  sbt:4,  sbd:7,  ct:6,  cbe:5,  cbt:6,  cbd:9,  at:8,  abe:6,  abt:7,  abd:10 },
-        { spec:'M4',  st:5.5, sbe:4,  sbt:5.5,sbd:9,  ct:8,  cbe:6,  cbt:7.5,cbd:11, at:10, abe:8,  abt:10, abd:14 },
-        { spec:'M5',  st:7,   sbe:5,  sbt:7,  sbd:11, ct:10, cbe:8,  cbt:10, cbd:14, at:12, abe:10, abt:12, abd:16 },
-        { spec:'M6',  st:8,   sbe:6,  sbt:8,  sbd:13, ct:12, cbe:10, cbt:12, cbd:17, at:15, abe:12, abt:15, abd:20 },
-        { spec:'M8',  st:10,  sbe:8,  sbt:10, sbd:16, ct:15, cbe:12, cbt:14, cbd:20, at:20, abe:16, abt:18, abd:24 },
-        { spec:'M10', st:12,  sbe:10, sbt:13, sbd:20, ct:18, cbe:15, cbt:18, cbd:25, at:24, abe:20, abt:23, abd:30 },
-        { spec:'M12', st:15,  sbe:12, sbt:15, sbd:24, ct:22, cbe:18, cbt:21, cbd:30, at:28, abe:24, abt:27, abd:36 },
-        { spec:'M16', st:20,  sbe:16, sbt:20, sbd:30, ct:28, cbe:24, cbt:28, cbd:33, at:36, abe:32, abt:36, abd:46 },
-    ];
     let holeType1 = 'blind';
 
     function setHole1(type) {
@@ -396,38 +410,56 @@
         btn.classList.add('active');
     }
 
-    // Build tables
-    (function() {
-        function buildTable(matKey, tbodyId, getCols) {
-            const tbody = document.getElementById(tbodyId);
-            data1.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.id = 's1-row-' + matKey + '-' + row.spec;
-                tr.innerHTML = `<td>${row.spec}</td>` + getCols(row).map(v => `<td>${v}</td>`).join('');
-                tbody.appendChild(tr);
-            });
+    (async function loadTable1() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/drill-hole/table1`);
+            const data = await res.json();
+            function buildTable(matKey, tbodyId, getCols) {
+                const tbody = document.getElementById(tbodyId);
+                data.rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.id = 's1-row-' + matKey + '-' + row.spec;
+                    tr.innerHTML = `<td>${row.spec}</td>` + getCols(row).map(v => `<td>${v}</td>`).join('');
+                    tbody.appendChild(tr);
+                });
+            }
+            buildTable('steel', 's1-tbody-steel', r => [r.st, r.sbe, r.sbt, r.sbd]);
+            buildTable('ci',    's1-tbody-ci',    r => [r.ct, r.cbe, r.cbt, r.cbd]);
+            buildTable('al',    's1-tbody-al',    r => [r.at, r.abe, r.abt, r.abd]);
+        } catch (err) {
+            console.error('載入表格1失敗', err);
         }
-        buildTable('steel', 's1-tbody-steel', r => [r.st, r.sbe, r.sbt, r.sbd]);
-        buildTable('ci',    's1-tbody-ci',    r => [r.ct, r.cbe, r.cbt, r.cbd]);
-        buildTable('al',    's1-tbody-al',    r => [r.at, r.abe, r.abt, r.abd]);
     })();
 
-    function query1() {
+    async function query1() {
         const spec = document.getElementById('s1-spec').value;
         const mat  = document.getElementById('s1-mat').value;
         document.querySelectorAll('#src-1 tbody tr').forEach(r => r.classList.remove('highlighted'));
         if (!spec) { document.getElementById('s1-result').classList.remove('visible'); return; }
-        const row = data1.find(d => d.spec === spec);
-        if (!row) return;
+
+        let data;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(`${API_BASE_URL}/api/drill-hole/source1`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ spec, mat, holeType: holeType1 })
+            });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            data = await res.json();
+            setApiStatus('ok');
+        } catch (err) {
+            console.error('query1 API 失敗', err);
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+            return;
+        }
+        if (!data.found) return;
+
         const isThrough = (holeType1 === 'through');
-        let engage, tap, drill;
-        if (mat === 'steel')     { engage = isThrough ? row.st : row.sbe; tap = isThrough ? null : row.sbt; drill = isThrough ? null : row.sbd; }
-        else if (mat === 'ci')   { engage = isThrough ? row.ct : row.cbe; tap = isThrough ? null : row.cbt; drill = isThrough ? null : row.cbd; }
-        else                     { engage = isThrough ? row.at : row.abe; tap = isThrough ? null : row.abt; drill = isThrough ? null : row.abd; }
-        let html = `<div class="result-item highlight"><div class="label">旋入深度</div><div class="value">${engage}</div><div class="unit">mm</div></div>`;
+        let html = `<div class="result-item highlight"><div class="label">旋入深度</div><div class="value">${data.engage}</div><div class="unit">mm</div></div>`;
         if (!isThrough) {
-            html += `<div class="result-item"><div class="label">攻牙深度</div><div class="value">${tap}</div><div class="unit">mm</div></div>
-                     <div class="result-item"><div class="label">鑽孔深度</div><div class="value">${drill}</div><div class="unit">mm</div></div>`;
+            html += `<div class="result-item"><div class="label">攻牙深度</div><div class="value">${data.tap}</div><div class="unit">mm</div></div>
+                     <div class="result-item"><div class="label">鑽孔深度</div><div class="value">${data.drill}</div><div class="unit">mm</div></div>`;
         }
         document.getElementById('s1-result-grid').innerHTML = html;
         const matLabel = { steel:'鋼', ci:'鑄鐵', al:'鋁' }[mat];
@@ -435,7 +467,7 @@
         const note = isThrough ? '通孔為整段攻牙，無需計算攻牙深度與鑽孔深度。' : '鑽孔深度已含底部餘量，盲孔務必鑽至此深度再攻牙。';
         document.getElementById('s1-tip').innerHTML = `
             <strong>📌 使用提示</strong>（${spec} / ${matLabel} / ${holeLabel}）<br>
-            螺絲長度 = 旋入深度（${engage} mm）+ 機構板材厚度<br>
+            螺絲長度 = 旋入深度（${data.engage} mm）+ 機構板材厚度<br>
             ${note}<br>
             推算：鋼類 d×1 倍，鑄鐵 d×1.67 倍，鋁 d×2 倍。<br>
             青銅、鑄鋼、青銅鑄件等同鋼材質。`;

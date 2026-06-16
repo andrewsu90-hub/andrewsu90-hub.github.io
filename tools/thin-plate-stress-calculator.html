@@ -36,7 +36,6 @@
     line-height: 1.6; -webkit-font-smoothing: antialiased; font-size: 14px;
   }
 
-  /* ---------- Header ---------- */
   header {
     position: sticky; top: 0; z-index: 100;
     display: flex; justify-content: space-between; align-items: center;
@@ -48,30 +47,25 @@
   .back-link { font-size: 14px; color: var(--secondary-color); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
   .back-link:hover { color: var(--primary-color); }
 
-  /* ---------- Hero ---------- */
   .hero { padding: 4rem 5% 2rem; max-width: 1200px; margin: 0 auto; animation: fadeInDown 0.6s ease; }
   .hero-label { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.75rem; }
   .hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
   .hero p { font-size: 15px; color: var(--secondary-color); line-height: 1.8; }
   .source-note { display: inline-block; margin-top: 0.75rem; font-size: 12px; color: var(--secondary-color); background-color: var(--bg-light); border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 4px 12px; }
 
-  /* ---------- Calc Section ---------- */
   .calc-section { padding: 1rem 5% 5rem; max-width: 1200px; margin: 0 auto; animation: fadeInUp 0.7s ease; }
 
-  /* ---------- Tabs ---------- */
   .tabs { display: flex; gap: 4px; margin-bottom: 1rem; border-bottom: 0.5px solid var(--border-color); overflow-x: auto; scrollbar-width: thin; }
   .tab { padding: 10px 16px; border: none; background: transparent; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--secondary-color); border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; user-select: none; }
   .tab:hover { color: var(--primary-color); }
   .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
 
-  /* ---------- Card ---------- */
   .card { background-color: var(--bg-light); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); margin-bottom: 1rem; overflow: hidden; }
   .card-head { padding: 14px 18px; border-bottom: 0.5px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .card-head h3 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: .2px; display: flex; align-items: center; gap: 8px;}
   .card-head .meta { color: var(--secondary-color); font-size: 12.5px; }
   .card-body { padding: 16px 18px; }
 
-  /* ---------- Grids ---------- */
   .grid { display: grid; gap: 14px; }
   .g-4 { grid-template-columns: repeat(4,minmax(0,1fr)); }
   .g-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
@@ -79,7 +73,6 @@
   @media (max-width:1000px){.g-4{grid-template-columns:repeat(2,minmax(0,1fr))}.g-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media (max-width:560px){.g-4,.g-3,.g-2{grid-template-columns:1fr}}
 
-  /* ---------- Input Field ---------- */
   .field label { display: block; font-size: 12px; font-weight: 600; color: var(--secondary-color); margin-bottom: 6px; letter-spacing: 0.3px; }
   .field select, .field input {
     width: 100%; padding: 9px 12px;
@@ -95,7 +88,6 @@
   .field select:focus, .field input:focus { outline: none; border-color: var(--primary-color); }
   .field .hint { font-size: 11px; color: var(--secondary-color); margin-top: 4px; }
 
-  /* ---------- Result Stat ---------- */
   .stat { background: var(--bg-white); border: 0.5px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 14px; min-height: 72px; display: flex; flex-direction: column; justify-content: center; }
   .stat.accent { background: var(--brand-50); border-color: var(--brand-100); }
   .stat .k { color: var(--secondary-color); font-size: 11.5px; font-weight: 600; margin-bottom: 4px; letter-spacing: .3px; }
@@ -111,7 +103,6 @@
     .stat.warn { background: rgba(239,83,80,0.1); border-color: rgba(239,83,80,0.3); }
   }
 
-  /* ---------- Table for thin plate ---------- */
   table.calc, table.coeff { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0; background: var(--bg-white); }
   table.calc th, table.coeff th { background: var(--table-header); padding: 8px 10px; text-align: center; font-weight: 600; border: 0.5px solid var(--border-color); color: var(--primary-color); }
   table.calc td, table.coeff td { padding: 8px 10px; text-align: center; border: 0.5px solid var(--border-color); }
@@ -121,7 +112,6 @@
   table.calc td.stress { color: var(--warn); }
   table.calc td.ok { color: var(--ok); }
 
-  /* ---------- Badges ---------- */
   .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--bg-light); color: var(--secondary-color); border: 0.5px solid var(--border-color); font-size: 11.5px; font-weight: 600; letter-spacing: .3px; }
   .badge.clamp { background-color: rgba(142, 68, 173, 0.1); color: #8e44ad; border-color: rgba(142, 68, 173, 0.3); }
   .badge.mixed { background-color: rgba(230, 126, 34, 0.1); color: #e67e22; border-color: rgba(230, 126, 34, 0.3); }
@@ -140,7 +130,6 @@
   .row-line { height: 1px; background: var(--border-color); margin: 12px 0; }
   .section-divider { height: 1px; background: var(--border-color); margin: 36px 0 24px; border: none; }
 
-  /* ---------- Boundary condition reference ---------- */
   .bc-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; }
   @media (max-width:900px){ .bc-grid{ grid-template-columns: repeat(2,minmax(0,1fr)); } }
   @media (max-width:520px){ .bc-grid{ grid-template-columns: 1fr; } }
@@ -158,12 +147,18 @@
 
   @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  
+
   .btn-text { background:none; border:none; color:var(--secondary-color); font-size:11.5px; cursor:pointer; text-decoration:underline; font-family:inherit; transition: color 0.2s;}
   .btn-text:hover { color:var(--primary-color); }
+
+  .api-status { position: fixed; bottom: 16px; right: 16px; z-index: 999; font-size: 11px; padding: 5px 10px; border-radius: 20px; background: var(--bg-light); border: 0.5px solid var(--border-color); color: var(--secondary-color); }
+  .api-status.loading { color: var(--secondary-color); }
+  .api-status.error { color: var(--warn); border-color: var(--warn); }
 </style>
 </head>
 <body>
+
+<div class="api-status" id="api-status">連線中...</div>
 
 <header>
     <a href="../index.html" class="logo"> Anzû Design Studio</a>
@@ -196,12 +191,7 @@
       <div class="grid g-4">
         <div class="field">
           <label>材料</label>
-          <select id="material" onchange="onMaterialChange()">
-            <option value="SECC" selected>SECC (E=210000, ν=0.3)</option>
-            <option value="SUS304">SUS304 (E=193000, ν=0.29)</option>
-            <option value="AL6061">AL6061-T6 (E=68900, ν=0.33)</option>
-            <option value="CUSTOM">自訂</option>
-          </select>
+          <select id="material" onchange="onMaterialChange()"></select>
         </div>
         <div class="field">
           <label>E 彈性係數 (N/mm²)</label>
@@ -250,7 +240,7 @@
           <select id="loadType" onchange="calc()"></select>
           <div class="hint">a：整個板面均佈載荷；b：中心小圓面集中力（因理論收斂限制，僅對稱之案例 1、8 提供集中力查表）</div>
         </div>
-        
+
         <div class="field" id="rcField" style="display:none">
           <label style="display:flex; justify-content:space-between; align-items:center;">
             <span>rc 接觸半徑 (mm)</span>
@@ -258,7 +248,7 @@
           </label>
           <input type="number" id="rc" value="5" step="0.5">
           <div class="hint">集中力實際接觸半徑；若 rc &lt; 0.5t 將自動換算等效半徑 r₀′</div>
-          
+
           <div id="rectToolBox" style="display:none; margin-top:10px; padding:10px; border:1px dashed var(--border-color); border-radius:var(--radius-sm); background:var(--bg-light);">
              <div style="font-size:11.5px; font-weight:600; color:var(--primary-color); margin-bottom:6px;">📐 矩形底面換算等效半徑</div>
              <div style="display:flex; gap:6px; align-items:center;">
@@ -269,7 +259,7 @@
              <div class="hint" style="margin-top:6px;">系統將自動套用等效面積公式 rc = √(長×寬 / π)</div>
           </div>
         </div>
-        
+
         <div class="field">
           <label>載重 (kg)</label>
           <input type="number" id="load_kg" value="18" step="0.1">
@@ -327,7 +317,7 @@
   </div>
 
   <hr class="section-divider">
-  
+
   <div class="page-title">
     <h2 id="resultTitle">案例計算結果</h2>
     <span class="badge" id="resultBadge">Table 11.4</span>
@@ -388,177 +378,62 @@
 </section>
 
 <script>
-// ============ Material Presets ============
-const MATERIALS = {
-  SECC:   { E: 210000, nu: 0.3,  sy: 270 },
-  SUS304: { E: 193000, nu: 0.29, sy: 205 },
-  AL6061: { E: 68900,  nu: 0.33, sy: 276 },
-  CUSTOM: null
-};
+// ════════════════════════════════════════════════════
+//  API 設定
+// ════════════════════════════════════════════════════
+const API_BASE_URL = 'https://anzu-calc-api.onrender.com'; // TODO: 換成實際後端網址
 
-// ============ Budynas Table 11.4 Case Data ============
-// row.key starting with "beta"  -> sigma = coef * q * b^2 / t^2   (MPa)
-// row.key starting with "alpha" -> y     = coef * q * b^4 / (E*t^3) (mm, magnitude; physically downward)
-// row.key starting with "gamma" -> R     = coef * q * b           (N/mm, edge reaction per unit length)
-const CASES = {
-  1: {
-    title: '案例 1：四邊簡支',
-    en: 'All edges simply supported',
-    nu: 0.3,
-    ratios: [1.0,1.2,1.4,1.6,1.8,2.0,3.0,4.0,5.0,10],
-    rows: [
-      { key:'beta',  label:'β — 板中心應力係數',   loc:'板中心 σmax = β·q·b²/t²',           vals:[0.2874,0.3762,0.4530,0.5172,0.5688,0.6102,0.7134,0.7410,0.7476,0.7500] },
-      { key:'alpha', label:'α — 板中心撓度係數',   loc:'板中心 y_max = α·q·b⁴/(E·t³)',      vals:[0.0444,0.0616,0.0770,0.0906,0.1017,0.1110,0.1335,0.1400,0.1417,0.1421] },
-      { key:'gamma', label:'γ — 長邊反力係數',     loc:'長邊中點 R = γ·q·b',                vals:[0.420,0.455,0.478,0.491,0.499,0.503,0.505,0.502,0.501,0.500] },
-    ],
-    concentrated: {
-      title: '案例 1b：四邊簡支，中心集中力',
-      en: 'All edges simply supported, concentrated load at center',
-      ratios: [1.0,1.2,1.4,1.6,1.8,2.0,1000],
-      beta:  [0.435,0.650,0.789,0.875,0.927,0.958,1.000],
-      alpha: [0.1267,0.1478,0.1621,0.1715,0.1770,0.1805,0.1851],
-    },
-  },
-  2: {
-    title: '案例 2：三邊簡支，一邊自由',
-    en: 'Three edges simply supported, one edge (b) free',
-    nu: 0.3,
-    ratios: [0.50,0.667,1.0,1.5,2.0,4.0],
-    rows: [
-      { key:'beta',  label:'β — 最大應力係數', loc:'σmax = β·q·b²/t²',      vals:[0.36,0.45,0.67,0.77,0.79,0.80] },
-      { key:'alpha', label:'α — 最大撓度係數', loc:'y_max = α·q·b⁴/(E·t³)', vals:[0.080,0.106,0.140,0.160,0.165,0.167] },
-    ],
-  },
-  3: {
-    title: '案例 3：三邊簡支，一短邊固定',
-    en: 'Three edges simply supported, one short edge (b) fixed',
-    nu: 0.3,
-    ratios: [1,1.5,2.0,2.5,3.0,3.5,4.0],
-    rows: [
-      { key:'beta',  label:'β — 最大應力係數', loc:'σmax = β·q·b²/t²',      vals:[0.50,0.67,0.73,0.74,0.75,0.75,0.75] },
-      { key:'alpha', label:'α — 最大撓度係數', loc:'y_max = α·q·b⁴/(E·t³)', vals:[0.030,0.071,0.101,0.122,0.132,0.137,0.139] },
-    ],
-  },
-  4: {
-    title: '案例 4：三邊簡支，一長邊固定',
-    en: 'Three edges simply supported, one long edge (a) fixed',
-    nu: 0.3,
-    ratios: [1,1.5,2.0,2.5,3.0,3.5,4.0],
-    rows: [
-      { key:'beta',  label:'β — 最大應力係數', loc:'σmax = β·q·b²/t²',      vals:[0.50,0.66,0.73,0.74,0.75,0.75,0.75] },
-      { key:'alpha', label:'α — 最大撓度係數', loc:'y_max = α·q·b⁴/(E·t³)', vals:[0.030,0.046,0.054,0.056,0.057,0.058,0.058] },
-    ],
-  },
-  5: {
-    title: '案例 5：兩長邊簡支，兩短邊固定',
-    en: 'Two long edges simply supported, two short edges fixed',
-    nu: 0.3,
-    ratios: [1,1.2,1.4,1.6,1.8,2.0],
-    rows: [
-      { key:'beta',  label:'β — 短邊中點應力係數', loc:'短邊中點 σmax = β·q·b²/t²',      vals:[0.4182,0.5208,0.5988,0.6540,0.6912,0.7146] },
-      { key:'alpha', label:'α — 板中心撓度係數',   loc:'板中心 y_max = α·q·b⁴/(E·t³)',   vals:[0.0210,0.0349,0.0502,0.0658,0.0800,0.0922] },
-    ],
-  },
-  6: {
-    title: '案例 6：兩長邊固定，兩短邊簡支',
-    en: 'Two long edges fixed, two short edges simply supported',
-    nu: 0.3,
-    ratios: [1,1.2,1.4,1.6,1.8,2.0,10],
-    rows: [
-      { key:'beta',  label:'β — 長邊中點應力係數', loc:'長邊中點 σmax = β·q·b²/t²',      vals:[0.4182,0.4626,0.4860,0.4968,0.4971,0.4973,0.500] },
-      { key:'alpha', label:'α — 板中心撓度係數',   loc:'板中心 y_max = α·q·b⁴/(E·t³)',   vals:[0.0210,0.0243,0.0262,0.0273,0.0280,0.0283,0.0285] },
-    ],
-  },
-  7: {
-    title: '案例 7：一邊固定，對邊自由，其餘兩邊簡支',
-    en: 'One edge fixed, opposite edge free, remaining edges simply supported',
-    nu: 0.2,
-    noDefl: true,
-    ratios: [0.25,0.50,0.75,1.0,1.5,2.0,3.0],
-    rows: [
-      { key:'beta1', label:'β₁ — 固定邊中點應力係數', loc:'固定邊中點 σ = β₁·q·b²/t²', vals:[0.044,0.176,0.380,0.665,1.282,1.804,2.450] },
-      { key:'beta2', label:'β₂ — 自由邊中點應力係數', loc:'自由邊中點 σ = β₂·q·b²/t²', vals:[0.048,0.190,0.386,0.565,0.730,0.688,0.434] },
-      { key:'gamma1',label:'γ₁ — 固定邊反力係數',     loc:'固定邊中點 R = γ₁·q·b',     vals:[0.183,0.368,0.541,0.701,0.919,1.018,1.055] },
-      { key:'gamma2',label:'γ₂ — 自由邊端點反力係數', loc:'自由邊端點 R = γ₂·q·b',     vals:[0.131,0.295,0.526,0.832,1.491,1.979,2.401] },
-    ],
-  },
-  8: {
-    title: '案例 8：四邊固定',
-    en: 'All edges fixed',
-    nu: 0.3,
-    ratios: [1.0,1.2,1.4,1.6,1.8,2.0,10],
-    rows: [
-      { key:'beta1', label:'β₁ — 長邊中點應力係數', loc:'長邊中點 σ = β₁·q·b²/t²',         vals:[0.3078,0.3834,0.4356,0.4680,0.4872,0.4974,0.5000] },
-      { key:'beta2', label:'β₂ — 板中心應力係數',   loc:'板中心 σ = β₂·q·b²/t²',           vals:[0.1386,0.1794,0.2094,0.2286,0.2406,0.2472,0.2500] },
-      { key:'alpha', label:'α — 板中心撓度係數',     loc:'板中心 y_max = α·q·b⁴/(E·t³)',    vals:[0.0138,0.0188,0.0226,0.0251,0.0267,0.0277,0.0284] },
-    ],
-    concentrated: {
-      title: '案例 8b：四邊固定，中心集中力',
-      en: 'All edges fixed, concentrated load at center',
-      ratios: [1.0,1.2,1.4,1.6,1.8,2.0,1000],
-      beta1: [-0.238,-0.078,0.011,0.053,0.068,0.067,0.067],
-      beta2: [0.7542,0.8940,0.9624,0.9906,1.0000,1.004,1.008],
-      alpha: [0.0611,0.0706,0.0754,0.0777,0.0786,0.0788,0.0791],
-    },
-  },
-  9: {
-    title: '案例 9：三邊固定，一邊（a）簡支',
-    en: 'Three edges fixed, one edge (a) simply supported',
-    nu: 0.2,
-    noDefl: true,
-    ratios: [0.25,0.50,0.75,1.0,1.5,2.0,3.0],
-    rows: [
-      { key:'beta1', label:'β₁ — 固定邊中點應力係數',  loc:'x=0,z=0（固定邊中點） σ = β₁·q·b²/t²', vals:[0.020,0.081,0.173,0.307,0.539,0.657,0.718] },
-      { key:'beta2', label:'β₂ — 內側應力係數',        loc:'x=0,z=0.6b σb = β₂·q·b²/t²',          vals:[0.004,0.018,0.062,0.134,0.284,0.370,0.422] },
-      { key:'beta3', label:'β₃ — 內側橫向應力係數',    loc:'x=0,z=0.6b σa = β₃·q·b²/t²',          vals:[0.016,0.061,0.118,0.158,0.164,0.135,0.097] },
-      { key:'beta4', label:'β₄ — 角隅應力係數',        loc:'x=±a/2,z=0.6b σa = β₄·q·b²/t²',       vals:[0.031,0.121,0.242,0.343,0.417,0.398,0.318] },
-      { key:'gamma1',label:'γ₁ — 固定邊反力係數',      loc:'x=0,z=0 R = γ₁·q·b',                  vals:[0.115,0.230,0.343,0.453,0.584,0.622,0.625] },
-      { key:'gamma2',label:'γ₂ — 簡支邊反力係數',      loc:'x=0,z=b R = γ₂·q·b',                  vals:[0.123,0.181,0.253,0.319,0.387,0.397,0.386] },
-      { key:'gamma3',label:'γ₃ — 角隅反力係數',        loc:'x=±a/2,z=0.6b R = γ₃·q·b',            vals:[0.125,0.256,0.382,0.471,0.547,0.549,0.530] },
-    ],
-  },
-  10: {
-    title: '案例 10：三邊固定，一邊（a）自由',
-    en: 'Three edges fixed, one edge (a) free',
-    nu: 0.2,
-    noDefl: true,
-    ratios: [0.25,0.50,0.75,1.0,1.5,2.0,3.0],
-    rows: [
-      { key:'beta1', label:'β₁ — 固定邊中點應力係數', loc:'x=0,z=0（固定邊中點） σ = β₁·q·b²/t²', vals:[0.020,0.081,0.173,0.321,0.727,1.226,2.105] },
-      { key:'beta2', label:'β₂ — 自由邊中點應力係數', loc:'x=0,z=b（自由邊中點） σa = β₂·q·b²/t²',vals:[0.016,0.066,0.148,0.259,0.484,0.605,0.519] },
-      { key:'beta3', label:'β₃ — 自由邊角隅應力係數', loc:'x=±a/2,z=b σa = β₃·q·b²/t²',           vals:[0.031,0.126,0.286,0.511,1.073,1.568,1.982] },
-      { key:'gamma1',label:'γ₁ — 固定邊反力係數',     loc:'x=0,z=0 R = γ₁·q·b',                   vals:[0.114,0.230,0.341,0.457,0.673,0.845,1.012] },
-      { key:'gamma2',label:'γ₂ — 自由邊角隅反力係數', loc:'x=±a/2,z=b R = γ₂·q·b',                vals:[0.125,0.248,0.371,0.510,0.859,1.212,1.627] },
-    ],
-  },
-  11: {
-    title: '案例 11：相鄰兩邊固定，其餘兩邊自由',
-    en: 'Two adjacent edges fixed, two remaining edges free',
-    nu: 0.2,
-    noDefl: true,
-    ratios: [0.125,0.25,0.375,0.50,0.75,1.0],
-    rows: [
-      { key:'beta1', label:'β₁ — 固定角應力係數', loc:'x=a,z=0（固定角） σ = β₁·q·b²/t²',                 vals:[0.050,0.182,0.353,0.631,1.246,1.769] },
-      { key:'beta2', label:'β₂ — 自由邊應力係數', loc:'x=0,z=b（a>b/2）或 z=0.8b（a≤b/2） σ = β₂·q·b²/t²', vals:[0.047,0.188,0.398,0.632,1.186,1.769] },
-      { key:'gamma1',label:'γ₁ — 固定角反力係數', loc:'x=a,z=0 R = γ₁·q·b',                               vals:[0.312,0.572,0.671,0.874,1.129,1.183] },
-      { key:'gamma2',label:'γ₂ — 自由邊反力係數', loc:'x=0,z=b 或 0.8b R = γ₂·q·b',                       vals:[0.127,0.264,0.413,0.557,0.829,1.183] },
-    ],
-  },
-};
+function setApiStatus(state) {
+    const el = document.getElementById('api-status');
+    if (state === 'loading') { el.textContent = '計算中...'; el.className = 'api-status loading'; }
+    else if (state === 'error') { el.textContent = '連線失敗'; el.className = 'api-status error'; }
+    else { el.textContent = '已連線'; el.className = 'api-status'; }
+}
 
 const $ = id => document.getElementById(id);
 function R(v, d=2) { return (v===null || v===undefined || isNaN(v)) ? '—' : Number(v.toFixed(d)); }
 
-function lerp(ratios, vals, ratio) {
-  if (ratio <= ratios[0]) return vals[0];
-  if (ratio >= ratios[ratios.length-1]) return vals[vals.length-1];
-  for (let i = 0; i < ratios.length - 1; i++) {
-    if (ratio >= ratios[i] && ratio <= ratios[i+1]) {
-      const f = (ratio - ratios[i]) / (ratios[i+1] - ratios[i]);
-      return vals[i] + f * (vals[i+1] - vals[i]);
-    }
+let MATERIALS = {};
+let CASE_META = []; // [{id, title, en, hasConcentrated}]
+let calcTimer = null;
+
+/* ========================= 載入選項（材料 + 案例清單，純資料，無公式） ========================= */
+async function loadOptions() {
+  setApiStatus('loading');
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/thin-plate/options`);
+    if (!res.ok) throw new Error('network');
+    const data = await res.json();
+    MATERIALS = data.materials;
+    CASE_META = data.cases;
+    setApiStatus('ok');
+  } catch (e) {
+    setApiStatus('error');
+    return;
   }
-  return vals[vals.length-1];
+  buildMaterialSelect();
+  buildCaseSelect();
+  renderCaseDiagram($('caseSel').value);
+  buildCaseListTable();
+  calc();
+}
+
+function buildMaterialSelect() {
+  const sel = $('material');
+  sel.innerHTML = '';
+  Object.keys(MATERIALS).forEach(key => {
+    const m = MATERIALS[key];
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = `${key} (E=${m.E}, ν=${m.nu})`;
+    sel.appendChild(opt);
+  });
+  const customOpt = document.createElement('option');
+  customOpt.value = 'CUSTOM';
+  customOpt.textContent = '自訂';
+  sel.appendChild(customOpt);
+  sel.value = 'SECC';
+  onMaterialChange();
 }
 
 function onMaterialChange() {
@@ -600,10 +475,9 @@ document.querySelectorAll(".tab").forEach(tab => {
 function buildCaseSelect() {
   const sel = $('caseSel');
   sel.innerHTML = '';
-  Object.keys(CASES).forEach(id => {
-    const c = CASES[id];
+  CASE_META.forEach(c => {
     const opt = document.createElement('option');
-    opt.value = id;
+    opt.value = c.id;
     opt.textContent = c.title;
     sel.appendChild(opt);
   });
@@ -613,7 +487,7 @@ function buildCaseSelect() {
 /* ========================= Build loading-type dropdown ========================= */
 function buildLoadTypeSelect() {
   const caseId = $('caseSel').value;
-  const cs = CASES[caseId];
+  const cs = CASE_META.find(c => c.id === caseId);
   const sel = $('loadType');
   const prev = sel.value;
   sel.innerHTML = '';
@@ -621,13 +495,13 @@ function buildLoadTypeSelect() {
   optA.value = 'a';
   optA.textContent = 'a：均佈載荷 (Uniform)';
   sel.appendChild(optA);
-  if (cs && cs.concentrated) {
+  if (cs && cs.hasConcentrated) {
     const optB = document.createElement('option');
     optB.value = 'b';
     optB.textContent = 'b：中心集中力 (Concentrated)';
     sel.appendChild(optB);
   }
-  sel.value = (prev === 'b' && cs && cs.concentrated) ? 'b' : 'a';
+  sel.value = (prev === 'b' && cs && cs.hasConcentrated) ? 'b' : 'a';
   $('rcField').style.display = (sel.value === 'b') ? '' : 'none';
 }
 
@@ -643,7 +517,7 @@ function toggleRectTool() {
   box.style.display = box.style.display === 'none' ? 'block' : 'none';
 }
 
-/* ========================= Calc RC from Rect ========================= */
+/* ========================= Calc RC from Rect (等效面積換算，非配方資料) ========================= */
 function calcRcFromRect() {
   const w = parseFloat($('rect_w').value);
   const l = parseFloat($('rect_l').value);
@@ -654,20 +528,18 @@ function calcRcFromRect() {
   }
 }
 
-/* ========================= Case Boundary Diagram ========================= */
+/* ========================= Case Boundary Diagram（純視覺化 SVG，無計算公式） ========================= */
 function renderCaseDiagram(caseId) {
   const wrap = $('caseDiagram');
   if (!wrap) return;
 
-  // ── 尺寸設定 ──────────────────────────────────────
   const VW = 220, VH = 190;
-  const px = 50, py = 36;       // 板件左上角
-  const pw = 110, ph = 80;      // 板件 (a方向=水平=pw, b方向=垂直=ph)
+  const px = 50, py = 36;
+  const pw = 110, ph = 80;
   const cx = px + pw/2, cy = py + ph/2;
-  const HT = 9;                 // fixed hatch 厚度
-  const SS_R = 5.5, SS_SP = 14; // simply supported 三角大小 / 間距
+  const HT = 9;
+  const SS_R = 5.5, SS_SP = 14;
 
-  // ── 色彩 ──────────────────────────────────────────
   const C = {
     plate:  '#dbeafe', plateS: '#1e40af',
     fix:    '#94a3b8', fixS:   '#475569',
@@ -798,7 +670,7 @@ function renderCaseDiagram(caseId) {
     </div>`;
 }
 
-/* ========================= Mini Case Diagram for Info Tab ========================= */
+/* ========================= Mini Case Diagram for Info Tab（純視覺化） ========================= */
 function miniCaseSVG(caseId) {
   const VW=130, VH=95;
   const px=28, py=18, pw=70, ph=50;
@@ -886,14 +758,6 @@ function buildCaseListTable() {
   if (el) el.innerHTML = html;
 }
 
-/* ========================= Westergaard equivalent radius ========================= */
-function equivRadius(r0, t) {
-  if (r0 < 0.5 * t) {
-    return Math.sqrt(1.6 * r0 * r0 + t * t) - 0.675 * t;
-  }
-  return r0;
-}
-
 /* ========================= UI Helpers ========================= */
 function setStat(id, value, unit){
   const el = $(id);
@@ -901,200 +765,149 @@ function setStat(id, value, unit){
   el.innerHTML = (unit ? `${value}<span class="u">${unit}</span>` : `${value}`);
 }
 
-/* ========================= Main Calc ========================= */
+/* ========================= Main Calc（送輸入給後端，公式全在伺服器端） ========================= */
 function calc() {
+  clearTimeout(calcTimer);
+  calcTimer = setTimeout(doCalc, 150);
+}
+
+async function doCalc() {
   const E  = parseFloat($('E').value);
   const nu = parseFloat($('nu').value);
+  const sy = parseFloat($('yield_str').value);
   const a  = parseFloat($('a').value);
   const b  = parseFloat($('b').value);
   const t  = parseFloat($('t').value);
   const kg = parseFloat($('load_kg').value);
   const sf = parseFloat($('sf').value);
-  const sy = parseFloat($('yield_str').value);
-
   const caseId = $('caseSel').value;
-  const cs = CASES[caseId];
-  if (!cs) return;
+  const loadType = $('loadType').value;
+  const rc = parseFloat($('rc').value) || 5;
 
-  let loadType = $('loadType').value;
-  if (loadType === 'b' && !cs.concentrated) loadType = 'a';
-  $('rcField').style.display = (loadType === 'b') ? '' : 'none';
+  if (!caseId || isNaN(a) || isNaN(b) || isNaN(t) || isNaN(kg) || isNaN(sf)) return;
 
-  const F_N = kg * 9.81;              // 物理載重力（不含 SF）
-  const F_design = kg * 9.81 * sf;   // 設計力 = 物理力 × SF
-  const allowSy = sy;                 // 容許應力 = σy（SF 已乘在載荷側）
-
-  const D = (E * Math.pow(t, 3)) / (12 * (1 - nu * nu));
-  const ab = a / b;
-  const Et3 = E * Math.pow(t, 3);
-  const bt2 = Math.pow(b / t, 2);
-
-  setStat("valF_N", R(F_N), "N");
-  setStat("valF_design", R(F_design), "N");
-  setStat("val_ab", R(ab, 2));
-  setStat("val_D", R(D, 2));
-  setStat("val_Et3", R(Et3, 0));
-  setStat("val_bt2", R(bt2, 2));
-  setStat("val_sy", R(allowSy,2), "MPa");
-  setStat("val_case", `案例 ${caseId}${loadType === 'b' ? 'b' : 'a'}`);
-
-  // a/b 是否超出查表範圍 → 警示
-  const rng = cs.ratios;
-  const lo = rng[0], hi = rng[rng.length - 1];
-  const rw = $('rangeWarn');
-  if (rw) {
-    if (ab < lo || ab > hi) {
-      rw.innerHTML = `⚠ 目前 a/b = ${R(ab,3)} 超出本案例查表範圍 [${lo}, ${hi}]。係數已取端點極限值（外插），結果僅供參考，建議改用 FEA 驗證。`;
-      rw.style.display = '';
-    } else {
-      rw.style.display = 'none';
-    }
-  }
-
-  if (loadType === 'b') {
-    const W = F_design;
-    $('uniformLoadField').style.display = 'none';
-    $('concLoadField').style.display = '';
-    $('load_direct_conc').value = R(W, 2) + ' N';
-    $('design_load_k').textContent = '設計集中力 W = 載重 × g × SF';
-    $('design_load_v').innerHTML = `${R(W,2)}<span class=\"u\">N</span>`;
-    calcConcentrated(cs, caseId, { E, nu, a, b, t, sf, sy, allowSy, ab, Et3, F_N: W });
+  setApiStatus('loading');
+  let r;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/thin-plate/calc`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ E, nu, sy, a, b, t, caseId, loadType, load_kg: kg, sf, rc })
+    });
+    if (!res.ok) throw new Error('network');
+    r = await res.json();
+    setApiStatus('ok');
+  } catch (e) {
+    setApiStatus('error');
     return;
   }
 
-  // 均佈載荷
-  const q = F_design / (a * b);
-  const qb4 = q * Math.pow(b, 4);
-  const qb2 = q * Math.pow(b, 2);
-  setStat("val_q", R(q, 6), "N/mm²");
+  if (r.error) return;
+  renderResult(r, { kg, sf, a, b, t, rc });
+}
 
-  $('uniformLoadField').style.display = '';
-  $('concLoadField').style.display = 'none';
-  $('load_direct').value = R(q, 6) + ' N/mm²';
-  $('design_load_hint').textContent = `q = (${kg} kg × ${sf} × 9.81) ÷ (${a} × ${b}) = ${R(q,6)} N/mm²`;
-  $('design_load_k').textContent = '均佈載荷 q = W ÷ (a × b)';
-  $('design_load_v').innerHTML = `${R(q,6)}<span class=\"u\">N/mm²</span>`;
+function renderResult(r, inp) {
+  setStat("valF_N", R(r.F_N), "N");
+  setStat("valF_design", R(r.F_design), "N");
+  setStat("val_ab", R(r.ab, 2));
+  setStat("val_D", R(r.D, 2));
+  setStat("val_Et3", R(r.Et3, 0));
+  setStat("val_bt2", R(r.bt2, 2));
+  setStat("val_sy", R(r.allowSy,2), "MPa");
+  setStat("val_case", `案例 ${r.caseId}${r.loadType === 'b' ? 'b' : 'a'}`);
 
-  // ===== Compute each coefficient row =====
-  let maxAbsSigma = -Infinity;
-  let maxSigmaRow = null;
-  let yMax = null;
+  const rw = $('rangeWarn');
+  if (r.rangeWarn) {
+    rw.innerHTML = `⚠ 目前 a/b = ${R(r.ab,3)} 超出本案例查表範圍 [${r.rangeLo}, ${r.rangeHi}]。係數已取端點極限值（外插），結果僅供參考，建議改用 FEA 驗證。`;
+    rw.style.display = '';
+  } else {
+    rw.style.display = 'none';
+  }
 
-  const rowResults = cs.rows.map(row => {
-    const coef = lerp(cs.ratios, row.vals, ab);
-    let value, unit, kind;
-    if (row.key.startsWith('beta')) {
-      value = coef * qb2 / (t * t);
-      unit = 'MPa';
-      kind = 'stress';
-      if (Math.abs(value) > maxAbsSigma) { maxAbsSigma = Math.abs(value); maxSigmaRow = row; }
-    } else if (row.key.startsWith('alpha')) {
-      value = coef * qb4 / Et3;
-      unit = 'mm';
-      kind = 'defl';
-      yMax = value;
-    } else if (row.key.startsWith('gamma')) {
-      value = coef * q * b;
-      unit = 'N/mm';
-      kind = 'reaction';
-    }
-    return { row, coef, value, unit, kind };
-  });
+  if (r.mode === 'concentrated') {
+    $('uniformLoadField').style.display = 'none';
+    $('concLoadField').style.display = '';
+    $('load_direct_conc').value = R(r.F_design, 2) + ' N';
+    $('design_load_k').textContent = '設計集中力 W = 載重 × g × SF';
+    $('design_load_v').innerHTML = `${R(r.F_design,2)}<span class="u">N</span>`;
+    renderConcentrated(r, inp);
+  } else {
+    $('uniformLoadField').style.display = '';
+    $('concLoadField').style.display = 'none';
+    setStat("val_q", R(r.q, 6), "N/mm²");
+    $('load_direct').value = R(r.q, 6) + ' N/mm²';
+    $('design_load_hint').textContent = `q = (${inp.kg} kg × ${inp.sf} × 9.81) ÷ (${inp.a} × ${inp.b}) = ${R(r.q,6)} N/mm²`;
+    $('design_load_k').textContent = '均佈載荷 q = W ÷ (a × b)';
+    $('design_load_v').innerHTML = `${R(r.q,6)}<span class="u">N/mm²</span>`;
+    renderUniform(r);
+  }
+}
 
-  // ===== Render result table =====
-  $('resultTitle').innerHTML = `${cs.title}`;
-  $('resultBadge').textContent = `a/b = ${R(ab,2)} ν = ${cs.nu}`;
+function renderUniform(r) {
+  $('resultTitle').innerHTML = `${r.title}`;
+  $('resultBadge').textContent = `a/b = ${R(r.ab,2)} ν = ${r.nu}`;
 
   let html = `
     <div class="card">
       <div class="card-head">
-        <h3>${cs.title}<span class="badge" style="margin-left:8px;">${cs.en}</span></h3>
-        <div class="meta">查表比值 a/b = ${R(ab,3)}（依書中 ν = ${cs.nu} 製表）</div>
+        <h3>${r.title}<span class="badge" style="margin-left:8px;">${r.en}</span></h3>
+        <div class="meta">查表比值 a/b = ${R(r.ab,3)}（依書中 ν = ${r.nu} 製表）</div>
       </div>
       <div class="card-body" style="overflow-x:auto;">
         <table class="calc">
           <tr><th>係數</th><th>內插值</th><th>位置 / 公式</th><th>計算結果</th></tr>`;
 
-  rowResults.forEach(r => {
-    const cellClass = r.kind === 'stress' ? (Math.abs(r.value) > allowSy ? 'stress' : 'ok') : 'defl';
+  r.rows.forEach(row => {
+    const cellClass = row.kind === 'stress' ? (Math.abs(row.value) > r.allowSy ? 'stress' : 'ok') : 'defl';
     html += `<tr>
-      <td class="label">${r.row.label}</td>
-      <td class="result">${R(r.coef,4)}</td>
-      <td style="text-align:left;font-size:12.5px;">${r.row.loc}</td>
-      <td class="result ${cellClass}">${R(r.value, r.kind==='reaction'?3:3)} <span style="font-weight:400;font-size:11px;">${r.unit}</span></td>
+      <td class="label">${row.label}</td>
+      <td class="result">${R(row.coef,4)}</td>
+      <td style="text-align:left;font-size:12.5px;">${row.loc}</td>
+      <td class="result ${cellClass}">${R(row.value, 3)} <span style="font-weight:400;font-size:11px;">${row.unit}</span></td>
     </tr>`;
   });
 
   html += `</table>`;
-  if (cs.noDefl) {
+  if (r.noDefl) {
     html += `<div class="banner info" style="margin-top:12px;margin-bottom:0;">ⓘ 本案例原書 Table 11.4 僅提供應力與反力係數，未提供撓度（y_max）係數。</div>`;
   }
   html += `</div></div>`;
 
   $('caseResults').innerHTML = html;
 
-  // ===== Summary Banner =====
-  const pass = maxAbsSigma < allowSy;
+  const pass = r.pass;
   $('summaryBox').innerHTML = `
     <div class="card">
-      <div class="card-head"><h3>設計結果評估</h3><div class="meta">容許應力 = σy（安全係數 SF=${sf} 已乘於設計載荷，容許值直接比較降伏強度）</div></div>
+      <div class="card-head"><h3>設計結果評估</h3><div class="meta">容許應力 = σy（安全係數 SF 已乘於設計載荷，容許值直接比較降伏強度）</div></div>
       <div class="card-body">
          <div class="stat ${pass ? 'final' : 'warn'}">
-            <div class="k">判定結果（容許應力 ${R(allowSy,2)} MPa = σy，設計載荷已含 SF=${sf}；最大應力位置：${maxSigmaRow ? maxSigmaRow.label : '—'}）</div>
-            <div class="v">最大應力 ${R(maxAbsSigma)} MPa ${pass ? '＜' : '＞'} 容許值 ${R(allowSy,2)} MPa → ${pass ? '✓ 安全' : '✗ 超出極限'}</div>
+            <div class="k">判定結果（容許應力 ${R(r.allowSy,2)} MPa = σy，最大應力位置：${r.maxSigmaLabel || '—'}）</div>
+            <div class="v">最大應力 ${R(r.maxAbsSigma)} MPa ${pass ? '＜' : '＞'} 容許值 ${R(r.allowSy,2)} MPa → ${pass ? '✓ 安全' : '✗ 超出極限'}</div>
          </div>
-         ${yMax !== null ? `<div class="stat dim" style="margin-top:10px;"><div class="k">最大撓度 y_max</div><div class="v">${R(yMax,4)}<span class="u">mm</span></div></div>` : ''}
+         ${r.yMax !== null && r.yMax !== undefined ? `<div class="stat dim" style="margin-top:10px;"><div class="k">最大撓度 y_max</div><div class="v">${R(r.yMax,4)}<span class="u">mm</span></div></div>` : ''}
       </div>
     </div>`;
 }
 
-/* ========================= Concentrated load (type b) ========================= */
-function calcConcentrated(cs, caseId, p) {
-  const { nu, b, t, sy, sf, allowSy, ab, Et3, F_N } = p;
-  const cc = cs.concentrated;
-  const rc = parseFloat($('rc').value);
-  const r0p = equivRadius(rc, t);
-  const W = F_N; // 集中力總力 (N)
-  const logTerm = Math.log((2 * b) / (Math.PI * r0p));
+function renderConcentrated(r, inp) {
+  $('resultTitle').innerHTML = `${r.title}`;
+  $('resultBadge').textContent = `a/b = ${R(r.ab,2)} rc = ${R(r.rc,2)} mm`;
 
-  $('resultTitle').innerHTML = `${cc.title}`;
-  $('resultBadge').textContent = `a/b = ${R(ab,2)} rc = ${R(rc,2)} mm`;
-
-  const alpha = lerp(cc.ratios, cc.alpha, ab);
-  const yMax = alpha * W * b * b / Et3;
-
-  let sigmaCenter, sigmaEdge = null, betaUsed;
   let rowsHtml = '';
+  r.rows.forEach(row => {
+    const cellClass = Math.abs(row.value) > r.allowSy ? 'stress' : 'ok';
+    rowsHtml += `<tr><td class="label">${row.label}</td><td class="result">${row.coefLabel}=${R(row.coef,4)}</td>
+      <td style="text-align:left;font-size:12.5px;">${row.loc}</td>
+      <td class="result ${cellClass}">${R(row.value,3)} <span style="font-weight:400;font-size:11px;">${row.unit}</span></td></tr>`;
+  });
 
-  if (caseId === '1') {
-    const beta = lerp(cc.ratios, cc.beta, ab);
-    betaUsed = beta;
-    sigmaCenter = (3 * W) / (2 * Math.PI * t * t) * ((1 + nu) * logTerm + beta);
-    rowsHtml += `<tr><td class="label">σ — 板中心應力（含對數項）</td><td class="result">β=${R(beta,4)}</td>
-      <td style="text-align:left;font-size:12.5px;">σmax = 3W/(2πt²)·[(1+ν)ln(2b/(πr0′)) + β]</td>
-      <td class="result ${Math.abs(sigmaCenter)>allowSy?'stress':'ok'}">${R(sigmaCenter,3)} <span style="font-weight:400;font-size:11px;">MPa</span></td></tr>`;
-  } else if (caseId === '8') {
-    const beta1 = lerp(cc.ratios, cc.beta1, ab);
-    const beta2 = lerp(cc.ratios, cc.beta2, ab);
-    betaUsed = beta1;
-    sigmaCenter = (3 * W) / (2 * Math.PI * t * t) * ((1 + nu) * logTerm + beta1);
-    sigmaEdge = -beta2 * W / (t * t);
-    rowsHtml += `<tr><td class="label">σ — 板中心應力（含對數項）</td><td class="result">β₁=${R(beta1,4)}</td>
-      <td style="text-align:left;font-size:12.5px;">σ(center) = 3W/(2πt²)·[(1+ν)ln(2b/(πr0′)) + β₁]</td>
-      <td class="result ${Math.abs(sigmaCenter)>allowSy?'stress':'ok'}">${R(sigmaCenter,3)} <span style="font-weight:400;font-size:11px;">MPa</span></td></tr>`;
-    rowsHtml += `<tr><td class="label">σ — 長邊中點應力</td><td class="result">β₂=${R(beta2,4)}</td>
-      <td style="text-align:left;font-size:12.5px;">σ(edge) = −β₂·W/t²</td>
-      <td class="result ${Math.abs(sigmaEdge)>allowSy?'stress':'ok'}">${R(sigmaEdge,3)} <span style="font-weight:400;font-size:11px;">MPa</span></td></tr>`;
-  }
-
-  const maxAbsSigma = Math.max(Math.abs(sigmaCenter), sigmaEdge !== null ? Math.abs(sigmaEdge) : -Infinity);
-  const pass = maxAbsSigma < allowSy;
+  const pass = r.pass;
 
   let html = `
     <div class="card">
       <div class="card-head">
-        <h3>${cc.title}<span class="badge" style="margin-left:8px;">${cc.en}</span></h3>
-        <div class="meta">查表比值 a/b = ${R(ab,3)} r0 = ${R(rc,3)} mm r0′（等效半徑） = ${R(r0p,4)} mm ${rc < 0.5*t ? '（r0 &lt; 0.5t，已套用 Westergaard 等效半徑公式）' : '（r0 ≥ 0.5t，直接使用實際半徑）'}</div>
+        <h3>${r.title}<span class="badge" style="margin-left:8px;">${r.en}</span></h3>
+        <div class="meta">查表比值 a/b = ${R(r.ab,3)} r0 = ${R(r.rc,3)} mm r0′（等效半徑） = ${R(r.r0p,4)} mm ${r.useWestergaard ? '（r0 &lt; 0.5t，已套用 Westergaard 等效半徑公式）' : '（r0 ≥ 0.5t，直接使用實際半徑）'}</div>
       </div>
       <div class="card-body" style="overflow-x:auto;">
         <table class="calc">
@@ -1102,9 +915,9 @@ function calcConcentrated(cs, caseId, p) {
           ${rowsHtml}
           <tr>
             <td class="label">y_max — 最大撓度</td>
-            <td class="result">α=${R(alpha,4)}</td>
+            <td class="result">α=${R(r.alpha,4)}</td>
             <td style="text-align:left;font-size:12.5px;">y_max = α·W·b²/(E·t³)</td>
-            <td class="result defl">${R(yMax,4)} <span style="font-weight:400;font-size:11px;">mm</span></td>
+            <td class="result defl">${R(r.yMax,4)} <span style="font-weight:400;font-size:11px;">mm</span></td>
           </tr>
         </table>
       </div>
@@ -1114,28 +927,25 @@ function calcConcentrated(cs, caseId, p) {
 
   $('summaryBox').innerHTML = `
     <div class="card">
-      <div class="card-head"><h3>設計結果評估</h3><div class="meta">集中力載荷（type b）以板中心對數應力與邊緣應力中較大者判定（SF=${sf} 已乘於設計集中力 W）</div></div>
+      <div class="card-head"><h3>設計結果評估</h3><div class="meta">集中力載荷（type b）以板中心對數應力與邊緣應力中較大者判定（SF 已乘於設計集中力 W）</div></div>
       <div class="card-body">
          <div class="stat ${pass ? 'final' : 'warn'}">
-            <div class="k">判定結果（容許應力 ${R(allowSy,2)} MPa = σy，設計力 W=${R(W,2)} N 已含 SF=${sf}）</div>
-            <div class="v">最大應力 ${R(maxAbsSigma)} MPa ${pass ? '＜' : '＞'} 容許值 ${R(allowSy,2)} MPa → ${pass ? '✓ 安全' : '✗ 超出極限'}</div>
+            <div class="k">判定結果（容許應力 ${R(r.allowSy,2)} MPa = σy，設計力 W=${R(r.F_design,2)} N 已含 SF）</div>
+            <div class="v">最大應力 ${R(r.maxAbsSigma)} MPa ${pass ? '＜' : '＞'} 容許值 ${R(r.allowSy,2)} MPa → ${pass ? '✓ 安全' : '✗ 超出極限'}</div>
          </div>
-         <div class="stat dim" style="margin-top:10px;"><div class="k">最大撓度 y_max</div><div class="v">${R(yMax,4)}<span class="u">mm</span></div></div>
+         <div class="stat dim" style="margin-top:10px;"><div class="k">最大撓度 y_max</div><div class="v">${R(r.yMax,4)}<span class="u">mm</span></div></div>
       </div>
     </div>`;
 }
 
 // 綁定事件
-buildCaseSelect();
-renderCaseDiagram($('caseSel').value);
-buildCaseListTable();
-document.querySelectorAll("input:not(#load_direct), select").forEach(el => {
+document.querySelectorAll("input:not(#load_direct):not(#load_direct_conc), select").forEach(el => {
   el.addEventListener("input", calc);
   el.addEventListener("change", calc);
 });
 
-// Initial calculation
-calc();
+// 初始化
+loadOptions();
 </script>
 </body>
 </html>
