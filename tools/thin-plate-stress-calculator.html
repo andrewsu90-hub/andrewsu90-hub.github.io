@@ -169,7 +169,7 @@
 <section class="hero">
     <div class="hero-label">工程計算工具</div>
     <h1>🔲 薄板應力承載計算工具</h1>
-    <p>依 Richard G. Budynas《Shigley's Mechanical Engineering Design》第 9 版 第 11 章 Flat Plates，Table 11.4「Formulas for Flat Plates with Straight Boundaries and Constant Thickness」之數據，計算矩形薄板在均佈載荷下之最大撓度與應力。內建 11 種常見邊界固定組合，依長寬比 a/b 自動線性內插查表係數 α（撓度）、β（應力）、γ（反力）。</p>
+    <p>依 Richard G. Budynas《Shigley's Mechanical Engineering Design》第 9 版 第 11 章 Flat Plates，Table 11.4「Formulas for Flat Plates with Straight Boundaries and Constant Thickness」之數據，計算矩形薄板在均佈載荷下之最大撓度與應力。內建 10 種常見邊界固定組合，依長寬比 a/b 自動線性內插查表係數 α（撓度）、β（應力）、γ（反力）。</p>
     <span class="source-note">參考文獻：Richard G. Budynas, Shigley's Mechanical Engineering Design, 9th Ed., Table 11.4（ν = 0.3，部分案例 ν = 0.2，已標註）</span>
 </section>
 
@@ -315,6 +315,7 @@
     <h2 id="resultTitle">案例計算結果</h2>
     <span class="badge" id="resultBadge">Table 11.4</span>
   </div>
+  <div id="rangeWarn" class="banner" style="display:none;"></div>
   <div id="caseResults"></div>
   <div id="summaryBox"></div>
 </section>
@@ -452,7 +453,7 @@ const CASES = {
     rows: [
       { key:'beta1', label:'β₁ — 固定邊中點應力係數', loc:'固定邊中點 σ = β₁·q·b²/t²', vals:[0.044,0.176,0.380,0.665,1.282,1.804,2.450] },
       { key:'beta2', label:'β₂ — 自由邊中點應力係數', loc:'自由邊中點 σ = β₂·q·b²/t²', vals:[0.048,0.190,0.386,0.565,0.730,0.688,0.434] },
-      { key:'gamma1',label:'γ₁ — 固定邊反力係數',     loc:'固定邊中點 R = γ₁·q·b',     vals:[0.130,0.368,0.541,0.701,0.919,1.018,1.055] },
+      { key:'gamma1',label:'γ₁ — 固定邊反力係數',     loc:'固定邊中點 R = γ₁·q·b',     vals:[0.183,0.368,0.541,0.701,0.919,1.018,1.055] },
       { key:'gamma2',label:'γ₂ — 自由邊端點反力係數', loc:'自由邊端點 R = γ₂·q·b',     vals:[0.131,0.295,0.526,0.832,1.491,1.979,2.401] },
     ],
   },
@@ -823,6 +824,19 @@ function calc() {
   setStat("val_bt2", R(bt2, 2));
   setStat("val_sy", R(allowSy,2), "MPa");
   setStat("val_case", `案例 ${caseId}${loadType === 'b' ? 'b' : 'a'}`);
+
+  // a/b 是否超出查表範圍 → 警示（lerp 會 clamp 至端點值，結果僅供參考）
+  const rng = cs.ratios;
+  const lo = rng[0], hi = rng[rng.length - 1];
+  const rw = $('rangeWarn');
+  if (rw) {
+    if (ab < lo || ab > hi) {
+      rw.innerHTML = `⚠ 目前 a/b = ${R(ab,3)} 超出本案例查表範圍 [${lo}, ${hi}]。係數已取端點極限值（外插），結果僅供參考，建議改用 FEA 驗證。`;
+      rw.style.display = '';
+    } else {
+      rw.style.display = 'none';
+    }
+  }
 
   if (loadType === 'b') {
     const W = F_design;
