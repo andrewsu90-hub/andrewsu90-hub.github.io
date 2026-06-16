@@ -202,15 +202,16 @@
         </div>
         <div class="field">
           <label>E 彈性係數 (N/mm²)</label>
-          <input type="number" id="E" value="210000">
+          <input type="number" id="E" value="210000" readonly style="background:var(--brand-50);cursor:default;">
         </div>
         <div class="field">
           <label>ν 蒲松比</label>
-          <input type="number" id="nu" value="0.3" step="0.01">
+          <input type="number" id="nu" value="0.3" step="0.01" readonly style="background:var(--brand-50);cursor:default;">
         </div>
         <div class="field">
           <label>降伏強度 σy (MPa)</label>
-          <input type="number" id="yield_str" value="270">
+          <input type="number" id="yield_str" value="270" readonly style="background:var(--brand-50);cursor:default;">
+          <div class="hint" id="sy_hint">SECC：270 MPa　SUS304：205 MPa　AL6061-T6：276 MPa</div>
         </div>
       </div>
       <div class="row-line"></div>
@@ -537,6 +538,19 @@ function lerp(ratios, vals, ratio) {
 function onMaterialChange() {
   const sel = $('material').value;
   const m = MATERIALS[sel];
+  const isCustom = sel === 'CUSTOM';
+  const readonlyStyle = 'background:var(--brand-50);cursor:default;';
+  const editStyle = '';
+
+  ['E','nu','yield_str'].forEach(id => {
+    const el = $(id);
+    el.readOnly = !isCustom;
+    el.style.cssText = isCustom ? editStyle : readonlyStyle;
+  });
+
+  const hintEl = $('sy_hint');
+  if (hintEl) hintEl.style.display = isCustom ? 'none' : '';
+
   if (m) {
     $('E').value = m.E;
     $('nu').value = m.nu;
