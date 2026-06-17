@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>非標機械設計自動計算大全 | Andrew Su Engineering Tools</title>
+  <meta name="description" content="163 個工作表 · 57 個計算器 · 非標機械設計自動計算工具，涵蓋電機選型、氣缸、絲桿、齒輪、彈簧、液壓等。">
+  <!-- React + Babel via CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    /* Reset & base while React loads */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body,#root{height:100%;background:#0f1117;color:#e2e8f0}
+    #loading{display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#4a7cff;font-size:14px;letter-spacing:.08em}
+  </style>
+</head>
+<body>
+  <div id="back-nav" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(15,17,23,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #252b3b;padding:0 20px;height:40px;display:flex;align-items:center;justify-content:space-between;">
+    <a href="../index.html" style="color:#4a7cff;font-size:12px;font-family:sans-serif;text-decoration:none;letter-spacing:.04em;display:flex;align-items:center;gap:6px;">
+      ← andrewsu90-hub.github.io
+    </a>
+    <span style="color:#64748b;font-size:11px;font-family:monospace;letter-spacing:.06em;">非標機械設計自動計算大全 · 57 calculators</span>
+  </div>
+  <div style="height:40px"></div>
+  <div id="root"><div id="loading">LOADING CALC ENGINE…</div></div>
+
+  <script type="text/babel" data-presets="react">
+    const { useState, useMemo, useCallback } = React;
+
+
+// ─── LOOKUP DATA ─────────────────────────────
+const BEARINGS_DEEP = [
+  {model:"684zz",d:4,D:9,B:2.5,Cr:641,Cor:227,nmax:53},{model:"694zz",d:4,D:11,B:4,Cr:957,Cor:350,nmax:48},
+  {model:"604zz",d:4,D:12,B:4,Cr:957,Cor:350,nmax:48},{model:"624zz",d:4,D:13,B:5,Cr:1301,Cor:488,nmax:40},
+  {model:"634zz",d:4,D:16,B:5,Cr:1340,Cor:523,nmax:36},{model:"685zz",d:5,D:11,B:3,Cr:716,Cor:282,nmax:45},
+  {model:"695zz",d:5,D:13,B:4,Cr:1077,Cor:432,nmax:43},{model:"605zz",d:5,D:14,B:5,Cr:1329,Cor:507,nmax:40},
+  {model:"625zz",d:5,D:16,B:5,Cr:1729,Cor:675,nmax:36},{model:"635zz",d:5,D:19,B:6,Cr:2336,Cor:896,nmax:32},
+  {model:"686zz",d:6,D:13,B:3.5,Cr:1082,Cor:442,nmax:40},{model:"696zz",d:6,D:15,B:5,Cr:1340,Cor:523,nmax:40},
+  {model:"606zz",d:6,D:17,B:6,Cr:2263,Cor:846,nmax:38},{model:"626zz",d:6,D:19,B:6,Cr:2336,Cor:896,nmax:32},
+  {model:"636zz",d:6,D:22,B:7,Cr:3333,Cor:1423,nmax:30},{model:"687zz",d:7,D:14,B:3.5,Cr:1173,Cor:513,nmax:40},
+  {model:"697zz",d:7,D:17,B:5,Cr:1605,Cor:719,nmax:36},{model:"607zz",d:7,D:19,B:6,Cr:2336,Cor:896,nmax:36},
+  {model:"627zz",d:7,D:22,B:7,Cr:3287,Cor:1379,nmax:30},{model:"637zz",d:7,D:26,B:9,Cr:4563,Cor:1983,nmax:28},
+  {model:"688zz",d:8,D:16,B:4,Cr:1252,Cor:592,nmax:36},{model:"698zz",d:8,D:19,B:6,Cr:2100,Cor:919,nmax:34},
+  {model:"608zz",d:8,D:22,B:7,Cr:3287,Cor:1379,nmax:30},{model:"628zz",d:8,D:24,B:8,Cr:4106,Cor:1734,nmax:28},
+  {model:"6000zz",d:10,D:26,B:8,Cr:4575,Cor:1960,nmax:28},{model:"6001zz",d:12,D:28,B:8,Cr:5070,Cor:2360,nmax:24},
+  {model:"6002zz",d:15,D:32,B:9,Cr:5590,Cor:2850,nmax:20},{model:"6003zz",d:17,D:35,B:10,Cr:6050,Cor:3250,nmax:18},
+  {model:"6004zz",d:20,D:42,B:12,Cr:9360,Cor:5000,nmax:15},{model:"6005zz",d:25,D:47,B:12,Cr:10100,Cor:5850,nmax:13},
+  {model:"6006zz",d:30,D:55,B:13,Cr:13300,Cor:8300,nmax:11},{model:"6007zz",d:35,D:62,B:14,Cr:16000,Cor:10200,nmax:9},
+  {model:"6008zz",d:40,D:68,B:15,Cr:17000,Cor:11200,nmax:9},{model:"6009zz",d:45,D:75,B:16,Cr:21200,Cor:14600,nmax:8},
+  {model:"6010zz",d:50,D:80,B:16,Cr:22500,Cor:16000,nmax:7},{model:"6200zz",d:10,D:30,B:9,Cr:5070,Cor:2360,nmax:24},
+  {model:"6201zz",d:12,D:32,B:10,Cr:6630,Cor:3050,nmax:22},{model:"6202zz",d:15,D:35,B:11,Cr:7650,Cor:3750,nmax:18},
+  {model:"6203zz",d:17,D:40,B:12,Cr:9360,Cor:4800,nmax:17},{model:"6204zz",d:20,D:47,B:14,Cr:12800,Cor:6550,nmax:14},
+  {model:"6205zz",d:25,D:52,B:15,Cr:14000,Cor:7800,nmax:11},{model:"6206zz",d:30,D:62,B:16,Cr:20000,Cor:11200,nmax:9},
+];
+
+const BEARINGS_THRUST = [
+  {model:"51100CE",d:10,D:24,T:9},{model:"51200CE",d:10,D:26,T:11},
+  {model:"51101CE",d:12,D:24,T:9},{model:"51201CE",d:12,D:28,T:11},
+  {model:"51102CE",d:15,D:28,T:9},{model:"51202CE",d:15,D:32,T:12},
+  {model:"51103CE",d:17,D:30,T:9},{model:"51203CE",d:17,D:35,T:12},
+  {model:"51104CE",d:20,D:35,T:10},{model:"51204CE",d:20,D:40,T:14},{model:"51304CE",d:20,D:47,T:18},
+  {model:"51105CE",d:25,D:42,T:11},{model:"51205CE",d:25,D:47,T:15},{model:"51305CE",d:25,D:52,T:18},{model:"51405CE",d:25,D:60,T:24},
+  {model:"51106CE",d:30,D:47,T:11},{model:"51206CE",d:30,D:52,T:16},{model:"51306CE",d:30,D:60,T:21},{model:"51406CE",d:30,D:70,T:28},
+  {model:"51107CE",d:35,D:52,T:12},{model:"51207CE",d:35,D:62,T:18},{model:"51307CE",d:35,D:68,T:24},{model:"51407CE",d:35,D:80,T:32},
+  {model:"51108CE",d:40,D:60,T:13},{model:"51208CE",d:40,D:68,T:19},{model:"51308CE",d:40,D:78,T:26},
+  {model:"51109CE",d:45,D:65,T:14},{model:"51209CE",d:45,D:73,T:20},{model:"51309CE",d:45,D:85,T:28},
+  {model:"51110CE",d:50,D:70,T:14},{model:"51210CE",d:50,D:78,T:22},{model:"51310CE",d:50,D:95,T:31},
+];
+
+const BOLT_TORQUE = [
+  {size:"M6", jp:1.2,  din:null},{size:"M8",  jp:2.5,  din:2.4},
+  {size:"M10",jp:5.5,  din:4.6},{size:"M12", jp:9,    din:8},
+  {size:"M14",jp:14,   din:null},{size:"M16", jp:23.5, din:19.9},
+  {size:"M18",jp:32,   din:null},{size:"M20", jp:47,   din:38.8},
+  {size:"M22",jp:66.5, din:null},{size:"M24", jp:82.5, din:67},
+  {size:"M27",jp:120,  din:98.3},{size:"M30", jp:155,  din:134},
+  {size:"M33",jp:200,  din:null},{size:"M36", jp:250,  din:233},
+  {size:"M39",jp:300,  din:303},{size:"M42",  jp:null, din:373},
+  {size:"M48",jp:null, din:561},{size:"M52",  jp:null, din:725},
+  {size:"M56",jp:null, din:907},{size:"M64",  jp:null, din:1360},
+  {size:"M72",jp:null, din:2090},{size:"M80", jp:null, din:2870},
+  {size:"M90",jp:null, din:4110},{size:"M100",jp:null, din:5670},
+];
+
+const FRICTION_TABLE = [
+  {pair:"鋼-鋼",     dry:"0.07~0.16",wet:"0.05~0.13"},
+  {pair:"鋼-鑄鋼",   dry:"0.11",     wet:"0.07"},
+  {pair:"鋼-結構鋼",  dry:"0.10",     wet:"0.08"},
+  {pair:"鋼-優質結構鋼",dry:"0.11",  wet:"0.07"},
+  {pair:"鋼-青銅",   dry:"0.15~0.20",wet:"0.03~0.06"},
+  {pair:"鋼-鑄鐵",   dry:"0.12~0.15",wet:"0.05~0.10"},
+  {pair:"鑄鐵-鑄鐵",  dry:"0.15~0.25",wet:"0.05~0.10"},
+];
+
+const ELASTIC_TABLE = [
+  {name:"碳鋼、低合金鋼、合金結構鋼", E:"200~235",nu:"0.30~0.31",alpha:"11"},
+  {name:"灰鑄鐵 HT150、HT200",       E:"70~80",  nu:"0.24~0.25",alpha:"11"},
+  {name:"灰鑄鐵 HT250、HT300",       E:"105~130",nu:"0.24~0.26",alpha:"10"},
+  {name:"可鍛鑄鐵",                   E:"90~100", nu:"0.25",     alpha:"10"},
+  {name:"非合金球墨鑄鐵",             E:"160~180",nu:"0.28~0.29",alpha:"10"},
+  {name:"青銅",                       E:"85",     nu:"0.35",     alpha:"17"},
+  {name:"鋁合金",                     E:"69~72",  nu:"0.33",     alpha:"23"},
+  {name:"不鏽鋼 304",                 E:"196",    nu:"0.28",     alpha:"16"},
+];
+
+const DENSITY_TABLE = [
+  {name:"普通碳素鋼",  rho:7850},{name:"優質碳素鋼",  rho:7850},
+  {name:"不鏽鋼 304", rho:7930},{name:"不鏽鋼 316", rho:8030},
+  {name:"灰口鑄鐵",   rho:7200},{name:"球墨鑄鐵",   rho:7060},
+  {name:"純銅",       rho:8900},{name:"黃銅 (通用)", rho:8500},
+  {name:"青銅",       rho:8800},{name:"純鋁",        rho:2700},
+  {name:"鋁合金 (通用)",rho:2750},{name:"硬鋁 LY12", rho:2780},
+  {name:"鈦合金 TC4", rho:4430},{name:"尼龍 PA66",  rho:1140},
+  {name:"PTFE",       rho:2200},{name:"POM 賽鋼",   rho:1410},
+  {name:"ABS",        rho:1050},{name:"PC 聚碳酸酯", rho:1200},
+];
+
+const IT_TABLE = [
+  {from:0, to:3,  IT5:4, IT6:6, IT7:10,IT8:14,IT9:25,IT10:40,IT11:60},
+  {from:3, to:6,  IT5:5, IT6:8, IT7:12,IT8:18,IT9:30,IT10:48,IT11:75},
+  {from:6, to:10, IT5:6, IT6:9, IT7:15,IT8:22,IT9:36,IT10:58,IT11:90},
+  {from:10,to:18, IT5:8, IT6:11,IT7:18,IT8:27,IT9:43,IT10:70,IT11:110},
+  {from:18,to:30, IT5:9, IT6:13,IT7:21,IT8:33,IT9:52,IT10:84,IT11:130},
+  {from:30,to:50, IT5:11,IT6:16,IT7:25,IT8:39,IT9:62,IT10:100,IT11:160},
+  {from:50,to:80, IT5:13,IT6:19,IT7:30,IT8:46,IT9:74,IT10:120,IT11:190},
+  {from:80,to:120,IT5:15,IT6:22,IT7:35,IT8:54,IT9:87,IT10:140,IT11:220},
+  {from:120,to:180,IT5:18,IT6:25,IT7:40,IT8:63,IT9:100,IT10:160,IT11:250},
+  {from:180,to:250,IT5:20,IT6:29,IT7:46,IT8:72,IT9:115,IT10:185,IT11:290},
+  {from:250,to:315,IT5:23,IT6:32,IT7:52,IT8:81,IT9:130,IT10:210,IT11:320},
+  {from:315,to:400,IT5:25,IT6:36,IT7:57,IT8:89,IT9:140,IT10:230,IT11:360},
+  {from:400,to:500,IT5:27,IT6:40,IT7:63,IT8:97,IT9:155,IT10:250,IT11:400},
+];
+
+const STD_BORES = [16,20,25,32,40,50,63,80,100,125,160,200,250,320];
+const PRESSURE_UNITS = ["Pa","kPa","MPa","bar","atm","kgf/cm²","psi"];
+const PRESSURE_TO_PA = [1,1e3,1e6,1e5,101325,98066.5,6894.76];
+
+// ─── CATEGORIES ──────────────────────────────
+const CATEGORIES = [
+  {id:"motor",    label:"電機選型",   icon:"⚡", calcs:["motor_torque","motor_inertia","servo_select","power_calc","belt_drive"]},
+  {id:"cylinder", label:"氣動選型",   icon:"💨", calcs:["cylinder_bore","cylinder_thrust","vacuum_pad"]},
+  {id:"ballscrew",label:"絲桿運動",   icon:"🔩", calcs:["ballscrew_horiz","ballscrew_vert"]},
+  {id:"gear",     label:"齒輪計算",   icon:"⚙️", calcs:["gear_rack_motor","gear_rack_design","worm_gear","bevel_gear","coupler_universal","coupler_gear"]},
+  {id:"spring",   label:"彈簧計算",   icon:"🌀", calcs:["spring_calc","spring_stiffness"]},
+  {id:"chain",    label:"鏈條計算",   icon:"⛓️", calcs:["chain_length","sprocket_basic"]},
+  {id:"belt",     label:"同步帶計算", icon:"🔄", calcs:["sync_belt"]},
+  {id:"section",  label:"截面力學",   icon:"📐", calcs:["section_circle","section_hollow_circle","section_rect","section_hollow_rect"]},
+  {id:"press",    label:"沖壓成型",   icon:"🔨", calcs:["blank_force","bend_v","bend_u"]},
+  {id:"fastener", label:"鍵銷強度",   icon:"🔧", calcs:["key_strength","pin_strength","press_fit","thread_dims"]},
+  {id:"bearing",  label:"軸承查詢",   icon:"⭕", calcs:["bearing_lookup","bearing_thrust_lookup","bearing_life"]},
+  {id:"tolerance",label:"公差查詢",   icon:"📏", calcs:["it_tolerance"]},
+  {id:"material", label:"材料查詢",   icon:"🧱", calcs:["material_elastic","material_density","material_friction","bolt_torque_lookup"]},
+  {id:"unit",     label:"單位換算",   icon:"🔁", calcs:["unit_pressure","unit_power","unit_torque","unit_length"]},
+  {id:"cam",      label:"凸輪分割器",  icon:"🎡", calcs:["cam_sine","indexer_select"]},
+  {id:"hydraulic",label:"液壓系統",   icon:"🛢️", calcs:["hydraulic_pump","hydraulic_pipe","hydraulic_shock","accumulator","tank_thermal"]},
+  {id:"pneumatic",label:"氣動計算",   icon:"🌬️", calcs:["air_consumption"]},
+  {id:"conveyor", label:"輸送系統",   icon:"🏭", calcs:["conveyor_chain"]},
+  {id:"other",    label:"其他計算",   icon:"📊", calcs:["column_buckling","ratchet_calc"]},
+];
+
+// ─── CALCULATORS ─────────────────────────────
+const CALCS = {
+
+  // ══ 氣動 ══
+  cylinder_bore:{name:"氣缸內徑選型",desc:"依負載與工作壓力計算缸徑",
+    inputs:[{key:"F",label:"實際負載 F",unit:"N",default:98},{key:"P",label:"工作壓力 P",unit:"MPa",default:0.5},{key:"beta",label:"負載率 β",unit:"",default:0.5,hint:"低速阻性0.65 / 高速慣性0.3 / 一般0.5"}],
+    outputs:[{key:"Fth",label:"理論出力",unit:"N"},{key:"D_calc",label:"計算缸徑",unit:"mm"},{key:"D_sel",label:"建議選用缸徑",unit:"mm"}],
+    calc(i){const Fth=i.F/i.beta;const D_calc=Math.sqrt((4*Fth)/(Math.PI*i.P*1e6))*1000;const D_sel=STD_BORES.find(d=>d>=D_calc)??STD_BORES[STD_BORES.length-1];return{Fth:Fth.toFixed(1),D_calc:D_calc.toFixed(2),D_sel};}
+  },
+  cylinder_thrust:{name:"氣缸推力計算",desc:"無桿側與有桿側推力",
+    inputs:[{key:"P",label:"氣壓",unit:"MPa",default:0.5},{key:"D",label:"缸徑",unit:"mm",default:63},{key:"d",label:"桿徑",unit:"mm",default:20},{key:"eta",label:"效率 η",unit:"",default:0.8}],
+    outputs:[{key:"F_push",label:"無桿側推力",unit:"N"},{key:"F_pull",label:"有桿側推力",unit:"N"}],
+    calc(i){const A1=Math.PI/4*i.D**2;const A2=Math.PI/4*(i.D**2-i.d**2);return{F_push:(i.P*1e6*A1*1e-6*i.eta).toFixed(1),F_pull:(i.P*1e6*A2*1e-6*i.eta).toFixed(1)};}
+  },
+  vacuum_pad:{name:"真空吸盤選型",desc:"計算所需吸力與吸盤尺寸",
+    inputs:[{key:"W",label:"工件重量",unit:"kg",default:2},{key:"n",label:"吸盤數量",unit:"個",default:2},{key:"sf",label:"安全係數",unit:"",default:2,hint:"水平:2 / 垂直側吸:4"},{key:"vac",label:"真空度",unit:"kPa",default:60}],
+    outputs:[{key:"F_req",label:"每盤所需吸力",unit:"N"},{key:"D_min",label:"最小吸盤直徑",unit:"mm"}],
+    calc(i){const F_req=i.W*9.8*i.sf/i.n;const D_min=Math.sqrt(4*F_req/(Math.PI*i.vac*1e3)*1e6);return{F_req:F_req.toFixed(1),D_min:D_min.toFixed(1)};}
+  },
+
+  // ══ 電機 ══
+  motor_torque:{name:"負載轉矩計算（絲桿驅動）",desc:"絲桿驅動電機負載轉矩",
+    inputs:[{key:"F",label:"軸向負載 F",unit:"N",default:500},{key:"F0",label:"預負載 F0",unit:"N",default:167},{key:"PB",label:"螺距 PB",unit:"mm",default:10},{key:"mu0",label:"預壓摩擦係數 μ₀",unit:"",default:0.2},{key:"eta",label:"機械效率 η",unit:"",default:0.9},{key:"i",label:"減速比 i",unit:"",default:1}],
+    outputs:[{key:"TL",label:"負載轉矩",unit:"N·m"}],
+    calc(inp){return{TL:((inp.F+inp.F0*inp.mu0)*(inp.PB/1000)/(2*Math.PI*inp.eta*inp.i)).toFixed(5)};}
+  },
+  motor_inertia:{name:"慣量（慣性矩）計算",desc:"圓柱/圓環/矩形板旋轉慣量",
+    inputs:[{key:"type",label:"形狀 (1=圓柱 2=圓環 3=矩形)",unit:"",default:1},{key:"m",label:"質量 m",unit:"kg",default:2},{key:"R",label:"外徑半徑 R",unit:"m",default:0.05},{key:"r",label:"內徑半徑 r（圓環）",unit:"m",default:0},{key:"a",label:"長 a（矩形）",unit:"m",default:0.1},{key:"b",label:"寬 b（矩形）",unit:"m",default:0.05}],
+    outputs:[{key:"J",label:"轉動慣量 J",unit:"kg·m²"}],
+    calc(i){const t=Math.round(i.type);const J=t===1?0.5*i.m*i.R**2:t===2?0.5*i.m*(i.R**2+i.r**2):i.m*(i.a**2+i.b**2)/12;return{J:J.toExponential(4)};}
+  },
+  servo_select:{name:"伺服電機選型驗證",desc:"驗證轉矩裕度與慣量比",
+    inputs:[{key:"TL",label:"負載轉矩 TL",unit:"N·m",default:1.5},{key:"TM",label:"電機額定轉矩",unit:"N·m",default:3.0},{key:"JL",label:"負載慣量 JL",unit:"kg·m²",default:0.001},{key:"JM",label:"電機慣量 JM",unit:"kg·m²",default:0.0005},{key:"ratio_max",label:"允許最大慣量比",unit:"",default:5}],
+    outputs:[{key:"torque_ok",label:"轉矩裕度",unit:"%"},{key:"ratio",label:"實際慣量比",unit:"倍"},{key:"verdict",label:"判定結果",unit:""}],
+    calc(i){const torque_ok=((i.TM-i.TL)/i.TM*100).toFixed(1);const ratio=(i.JL/i.JM).toFixed(2);return{torque_ok,ratio,verdict:parseFloat(torque_ok)>0&&parseFloat(ratio)<=i.ratio_max?"✅ 符合":"❌ 不符合，需重選"};}
+  },
+  power_calc:{name:"功率 ↔ 轉矩換算",desc:"轉速×轉矩→功率，功率→轉矩",
+    inputs:[{key:"P",label:"功率 P",unit:"W",default:750},{key:"T",label:"轉矩 T",unit:"N·m",default:5},{key:"n",label:"轉速 n",unit:"rpm",default:1450}],
+    outputs:[{key:"T_from_P",label:"由P計算轉矩",unit:"N·m"},{key:"P_from_T",label:"由T計算功率",unit:"W"}],
+    calc(i){return{T_from_P:((i.P*60)/(2*Math.PI*i.n)).toFixed(4),P_from_T:((i.T*2*Math.PI*i.n)/60).toFixed(2)};}
+  },
+  belt_drive:{name:"皮帶傳動慣量計算",desc:"皮帶輪驅動機構慣量比",
+    inputs:[{key:"WA",label:"工件質量",unit:"kg",default:2},{key:"PD",label:"帶輪直徑",unit:"m",default:0.05},{key:"WP",label:"帶輪質量",unit:"kg",default:0.5},{key:"BN",label:"機構效率",unit:"",default:0.8},{key:"mu",label:"摩擦係數",unit:"",default:0.1},{key:"F",label:"外力 F",unit:"N",default:0},{key:"JM",label:"電機慣量",unit:"kg·m²",default:0.0001}],
+    outputs:[{key:"JL",label:"負載慣量 JL",unit:"kg·m²"},{key:"ratio",label:"慣量比 JL/JM",unit:"倍"},{key:"TL",label:"負載轉矩",unit:"N·m"}],
+    calc(i){const JP=0.5*i.WP*(i.PD/2)**2;const JW=i.WA*(i.PD/2)**2;const JL=JP+JW;return{JL:JL.toExponential(3),ratio:(JL/i.JM).toFixed(2),TL:((i.WA*9.8*i.mu+i.F)*(i.PD/2)/i.BN).toFixed(4)};}
+  },
+
+  // ══ 絲桿 ══
+  ballscrew_horiz:{name:"滾珠絲桿水平運動",desc:"計算慣量比與負載轉矩",
+    inputs:[{key:"WA",label:"工件質量",unit:"kg",default:20},{key:"BL",label:"絲桿長度",unit:"m",default:0.5},{key:"BD",label:"絲桿直徑",unit:"m",default:0.025},{key:"BP",label:"螺距 Lead",unit:"m",default:0.01},{key:"BN",label:"效率 η",unit:"",default:0.9},{key:"mu",label:"摩擦係數 μ",unit:"",default:0.1},{key:"F",label:"外力 F",unit:"N",default:0},{key:"JM",label:"電機慣量 JM",unit:"kg·m²",default:0.0001}],
+    outputs:[{key:"JL",label:"負載慣量 JL",unit:"kg·m²"},{key:"ratio",label:"慣量比 JL/JM",unit:"倍"},{key:"TL",label:"負載轉矩",unit:"N·m"}],
+    calc(i){const BW=7900*Math.PI/4*i.BD**2*i.BL;const JB=BW*i.BD**2/8;const JW=i.WA*(i.BP/(2*Math.PI))**2;const JL=JB+JW;return{JL:JL.toExponential(3),ratio:(JL/i.JM).toFixed(2),TL:((i.WA*9.8*i.mu+i.F)*i.BP/(2*Math.PI*i.BN)).toFixed(5)};}
+  },
+  ballscrew_vert:{name:"滾珠絲桿垂直運動",desc:"含重力項垂直絲桿轉矩",
+    inputs:[{key:"WA",label:"工件質量",unit:"kg",default:10},{key:"BP",label:"螺距 Lead",unit:"m",default:0.01},{key:"BN",label:"效率 η",unit:"",default:0.9},{key:"mu",label:"摩擦係數",unit:"",default:0.1},{key:"F",label:"額外外力",unit:"N",default:0}],
+    outputs:[{key:"T_up",label:"上升轉矩",unit:"N·m"},{key:"T_down",label:"下降轉矩",unit:"N·m"}],
+    calc(i){const Fg=i.WA*9.8;const Ff=Fg*i.mu;return{T_up:((Fg+Ff+i.F)*i.BP/(2*Math.PI*i.BN)).toFixed(5),T_down:(Math.max(0,Fg-Ff-i.F)*i.BP*i.BN/(2*Math.PI)).toFixed(5)};}
+  },
+
+  // ══ 齒輪 ══
+  gear_rack_motor:{name:"齒輪齒條電機選型",desc:"直線運動所需電機功率與轉矩",
+    inputs:[{key:"F",label:"移動阻力 F",unit:"N",default:200},{key:"v",label:"移動速度 v",unit:"m/s",default:0.5},{key:"m",label:"齒輪模數",unit:"mm",default:2},{key:"z",label:"齒輪齒數",unit:"",default:20},{key:"eta",label:"傳動效率 η",unit:"",default:0.85}],
+    outputs:[{key:"D",label:"節圓直徑",unit:"mm"},{key:"n",label:"所需轉速",unit:"rpm"},{key:"T",label:"所需轉矩",unit:"N·m"},{key:"P",label:"所需功率",unit:"W"}],
+    calc(i){const D=i.m*i.z;return{D:D.toFixed(1),n:(i.v*1000*60/(Math.PI*D)).toFixed(1),T:(i.F*(D/2)/1000/i.eta).toFixed(3),P:(i.F*i.v/i.eta).toFixed(1)};}
+  },
+  gear_rack_design:{name:"齒輪齒條幾何尺寸",desc:"標準齒輪幾何尺寸計算",
+    inputs:[{key:"m",label:"模數 m",unit:"mm",default:2},{key:"z",label:"齒數 z",unit:"",default:20},{key:"alpha",label:"壓力角 α",unit:"°",default:20}],
+    outputs:[{key:"d",label:"節圓直徑",unit:"mm"},{key:"da",label:"齒頂圓",unit:"mm"},{key:"df",label:"齒根圓",unit:"mm"},{key:"p",label:"齒距",unit:"mm"},{key:"h",label:"全齒高",unit:"mm"}],
+    calc(i){const d=i.m*i.z;return{d:d.toFixed(2),da:(d+2*i.m).toFixed(2),df:(d-2.5*i.m).toFixed(2),p:(Math.PI*i.m).toFixed(3),h:(2.25*i.m).toFixed(2)};}
+  },
+  worm_gear:{name:"圓柱蝸杆傳動幾何尺寸",desc:"蝸杆蝸輪基本幾何尺寸",
+    inputs:[{key:"Mdu",label:"模數 m",unit:"mm",default:2},{key:"Z1",label:"蝸杆頭數",unit:"",default:1},{key:"Z2",label:"蝸輪齒數",unit:"",default:40},{key:"q",label:"特性係數 q",unit:"",default:10},{key:"xi",label:"變位係數 ξ",unit:"",default:0}],
+    outputs:[{key:"A",label:"中心距 A",unit:"mm"},{key:"d1",label:"蝸杆分度圓",unit:"mm"},{key:"d2",label:"蝸輪分度圓",unit:"mm"},{key:"da1",label:"蝸杆齒頂圓",unit:"mm"},{key:"da2",label:"蝸輪齒頂圓",unit:"mm"},{key:"i",label:"傳動比",unit:""},{key:"lam",label:"導角 λ",unit:"°"}],
+    calc(inp){const{Mdu,Z1,Z2,q,xi}=inp;const d1=q*Mdu,d2=Mdu*Z2,A=0.5*Mdu*(Z2+q+2*xi);return{A:A.toFixed(2),d1:d1.toFixed(2),d2:d2.toFixed(2),da1:(Mdu*(q+2)).toFixed(2),da2:(2*(A-0.5*d1+Mdu)).toFixed(2),i:(Z2/Z1).toFixed(0),lam:(Math.atan(Z1/q)*180/Math.PI).toFixed(3)};}
+  },
+  bevel_gear:{name:"直齒錐齒輪幾何尺寸",desc:"大端幾何尺寸基本計算",
+    inputs:[{key:"m",label:"大端模數 m",unit:"mm",default:3},{key:"z1",label:"小齒輪齒數 z₁",unit:"",default:15},{key:"z2",label:"大齒輪齒數 z₂",unit:"",default:30},{key:"alpha",label:"壓力角 α",unit:"°",default:20},{key:"b",label:"齒寬 b",unit:"mm",default:20}],
+    outputs:[{key:"delta1",label:"小輪節錐角 δ₁",unit:"°"},{key:"delta2",label:"大輪節錐角 δ₂",unit:"°"},{key:"R",label:"背錐距 R",unit:"mm"},{key:"d1",label:"小輪分度圓徑",unit:"mm"},{key:"d2",label:"大輪分度圓徑",unit:"mm"},{key:"da1",label:"小輪齒頂圓",unit:"mm"},{key:"da2",label:"大輪齒頂圓",unit:"mm"}],
+    calc(i){const u=i.z2/i.z1;const d1=Math.atan(i.z1/i.z2)*180/Math.PI;const d2=90-d1;const R=Math.sqrt((i.m*i.z1)**2+(i.m*i.z2)**2)/2;const D1=i.m*i.z1,D2=i.m*i.z2;const ha=1*i.m;const da1=D1+2*ha*Math.cos(d1*Math.PI/180),da2=D2+2*ha*Math.cos(d2*Math.PI/180);return{delta1:d1.toFixed(3),delta2:d2.toFixed(3),R:R.toFixed(2),d1:D1.toFixed(2),d2:D2.toFixed(2),da1:da1.toFixed(2),da2:da2.toFixed(2)};}
+  },
+  coupler_universal:{name:"萬向聯軸器計算",desc:"計算轉矩與驗算",
+    inputs:[{key:"P",label:"傳動功率 P",unit:"kW",default:5.5},{key:"n",label:"轉速 n",unit:"rpm",default:73},{key:"K",label:"工況係數 K",unit:"",default:5,hint:"輕微衝擊:3~4 / 中等衝擊:5~6 / 嚴重衝擊:7~8"},{key:"Tn",label:"選用聯軸器公稱轉矩 Tn",unit:"kN·m",default:12.5}],
+    outputs:[{key:"T",label:"理論轉矩 T",unit:"kN·m"},{key:"Tc",label:"計算轉矩 Tc",unit:"kN·m"},{key:"verdict",label:"驗算 Tn≥Tc",unit:""}],
+    calc(i){const T=9.55*i.P/i.n;const Tc=T*i.K;return{T:T.toFixed(3),Tc:Tc.toFixed(3),verdict:i.Tn>=Tc?"✅ 符合":"❌ 不符合，需升級"};}
+  },
+  coupler_gear:{name:"齒式聯軸器計算",desc:"計算轉矩驗算公稱轉矩",
+    inputs:[{key:"T",label:"理論轉矩 T",unit:"N·m",default:2387.5},{key:"Kw",label:"動力機係數 Kw",unit:"",default:1},{key:"K",label:"工況係數 K",unit:"",default:2},{key:"Kt",label:"溫度係數 Kt",unit:"",default:1},{key:"Kz",label:"啟動係數 Kz",unit:"",default:1},{key:"Tn",label:"選用聯軸器公稱轉矩 Tn",unit:"N·m",default:14000}],
+    outputs:[{key:"Tc",label:"計算轉矩 Tc",unit:"N·m"},{key:"verdict",label:"驗算 Tn≥Tc",unit:""}],
+    calc(i){const Tc=i.T*i.Kw*i.K*i.Kt*i.Kz;return{Tc:Tc.toFixed(0),verdict:i.Tn>=Tc?"✅ 符合":"❌ 不符合，需升級"};}
+  },
+
+  // ══ 彈簧 ══
+  spring_calc:{name:"圓柱螺旋彈簧",desc:"彈簧剛度、有效圈數、剪應力",
+    inputs:[{key:"P1",label:"最小載荷 P1",unit:"N",default:0},{key:"Pn",label:"最大載荷 Pn",unit:"N",default:500},{key:"h",label:"工作行程 h",unit:"mm",default:20},{key:"D",label:"彈簧中徑 D",unit:"mm",default:25},{key:"d",label:"鋼絲直徑 d",unit:"mm",default:3},{key:"G",label:"切變模量 G",unit:"MPa",default:79000}],
+    outputs:[{key:"C",label:"旋繞比 C",unit:""},{key:"K",label:"曲度係數 K",unit:""},{key:"tau",label:"最大剪應力 τ",unit:"MPa"},{key:"k",label:"彈簧剛度 k",unit:"N/mm"},{key:"n",label:"有效圈數 n",unit:"圈"}],
+    calc(i){const C=i.D/i.d,K=(4*C-1)/(4*C-4)+0.615/C;return{C:C.toFixed(2),K:K.toFixed(4),tau:(8*K*i.Pn*i.D/(Math.PI*i.d**3)).toFixed(1),k:((i.Pn-i.P1)/i.h).toFixed(2),n:(i.G*i.d**4/(8*i.D**3*((i.Pn-i.P1)/i.h))).toFixed(2)};}
+  },
+  spring_stiffness:{name:"彈簧剛度（已知幾何）",desc:"已知鋼絲直徑、中徑、圈數求剛度",
+    inputs:[{key:"G",label:"切變模量 G",unit:"MPa",default:79000},{key:"d",label:"鋼絲直徑 d",unit:"mm",default:2.2},{key:"D2",label:"彈簧中徑 D₂",unit:"mm",default:24.5},{key:"n",label:"有效圈數 n",unit:"圈",default:30}],
+    outputs:[{key:"k",label:"彈簧剛度 k",unit:"N/mm"},{key:"C",label:"旋繞比 C",unit:""},{key:"Pmax",label:"許用極限載荷",unit:"N"}],
+    calc(i){const k=i.G*i.d**4/(8*i.D2**3*i.n);const C=i.D2/i.d;const K=(4*C-1)/(4*C-4)+0.615/C;return{k:k.toFixed(4),C:C.toFixed(2),Pmax:(600*Math.PI*i.d**3/(8*K*i.D2)).toFixed(1)};}
+  },
+
+  // ══ 鏈條 ══
+  chain_length:{name:"滾子鏈條長度計算",desc:"計算鏈條節數與實際中心距",
+    inputs:[{key:"z1",label:"小鏈輪齒數 z₁",unit:"",default:17},{key:"z2",label:"大鏈輪齒數 z₂",unit:"",default:34},{key:"a0",label:"初定中心距 a₀",unit:"mm",default:400},{key:"p",label:"鏈條節距 P",unit:"mm",default:12.7}],
+    outputs:[{key:"Lp",label:"計算節數",unit:"節"},{key:"Lp0",label:"選用節數（偶數）",unit:"節"},{key:"L",label:"鏈條長度",unit:"mm"},{key:"a",label:"實際中心距",unit:"mm"}],
+    calc(i){const a0p=i.a0/i.p;const Lp=2*a0p+(i.z1+i.z2)/2+((i.z2-i.z1)/(2*Math.PI))**2/a0p;let Lp0=Math.ceil(Lp);if(Lp0%2!==0)Lp0++;const A=Lp0-(i.z1+i.z2)/2;return{Lp:Lp.toFixed(3),Lp0,L:(Lp0*i.p).toFixed(1),a:(i.p/4*(A+Math.sqrt(A**2-8*((i.z2-i.z1)/(2*Math.PI))**2))).toFixed(1)};}
+  },
+  sprocket_basic:{name:"鏈輪基本尺寸",desc:"分度圓、齒頂圓、齒根圓",
+    inputs:[{key:"z",label:"齒數 z",unit:"",default:17},{key:"p",label:"節距 P",unit:"mm",default:12.7},{key:"d1",label:"滾子外徑 d₁",unit:"mm",default:7.95}],
+    outputs:[{key:"d",label:"分度圓直徑",unit:"mm"},{key:"da_max",label:"齒頂圓（最大）",unit:"mm"},{key:"da_min",label:"齒頂圓（最小）",unit:"mm"},{key:"df",label:"齒根圓直徑",unit:"mm"}],
+    calc(i){const d=i.p/Math.sin(Math.PI/i.z);return{d:d.toFixed(3),da_max:(d+1.25*i.p-i.d1).toFixed(3),da_min:(d+(1-1.6/i.z)*i.p-i.d1).toFixed(3),df:(d-i.d1).toFixed(3)};}
+  },
+
+  // ══ 同步帶 ══
+  sync_belt:{name:"同步帶傳動設計",desc:"節圓直徑、帶長、傳動比",
+    inputs:[{key:"p",label:"節距 P",unit:"mm",default:5},{key:"z1",label:"主動輪齒數 z₁",unit:"",default:24},{key:"z2",label:"從動輪齒數 z₂",unit:"",default:48},{key:"a0",label:"設計中心距 a₀",unit:"mm",default:200}],
+    outputs:[{key:"d1",label:"主動輪節徑",unit:"mm"},{key:"d2",label:"從動輪節徑",unit:"mm"},{key:"i",label:"傳動比",unit:""},{key:"Lp",label:"帶節線長",unit:"mm"},{key:"Lp0",label:"建議帶長（取整）",unit:"mm"}],
+    calc(i){const d1=i.p*i.z1/Math.PI,d2=i.p*i.z2/Math.PI;const Lp=2*i.a0+Math.PI*(d1+d2)/2+(d2-d1)**2/(4*i.a0);const Lp0=Math.round(Lp/i.p)*i.p;return{d1:d1.toFixed(3),d2:d2.toFixed(3),i:(i.z2/i.z1).toFixed(3),Lp:Lp.toFixed(1),Lp0:Lp0.toFixed(1)};}
+  },
+
+  // ══ 截面 ══
+  section_circle:{name:"圓截面慣性矩",desc:"實心圓截面特性",
+    inputs:[{key:"D",label:"直徑 D",unit:"mm",default:30}],
+    outputs:[{key:"A",label:"截面積",unit:"mm²"},{key:"I",label:"慣性矩",unit:"mm⁴"},{key:"W",label:"截面模數",unit:"mm³"},{key:"i_r",label:"迴轉半徑",unit:"mm"}],
+    calc(inp){const r=inp.D/2,A=Math.PI*r**2,I=Math.PI*r**4/4;return{A:A.toFixed(2),I:I.toFixed(2),W:(I/r).toFixed(2),i_r:Math.sqrt(I/A).toFixed(3)};}
+  },
+  section_hollow_circle:{name:"空心圓截面慣性矩",desc:"圓管截面特性",
+    inputs:[{key:"D",label:"外徑 D",unit:"mm",default:50},{key:"d",label:"內徑 d",unit:"mm",default:40}],
+    outputs:[{key:"A",label:"截面積",unit:"mm²"},{key:"I",label:"慣性矩",unit:"mm⁴"},{key:"W",label:"截面模數",unit:"mm³"},{key:"i_r",label:"迴轉半徑",unit:"mm"}],
+    calc(inp){const A=Math.PI/4*(inp.D**2-inp.d**2),I=Math.PI/64*(inp.D**4-inp.d**4);return{A:A.toFixed(2),I:I.toFixed(2),W:(I/(inp.D/2)).toFixed(2),i_r:Math.sqrt(I/A).toFixed(3)};}
+  },
+  section_rect:{name:"矩形截面慣性矩",desc:"矩形截面（對形心軸）",
+    inputs:[{key:"b",label:"寬度 b",unit:"mm",default:40},{key:"h",label:"高度 h",unit:"mm",default:60}],
+    outputs:[{key:"A",label:"截面積",unit:"mm²"},{key:"Ix",label:"Ix（強軸）",unit:"mm⁴"},{key:"Wx",label:"截面模數 Wx",unit:"mm³"},{key:"Iy",label:"Iy（弱軸）",unit:"mm⁴"},{key:"i_r",label:"x軸迴轉半徑",unit:"mm"}],
+    calc(inp){const A=inp.b*inp.h,Ix=inp.b*inp.h**3/12,Iy=inp.h*inp.b**3/12;return{A:A.toFixed(2),Ix:Ix.toFixed(2),Wx:(Ix/(inp.h/2)).toFixed(2),Iy:Iy.toFixed(2),i_r:Math.sqrt(Ix/A).toFixed(3)};}
+  },
+  section_hollow_rect:{name:"空心矩形截面慣性矩",desc:"方管截面特性",
+    inputs:[{key:"B",label:"外寬 B",unit:"mm",default:60},{key:"H",label:"外高 H",unit:"mm",default:80},{key:"t",label:"壁厚 t",unit:"mm",default:4}],
+    outputs:[{key:"A",label:"截面積",unit:"mm²"},{key:"Ix",label:"Ix",unit:"mm⁴"},{key:"Wx",label:"截面模數",unit:"mm³"}],
+    calc(inp){const b=inp.B-2*inp.t,h=inp.H-2*inp.t;const A=inp.B*inp.H-b*h,Ix=(inp.B*inp.H**3-b*h**3)/12;return{A:A.toFixed(2),Ix:Ix.toFixed(2),Wx:(Ix/(inp.H/2)).toFixed(2)};}
+  },
+
+  // ══ 沖壓 ══
+  blank_force:{name:"總沖裁力計算",desc:"修正係數法",
+    inputs:[{key:"L",label:"沖裁周長 L",unit:"mm",default:100},{key:"t",label:"料厚 t",unit:"mm",default:2},{key:"tau",label:"抗剪強度 τ",unit:"MPa",default:300},{key:"k",label:"修正係數 k",unit:"",default:1.3,hint:"一般取1.3"}],
+    outputs:[{key:"F",label:"理論沖裁力",unit:"N"},{key:"F_cor",label:"修正沖裁力",unit:"N"},{key:"F_kN",label:"修正沖裁力",unit:"kN"}],
+    calc(i){const F=i.L*i.t*i.tau,Fc=F*i.k;return{F:F.toFixed(0),F_cor:Fc.toFixed(0),F_kN:(Fc/1000).toFixed(2)};}
+  },
+  bend_v:{name:"V型彎曲力計算",desc:"V形模彎曲所需壓力",
+    inputs:[{key:"b",label:"彎曲寬度 b",unit:"mm",default:50},{key:"t",label:"料厚 t",unit:"mm",default:2},{key:"r",label:"彎曲半徑 r",unit:"mm",default:3},{key:"sigma",label:"抗拉強度 σ",unit:"MPa",default:400}],
+    outputs:[{key:"F",label:"V型彎曲力",unit:"N"}],
+    calc(i){return{F:(0.6*i.b*i.t**2*i.sigma/(i.r+i.t)).toFixed(0)};}
+  },
+  bend_u:{name:"U型彎曲力計算",desc:"U形模彎曲所需壓力",
+    inputs:[{key:"b",label:"彎曲寬度 b",unit:"mm",default:50},{key:"t",label:"料厚 t",unit:"mm",default:2},{key:"r",label:"彎曲半徑 r",unit:"mm",default:3},{key:"sigma",label:"抗拉強度 σ",unit:"MPa",default:400}],
+    outputs:[{key:"F",label:"U型彎曲力",unit:"N"}],
+    calc(i){return{F:(0.7*i.b*i.t**2*i.sigma/(i.r+i.t)).toFixed(0)};}
+  },
+
+  // ══ 鍵銷強度 ══
+  key_strength:{name:"平鍵強度計算",desc:"擠壓與剪切應力驗算",
+    inputs:[{key:"T",label:"傳遞轉矩 T",unit:"N·m",default:50},{key:"D",label:"軸徑 D",unit:"mm",default:30},{key:"L",label:"鍵長 L",unit:"mm",default:50},{key:"b",label:"鍵寬 b",unit:"mm",default:10},{key:"h",label:"鍵高 h",unit:"mm",default:8},{key:"Ppp",label:"許用擠壓應力 [σ]",unit:"MPa",default:80,hint:"靜載輕衝:100~120 / 衝擊:60~70"},{key:"tp",label:"許用剪切應力 [τ]",unit:"MPa",default:40}],
+    outputs:[{key:"l",label:"有效鍵長 l",unit:"mm"},{key:"sigma",label:"擠壓應力 σ",unit:"MPa"},{key:"tau",label:"剪切應力 τ",unit:"MPa"},{key:"v_sigma",label:"擠壓驗算",unit:""},{key:"v_tau",label:"剪切驗算",unit:""}],
+    calc(i){const T_Nmm=i.T*1000;const l=i.L-i.b,k=i.h/2,sigma=2*T_Nmm/(i.D*k*l),tau=2*T_Nmm/(i.D*i.b*l);return{l:l.toFixed(0),sigma:sigma.toFixed(2),tau:tau.toFixed(2),v_sigma:sigma<=i.Ppp?"✅ 合格":"❌ 超限",v_tau:tau<=i.tp?"✅ 合格":"❌ 超限"};}
+  },
+  pin_strength:{name:"圓柱銷強度計算",desc:"平面型圓柱銷剪切應力驗算",
+    inputs:[{key:"F",label:"橫向力 F",unit:"N",default:5000},{key:"d",label:"銷直徑 d",unit:"mm",default:10},{key:"Z",label:"銷數量 Z",unit:"個",default:2},{key:"Tp",label:"許用剪切 [τ]",unit:"MPa",default:80}],
+    outputs:[{key:"tau",label:"剪切應力 τ",unit:"MPa"},{key:"verdict",label:"驗算結果",unit:""}],
+    calc(i){const tau=4*i.F/(Math.PI*i.d**2*i.Z);return{tau:tau.toFixed(2),verdict:tau<=i.Tp?"✅ 合格":"❌ 超限"};}
+  },
+  press_fit:{name:"過盈配合計算",desc:"最小有效過盈量與最大允許壓力",
+    inputs:[{key:"da",label:"包容件外徑 da",unit:"mm",default:100},{key:"df",label:"結合直徑 df",unit:"mm",default:50},{key:"di",label:"被包容件內徑 di",unit:"mm",default:0},{key:"lf",label:"結合長度 lf",unit:"mm",default:60},{key:"mu",label:"摩擦係數 μ",unit:"",default:0.14},{key:"T",label:"傳遞轉矩 T",unit:"N·m",default:500},{key:"Ea",label:"包容件彈性模量",unit:"MPa",default:200000},{key:"Ei",label:"被包容件彈性模量",unit:"MPa",default:200000},{key:"va",label:"包容件泊松比",unit:"",default:0.3},{key:"vi",label:"被包容件泊松比",unit:"",default:0.3},{key:"ssa",label:"包容件屈服強度",unit:"MPa",default:295},{key:"ssi",label:"被包容件屈服強度",unit:"MPa",default:275}],
+    outputs:[{key:"Pfmin",label:"最小接合壓強",unit:"MPa"},{key:"delta_min",label:"最小有效過盈量",unit:"μm"},{key:"Pfmax",label:"最大允許壓強",unit:"MPa"},{key:"delta_max",label:"最大允許過盈量",unit:"μm"}],
+    calc(i){const T_Nmm=i.T*1000;const Pfmin=2*T_Nmm/(Math.PI*i.df**2*i.lf*i.mu);const qa=i.df/i.da,qi=i.di/i.df;const Ca=(1+qa**2)/(1-qa**2)+i.va,Ci=qi>0?(1+qi**2)/(1-qi**2)-i.vi:1-i.vi;const dmin=(Pfmin*i.df*Ca/i.Ea+Pfmin*i.df*Ci/i.Ei)*1000;const Pfmax=Math.min(0.58*i.ssa*(1-qa**2),qi>0?0.58*i.ssi*(1-qi**2):0.58*i.ssi);const dmax=(Pfmax*i.df*Ca/i.Ea+Pfmax*i.df*Ci/i.Ei)*1000;return{Pfmin:Pfmin.toFixed(2),delta_min:dmin.toFixed(1),Pfmax:Pfmax.toFixed(1),delta_max:dmax.toFixed(1)};}
+  },
+  thread_dims:{name:"公制螺紋中小徑計算",desc:"內螺紋中徑、小徑計算",
+    inputs:[{key:"D",label:"公稱直徑 D",unit:"mm",default:20},{key:"P",label:"螺距 P",unit:"mm",default:2.5}],
+    outputs:[{key:"D1",label:"小徑 D₁",unit:"mm"},{key:"D2",label:"中徑 D₂",unit:"mm"},{key:"da_min",label:"外螺紋大徑最小 d_min",unit:"mm"},{key:"pitch_remark",label:"常用螺距備註",unit:""}],
+    calc(i){const D1=i.D-1.0825*i.P;const D2=i.D-0.6495*i.P;const pitch_map={1:0.25,1.2:0.25,1.6:0.35,2:0.4,2.5:0.45,3:0.5,4:0.7,5:0.8,6:1,8:1.25,10:1.5,12:1.75,16:2,20:2.5,24:3,30:3.5,36:4,42:4.5,48:5};const std=pitch_map[i.D];return{D1:D1.toFixed(5),D2:D2.toFixed(5),da_min:(i.D-0.1).toFixed(2),pitch_remark:std?`M${i.D} 標準螺距 ${std}mm`:"非標準尺寸"};}
+  },
+
+  // ══ 軸承 ══
+  bearing_life:{name:"軸承壽命計算（L10）",desc:"依動負荷計算基本額定壽命",
+    inputs:[{key:"Cr",label:"額定動負荷 Cr",unit:"N",default:5590},{key:"P",label:"當量動負荷 P",unit:"N",default:800},{key:"n",label:"轉速 n",unit:"rpm",default:1450},{key:"p",label:"指數 p（球:3 滾:3.33）",unit:"",default:3}],
+    outputs:[{key:"L10",label:"L₁₀",unit:"×10⁶轉"},{key:"L10h",label:"L₁₀h 壽命",unit:"hr"}],
+    calc(i){const L10=(i.Cr/i.P)**i.p;return{L10:L10.toFixed(3),L10h:(L10*1e6/(60*i.n)).toFixed(0)};}
+  },
+
+  // ══ 立柱 & 棘輪 ══
+  column_buckling:{name:"立柱（軸心壓柱）穩定性",desc:"歐拉公式計算臨界力",
+    inputs:[{key:"N",label:"軸向壓力 N",unit:"N",default:50000},{key:"L",label:"立柱長度 L",unit:"mm",default:1000},{key:"I",label:"截面慣性矩",unit:"mm⁴",default:250000},{key:"A",label:"截面積 A",unit:"mm²",default:500},{key:"E",label:"彈性模量 E",unit:"MPa",default:206000},{key:"mu1",label:"約束係數 μ₁",unit:"",default:2,hint:"兩端固定:0.5 / 一固一鉸:0.7 / 兩端鉸:1 / 一固一自由:2"}],
+    outputs:[{key:"i_r",label:"迴轉半徑",unit:"mm"},{key:"lam",label:"長細比 λ",unit:""},{key:"Fcr",label:"歐拉臨界力",unit:"N"},{key:"safety",label:"穩定安全係數",unit:""}],
+    calc(i){const i_r=Math.sqrt(i.I/i.A);const Fcr=Math.PI**2*i.E*i.I/(i.mu1*i.L)**2;return{i_r:i_r.toFixed(2),lam:(i.mu1*i.L/i_r).toFixed(1),Fcr:Fcr.toFixed(0),safety:(Fcr/i.N).toFixed(2)};}
+  },
+// ══ 新增計算器模組 ══
+
+// ── 凸輪（正弦加速度曲線）──
+cam_sine:{name:"正弦加速度凸輪設計",desc:"計算凸輪位移、速度、加速度（修正正弦曲線）",
+  inputs:[
+    {key:"h",  label:"行程 h（升程）",unit:"mm", default:30},
+    {key:"rb", label:"基圓半徑 rb",   unit:"mm", default:100},
+    {key:"phi_o",label:"推程運動角 φ₀",unit:"°",default:120},
+    {key:"phi",label:"計算角度 φ（0~φ₀）",unit:"°",default:60},
+  ],
+  outputs:[
+    {key:"s",  label:"位移 s",        unit:"mm"},
+    {key:"v_coef",label:"速度係數 ds/dφ",unit:"mm/°"},
+    {key:"a_coef",label:"加速度係數",   unit:"mm/°²"},
+    {key:"r",  label:"凸輪向徑 r",     unit:"mm"},
+  ],
+  calc(i){
+    const phi_r=i.phi*Math.PI/180;
+    const phi_o_r=i.phi_o*Math.PI/180;
+    const tau=phi_r/phi_o_r; // 無因次時間
+    // 修正正弦曲線 (Modified Sine, Vm=1.76, Am=5.53)
+    const Vm=1.76,Am=5.53;
+    let s,v,a;
+    if(tau<=0.25){
+      s=i.h*(Am/(4*Math.PI**2))*(Math.PI/2*tau-Math.sin(2*Math.PI*tau)/2);
+      v=i.h/phi_o_r*Am/(4*Math.PI)*(Math.PI/2*(1-Math.cos(2*Math.PI*tau)));
+      a=i.h/phi_o_r**2*Am/2*Math.sin(2*Math.PI*tau);
+    }else if(tau<=0.75){
+      s=i.h*(Am/(4*Math.PI**2)*(Math.PI*(tau-0.25)+1)-1/(2*Math.PI)*Math.sin(2*Math.PI*tau));
+      v=i.h/phi_o_r*Am/(4*Math.PI)*(Math.PI*(1-Math.cos(2*Math.PI*(tau-0.25))));
+      a=i.h/phi_o_r**2*Am/2*Math.sin(2*Math.PI*(tau-0.25));
+    }else{
+      s=i.h*(1-Am/(4*Math.PI**2)*(Math.PI/2*(1-tau)+Math.sin(2*Math.PI*tau)/2));
+      v=i.h/phi_o_r*Am/(4*Math.PI)*(Math.PI/2*(1+Math.cos(2*Math.PI*tau)));
+      a=-i.h/phi_o_r**2*Am/2*Math.sin(2*Math.PI*tau);
+    }
+    const r=Math.sqrt((i.rb+s)**2+(v)**2);
+    return{s:s.toFixed(4),v_coef:v.toFixed(5),a_coef:a.toFixed(5),r:r.toFixed(3)};
+  }
+},
+
+// ── 分割器選型 ──
+indexer_select:{name:"凸輪分割器選型計算",desc:"間歇回轉轉盤電機功率選型",
+  inputs:[
+    {key:"N", label:"分割等份 N",       unit:"",    default:12},
+    {key:"t1",label:"定位時間 t₁",      unit:"s",   default:1},
+    {key:"t2",label:"驅動時間 t₂",      unit:"s",   default:3},
+    {key:"n", label:"入力軸轉速 n",     unit:"rpm", default:125},
+    {key:"D", label:"轉盤直徑 D",       unit:"cm",  default:60},
+    {key:"T", label:"轉盤厚度 T",       unit:"cm",  default:1.5},
+    {key:"M", label:"材質比重（鋼:7.8）",unit:"kg/dm³",default:7.8},
+    {key:"M1",label:"工件重量 M1",      unit:"kg/組",default:1},
+    {key:"M2",label:"夾具重量 M2",      unit:"kg/組",default:3},
+    {key:"Re",label:"夾具PCD半徑 Re",   unit:"cm",  default:30},
+    {key:"z", label:"電機效率 z",       unit:"",    default:0.7},
+    {key:"fe",label:"安全係數 fe",      unit:"",    default:1.5},
+  ],
+  outputs:[
+    {key:"phi_h",label:"驅動角 φh",      unit:"°"},
+    {key:"W1",   label:"轉盤重量 W1",    unit:"kg"},
+    {key:"JT",   label:"系統總慣量 JT",  unit:"kg·cm²"},
+    {key:"P_min",label:"電機最小功率",   unit:"kW"},
+  ],
+  calc(i){
+    const phi_h=360*i.t2/(i.t1+i.t2);
+    const W1=Math.PI/4*i.D**2*i.T*i.M*0.1**3;
+    const W2=i.M1*i.N,W3=i.M2*i.N;
+    const JT_disk=W1*i.D**2/8;
+    const JT_fixture=(W2+W3)*i.Re**2;
+    const JT=JT_disk+JT_fixture;
+    const omega=2*Math.PI*i.n/60;
+    const Vm=1.76,Am=5.53;
+    const phi_h_r=phi_h*Math.PI/180;
+    const T_motor=JT*omega**2*Am*i.fe/(phi_h_r*i.n*60/i.t2);
+    const P_min=T_motor*omega/i.z/1000;
+    return{phi_h:phi_h.toFixed(1),W1:W1.toFixed(2),JT:JT.toFixed(1),P_min:P_min.toFixed(3)};
+  }
+},
+
+// ── 液壓：泵與電機 ──
+hydraulic_pump:{name:"液壓泵與電機選型",desc:"依系統壓力流量計算泵排量與電機功率",
+  inputs:[
+    {key:"Q", label:"系統流量 Q",     unit:"L/min",default:135},
+    {key:"P", label:"系統壓力 P",     unit:"bar",  default:200},
+    {key:"n", label:"電機轉速 n",     unit:"rpm",  default:1450},
+    {key:"eta_v",label:"容積效率 ηᵥ", unit:"",     default:0.95},
+    {key:"eta_m",label:"機械效率 ηₘ", unit:"",     default:0.85},
+  ],
+  outputs:[
+    {key:"Vg",  label:"泵排量 Vg",      unit:"mL/r"},
+    {key:"P_kW",label:"電機功率",        unit:"kW"},
+    {key:"T_motor",label:"電機轉矩",     unit:"N·m"},
+  ],
+  calc(i){
+    const Vg=i.Q*1000/(i.n*i.eta_v); // mL/r
+    const P_kW=i.Q*i.P/(600*i.eta_v*i.eta_m);
+    const T_motor=P_kW*1000*60/(2*Math.PI*i.n);
+    return{Vg:Vg.toFixed(2),P_kW:P_kW.toFixed(2),T_motor:T_motor.toFixed(2)};
+  }
+},
+
+// ── 液壓：管路壓損 ──
+hydraulic_pipe:{name:"液壓管路壓力損失",desc:"計算直管段壓損與流速（層流/紊流）",
+  inputs:[
+    {key:"Q", label:"流量 Q",        unit:"L/min",default:70},
+    {key:"d", label:"管路內徑 d",    unit:"mm",   default:15},
+    {key:"L", label:"管路長度 L",    unit:"m",    default:5},
+    {key:"nu",label:"運動黏度 ν",    unit:"cSt",  default:46,hint:"ISO VG46液壓油常溫約46 cSt"},
+    {key:"rho",label:"油液密度 ρ",   unit:"kg/m³",default:870},
+  ],
+  outputs:[
+    {key:"v",   label:"流速",           unit:"m/s"},
+    {key:"Re",  label:"雷諾數 Re",      unit:""},
+    {key:"type",label:"流態",           unit:""},
+    {key:"dp",  label:"管路壓損 Δp",   unit:"bar"},
+  ],
+  calc(i){
+    const A=Math.PI/4*(i.d/1000)**2;
+    const v=(i.Q/60000)/A;
+    const Re=v*(i.d/1000)/(i.nu*1e-6);
+    const laminar=Re<2300;
+    let lambda;
+    if(laminar) lambda=64/Re;
+    else lambda=0.316/Math.pow(Re,0.25); // Blasius
+    const dp=lambda*(i.L/(i.d/1000))*(i.rho*v**2/2)/1e5;
+    return{v:v.toFixed(3),Re:Re.toFixed(0),type:laminar?"層流 (Re<2300)":"紊流 (Re≥2300)",dp:dp.toFixed(4)};
+  }
+},
+
+// ── 液壓衝擊 ──
+hydraulic_shock:{name:"液壓衝擊計算",desc:"計算衝擊波速度與最大壓力升高值",
+  inputs:[
+    {key:"E0", label:"液體體積彈性模量 E₀",unit:"GPa",default:1.4},
+    {key:"rho",label:"液體密度 ρ",          unit:"kg/m³",default:870},
+    {key:"d",  label:"管道內徑 d",          unit:"mm",   default:30},
+    {key:"delta",label:"管壁厚度 δ",        unit:"mm",   default:5},
+    {key:"E",  label:"管材彈性模量 E",      unit:"GPa",  default:206},
+    {key:"v1", label:"管內原流速 v₁",      unit:"m/s",  default:3},
+    {key:"v2", label:"關閉後流速 v₂",      unit:"m/s",  default:0},
+    {key:"L",  label:"管道長度 L",          unit:"m",    default:10},
+    {key:"t_close",label:"關閉時間 t",      unit:"s",    default:0.05},
+  ],
+  outputs:[
+    {key:"alpha",label:"衝擊波速度 α",      unit:"m/s"},
+    {key:"T_wave",label:"往復時間 T",        unit:"s"},
+    {key:"dp_direct",label:"直接衝擊壓升 Δp",unit:"MPa"},
+    {key:"dp_indirect",label:"間接衝擊壓升 Δp",unit:"MPa"},
+    {key:"type",label:"衝擊類型",           unit:""},
+  ],
+  calc(i){
+    const E0_Pa=i.E0*1e9,E_Pa=i.E*1e9;
+    const K=1/(1/E0_Pa+i.d/1000/(E_Pa*(i.delta/1000)));
+    const alpha=Math.sqrt(K/i.rho);
+    const T_wave=2*i.L/alpha;
+    const dp_direct=alpha*i.rho*(i.v1-i.v2)/1e6;
+    const dp_indirect=alpha*i.rho*(i.v1-i.v2)*T_wave/i.t_close/1e6;
+    const isDirect=i.t_close<=T_wave;
+    return{alpha:alpha.toFixed(1),T_wave:T_wave.toFixed(4),dp_direct:dp_direct.toFixed(3),dp_indirect:dp_indirect.toFixed(3),type:isDirect?"直接衝擊（t≤T）":"間接衝擊（t＞T）"};
+  }
+},
+
+// ── 蓄能器容積 ──
+accumulator:{name:"蓄能器容積計算",desc:"依工作容積與壓力比計算蓄能器容積",
+  inputs:[
+    {key:"Vw",  label:"工作容積 Vw",     unit:"L",  default:10},
+    {key:"P1",  label:"最低工作壓力 P₁", unit:"bar",default:100},
+    {key:"P2",  label:"最高工作壓力 P₂", unit:"bar",default:140},
+    {key:"P0",  label:"充氣壓力 P₀",     unit:"bar",default:85,hint:"通常 P₀ = 0.6~0.9×P₁"},
+    {key:"n",   label:"多變指數 n",      unit:"",   default:1.0,hint:"等溫:1.0 / 絕熱:1.4"},
+  ],
+  outputs:[
+    {key:"V0",  label:"蓄能器容積 V₀",   unit:"L"},
+    {key:"ratio",label:"壓力比 P₂/P₁",  unit:""},
+    {key:"check",label:"P₀ 驗算",        unit:""},
+  ],
+  calc(i){
+    const ratio=i.P2/i.P1;
+    const V0=i.Vw/((i.P0/i.P1)**(1/i.n)-(i.P0/i.P2)**(1/i.n));
+    const ok=i.P0>=0.6*i.P1&&i.P0<=0.9*i.P1;
+    return{V0:V0.toFixed(2),ratio:ratio.toFixed(3),check:ok?"✅ P₀ 設定合理":"⚠️ 建議 P₀=0.6~0.9×P₁"};
+  }
+},
+
+// ── 耗氣量計算 ──
+air_consumption:{name:"氣缸耗氣量計算",desc:"最大耗氣量與電磁閥 Cv 值選型",
+  inputs:[
+    {key:"D",   label:"氣缸缸徑 D",   unit:"mm",    default:63},
+    {key:"Vmax",label:"最大速度 Vmax", unit:"mm/s",  default:420},
+    {key:"P",   label:"使用壓力 P",   unit:"MPa",   default:0.5},
+    {key:"L",   label:"氣缸行程 L",   unit:"mm",    default:100},
+    {key:"freq",label:"每分鐘往復數", unit:"次/min", default:10},
+  ],
+  outputs:[
+    {key:"Q_max",label:"最大耗氣量（自由空氣）", unit:"L/min"},
+    {key:"Cv",   label:"所需電磁閥 Cv 值",        unit:""},
+    {key:"Q_avg",label:"平均耗氣量",              unit:"L/min"},
+  ],
+  calc(i){
+    const A=Math.PI/4*(i.D/1000)**2; // m²
+    const Q_max=A*i.Vmax/1000*(i.P/0.1013+1)*1000*60; // L/min ANR
+    const Cv=Q_max/984;
+    const Q_avg=2*A*(i.L/1000)*(i.P/0.1013+1)*1000*i.freq; // L/min
+    return{Q_max:Q_max.toFixed(2),Cv:Cv.toFixed(4),Q_avg:Q_avg.toFixed(2)};
+  }
+},
+
+// ── 倍速鏈電機功率 ──
+conveyor_chain:{name:"倍速鏈電機功率計算",desc:"輸送機電機選型計算",
+  inputs:[
+    {key:"V",  label:"輸送速度 V",    unit:"m/min",default:20},
+    {key:"A",  label:"速度倍速 A",    unit:"",     default:2.5},
+    {key:"D",  label:"輸送鏈輪直徑 D",unit:"m",    default:0.164},
+    {key:"M1", label:"輸送工件總重 M1",unit:"kg",   default:1000},
+    {key:"M2", label:"鏈條重量 M2",   unit:"kg",   default:200},
+    {key:"M3", label:"轉動物重量 M3", unit:"kg",   default:150},
+    {key:"mu2",label:"靜摩擦係數 μ",  unit:"",     default:0.25},
+    {key:"eta1",label:"電機效率 η₁", unit:"",     default:0.85},
+    {key:"eta2",label:"機構效率 η₂", unit:"",     default:0.90},
+    {key:"t",  label:"加速時間 t",    unit:"s",    default:0.2},
+  ],
+  outputs:[
+    {key:"Va",  label:"鏈條速度 Va",   unit:"m/min"},
+    {key:"T3",  label:"克服摩擦扭矩 T3",unit:"N·m"},
+    {key:"Te",  label:"驅動軸最小扭矩",unit:"N·m"},
+    {key:"P_kW",label:"電機功率",       unit:"kW"},
+  ],
+  calc(i){
+    const Va=i.V/i.A;
+    const a=Va/(60*i.t);
+    const T1=(i.M1+i.M2)*a*i.D/2;
+    const T2=i.M3*a*i.D/2*0.1;
+    const T3=(i.M1+i.M2)*9.8*i.mu2*i.D/2;
+    const Te=T1+T2+T3;
+    const omega=Va/60/(i.D/2);
+    const P_kW=Te*omega/(i.eta1*i.eta2*1000);
+    return{Va:Va.toFixed(2),T3:T3.toFixed(1),Te:Te.toFixed(1),P_kW:P_kW.toFixed(3)};
+  }
+},
+
+// ── 油箱熱平衡 ──
+tank_thermal:{name:"油箱熱平衡計算",desc:"散熱面積、熱平衡溫度、風冷/水冷功率",
+  inputs:[
+    {key:"Pheat",label:"系統發熱功率",     unit:"kW", default:11},
+    {key:"A",    label:"油箱散熱面積",     unit:"m²", default:2},
+    {key:"k",    label:"傳熱係數 k",      unit:"W/(m²·K)",default:8,hint:"通風差:6 / 良好:10 / 風冷:15"},
+    {key:"T0",   label:"環境溫度 T₀",     unit:"°C", default:30},
+    {key:"T_set",label:"設定最高油溫 T",   unit:"°C", default:55},
+  ],
+  outputs:[
+    {key:"Pcool_need",label:"需要冷卻功率", unit:"kW"},
+    {key:"P_radiate",  label:"油箱自然散熱",unit:"kW"},
+    {key:"T_balance",  label:"熱平衡溫度",  unit:"°C"},
+    {key:"verdict",    label:"散熱判定",    unit:""},
+  ],
+  calc(i){
+    const dT=i.T_set-i.T0;
+    const P_radiate=i.k*i.A*dT/1000;
+    const Pcool_need=Math.max(0,i.Pheat-P_radiate);
+    const T_balance=i.Pheat*1000/(i.k*i.A)+i.T0;
+    return{Pcool_need:Pcool_need.toFixed(2),P_radiate:P_radiate.toFixed(2),T_balance:T_balance.toFixed(1),verdict:T_balance<=i.T_set?"✅ 自然散熱足夠":"❌ 需加裝冷卻器"};
+  }
+},
+
+
+  ratchet_calc:{name:"棘輪計算（CONTACT型）",desc:"料帶棘輪節圓與幾何尺寸",
+    inputs:[{key:"P",label:"料帶PITCH孔距 P",unit:"mm",default:5.3},{key:"T",label:"料厚 T",unit:"mm",default:0.12},{key:"D",label:"PITCH孔徑 D",unit:"mm",default:1},{key:"N",label:"棘輪齒數 N",unit:"",default:25}],
+    outputs:[{key:"S",label:"理論周長 S",unit:"mm"},{key:"D1",label:"理論直徑 D₁",unit:"mm"},{key:"D2",label:"實際直徑 D₂",unit:"mm"},{key:"D3",label:"腰高 D₃",unit:"mm"}],
+    calc(i){const S=i.P*i.N,D1=S/Math.PI;return{S:S.toFixed(3),D1:D1.toFixed(5),D2:(D1-2*i.T).toFixed(5),D3:(2.25*i.T).toFixed(3)};}
+  },
+
+  // ══ 單位換算 ══
+  unit_pressure:{_type:"unit_pressure",name:"壓力單位換算",desc:"Pa/kPa/MPa/bar/atm/psi 互換"},
+  unit_power:{name:"功率單位換算",desc:"W / kW / hp / PS 互換",
+    inputs:[{key:"val",label:"輸入值",unit:"",default:1},{key:"from",label:"單位 (1=W 2=kW 3=hp 4=PS)",unit:"",default:2}],
+    outputs:[{key:"W",label:"W"},{key:"kW",label:"kW"},{key:"hp",label:"hp（英制）"},{key:"PS",label:"PS（公制馬力）"}],
+    calc(i){const f=[1,1000,745.7,735.5][Math.round(i.from)-1]||1;const w=i.val*f;return{W:w.toFixed(2),kW:(w/1000).toFixed(4),hp:(w/745.7).toFixed(4),PS:(w/735.5).toFixed(4)};}
+  },
+  unit_torque:{name:"轉矩單位換算",desc:"N·m / kN·m / kgf·m / lbf·ft 互換",
+    inputs:[{key:"val",label:"輸入值",unit:"",default:10},{key:"from",label:"單位 (1=N·m 2=kN·m 3=kgf·m 4=lbf·ft)",unit:"",default:1}],
+    outputs:[{key:"Nm",label:"N·m"},{key:"kNm",label:"kN·m"},{key:"kgfm",label:"kgf·m"},{key:"lbft",label:"lbf·ft"}],
+    calc(i){const f=[1,1000,9.807,1.35582][Math.round(i.from)-1]||1;const nm=i.val*f;return{Nm:nm.toFixed(4),kNm:(nm/1000).toFixed(6),kgfm:(nm/9.807).toFixed(4),lbft:(nm/1.35582).toFixed(4)};}
+  },
+  unit_length:{name:"長度單位換算",desc:"mm / cm / m / in / ft 互換",
+    inputs:[{key:"val",label:"輸入值",unit:"",default:100},{key:"from",label:"單位 (1=mm 2=cm 3=m 4=in 5=ft)",unit:"",default:1}],
+    outputs:[{key:"mm",label:"mm"},{key:"cm",label:"cm"},{key:"m",label:"m"},{key:"inch",label:"inch"},{key:"ft",label:"ft"}],
+    calc(i){const f=[1,10,1000,25.4,304.8][Math.round(i.from)-1]||1;const mm=i.val*f;return{mm:mm.toFixed(4),cm:(mm/10).toFixed(4),m:(mm/1000).toFixed(6),inch:(mm/25.4).toFixed(5),ft:(mm/304.8).toFixed(6)};}
+  },
+
+  // ══ 查詢型（特殊 _type） ══
+  bearing_lookup:{_type:"bearing_lookup",name:"深溝球軸承查詢",desc:"依內徑或型號搜尋"},
+  bearing_thrust_lookup:{_type:"bearing_thrust_lookup",name:"推力球軸承查詢",desc:"依內徑或型號搜尋"},
+  it_tolerance:{_type:"it_tolerance",name:"IT公差等級查詢",desc:"依基本尺寸查 IT5~IT11"},
+  material_elastic:{_type:"material_elastic",name:"彈性模量 & 泊松比",desc:"常用材料彈性模量查詢"},
+  material_density:{_type:"material_density",name:"材料密度查詢",desc:"常用金屬與工程材料密度"},
+  material_friction:{_type:"material_friction",name:"材料摩擦係數",desc:"常用材料副摩擦係數"},
+  bolt_torque_lookup:{_type:"bolt_torque_lookup",name:"螺栓鎖緊扭矩標準",desc:"M6~M100 日本/DIN 標準扭矩"},
+};
+
+// ─── STYLES ──────────────────────────────────
+const CSS=`
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--surface:#181c27;--surface2:#1e2336;--border:#252b3b;--accent:#4a7cff;--accent2:#34c99e;--warn:#ff6b6b;--text:#e2e8f0;--muted:#64748b;--label:#94a3b8;--mono:'IBM Plex Mono',monospace;--sans:'Noto Sans TC',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px}
+.app{display:flex;height:calc(100vh - 40px);overflow:hidden}
+.sidebar{width:210px;min-width:210px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-header{padding:18px 16px 10px;border-bottom:1px solid var(--border)}
+.sidebar-header h1{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
+.sidebar-header p{font-size:11px;color:var(--muted);margin-top:2px}
+.search-box{margin:8px 10px 4px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;width:calc(100% - 20px);outline:none;font-family:var(--sans)}
+.search-box:focus{border-color:var(--accent)}
+.search-box::placeholder{color:var(--muted)}
+.nav-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:12px;color:var(--label);border-left:2px solid transparent;transition:all .12s;user-select:none}
+.nav-item:hover{color:var(--text);background:rgba(74,124,255,.07)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(74,124,255,.12)}
+.nav-icon{font-size:13px;width:18px;text-align:center}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:12px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.topbar h2{font-size:15px;font-weight:700}
+.topbar p{font-size:11px;color:var(--muted);margin-top:2px}
+.content{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;align-content:start}
+.home-grid{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-content:start}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--label);text-transform:uppercase;margin-bottom:4px}
+.card-desc{font-size:11px;color:var(--muted);margin-bottom:12px}
+.home-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s}
+.home-card:hover{border-color:var(--accent);background:rgba(74,124,255,.06)}
+.home-card .icon{font-size:20px;margin-bottom:8px}
+.home-card .name{font-size:12px;font-weight:600}
+.home-card .count{font-size:11px;color:var(--muted);margin-top:2px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;color:var(--label);margin-bottom:4px}
+.field .hint{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+.field-row{display:flex;align-items:center;gap:6px}
+.field input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .12s}
+.field input:focus{border-color:var(--accent)}
+.field .unit-tag{font-size:11px;color:var(--muted);min-width:44px;text-align:right;font-family:var(--mono)}
+.calc-btn{width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:7px;padding:8px 0;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .12s;font-family:var(--sans)}
+.calc-btn:hover{opacity:.85}
+.results-divider{margin-top:14px;border-top:1px solid var(--border);padding-top:10px}
+.result-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(37,43,59,.7)}
+.result-row:last-child{border-bottom:none}
+.result-label{font-size:11px;color:var(--label)}
+.result-val{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--accent2)}
+.result-unit{font-size:10px;color:var(--muted);margin-left:3px}
+.verdict-ok{color:var(--accent2)!important}
+.verdict-ng{color:var(--warn)!important}
+.lookup-input{display:flex;gap:8px;margin-bottom:12px}
+.lookup-input input,.lookup-input select{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none}
+.lookup-input input:focus{border-color:var(--accent)}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{text-align:left;padding:6px 8px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:11px;font-family:var(--mono)}
+.data-table td{padding:6px 8px;border-bottom:1px solid rgba(37,43,59,.5);font-family:var(--mono);color:var(--text)}
+.data-table tr:hover td{background:rgba(74,124,255,.05)}
+.conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.conv-item{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.conv-item label{font-size:10px;color:var(--muted)}
+.conv-item .val{font-family:var(--mono);font-size:14px;color:var(--text);margin-top:2px}
+.it-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.it-table th{padding:5px 6px;color:var(--muted);text-align:center;font-size:10px;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.it-table td{padding:5px 6px;text-align:center;font-family:var(--mono);border-bottom:1px solid rgba(37,43,59,.5)}
+.it-table tr.hl td{background:rgba(52,201,158,.08);color:var(--accent2)}
+.it-badge{display:inline-block;padding:2px 6px;border-radius:4px;background:rgba(74,124,255,.15);color:var(--accent);font-family:var(--mono);font-size:13px;margin:3px 3px 0 0}
+
+.link-btn{margin-top:8px;width:100%;background:rgba(52,201,158,.12);color:var(--accent2);border:1px solid rgba(52,201,158,.3);border-radius:6px;padding:5px 0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+.link-btn:hover{background:rgba(52,201,158,.22)}
+.linked-badge{display:inline-block;background:rgba(52,201,158,.12);color:var(--accent2);border:1px solid rgba(52,201,158,.3);border-radius:4px;padding:2px 6px;font-size:10px;margin-left:6px}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+`;
+
+// ─── SPECIAL PANELS ───────────────────────────
+function LookupPanel({title,desc,data,columns,filterFn}){
+  const [q,setQ]=useState("");
+  const rows=useMemo(()=>q?data.filter(r=>filterFn(r,q)):data,[q,data,filterFn]);
+  return(<div>
+    <div className="card-title">{title}</div>
+    <div className="card-desc">{desc}</div>
+    <div className="lookup-input"><input placeholder="搜尋…" value={q} onChange={e=>setQ(e.target.value)}/></div>
+    <div style={{overflowX:"auto",maxHeight:340,overflowY:"auto"}}>
+      <table className="data-table">
+        <thead><tr>{columns.map(c=><th key={c.key}>{c.label}</th>)}</tr></thead>
+        <tbody>{rows.map((r,i)=>(
+          <tr key={i}>{columns.map(c=><td key={c.key}>{r[c.key]!=null?r[c.key]:"—"}</td>)}</tr>
+        ))}</tbody>
+      </table>
+    </div>
+  </div>);
+}
+
+function ITTolerance(){
+  const [dim,setDim]=useState(30);
+  const row=useMemo(()=>IT_TABLE.find(r=>dim>r.from&&dim<=r.to)||IT_TABLE[0],[dim]);
+  return(<div>
+    <div className="card-title">IT公差等級查詢</div>
+    <div className="card-desc">依基本尺寸查 IT5~IT11 公差值（μm）</div>
+    <div className="field"><label>基本尺寸 (mm)</label>
+      <div className="field-row"><input type="number" value={dim} onChange={e=>setDim(parseFloat(e.target.value)||0)}/><span className="unit-tag">mm</span></div>
+    </div>
+    {row&&<div>
+      <div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>尺寸段：{row.from} ＜ d ≤ {row.to} mm</div>
+      <table className="it-table">
+        <thead><tr>{["IT5","IT6","IT7","IT8","IT9","IT10","IT11"].map(g=><th key={g}>{g}</th>)}</tr></thead>
+        <tbody><tr className="hl">{["IT5","IT6","IT7","IT8","IT9","IT10","IT11"].map(g=><td key={g}>{row[g]}</td>)}</tr></tbody>
+      </table>
+      <div style={{marginTop:10,fontSize:11,color:"var(--muted)"}}>
+        {["IT6","IT7","IT8","IT9"].map(g=><span key={g} className="it-badge">{g}={row[g]}μm</span>)}
+      </div>
+    </div>}
+  </div>);
+}
+
+function PressureConv(){
+  const [val,setVal]=useState(0.5);
+  const [fi,setFi]=useState(2);
+  const pa=useMemo(()=>val*PRESSURE_TO_PA[fi],[val,fi]);
+  return(<div>
+    <div className="card-title">壓力單位換算</div>
+    <div className="card-desc">Pa/kPa/MPa/bar/atm/kgf/cm²/psi 互換</div>
+    <div className="lookup-input">
+      <input type="number" value={val} onChange={e=>setVal(parseFloat(e.target.value)||0)}/>
+      <select value={fi} onChange={e=>setFi(+e.target.value)}>
+        {PRESSURE_UNITS.map((u,i)=><option key={u} value={i}>{u}</option>)}
+      </select>
+    </div>
+    <div className="conv-grid">
+      {PRESSURE_UNITS.map((u,i)=>(
+        <div className="conv-item" key={u}><label>{u}</label><div className="val">{(pa/PRESSURE_TO_PA[i]).toPrecision(5)}</div></div>
+      ))}
+    </div>
+  </div>);
+}
+
+
+// ─── SVG SECTION PREVIEW ─────────────────────
+function SectionSVG({type,vals}){
+  const W=180,H=160,cx=90,cy=85,sc=2.2;
+  if(type==="circle"){
+    const r=Math.min((vals.D||30)/2*sc,65);
+    return(<svg width={W} height={H} style={{display:"block",margin:"12px auto 0"}}>
+      <circle cx={cx} cy={cy} r={r} fill="rgba(74,124,255,.15)" stroke="var(--accent)" strokeWidth="1.5"/>
+      <line x1={cx} y1={cy} x2={cx+r} y2={cy} stroke="var(--muted)" strokeWidth="1" strokeDasharray="4,2"/>
+      <text x={cx+r/2} y={cy-6} fill="var(--muted)" fontSize="10" textAnchor="middle">D/2</text>
+    </svg>);
+  }
+  if(type==="hollow_circle"){
+    const ro=Math.min((vals.D||50)/2*sc,65),ri=Math.min((vals.d||40)/2*sc,62);
+    return(<svg width={W} height={H} style={{display:"block",margin:"12px auto 0"}}>
+      <circle cx={cx} cy={cy} r={ro} fill="rgba(74,124,255,.1)" stroke="var(--accent)" strokeWidth="1.5"/>
+      <circle cx={cx} cy={cy} r={Math.max(ri,2)} fill="var(--bg)" stroke="var(--accent2)" strokeWidth="1.5"/>
+      <text x={cx} y={cy+4} fill="var(--muted)" fontSize="9" textAnchor="middle">D={vals.D||50} / d={vals.d||40}</text>
+    </svg>);
+  }
+  if(type==="rect"){
+    const bw=Math.min((vals.b||40)*sc,120),bh=Math.min((vals.h||60)*sc,120);
+    return(<svg width={W} height={H} style={{display:"block",margin:"12px auto 0"}}>
+      <rect x={cx-bw/2} y={cy-bh/2} width={bw} height={bh} fill="rgba(74,124,255,.15)" stroke="var(--accent)" strokeWidth="1.5"/>
+      <line x1={cx-bw/2-8} y1={cy-bh/2} x2={cx-bw/2-8} y2={cy+bh/2} stroke="var(--muted)" strokeWidth="1"/>
+      <text x={cx-bw/2-12} y={cy+4} fill="var(--muted)" fontSize="9" textAnchor="middle" transform={`rotate(-90,${cx-bw/2-12},${cy})`}>h={vals.h||60}</text>
+      <line x1={cx-bw/2} y1={cy+bh/2+8} x2={cx+bw/2} y2={cy+bh/2+8} stroke="var(--muted)" strokeWidth="1"/>
+      <text x={cx} y={cy+bh/2+18} fill="var(--muted)" fontSize="9" textAnchor="middle">b={vals.b||40}</text>
+    </svg>);
+  }
+  if(type==="hollow_rect"){
+    const Bo=Math.min((vals.B||60)*sc,130),Ho=Math.min((vals.H||80)*sc,130);
+    const t=(vals.t||4)*sc;
+    return(<svg width={W} height={H} style={{display:"block",margin:"12px auto 0"}}>
+      <rect x={cx-Bo/2} y={cy-Ho/2} width={Bo} height={Ho} fill="rgba(74,124,255,.15)" stroke="var(--accent)" strokeWidth="1.5"/>
+      <rect x={cx-Bo/2+t} y={cy-Ho/2+t} width={Bo-2*t} height={Ho-2*t} fill="var(--bg)" stroke="var(--accent2)" strokeWidth="1"/>
+    </svg>);
+  }
+  return null;
+}
+
+
+// ─── CAM CURVE SVG ───────────────────────────
+function CamCurvePanel(){
+  const [rb,setRb]=useState(100);
+  const [h,setH]=useState(30);
+  const [phi_o,setPhi_o]=useState(120);
+  const [phi_r,setPhi_r]=useState(60);  // dwell return start
+  const [phi_s,setPhi_s]=useState(60);  // return stroke angle
+
+  // Compute modified sine displacement
+  function msDisp(tau){
+    const Am=5.53;
+    if(tau<=0){return 0;}
+    if(tau>=1){return 1;}
+    if(tau<=0.25)  return Am/(4*Math.PI**2)*(Math.PI/2*tau - Math.sin(2*Math.PI*tau)/2);
+    if(tau<=0.75)  return Am/(4*Math.PI**2)*(Math.PI*(tau-0.25)+1) - Am/(4*Math.PI**2)*1/(2)*Math.sin(2*Math.PI*tau);
+    return 1 - Am/(4*Math.PI**2)*(Math.PI/2*(1-tau) + Math.sin(2*Math.PI*tau)/2);
+  }
+
+  const W=340,H=260,cx=170,cy=130,scale=0.85;
+  const maxR=(rb+h)*scale;
+  const rbS=rb*scale;
+
+  // Generate cam profile points (polar)
+  const pts=[];
+  const N=360;
+  for(let deg=0;deg<N;deg++){
+    const phi=deg*Math.PI/180;
+    const phi_o_r=phi_o*Math.PI/180;
+    const phi_r_r=phi_r*Math.PI/180;
+    const phi_s_r=phi_s*Math.PI/180;
+    const phi_end_dwell1=phi_o_r;
+    const phi_end_return=phi_end_dwell1+phi_r_r;
+    const phi_end_stroke=phi_end_return+phi_s_r;
+
+    let s;
+    if(phi<=phi_o_r){
+      s=h*msDisp(phi/phi_o_r);
+    } else if(phi<=phi_end_return){
+      s=h; // dwell high
+    } else if(phi<=phi_end_stroke){
+      s=h*(1-msDisp((phi-phi_end_return)/phi_s_r));
+    } else {
+      s=0; // dwell low
+    }
+    const r=(rb+s)*scale;
+    pts.push([cx+r*Math.cos(phi-Math.PI/2), cy+r*Math.sin(phi-Math.PI/2)]);
+  }
+  const pathD='M'+pts.map(p=>p.map(v=>v.toFixed(1)).join(',')).join('L')+'Z';
+
+  // Displacement chart (small, right side)
+  const chartX=10,chartY=10,chartW=100,chartH=80;
+  const dispPts=[];
+  for(let i=0;i<=72;i++){
+    const deg=i*5;
+    const phi=deg*Math.PI/180;
+    const phi_o_r=phi_o*Math.PI/180;
+    let s=0;
+    if(phi<=phi_o_r) s=h*msDisp(phi/phi_o_r);
+    else if(phi<=(phi_o+phi_r)*Math.PI/180) s=h;
+    else if(phi<=(phi_o+phi_r+phi_s)*Math.PI/180) s=h*(1-msDisp((phi-(phi_o+phi_r)*Math.PI/180)/(phi_s*Math.PI/180)));
+    dispPts.push([chartX+i/72*chartW, chartY+chartH-(s/h)*chartH]);
+  }
+  const dispPath='M'+dispPts.map(p=>p.map(v=>v.toFixed(1)).join(',')).join('L');
+
+  return(
+    <div className="card" style={{gridColumn:"1 / -1"}}>
+      <div className="card-title">凸輪輪廓曲線視覺化</div>
+      <div className="card-desc">修正正弦曲線（MS），即時渲染凸輪輪廓</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:12}}>
+        {[
+          {label:"基圓半徑 rb (mm)",val:rb,set:setRb,min:20,max:200},
+          {label:"行程 h (mm)",    val:h,  set:setH,  min:5, max:100},
+          {label:"推程角 φ₀ (°)",  val:phi_o,set:setPhi_o,min:30,max:180},
+          {label:"遠休角 φᵣ (°)",  val:phi_r,set:setPhi_r,min:0, max:120},
+          {label:"回程角 φₛ (°)",  val:phi_s,set:setPhi_s,min:30,max:180},
+        ].map(f=>(
+          <div className="field" key={f.label}>
+            <label>{f.label}</label>
+            <div className="field-row">
+              <input type="range" min={f.min} max={f.max} value={f.val}
+                onChange={e=>f.set(+e.target.value)}
+                style={{flex:1,accentColor:"var(--accent)"}}/>
+              <span className="unit-tag" style={{minWidth:36}}>{f.val}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{background:"var(--bg)",borderRadius:8,border:"1px solid var(--border)"}}>
+        {/* Grid */}
+        <circle cx={cx} cy={cy} r={rbS} fill="none" stroke="var(--border)" strokeWidth="1" strokeDasharray="4,3"/>
+        <circle cx={cx} cy={cy} r={maxR} fill="none" stroke="var(--border)" strokeWidth="1" strokeDasharray="2,4"/>
+        {[0,45,90,135,180,225,270,315].map(a=>{
+          const ar=a*Math.PI/180;
+          return <line key={a} x1={cx} y1={cy} x2={cx+maxR*Math.cos(ar-Math.PI/2)} y2={cy+maxR*Math.sin(ar-Math.PI/2)} stroke="var(--border)" strokeWidth="0.5"/>;
+        })}
+        {/* Base circle label */}
+        <text x={cx+rbS+4} y={cy-4} fill="var(--muted)" fontSize="9">rb={rb}</text>
+        {/* Cam profile */}
+        <path d={pathD} fill="rgba(74,124,255,.15)" stroke="var(--accent)" strokeWidth="2"/>
+        {/* Centre dot */}
+        <circle cx={cx} cy={cy} r={3} fill="var(--accent)"/>
+        {/* Displacement inset chart */}
+        <rect x={chartX-4} y={chartY-16} width={chartW+8} height={chartH+24} rx="4" fill="var(--surface)" opacity="0.9"/>
+        <text x={chartX+chartW/2} y={chartY-6} fill="var(--label)" fontSize="8" textAnchor="middle">位移曲線</text>
+        <line x1={chartX} y1={chartY+chartH} x2={chartX+chartW} y2={chartY+chartH} stroke="var(--border)" strokeWidth="1"/>
+        <line x1={chartX} y1={chartY} x2={chartX} y2={chartY+chartH} stroke="var(--border)" strokeWidth="1"/>
+        <path d={dispPath} fill="none" stroke="var(--accent2)" strokeWidth="1.5"/>
+        {/* Angle labels */}
+        <text x={W/2} y={H-6} fill="var(--muted)" fontSize="9" textAnchor="middle">φ₀={phi_o}° 遠休={phi_r}° 回={phi_s}° 近休={360-phi_o-phi_r-phi_s}°</text>
+      </svg>
+    </div>
+  );
+}
+
+
+// ─── PDF EXPORT ──────────────────────────────
+function useExport(){
+  const exportRef = {current:null};
+  const exportPDF = useCallback(async(calcName, inputs, outputs, results)=>{
+    const rows = [
+      ['計算項目', calcName],
+      ['計算時間', new Date().toLocaleString('zh-TW')],
+      ['', ''],
+      ['── 輸入參數 ──', ''],
+      ...inputs.map(i=>[`${i.label}${i.unit?' ('+i.unit+')':''}`, inputs.find?.(x=>x.key===i.key)?.val ?? '']),
+      ['', ''],
+      ['── 計算結果 ──', ''],
+      ...outputs.map(o=>[`${o.label}${o.unit?' ('+o.unit+')':''}`, results?.[o.key] ?? '']),
+    ];
+    // Build HTML printable page
+    const html=`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>${calcName} - 計算報告</title>
+<style>
+  body{font-family:'Noto Sans TC',sans-serif;font-size:13px;color:#1e293b;padding:32px;max-width:600px;margin:0 auto}
+  h1{font-size:18px;border-bottom:2px solid #4a7cff;padding-bottom:8px;color:#4a7cff}
+  h2{font-size:13px;color:#64748b;font-weight:400;margin-top:-4px}
+  table{width:100%;border-collapse:collapse;margin-top:20px}
+  th{background:#f1f5f9;text-align:left;padding:8px 12px;font-size:12px;color:#475569;border:1px solid #e2e8f0}
+  td{padding:8px 12px;border:1px solid #e2e8f0;font-family:monospace}
+  tr:nth-child(even) td{background:#fafafa}
+  .section-head td{background:#eff6ff;color:#1e40af;font-weight:600;font-family:sans-serif;letter-spacing:.04em}
+  .result-val{color:#0f766e;font-size:15px;font-weight:600}
+  .footer{margin-top:32px;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:12px}
+</style></head><body>
+<h1>非標機械設計計算報告</h1>
+<h2>${calcName}</h2>
+<table>
+${rows.map(([a,b],i)=>{
+  if(a.startsWith('──'))return`<tr class="section-head"><td colspan="2">${a}</td></tr>`;
+  if(!a&&!b)return'';
+  const isResult=i>rows.findIndex(r=>r[0].startsWith('── 計算'));
+  return`<tr><td>${a}</td><td class="${isResult?'result-val':''}">${b}</td></tr>`;
+}).filter(Boolean).join('')}
+</table>
+<div class="footer">計算時間：${new Date().toLocaleString('zh-TW')} ／ 非標機械設計自動計算大全</div>
+</body></html>`;
+    const blob=new Blob([html],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const w=window.open(url,'_blank');
+    if(w) setTimeout(()=>{w.print();URL.revokeObjectURL(url);},600);
+    else{const a=document.createElement('a');a.href=url;a.download=calcName+'_計算報告.html';a.click();URL.revokeObjectURL(url);}
+  },[]);
+  return{exportPDF};
+}
+
+// ─── CALC CARD ────────────────────────────────
+function CalcCard({calcId,onLink}){
+  const def=CALCS[calcId];
+  if(!def)return null;
+  if(def._type==="bearing_lookup") return <div className="card"><LookupPanel title="深溝球軸承查詢" desc="依內徑(d)或型號搜尋" data={BEARINGS_DEEP} columns={[{key:"model",label:"型號"},{key:"d",label:"d"},{key:"D",label:"D"},{key:"B",label:"B"},{key:"Cr",label:"Cr(N)"},{key:"Cor",label:"Cor(N)"},{key:"nmax",label:"nmax×10³"}]} filterFn={(r,q)=>r.model.toLowerCase().includes(q.toLowerCase())||String(r.d)===q}/></div>;
+  if(def._type==="bearing_thrust_lookup") return <div className="card"><LookupPanel title="推力球軸承查詢" desc="依內徑(d)或型號搜尋" data={BEARINGS_THRUST} columns={[{key:"model",label:"型號"},{key:"d",label:"d(mm)"},{key:"D",label:"D(mm)"},{key:"T",label:"T(mm)"}]} filterFn={(r,q)=>r.model.toLowerCase().includes(q.toLowerCase())||String(r.d)===q}/></div>;
+  if(def._type==="it_tolerance") return <div className="card"><ITTolerance/></div>;
+  if(def._type==="unit_pressure") return <div className="card"><PressureConv/></div>;
+  if(def._type==="material_elastic") return <div className="card"><LookupPanel title="彈性模量 & 泊松比" desc="常用工程材料" data={ELASTIC_TABLE} columns={[{key:"name",label:"材料"},{key:"E",label:"E (GPa)"},{key:"nu",label:"ν"},{key:"alpha",label:"α (×10⁻⁶/K)"}]} filterFn={(r,q)=>r.name.includes(q)}/></div>;
+  if(def._type==="material_density") return <div className="card"><LookupPanel title="材料密度查詢" desc="常用金屬與工程材料 (kg/m³)" data={DENSITY_TABLE} columns={[{key:"name",label:"材料名稱"},{key:"rho",label:"密度 kg/m³"}]} filterFn={(r,q)=>r.name.includes(q)}/></div>;
+  if(def._type==="material_friction") return <div className="card"><LookupPanel title="材料摩擦係數" desc="無潤滑 / 有潤滑" data={FRICTION_TABLE} columns={[{key:"pair",label:"材料副"},{key:"dry",label:"無潤滑"},{key:"wet",label:"有潤滑"}]} filterFn={(r,q)=>r.pair.includes(q)}/></div>;
+  if(def._type==="bolt_torque_lookup") return <div className="card"><LookupPanel title="螺栓鎖緊扭矩標準" desc="單位：kgf·m，4.8級螺栓" data={BOLT_TORQUE} columns={[{key:"size",label:"規格"},{key:"jp",label:"日本標準"},{key:"din",label:"DIN標準"}]} filterFn={(r,q)=>r.size.toLowerCase().includes(q.toLowerCase())}/></div>;
+
+  const {exportPDF}=useExport();
+  const init=()=>Object.fromEntries(def.inputs.map(i=>[i.key,i.default]));
+  const [vals,setVals]=useState(init);
+  const [results,setResults]=useState(null);
+  const run=useCallback(()=>{
+    try{const nv=Object.fromEntries(Object.entries(vals).map(([k,v])=>[k,parseFloat(v)]));setResults(def.calc(nv));}
+    catch(e){setResults({error:e.message});}
+  },[vals,def]);
+
+  const svgType = calcId==="section_circle"?"circle":calcId==="section_hollow_circle"?"hollow_circle":calcId==="section_rect"?"rect":calcId==="section_hollow_rect"?"hollow_rect":null;
+  return(<div className="card">
+    <div className="card-title">{def.name}</div>
+    {def.desc&&<div className="card-desc">{def.desc}</div>}
+    {def.inputs.map(inp=>(
+      <div className="field" key={inp.key}>
+        <label>{inp.label}</label>
+        <div className="field-row">
+          <input type="number" value={vals[inp.key]} onChange={e=>setVals(v=>({...v,[inp.key]:e.target.value}))}/>
+          {inp.unit&&<span className="unit-tag">{inp.unit}</span>}
+        </div>
+        {inp.hint&&<div className="hint">{inp.hint}</div>}
+      </div>
+    ))}
+    <button className="calc-btn" onClick={run}>計算</button>
+    {svgType&&<SectionSVG type={svgType} vals={vals}/>}
+    {results&&<div className="results-divider">
+      {results.error
+        ?<div style={{color:"var(--warn)",fontSize:12}}>錯誤：{results.error}</div>
+        :def.outputs.map(o=>(
+          <div className="result-row" key={o.key}>
+            <span className="result-label">{o.label}</span>
+            <span>
+              <span className={`result-val${String(results[o.key]).includes("✅")?" verdict-ok":String(results[o.key]).includes("❌")?" verdict-ng":""}`}>{results[o.key]??"—"}</span>
+              {o.unit&&<span className="result-unit">{o.unit}</span>}
+            </span>
+          </div>
+        ))
+      }
+    </div>}
+    {results&&!results.error&&(
+      <div style={{display:"flex",gap:6,marginTop:8}}>
+        <button className="link-btn" style={{flex:1}} onClick={()=>exportPDF(def.name,def.inputs.map(i=>({...i,val:vals[i.key]})),def.outputs,results)}>
+          📄 匯出計算報告
+        </button>
+        {["section_circle","section_hollow_circle","section_rect","section_hollow_rect"].includes(calcId)&&onLink&&(
+          <button className="link-btn" style={{flex:1}} onClick={()=>onLink(calcId,results)}>
+            🔗 帶入立柱計算
+          </button>
+        )}
+      </div>
+    )}
+  </div>);
+}
+
+// ─── APP ─────────────────────────────────────
+function App(){
+  const [activeCat,setActiveCat]=useState(null);
+  const [search,setSearch]=useState("");
+  const [linkedSection,setLinkedSection]=useState(null); // {I, A} from section calc
+
+  const filteredCats=useMemo(()=>{
+    if(!search)return CATEGORIES;
+    const q=search.toLowerCase();
+    return CATEGORIES.map(cat=>({...cat,calcs:cat.calcs.filter(id=>{const d=CALCS[id];return d&&(d.name.includes(q)||d.desc?.includes(q));})})).filter(c=>c.calcs.length>0||c.label.includes(q));
+  },[search]);
+
+  const activeCategory=CATEGORIES.find(c=>c.id===activeCat);
+  const visibleCalcs=activeCategory
+    ?(search?activeCategory.calcs.filter(id=>{const d=CALCS[id];return d&&(d.name.includes(search)||d.desc?.includes(search));}):activeCategory.calcs)
+    :[];
+
+  const totalCalcs=CATEGORIES.reduce((s,c)=>s+c.calcs.length,0);
+  const handleLink=useCallback((calcId,results)=>{
+    const I=parseFloat(results.Ix||results.I||0);
+    const A=parseFloat(results.A||0);
+    setLinkedSection({I,A,from:calcId});
+    setActiveCat("other");
+    alert(`截面資料已帶入立柱計算：I=${I} mm⁴, A=${A} mm²\n請至「其他計算 → 立柱穩定性」使用。`);
+  },[]);
+
+  return(<>
+    <style>{CSS}</style>
+    <div className="app">
+      <nav className="sidebar">
+        <div className="sidebar-header"><h1>非標機械</h1><p>自動計算大全</p></div>
+        <input className="search-box" placeholder="搜尋計算器…" value={search} onChange={e=>setSearch(e.target.value)}/>
+        <div className={`nav-item${activeCat==null&&!search?" active":""}`} style={{marginTop:4}} onClick={()=>{setActiveCat(null);setSearch("");}}>
+          <span className="nav-icon">🏠</span>總覽
+        </div>
+        {filteredCats.map(cat=>(
+          <div key={cat.id} className={`nav-item${activeCat===cat.id?" active":""}`} onClick={()=>setActiveCat(cat.id)}>
+            <span className="nav-icon">{cat.icon}</span>{cat.label}
+          </div>
+        ))}
+      </nav>
+      <div className="main">
+        <div className="topbar">
+          {activeCat==null
+            ?<div><h2>非標機械設計自動計算大全</h2><p>163 個原始工作表 · {CATEGORIES.length} 個分類 · {totalCalcs} 個計算器</p></div>
+            :<div><h2>{activeCategory?.icon} {activeCategory?.label}</h2><p>{visibleCalcs.length} 個計算器</p></div>}
+        </div>
+        {activeCat==null
+          ?<div className="home-grid">{CATEGORIES.map(cat=>(
+            <div className="home-card" key={cat.id} onClick={()=>setActiveCat(cat.id)}>
+              <div className="icon">{cat.icon}</div>
+              <div className="name">{cat.label}</div>
+              <div className="count">{cat.calcs.length} 個</div>
+            </div>
+          ))}</div>
+          :<div className="content">
+            {activeCat==="cam"&&<CamCurvePanel/>}
+            {visibleCalcs.map(id=>(
+              <div key={id} style={{position:"relative"}}>
+                {id==="column_buckling"&&linkedSection&&(
+                  <div style={{fontSize:10,color:"var(--accent2)",marginBottom:6}}>
+                    🔗 已從截面計算帶入：I={linkedSection.I.toFixed(0)} mm⁴ / A={linkedSection.A.toFixed(0)} mm²
+                  </div>
+                )}
+                <CalcCard calcId={id} onLink={handleLink}/>
+              </div>
+            ))}
+          </div>
+        }
+      </div>
+    </div>
+  </>);
+}
+
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
