@@ -10,30 +10,22 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;background:#fff;color:#000}
+    html,body{background:#fff;color:#111;font-family:'DM Sans',sans-serif}
     @media(prefers-color-scheme:dark){html,body{background:#0d0d0d;color:#f0f0f0}}
-    #root{height:100%}
-    #loading{display:flex;align-items:center;justify-content:center;height:100vh;font-family:'DM Sans',sans-serif;font-size:13px;color:#666;letter-spacing:.08em}
+    #root{min-height:calc(100vh - 56px)}
+    #loading{display:flex;align-items:center;justify-content:center;height:80vh;font-size:13px;color:#888;letter-spacing:.08em}
   </style>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 </head>
 <body>
-  <header style="position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1rem 5%;border-bottom:0.5px solid #e0e0e0;background:rgba(255,255,255,0.92);backdrop-filter:blur(8px);height:56px;">
+  <header style="position:sticky;top:0;z-index:200;display:flex;justify-content:space-between;align-items:center;padding:0 5%;height:56px;border-bottom:0.5px solid #e0e0e0;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);">
     <a href="../index.html" style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:1px;text-decoration:none;color:inherit;">Anzû Design Studio</a>
-    <a href="engineering-calculators.html" style="font-size:13px;color:#666;text-decoration:none;display:flex;align-items:center;gap:6px;">← 返回工具選單</a>
+    <a href="#" onclick="history.back();return false;" style="font-size:13px;color:#666;text-decoration:none;">← 返回上一層</a>
   </header>
-  <style>
-    header{background:rgba(255,255,255,0.92)}
-    @media(prefers-color-scheme:dark){
-      header{background:rgba(13,13,13,0.92)!important;border-bottom-color:#2a2a2a!important}
-      header a{color:#f0f0f0!important}
-      header a:last-child{color:#aaa!important}
-    }
-  </style>
+  <style>@media(prefers-color-scheme:dark){header{background:rgba(13,13,13,0.95)!important;border-bottom-color:#2a2a2a!important}header a{color:#f0f0f0!important}header a:last-child{color:#999!important}}</style>
 
   <div id="root"><div id="loading">LOADING CALC ENGINE…</div></div>
-
   <script>
 const { useState, useMemo, useCallback } = React;
 const BEARINGS_DEEP = [
@@ -933,188 +925,92 @@ const CALCS = {
 };
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
 :root{
-  --primary:#000;--secondary:#666;--border-color:#e0e0e0;
+  --primary:#111;--secondary:#666;--border-color:#e0e0e0;
   --bg-light:#f5f5f5;--bg-white:#fff;
-  --accent:#1a1a2e;--accent2:#2e7d32;--warn:#c62828;
-  --muted:#64748b;--border:#e0e0e0;
-  --brand:#1a1a2e;--brand-50:#f0f0f5;
+  --accent2:#2e7d32;--warn:#c62828;--muted:#888;
+  --brand-50:#f5f5f5;--border:#e0e0e0;
   --radius-sm:6px;--radius-md:10px;--radius-lg:14px;
   --mono:'IBM Plex Mono',monospace;
-  --sans:'DM Sans','Noto Sans TC',-apple-system,sans-serif;
+  --sans:'DM Sans','Noto Sans TC',sans-serif;
+  --primary-color:#111;
 }
 @media(prefers-color-scheme:dark){:root{
-  --primary:#f0f0f0;--secondary:#aaa;--border-color:#2a2a2a;
-  --bg-light:#161616;--bg-white:#0d0d0d;
-  --accent:#aaa;--accent2:#66bb6a;--warn:#ef5350;
-  --muted:#888;--border:#2a2a2a;
-  --brand:#ccc;--brand-50:#1a1a1a;
+  --primary:#f0f0f0;--primary-color:#f0f0f0;--secondary:#999;--border-color:#2a2a2a;
+  --bg-light:#181818;--bg-white:#0d0d0d;
+  --accent2:#66bb6a;--warn:#ef5350;--muted:#777;
+  --brand-50:#181818;--border:#2a2a2a;
 }}
-
 html{scroll-behavior:smooth}
 body{font-family:var(--sans);font-weight:300;color:var(--primary);background:var(--bg-white);line-height:1.6;-webkit-font-smoothing:antialiased;font-size:14px}
-
-/* App layout */
 .app{display:flex;flex-direction:column;min-height:100vh}
-
-/* Sidebar */
 .sidebar{
   position:fixed;top:56px;left:0;bottom:0;width:200px;
-  background:var(--bg-white);border-right:0.5px solid var(--border-color);
-  overflow-y:auto;z-index:50;
+  background:var(--bg-white);border-right:0.5px solid var(--border-color);overflow-y:auto;z-index:50;
 }
-.sidebar-header{padding:16px 16px 10px;border-bottom:0.5px solid var(--border-color)}
-.sidebar-header h1{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--primary);text-transform:uppercase}
+.sidebar-header{padding:14px 16px 10px;border-bottom:0.5px solid var(--border-color)}
+.sidebar-header h1{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--primary);text-transform:uppercase}
 .sidebar-header p{font-size:11px;color:var(--secondary);margin-top:2px}
-
-.search-box{
-  display:block;margin:8px 10px 4px;width:calc(100% - 20px);
-  padding:6px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);
-  background:var(--bg-light);font:inherit;font-size:12px;color:var(--primary);outline:none;
-}
+.search-box{display:block;margin:8px 10px 4px;width:calc(100% - 20px);padding:6px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-light);font:inherit;font-size:12px;color:var(--primary);outline:none}
 .search-box:focus{border-color:var(--primary)}
 .search-box::placeholder{color:var(--muted)}
-
-.nav-item{
-  display:flex;align-items:center;gap:8px;
-  padding:7px 14px;cursor:pointer;font-size:12px;font-weight:500;
-  color:var(--secondary);border-left:2px solid transparent;
-  transition:all .15s;user-select:none;
-}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;font-size:12px;font-weight:500;color:var(--secondary);border-left:2px solid transparent;transition:all .15s;user-select:none}
 .nav-item:hover{color:var(--primary);background:var(--bg-light)}
 .nav-item.active{color:var(--primary);border-left-color:var(--primary);background:var(--brand-50);font-weight:600}
 .nav-icon{font-size:13px;width:18px;text-align:center}
-
-/* Main area */
 .main{margin-left:200px;display:flex;flex-direction:column;min-height:calc(100vh - 56px)}
-
-.topbar{
-  padding:20px 28px 14px;
-  border-bottom:0.5px solid var(--border-color);
-}
-.topbar h2{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:.3px;color:var(--primary)}
+.topbar{padding:18px 24px 12px;border-bottom:0.5px solid var(--border-color)}
+.topbar h2{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;letter-spacing:.3px;color:var(--primary)}
 .topbar p{font-size:12px;color:var(--secondary);margin-top:3px}
-
-.content{
-  flex:1;padding:20px 28px;
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-  gap:16px;align-content:start;
-}
-.home-grid{
-  flex:1;padding:20px 28px;
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:12px;align-content:start;
-}
-
-/* Cards */
-.card{
-  background:var(--bg-light);border:0.5px solid var(--border-color);
-  border-radius:var(--radius-lg);overflow:hidden;
-}
-.card-title{
-  font-size:11px;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--secondary);
-  padding:12px 16px 0;margin-bottom:12px;
-}
-.card-desc{font-size:12px;color:var(--muted);margin:-8px 16px 10px;line-height:1.5}
-
-.home-card{
-  background:var(--bg-light);border:0.5px solid var(--border-color);
-  border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .2s;
-}
-.home-card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.content{flex:1;padding:20px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;align-content:start}
+.home-grid{flex:1;padding:20px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-content:start}
+.card{background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:var(--radius-lg);overflow:hidden}
+.card-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--secondary);padding:14px 16px 0;margin-bottom:10px}
+.card-desc{font-size:12px;color:var(--muted);margin:-6px 16px 10px;line-height:1.5}
+.home-card{background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .2s}
+.home-card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.07)}
 .home-card .icon{font-size:22px;margin-bottom:8px}
 .home-card .name{font-size:13px;font-weight:700;color:var(--primary)}
 .home-card .count{font-size:11px;color:var(--secondary);margin-top:3px}
-
-/* Fields */
 .field{padding:0 16px;margin-bottom:10px}
 .field label{display:block;font-size:11.5px;font-weight:600;color:var(--secondary);margin-bottom:5px;letter-spacing:.3px}
 .field .hint{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.4}
 .field-row{display:flex;align-items:center;gap:6px}
-.field input{
-  flex:1;padding:8px 10px;
-  border:0.5px solid var(--border-color);border-radius:var(--radius-sm);
-  background:var(--bg-white);font:inherit;font-family:var(--mono);font-size:13px;
-  color:var(--primary);outline:none;transition:border-color .15s;
-}
+.field input{flex:1;padding:8px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-white);font:inherit;font-family:var(--mono);font-size:13px;color:var(--primary);outline:none;transition:border-color .15s}
 .field input:focus{border-color:var(--primary)}
 .field .unit-tag{font-size:11px;color:var(--muted);min-width:44px;text-align:right;font-family:var(--mono)}
-
-.calc-btn{
-  display:block;width:calc(100% - 32px);margin:14px 16px 16px;
-  padding:9px 0;border:none;border-radius:var(--radius-sm);
-  background:var(--primary);color:var(--bg-white);
-  font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;letter-spacing:.3px;
-}
+.calc-btn{display:block;width:calc(100% - 32px);margin:12px 16px 16px;padding:9px 0;border:none;border-radius:var(--radius-sm);background:var(--primary);color:var(--bg-white);font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;letter-spacing:.3px}
 .calc-btn:hover{opacity:.8}
-
-/* Results */
 .results-divider{margin:0 16px 14px;border-top:0.5px solid var(--border-color);padding-top:12px}
-.result-row{
-  display:flex;justify-content:space-between;align-items:baseline;
-  padding:6px 0;border-bottom:0.5px solid var(--border-color);
-}
+.result-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:0.5px solid var(--border-color)}
 .result-row:last-child{border-bottom:none}
 .result-label{font-size:11.5px;color:var(--secondary);font-weight:500}
 .result-val{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--primary)}
 .result-unit{font-size:10.5px;color:var(--muted);margin-left:3px}
 .verdict-ok{color:var(--accent2)!important}
 .verdict-ng{color:var(--warn)!important}
-
-/* Export / Link buttons */
-.link-btn{
-  display:block;width:calc(50% - 8px);margin:0;
-  padding:7px 0;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);
-  background:var(--bg-white);color:var(--secondary);
-  font:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
-  white-space:nowrap;
-}
+.link-btn{padding:7px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-white);color:var(--secondary);font:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
 .link-btn:hover{border-color:var(--primary);color:var(--primary)}
-
-/* Lookup tables */
 .lookup-input{display:flex;gap:8px;margin:0 16px 12px}
-.lookup-input input,.lookup-input select{
-  flex:1;padding:7px 10px;border:0.5px solid var(--border-color);
-  border-radius:var(--radius-sm);background:var(--bg-white);
-  font:inherit;font-size:13px;color:var(--primary);outline:none;
-}
-.lookup-input input:focus{border-color:var(--primary)}
-
-.data-table{width:100%;border-collapse:collapse;font-size:12px;margin:0 0 4px}
-.data-table th{
-  text-align:left;padding:7px 10px;font-size:11px;font-weight:700;
-  color:var(--secondary);border-bottom:0.5px solid var(--border-color);
-  background:var(--bg-white);letter-spacing:.3px;
-}
+.lookup-input input,.lookup-input select{flex:1;padding:7px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-white);font:inherit;font-size:13px;color:var(--primary);outline:none}
+.data-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px}
+.data-table th{text-align:left;padding:7px 10px;font-size:11px;font-weight:700;color:var(--secondary);border-bottom:0.5px solid var(--border-color);background:var(--bg-white)}
 .data-table td{padding:6px 10px;border-bottom:0.5px solid var(--border-color);font-family:var(--mono);color:var(--primary)}
 .data-table tr:hover td{background:var(--brand-50)}
-
-/* IT table */
-.it-table{width:100%;border-collapse:collapse;font-size:11.5px;margin:0 16px 4px;width:calc(100% - 32px)}
+.it-table{width:calc(100% - 32px);border-collapse:collapse;font-size:11.5px;margin:0 16px 4px}
 .it-table th{padding:6px 8px;text-align:center;font-size:10.5px;font-weight:700;color:var(--secondary);border-bottom:0.5px solid var(--border-color)}
 .it-table td{padding:6px 8px;text-align:center;font-family:var(--mono);border-bottom:0.5px solid var(--border-color)}
-.it-table tr.hl td{background:var(--brand-50);color:var(--primary);font-weight:700}
-.it-badge{display:inline-block;padding:2px 7px;border-radius:var(--radius-sm);background:var(--bg-light);border:0.5px solid var(--border-color);font-family:var(--mono);font-size:12px;margin:3px 3px 0 0;color:var(--primary)}
-
-/* Pressure conv */
+.it-table tr.hl td{background:var(--bg-white);color:var(--primary);font-weight:700;border:0.5px solid var(--border-color)}
+.it-badge{display:inline-block;padding:2px 7px;border-radius:var(--radius-sm);background:var(--bg-white);border:0.5px solid var(--border-color);font-family:var(--mono);font-size:12px;margin:3px 3px 0 0;color:var(--primary)}
 .conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 16px 14px}
 .conv-item{background:var(--bg-white);border:0.5px solid var(--border-color);border-radius:var(--radius-sm);padding:8px 10px}
 .conv-item label{font-size:10.5px;color:var(--secondary);font-weight:600}
 .conv-item .val{font-family:var(--mono);font-size:14px;color:var(--primary);margin-top:2px}
-
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:2px}
-
-@media(max-width:768px){
-  .sidebar{display:none}
-  .main{margin-left:0}
-  .content,.home-grid{padding:16px}
-}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.content,.home-grid{padding:16px}}
 `;
 function LookupPanel({ title, desc, data, columns, filterFn }) {
   const [q, setQ] = useState("");
@@ -1124,7 +1020,7 @@ function LookupPanel({ title, desc, data, columns, filterFn }) {
 function ITTolerance() {
   const [dim, setDim] = useState(30);
   const row = useMemo(() => IT_TABLE.find((r) => dim > r.from && dim <= r.to) || IT_TABLE[0], [dim]);
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "IT\u516C\u5DEE\u7B49\u7D1A\u67E5\u8A62"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "\u4F9D\u57FA\u672C\u5C3A\u5BF8\u67E5 IT5~IT11 \u516C\u5DEE\u503C\uFF08\u03BCm\uFF09"), /* @__PURE__ */ React.createElement("div", { className: "field" }, /* @__PURE__ */ React.createElement("label", null, "\u57FA\u672C\u5C3A\u5BF8 (mm)"), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: dim, onChange: (e) => setDim(parseFloat(e.target.value) || 0) }), /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, "mm"))), row && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "var(--muted)", marginBottom: 6 } }, "\u5C3A\u5BF8\u6BB5\uFF1A", row.from, " \uFF1C d \u2264 ", row.to, " mm"), /* @__PURE__ */ React.createElement("table", { className: "it-table" }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("th", { key: g }, g)))), /* @__PURE__ */ React.createElement("tbody", null, /* @__PURE__ */ React.createElement("tr", { className: "hl" }, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("td", { key: g }, row[g]))))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: "var(--muted)" } }, ["IT6", "IT7", "IT8", "IT9"].map((g) => /* @__PURE__ */ React.createElement("span", { key: g, className: "it-badge" }, g, "=", row[g], "\u03BCm")))));
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "IT\u516C\u5DEE\u7B49\u7D1A\u67E5\u8A62"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "\u4F9D\u57FA\u672C\u5C3A\u5BF8\u67E5 IT5~IT11 \u516C\u5DEE\u503C\uFF08\u03BCm\uFF09"), /* @__PURE__ */ React.createElement("div", { className: "field" }, /* @__PURE__ */ React.createElement("label", null, "\u57FA\u672C\u5C3A\u5BF8 (mm)"), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: dim, onChange: (e) => setDim(parseFloat(e.target.value) || 0) }), /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, "mm"))), row && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "var(--muted)", marginBottom: 6 } }, "\u5C3A\u5BF8\u6BB5\uFF1A", row.from, " \uFF1C d \u2264 ", row.to, " mm"), /* @__PURE__ */ React.createElement("table", { className: "it-table" }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("th", { key: g }, g)))), /* @__PURE__ */ React.createElement("tbody", null, /* @__PURE__ */ React.createElement("tr", { className: "hl" }, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("td", { key: g }, row[g]))))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: "var(--muted)" } }, ["IT6", "IT7", "IT8", "IT9", "IT10"].map((g) => /* @__PURE__ */ React.createElement("span", { key: g, className: "it-badge" }, g, "=", row[g], "\u03BCm")))));
 }
 function PressureConv() {
   const [val, setVal] = useState(0.5);
@@ -1281,6 +1177,35 @@ function useExport() {
   }, []);
   return { exportPDF };
 }
+
+function MaterialDropdown({ title, desc, data, cols }) {
+  const [sel, setSel] = React.useState(0);
+  const row = data[sel] || data[0];
+  return React.createElement("div", { className: "card", style:{padding:0} },
+    React.createElement("div", { className: "card-title" }, title),
+    React.createElement("div", { className: "card-desc" }, desc),
+    React.createElement("div", { className: "field" },
+      React.createElement("label", null, "\u9078\u64C7"),
+      React.createElement("select", {
+        value: sel, onChange: function(e){ setSel(+e.target.value); },
+        style: { width:"100%", padding:"8px 10px", border:"0.5px solid var(--border-color)",
+                 borderRadius:"var(--radius-sm)", background:"var(--bg-white)",
+                 font:"inherit", color:"var(--primary)", outline:"none" }
+      }, data.map(function(r,i){ return React.createElement("option",{key:i,value:i},r[cols[0].key]); }))
+    ),
+    React.createElement("div", { style:{margin:"0 16px 14px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:8} },
+      cols.slice(1).map(function(c,i){
+        return React.createElement("div", { key:i,
+          style:{background:"var(--bg-light)",border:"0.5px solid var(--border-color)",
+                 borderRadius:"var(--radius-sm)",padding:"10px 12px"} },
+          React.createElement("div",{style:{fontSize:11,color:"var(--secondary)",fontWeight:600,marginBottom:4}}, c.label),
+          React.createElement("div",{style:{fontFamily:"var(--mono)",fontSize:16,fontWeight:700,color:"var(--primary)"}},
+            row[c.key] != null ? String(row[c.key]) : "—")
+        );
+      })
+    )
+  );
+}
 function CalcCard({ calcId, onLink }) {
   const def = CALCS[calcId];
   if (!def) return null;
@@ -1288,10 +1213,10 @@ function CalcCard({ calcId, onLink }) {
   if (def._type === "bearing_thrust_lookup") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(LookupPanel, { title: "\u63A8\u529B\u7403\u8EF8\u627F\u67E5\u8A62", desc: "\u4F9D\u5167\u5F91(d)\u6216\u578B\u865F\u641C\u5C0B", data: BEARINGS_THRUST, columns: [{ key: "model", label: "\u578B\u865F" }, { key: "d", label: "d(mm)" }, { key: "D", label: "D(mm)" }, { key: "T", label: "T(mm)" }], filterFn: (r, q) => r.model.toLowerCase().includes(q.toLowerCase()) || String(r.d) === q }));
   if (def._type === "it_tolerance") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(ITTolerance, null));
   if (def._type === "unit_pressure") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(PressureConv, null));
-  if (def._type === "material_elastic") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(LookupPanel, { title: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u5DE5\u7A0B\u6750\u6599", data: ELASTIC_TABLE, columns: [{ key: "name", label: "\u6750\u6599" }, { key: "E", label: "E (GPa)" }, { key: "nu", label: "\u03BD" }, { key: "alpha", label: "\u03B1 (\xD710\u207B\u2076/K)" }], filterFn: (r, q) => r.name.includes(q) }));
-  if (def._type === "material_density") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(LookupPanel, { title: "\u6750\u6599\u5BC6\u5EA6\u67E5\u8A62", desc: "\u5E38\u7528\u91D1\u5C6C\u8207\u5DE5\u7A0B\u6750\u6599 (kg/m\xB3)", data: DENSITY_TABLE, columns: [{ key: "name", label: "\u6750\u6599\u540D\u7A31" }, { key: "rho", label: "\u5BC6\u5EA6 kg/m\xB3" }], filterFn: (r, q) => r.name.includes(q) }));
-  if (def._type === "material_friction") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(LookupPanel, { title: "\u6750\u6599\u6469\u64E6\u4FC2\u6578", desc: "\u7121\u6F64\u6ED1 / \u6709\u6F64\u6ED1", data: FRICTION_TABLE, columns: [{ key: "pair", label: "\u6750\u6599\u526F" }, { key: "dry", label: "\u7121\u6F64\u6ED1" }, { key: "wet", label: "\u6709\u6F64\u6ED1" }], filterFn: (r, q) => r.pair.includes(q) }));
-  if (def._type === "bolt_torque_lookup") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(LookupPanel, { title: "\u87BA\u6813\u9396\u7DCA\u626D\u77E9\u6A19\u6E96", desc: "\u55AE\u4F4D\uFF1Akgf\xB7m\uFF0C4.8\u7D1A\u87BA\u6813", data: BOLT_TORQUE, columns: [{ key: "size", label: "\u898F\u683C" }, { key: "jp", label: "\u65E5\u672C\u6A19\u6E96" }, { key: "din", label: "DIN\u6A19\u6E96" }], filterFn: (r, q) => r.size.toLowerCase().includes(q.toLowerCase()) }));
+  if (def._type === "material_elastic") return React.createElement(MaterialDropdown, { title: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u5DE5\u7A0B\u6750\u6599", data: ELASTIC_TABLE, cols: [{key:"name",label:"\u6750\u6599"},{key:"E",label:"E (GPa)"},{key:"nu",label:"\u6CCA\u677E\u6BD4 \u03BD"},{key:"alpha",label:"\u7DDA\u81A8\u81A8 \u03B1"}] });
+  if (def._type === "material_density") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u5BC6\u5EA6\u67E5\u8A62", desc: "\u5E38\u7528\u91D1\u5C6C\u8207\u5DE5\u7A0B\u6750\u6599", data: DENSITY_TABLE, cols: [{key:"name",label:"\u6750\u6599"},{key:"rho",label:"\u5BC6\u5EA6 kg/m\xB3"}] });
+  if (def._type === "material_friction") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u6469\u64E6\u4FC2\u6578", desc: "\u7121\u6F64\u6ED1 / \u6709\u6F64\u6ED1", data: FRICTION_TABLE, cols: [{key:"pair",label:"\u6750\u6599\u526F"},{key:"dry",label:"\u7121\u6F64\u6ED1"},{key:"wet",label:"\u6709\u6F64\u6ED1"}] });
+  if (def._type === "bolt_torque_lookup") return React.createElement(MaterialDropdown, { title: "\u87BA\u6813\u9396\u7DCA\u6247\u77E9\u6A19\u6E96", desc: "\u55AE\u4F4D: kgf\xB7m\uFF0C4.8\u7D1A", data: BOLT_TORQUE, cols: [{key:"size",label:"\u898F\u683C"},{key:"jp",label:"\u65E5\u672C\u6A19\u6E96"},{key:"din",label:"DIN\u6A19\u6E96"}] });
   const { exportPDF } = useExport();
   const init = () => Object.fromEntries(def.inputs.map((i) => [i.key, i.default]));
   const [vals, setVals] = useState(init);
