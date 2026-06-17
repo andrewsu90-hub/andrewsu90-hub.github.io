@@ -1,100 +1,38 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///C:/Users/user/Downloads/mech-calc_3.html -->
-<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>非標機械設計自動計算大全 | Andrew Su Engineering Tools</title>
-  <meta name="description" content="163 個工作表 · 57 個計算器 · 非標機械設計自動計算工具，涵蓋電機選型、氣缸、絲桿、齒輪、彈簧、液壓等。">
-  <!-- React + Babel via CDN -->
-  <script crossorigin="" src="./非標機械設計自動計算大全 _ Andrew Su Engineering Tools_files/react.production.min.js.下載"></script>
-  <script crossorigin="" src="./非標機械設計自動計算大全 _ Andrew Su Engineering Tools_files/react-dom.production.min.js.下載"></script>
+  <title>非標機械設計自動計算大全 | Anzû Design Studio</title>
+  <meta name="description" content="163 個工作表 · 57 個計算器 · 非標機械設計自動計算工具">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* Reset & base while React loads */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body,#root{height:100%;background:#0f1117;color:#e2e8f0}
-    #loading{display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#4a7cff;font-size:14px;letter-spacing:.08em}
+    html,body{height:100%;background:#fff;color:#000}
+    @media(prefers-color-scheme:dark){html,body{background:#0d0d0d;color:#f0f0f0}}
+    #root{height:100%}
+    #loading{display:flex;align-items:center;justify-content:center;height:100vh;font-family:'DM Sans',sans-serif;font-size:13px;color:#666;letter-spacing:.08em}
   </style>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 </head>
 <body>
-  <div id="back-nav" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(15,17,23,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #252b3b;padding:0 20px;height:40px;display:flex;align-items:center;justify-content:space-between;">
-    <a href="file:///C:/Users/user/index.html" style="color:#4a7cff;font-size:12px;font-family:sans-serif;text-decoration:none;letter-spacing:.04em;display:flex;align-items:center;gap:6px;">
-      ← andrewsu90-hub.github.io
-    </a>
-    <span style="color:#64748b;font-size:11px;font-family:monospace;letter-spacing:.06em;">非標機械設計自動計算大全 · 57 calculators</span>
-  </div>
-  <div style="height:40px"></div>
-  <div id="root"><style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0f1117;--surface:#181c27;--surface2:#1e2336;--border:#252b3b;--accent:#4a7cff;--accent2:#34c99e;--warn:#ff6b6b;--text:#e2e8f0;--muted:#64748b;--label:#94a3b8;--mono:'IBM Plex Mono',monospace;--sans:'Noto Sans TC',sans-serif}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px}
-.app{display:flex;height:calc(100vh - 40px);overflow:hidden}
-.sidebar{width:210px;min-width:210px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
-.sidebar-header{padding:18px 16px 10px;border-bottom:1px solid var(--border)}
-.sidebar-header h1{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
-.sidebar-header p{font-size:11px;color:var(--muted);margin-top:2px}
-.search-box{margin:8px 10px 4px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;width:calc(100% - 20px);outline:none;font-family:var(--sans)}
-.search-box:focus{border-color:var(--accent)}
-.search-box::placeholder{color:var(--muted)}
-.nav-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:12px;color:var(--label);border-left:2px solid transparent;transition:all .12s;user-select:none}
-.nav-item:hover{color:var(--text);background:rgba(74,124,255,.07)}
-.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(74,124,255,.12)}
-.nav-icon{font-size:13px;width:18px;text-align:center}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{padding:12px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
-.topbar h2{font-size:15px;font-weight:700}
-.topbar p{font-size:11px;color:var(--muted);margin-top:2px}
-.content{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;align-content:start}
-.home-grid{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-content:start}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px}
-.card-title{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--label);text-transform:uppercase;margin-bottom:4px}
-.card-desc{font-size:11px;color:var(--muted);margin-bottom:12px}
-.home-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s}
-.home-card:hover{border-color:var(--accent);background:rgba(74,124,255,.06)}
-.home-card .icon{font-size:20px;margin-bottom:8px}
-.home-card .name{font-size:12px;font-weight:600}
-.home-card .count{font-size:11px;color:var(--muted);margin-top:2px}
-.field{margin-bottom:10px}
-.field label{display:block;font-size:11px;color:var(--label);margin-bottom:4px}
-.field .hint{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
-.field-row{display:flex;align-items:center;gap:6px}
-.field input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .12s}
-.field input:focus{border-color:var(--accent)}
-.field .unit-tag{font-size:11px;color:var(--muted);min-width:44px;text-align:right;font-family:var(--mono)}
-.calc-btn{width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:7px;padding:8px 0;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .12s;font-family:var(--sans)}
-.calc-btn:hover{opacity:.85}
-.results-divider{margin-top:14px;border-top:1px solid var(--border);padding-top:10px}
-.result-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(37,43,59,.7)}
-.result-row:last-child{border-bottom:none}
-.result-label{font-size:11px;color:var(--label)}
-.result-val{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--accent2)}
-.result-unit{font-size:10px;color:var(--muted);margin-left:3px}
-.verdict-ok{color:var(--accent2)!important}
-.verdict-ng{color:var(--warn)!important}
-.lookup-input{display:flex;gap:8px;margin-bottom:12px}
-.lookup-input input,.lookup-input select{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none}
-.lookup-input input:focus{border-color:var(--accent)}
-.data-table{width:100%;border-collapse:collapse;font-size:12px}
-.data-table th{text-align:left;padding:6px 8px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:11px;font-family:var(--mono)}
-.data-table td{padding:6px 8px;border-bottom:1px solid rgba(37,43,59,.5);font-family:var(--mono);color:var(--text)}
-.data-table tr:hover td{background:rgba(74,124,255,.05)}
-.conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.conv-item{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
-.conv-item label{font-size:10px;color:var(--muted)}
-.conv-item .val{font-family:var(--mono);font-size:14px;color:var(--text);margin-top:2px}
-.it-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
-.it-table th{padding:5px 6px;color:var(--muted);text-align:center;font-size:10px;border-bottom:1px solid var(--border);font-family:var(--mono)}
-.it-table td{padding:5px 6px;text-align:center;font-family:var(--mono);border-bottom:1px solid rgba(37,43,59,.5)}
-.it-table tr.hl td{background:rgba(52,201,158,.08);color:var(--accent2)}
-.it-badge{display:inline-block;padding:2px 6px;border-radius:4px;background:rgba(74,124,255,.15);color:var(--accent);font-family:var(--mono);font-size:13px;margin:3px 3px 0 0}
+  <header style="position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1rem 5%;border-bottom:0.5px solid #e0e0e0;background:rgba(255,255,255,0.92);backdrop-filter:blur(8px);height:56px;">
+    <a href="../index.html" style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:1px;text-decoration:none;color:inherit;">Anzû Design Studio</a>
+    <a href="engineering-calculators.html" style="font-size:13px;color:#666;text-decoration:none;display:flex;align-items:center;gap:6px;">← 返回工具選單</a>
+  </header>
+  <style>
+    header{background:rgba(255,255,255,0.92)}
+    @media(prefers-color-scheme:dark){
+      header{background:rgba(13,13,13,0.92)!important;border-bottom-color:#2a2a2a!important}
+      header a{color:#f0f0f0!important}
+      header a:last-child{color:#aaa!important}
+    }
+  </style>
 
-.link-btn{margin-top:8px;width:100%;background:rgba(52,201,158,.12);color:var(--accent2);border:1px solid rgba(52,201,158,.3);border-radius:6px;padding:5px 0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)}
-.link-btn:hover{background:rgba(52,201,158,.22)}
-.linked-badge{display:inline-block;background:rgba(52,201,158,.12);color:var(--accent2);border:1px solid rgba(52,201,158,.3);border-radius:4px;padding:2px 6px;font-size:10px;margin-left:6px}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-</style><div class="app"><nav class="sidebar"><div class="sidebar-header"><h1>非標機械</h1><p>自動計算大全</p></div><input class="search-box" placeholder="搜尋計算器…" value=""><div class="nav-item active" style="margin-top: 4px;"><span class="nav-icon">🏠</span>總覽</div><div class="nav-item"><span class="nav-icon">⚡</span>電機選型</div><div class="nav-item"><span class="nav-icon">💨</span>氣動選型</div><div class="nav-item"><span class="nav-icon">🔩</span>絲桿運動</div><div class="nav-item"><span class="nav-icon">⚙️</span>齒輪計算</div><div class="nav-item"><span class="nav-icon">🌀</span>彈簧計算</div><div class="nav-item"><span class="nav-icon">⛓️</span>鏈條計算</div><div class="nav-item"><span class="nav-icon">🔄</span>同步帶計算</div><div class="nav-item"><span class="nav-icon">📐</span>截面力學</div><div class="nav-item"><span class="nav-icon">🔨</span>沖壓成型</div><div class="nav-item"><span class="nav-icon">🔧</span>鍵銷強度</div><div class="nav-item"><span class="nav-icon">⭕</span>軸承查詢</div><div class="nav-item"><span class="nav-icon">📏</span>公差查詢</div><div class="nav-item"><span class="nav-icon">🧱</span>材料查詢</div><div class="nav-item"><span class="nav-icon">🔁</span>單位換算</div><div class="nav-item"><span class="nav-icon">🎡</span>凸輪分割器</div><div class="nav-item"><span class="nav-icon">🛢️</span>液壓系統</div><div class="nav-item"><span class="nav-icon">🌬️</span>氣動計算</div><div class="nav-item"><span class="nav-icon">🏭</span>輸送系統</div><div class="nav-item"><span class="nav-icon">📊</span>其他計算</div></nav><div class="main"><div class="topbar"><div><h2>非標機械設計自動計算大全</h2><p>163 個原始工作表 · 19 個分類 · 55 個計算器</p></div></div><div class="home-grid"><div class="home-card"><div class="icon">⚡</div><div class="name">電機選型</div><div class="count">5 個</div></div><div class="home-card"><div class="icon">💨</div><div class="name">氣動選型</div><div class="count">3 個</div></div><div class="home-card"><div class="icon">🔩</div><div class="name">絲桿運動</div><div class="count">2 個</div></div><div class="home-card"><div class="icon">⚙️</div><div class="name">齒輪計算</div><div class="count">6 個</div></div><div class="home-card"><div class="icon">🌀</div><div class="name">彈簧計算</div><div class="count">2 個</div></div><div class="home-card"><div class="icon">⛓️</div><div class="name">鏈條計算</div><div class="count">2 個</div></div><div class="home-card"><div class="icon">🔄</div><div class="name">同步帶計算</div><div class="count">1 個</div></div><div class="home-card"><div class="icon">📐</div><div class="name">截面力學</div><div class="count">4 個</div></div><div class="home-card"><div class="icon">🔨</div><div class="name">沖壓成型</div><div class="count">3 個</div></div><div class="home-card"><div class="icon">🔧</div><div class="name">鍵銷強度</div><div class="count">4 個</div></div><div class="home-card"><div class="icon">⭕</div><div class="name">軸承查詢</div><div class="count">3 個</div></div><div class="home-card"><div class="icon">📏</div><div class="name">公差查詢</div><div class="count">1 個</div></div><div class="home-card"><div class="icon">🧱</div><div class="name">材料查詢</div><div class="count">4 個</div></div><div class="home-card"><div class="icon">🔁</div><div class="name">單位換算</div><div class="count">4 個</div></div><div class="home-card"><div class="icon">🎡</div><div class="name">凸輪分割器</div><div class="count">2 個</div></div><div class="home-card"><div class="icon">🛢️</div><div class="name">液壓系統</div><div class="count">5 個</div></div><div class="home-card"><div class="icon">🌬️</div><div class="name">氣動計算</div><div class="count">1 個</div></div><div class="home-card"><div class="icon">🏭</div><div class="name">輸送系統</div><div class="count">1 個</div></div><div class="home-card"><div class="icon">📊</div><div class="name">其他計算</div><div class="count">2 個</div></div></div></div></div></div>
+  <div id="root"><div id="loading">LOADING CALC ENGINE…</div></div>
 
   <script>
 const { useState, useMemo, useCallback } = React;
@@ -261,24 +199,24 @@ const PRESSURE_UNITS = ["Pa", "kPa", "MPa", "bar", "atm", "kgf/cm\xB2", "psi"];
 const PRESSURE_TO_PA = [1, 1e3, 1e6, 1e5, 101325, 98066.5, 6894.76];
 const CATEGORIES = [
   { id: "motor", label: "\u96FB\u6A5F\u9078\u578B", icon: "\u26A1", calcs: ["motor_torque", "motor_inertia", "servo_select", "power_calc", "belt_drive"] },
-  { id: "cylinder", label: "\u6C23\u52D5\u9078\u578B", icon: "\uD83D\uDCA8", calcs: ["cylinder_bore", "cylinder_thrust", "vacuum_pad"] },
-  { id: "ballscrew", label: "\u7D72\u687F\u904B\u52D5", icon: "\uD83D\uDD29", calcs: ["ballscrew_horiz", "ballscrew_vert"] },
+  { id: "cylinder", label: "\u6C23\u52D5\u9078\u578B", icon: "\u{1F4A8}", calcs: ["cylinder_bore", "cylinder_thrust", "vacuum_pad"] },
+  { id: "ballscrew", label: "\u7D72\u687F\u904B\u52D5", icon: "\u{1F529}", calcs: ["ballscrew_horiz", "ballscrew_vert"] },
   { id: "gear", label: "\u9F52\u8F2A\u8A08\u7B97", icon: "\u2699\uFE0F", calcs: ["gear_rack_motor", "gear_rack_design", "worm_gear", "bevel_gear", "coupler_universal", "coupler_gear"] },
-  { id: "spring", label: "\u5F48\u7C27\u8A08\u7B97", icon: "\uD83C\uDF00", calcs: ["spring_calc", "spring_stiffness"] },
+  { id: "spring", label: "\u5F48\u7C27\u8A08\u7B97", icon: "\u{1F300}", calcs: ["spring_calc", "spring_stiffness"] },
   { id: "chain", label: "\u93C8\u689D\u8A08\u7B97", icon: "\u26D3\uFE0F", calcs: ["chain_length", "sprocket_basic"] },
-  { id: "belt", label: "\u540C\u6B65\u5E36\u8A08\u7B97", icon: "\uD83D\uDD04", calcs: ["sync_belt"] },
-  { id: "section", label: "\u622A\u9762\u529B\u5B78", icon: "\uD83D\uDCD0", calcs: ["section_circle", "section_hollow_circle", "section_rect", "section_hollow_rect"] },
-  { id: "press", label: "\u6C96\u58D3\u6210\u578B", icon: "\uD83D\uDD28", calcs: ["blank_force", "bend_v", "bend_u"] },
-  { id: "fastener", label: "\u9375\u92B7\u5F37\u5EA6", icon: "\uD83D\uDD27", calcs: ["key_strength", "pin_strength", "press_fit", "thread_dims"] },
+  { id: "belt", label: "\u540C\u6B65\u5E36\u8A08\u7B97", icon: "\u{1F504}", calcs: ["sync_belt"] },
+  { id: "section", label: "\u622A\u9762\u529B\u5B78", icon: "\u{1F4D0}", calcs: ["section_circle", "section_hollow_circle", "section_rect", "section_hollow_rect"] },
+  { id: "press", label: "\u6C96\u58D3\u6210\u578B", icon: "\u{1F528}", calcs: ["blank_force", "bend_v", "bend_u"] },
+  { id: "fastener", label: "\u9375\u92B7\u5F37\u5EA6", icon: "\u{1F527}", calcs: ["key_strength", "pin_strength", "press_fit", "thread_dims"] },
   { id: "bearing", label: "\u8EF8\u627F\u67E5\u8A62", icon: "\u2B55", calcs: ["bearing_lookup", "bearing_thrust_lookup", "bearing_life"] },
-  { id: "tolerance", label: "\u516C\u5DEE\u67E5\u8A62", icon: "\uD83D\uDCCF", calcs: ["it_tolerance"] },
-  { id: "material", label: "\u6750\u6599\u67E5\u8A62", icon: "\uD83E\uDDF1", calcs: ["material_elastic", "material_density", "material_friction", "bolt_torque_lookup"] },
-  { id: "unit", label: "\u55AE\u4F4D\u63DB\u7B97", icon: "\uD83D\uDD01", calcs: ["unit_pressure", "unit_power", "unit_torque", "unit_length"] },
-  { id: "cam", label: "\u51F8\u8F2A\u5206\u5272\u5668", icon: "\uD83C\uDFA1", calcs: ["cam_sine", "indexer_select"] },
-  { id: "hydraulic", label: "\u6DB2\u58D3\u7CFB\u7D71", icon: "\uD83D\uDEE2\uFE0F", calcs: ["hydraulic_pump", "hydraulic_pipe", "hydraulic_shock", "accumulator", "tank_thermal"] },
-  { id: "pneumatic", label: "\u6C23\u52D5\u8A08\u7B97", icon: "\uD83C\uDF2C\uFE0F", calcs: ["air_consumption"] },
-  { id: "conveyor", label: "\u8F38\u9001\u7CFB\u7D71", icon: "\uD83C\uDFED", calcs: ["conveyor_chain"] },
-  { id: "other", label: "\u5176\u4ED6\u8A08\u7B97", icon: "\uD83D\uDCCA", calcs: ["column_buckling", "ratchet_calc"] }
+  { id: "tolerance", label: "\u516C\u5DEE\u67E5\u8A62", icon: "\u{1F4CF}", calcs: ["it_tolerance"] },
+  { id: "material", label: "\u6750\u6599\u67E5\u8A62", icon: "\u{1F9F1}", calcs: ["material_elastic", "material_density", "material_friction", "bolt_torque_lookup"] },
+  { id: "unit", label: "\u55AE\u4F4D\u63DB\u7B97", icon: "\u{1F501}", calcs: ["unit_pressure", "unit_power", "unit_torque", "unit_length"] },
+  { id: "cam", label: "\u51F8\u8F2A\u5206\u5272\u5668", icon: "\u{1F3A1}", calcs: ["cam_sine", "indexer_select"] },
+  { id: "hydraulic", label: "\u6DB2\u58D3\u7CFB\u7D71", icon: "\u{1F6E2}\uFE0F", calcs: ["hydraulic_pump", "hydraulic_pipe", "hydraulic_shock", "accumulator", "tank_thermal"] },
+  { id: "pneumatic", label: "\u6C23\u52D5\u8A08\u7B97", icon: "\u{1F32C}\uFE0F", calcs: ["air_consumption"] },
+  { id: "conveyor", label: "\u8F38\u9001\u7CFB\u7D71", icon: "\u{1F3ED}", calcs: ["conveyor_chain"] },
+  { id: "other", label: "\u5176\u4ED6\u8A08\u7B97", icon: "\u{1F4CA}", calcs: ["column_buckling", "ratchet_calc"] }
 ];
 const CALCS = {
   // ══ 氣動 ══
@@ -994,76 +932,189 @@ const CALCS = {
   bolt_torque_lookup: { _type: "bolt_torque_lookup", name: "\u87BA\u6813\u9396\u7DCA\u626D\u77E9\u6A19\u6E96", desc: "M6~M100 \u65E5\u672C/DIN \u6A19\u6E96\u626D\u77E9" }
 };
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0f1117;--surface:#181c27;--surface2:#1e2336;--border:#252b3b;--accent:#4a7cff;--accent2:#34c99e;--warn:#ff6b6b;--text:#e2e8f0;--muted:#64748b;--label:#94a3b8;--mono:'IBM Plex Mono',monospace;--sans:'Noto Sans TC',sans-serif}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px}
-.app{display:flex;height:calc(100vh - 40px);overflow:hidden}
-.sidebar{width:210px;min-width:210px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
-.sidebar-header{padding:18px 16px 10px;border-bottom:1px solid var(--border)}
-.sidebar-header h1{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
-.sidebar-header p{font-size:11px;color:var(--muted);margin-top:2px}
-.search-box{margin:8px 10px 4px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;width:calc(100% - 20px);outline:none;font-family:var(--sans)}
-.search-box:focus{border-color:var(--accent)}
+
+:root{
+  --primary:#000;--secondary:#666;--border-color:#e0e0e0;
+  --bg-light:#f5f5f5;--bg-white:#fff;
+  --accent:#1a1a2e;--accent2:#2e7d32;--warn:#c62828;
+  --muted:#64748b;--border:#e0e0e0;
+  --brand:#1a1a2e;--brand-50:#f0f0f5;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'DM Sans','Noto Sans TC',-apple-system,sans-serif;
+}
+@media(prefers-color-scheme:dark){:root{
+  --primary:#f0f0f0;--secondary:#aaa;--border-color:#2a2a2a;
+  --bg-light:#161616;--bg-white:#0d0d0d;
+  --accent:#aaa;--accent2:#66bb6a;--warn:#ef5350;
+  --muted:#888;--border:#2a2a2a;
+  --brand:#ccc;--brand-50:#1a1a1a;
+}}
+
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);font-weight:300;color:var(--primary);background:var(--bg-white);line-height:1.6;-webkit-font-smoothing:antialiased;font-size:14px}
+
+/* App layout */
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+/* Sidebar */
+.sidebar{
+  position:fixed;top:56px;left:0;bottom:0;width:200px;
+  background:var(--bg-white);border-right:0.5px solid var(--border-color);
+  overflow-y:auto;z-index:50;
+}
+.sidebar-header{padding:16px 16px 10px;border-bottom:0.5px solid var(--border-color)}
+.sidebar-header h1{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--primary);text-transform:uppercase}
+.sidebar-header p{font-size:11px;color:var(--secondary);margin-top:2px}
+
+.search-box{
+  display:block;margin:8px 10px 4px;width:calc(100% - 20px);
+  padding:6px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);
+  background:var(--bg-light);font:inherit;font-size:12px;color:var(--primary);outline:none;
+}
+.search-box:focus{border-color:var(--primary)}
 .search-box::placeholder{color:var(--muted)}
-.nav-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:12px;color:var(--label);border-left:2px solid transparent;transition:all .12s;user-select:none}
-.nav-item:hover{color:var(--text);background:rgba(74,124,255,.07)}
-.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(74,124,255,.12)}
+
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;cursor:pointer;font-size:12px;font-weight:500;
+  color:var(--secondary);border-left:2px solid transparent;
+  transition:all .15s;user-select:none;
+}
+.nav-item:hover{color:var(--primary);background:var(--bg-light)}
+.nav-item.active{color:var(--primary);border-left-color:var(--primary);background:var(--brand-50);font-weight:600}
 .nav-icon{font-size:13px;width:18px;text-align:center}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{padding:12px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
-.topbar h2{font-size:15px;font-weight:700}
-.topbar p{font-size:11px;color:var(--muted);margin-top:2px}
-.content{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;align-content:start}
-.home-grid{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-content:start}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px}
-.card-title{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--label);text-transform:uppercase;margin-bottom:4px}
-.card-desc{font-size:11px;color:var(--muted);margin-bottom:12px}
-.home-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s}
-.home-card:hover{border-color:var(--accent);background:rgba(74,124,255,.06)}
-.home-card .icon{font-size:20px;margin-bottom:8px}
-.home-card .name{font-size:12px;font-weight:600}
-.home-card .count{font-size:11px;color:var(--muted);margin-top:2px}
-.field{margin-bottom:10px}
-.field label{display:block;font-size:11px;color:var(--label);margin-bottom:4px}
-.field .hint{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+
+/* Main area */
+.main{margin-left:200px;display:flex;flex-direction:column;min-height:calc(100vh - 56px)}
+
+.topbar{
+  padding:20px 28px 14px;
+  border-bottom:0.5px solid var(--border-color);
+}
+.topbar h2{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:.3px;color:var(--primary)}
+.topbar p{font-size:12px;color:var(--secondary);margin-top:3px}
+
+.content{
+  flex:1;padding:20px 28px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:16px;align-content:start;
+}
+.home-grid{
+  flex:1;padding:20px 28px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;align-content:start;
+}
+
+/* Cards */
+.card{
+  background:var(--bg-light);border:0.5px solid var(--border-color);
+  border-radius:var(--radius-lg);overflow:hidden;
+}
+.card-title{
+  font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--secondary);
+  padding:12px 16px 0;margin-bottom:12px;
+}
+.card-desc{font-size:12px;color:var(--muted);margin:-8px 16px 10px;line-height:1.5}
+
+.home-card{
+  background:var(--bg-light);border:0.5px solid var(--border-color);
+  border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .2s;
+}
+.home-card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.home-card .icon{font-size:22px;margin-bottom:8px}
+.home-card .name{font-size:13px;font-weight:700;color:var(--primary)}
+.home-card .count{font-size:11px;color:var(--secondary);margin-top:3px}
+
+/* Fields */
+.field{padding:0 16px;margin-bottom:10px}
+.field label{display:block;font-size:11.5px;font-weight:600;color:var(--secondary);margin-bottom:5px;letter-spacing:.3px}
+.field .hint{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.4}
 .field-row{display:flex;align-items:center;gap:6px}
-.field input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .12s}
-.field input:focus{border-color:var(--accent)}
+.field input{
+  flex:1;padding:8px 10px;
+  border:0.5px solid var(--border-color);border-radius:var(--radius-sm);
+  background:var(--bg-white);font:inherit;font-family:var(--mono);font-size:13px;
+  color:var(--primary);outline:none;transition:border-color .15s;
+}
+.field input:focus{border-color:var(--primary)}
 .field .unit-tag{font-size:11px;color:var(--muted);min-width:44px;text-align:right;font-family:var(--mono)}
-.calc-btn{width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:7px;padding:8px 0;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .12s;font-family:var(--sans)}
-.calc-btn:hover{opacity:.85}
-.results-divider{margin-top:14px;border-top:1px solid var(--border);padding-top:10px}
-.result-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(37,43,59,.7)}
+
+.calc-btn{
+  display:block;width:calc(100% - 32px);margin:14px 16px 16px;
+  padding:9px 0;border:none;border-radius:var(--radius-sm);
+  background:var(--primary);color:var(--bg-white);
+  font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;letter-spacing:.3px;
+}
+.calc-btn:hover{opacity:.8}
+
+/* Results */
+.results-divider{margin:0 16px 14px;border-top:0.5px solid var(--border-color);padding-top:12px}
+.result-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:6px 0;border-bottom:0.5px solid var(--border-color);
+}
 .result-row:last-child{border-bottom:none}
-.result-label{font-size:11px;color:var(--label)}
-.result-val{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--accent2)}
-.result-unit{font-size:10px;color:var(--muted);margin-left:3px}
+.result-label{font-size:11.5px;color:var(--secondary);font-weight:500}
+.result-val{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--primary)}
+.result-unit{font-size:10.5px;color:var(--muted);margin-left:3px}
 .verdict-ok{color:var(--accent2)!important}
 .verdict-ng{color:var(--warn)!important}
-.lookup-input{display:flex;gap:8px;margin-bottom:12px}
-.lookup-input input,.lookup-input select{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none}
-.lookup-input input:focus{border-color:var(--accent)}
-.data-table{width:100%;border-collapse:collapse;font-size:12px}
-.data-table th{text-align:left;padding:6px 8px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:11px;font-family:var(--mono)}
-.data-table td{padding:6px 8px;border-bottom:1px solid rgba(37,43,59,.5);font-family:var(--mono);color:var(--text)}
-.data-table tr:hover td{background:rgba(74,124,255,.05)}
-.conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.conv-item{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
-.conv-item label{font-size:10px;color:var(--muted)}
-.conv-item .val{font-family:var(--mono);font-size:14px;color:var(--text);margin-top:2px}
-.it-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
-.it-table th{padding:5px 6px;color:var(--muted);text-align:center;font-size:10px;border-bottom:1px solid var(--border);font-family:var(--mono)}
-.it-table td{padding:5px 6px;text-align:center;font-family:var(--mono);border-bottom:1px solid rgba(37,43,59,.5)}
-.it-table tr.hl td{background:rgba(52,201,158,.08);color:var(--accent2)}
-.it-badge{display:inline-block;padding:2px 6px;border-radius:4px;background:rgba(74,124,255,.15);color:var(--accent);font-family:var(--mono);font-size:13px;margin:3px 3px 0 0}
 
-.link-btn{margin-top:8px;width:100%;background:rgba(52,201,158,.12);color:var(--accent2);border:1px solid rgba(52,201,158,.3);border-radius:6px;padding:5px 0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)}
-.link-btn:hover{background:rgba(52,201,158,.22)}
-.linked-badge{display:inline-block;background:rgba(52,201,158,.12);color:var(--accent2);border:1px solid rgba(52,201,158,.3);border-radius:4px;padding:2px 6px;font-size:10px;margin-left:6px}
-::-webkit-scrollbar{width:5px}
+/* Export / Link buttons */
+.link-btn{
+  display:block;width:calc(50% - 8px);margin:0;
+  padding:7px 0;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);
+  background:var(--bg-white);color:var(--secondary);
+  font:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
+  white-space:nowrap;
+}
+.link-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* Lookup tables */
+.lookup-input{display:flex;gap:8px;margin:0 16px 12px}
+.lookup-input input,.lookup-input select{
+  flex:1;padding:7px 10px;border:0.5px solid var(--border-color);
+  border-radius:var(--radius-sm);background:var(--bg-white);
+  font:inherit;font-size:13px;color:var(--primary);outline:none;
+}
+.lookup-input input:focus{border-color:var(--primary)}
+
+.data-table{width:100%;border-collapse:collapse;font-size:12px;margin:0 0 4px}
+.data-table th{
+  text-align:left;padding:7px 10px;font-size:11px;font-weight:700;
+  color:var(--secondary);border-bottom:0.5px solid var(--border-color);
+  background:var(--bg-white);letter-spacing:.3px;
+}
+.data-table td{padding:6px 10px;border-bottom:0.5px solid var(--border-color);font-family:var(--mono);color:var(--primary)}
+.data-table tr:hover td{background:var(--brand-50)}
+
+/* IT table */
+.it-table{width:100%;border-collapse:collapse;font-size:11.5px;margin:0 16px 4px;width:calc(100% - 32px)}
+.it-table th{padding:6px 8px;text-align:center;font-size:10.5px;font-weight:700;color:var(--secondary);border-bottom:0.5px solid var(--border-color)}
+.it-table td{padding:6px 8px;text-align:center;font-family:var(--mono);border-bottom:0.5px solid var(--border-color)}
+.it-table tr.hl td{background:var(--brand-50);color:var(--primary);font-weight:700}
+.it-badge{display:inline-block;padding:2px 7px;border-radius:var(--radius-sm);background:var(--bg-light);border:0.5px solid var(--border-color);font-family:var(--mono);font-size:12px;margin:3px 3px 0 0;color:var(--primary)}
+
+/* Pressure conv */
+.conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 16px 14px}
+.conv-item{background:var(--bg-white);border:0.5px solid var(--border-color);border-radius:var(--radius-sm);padding:8px 10px}
+.conv-item label{font-size:10.5px;color:var(--secondary);font-weight:600}
+.conv-item .val{font-family:var(--mono);font-size:14px;color:var(--primary);margin-top:2px}
+
+::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:2px}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0}
+  .content,.home-grid{padding:16px}
+}
 `;
 function LookupPanel({ title, desc, data, columns, filterFn }) {
   const [q, setQ] = useState("");
@@ -1254,7 +1305,7 @@ function CalcCard({ calcId, onLink }) {
     }
   }, [vals, def]);
   const svgType = calcId === "section_circle" ? "circle" : calcId === "section_hollow_circle" ? "hollow_circle" : calcId === "section_rect" ? "rect" : calcId === "section_hollow_rect" ? "hollow_rect" : null;
-  return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, def.name), def.desc && /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, def.desc), def.inputs.map((inp) => /* @__PURE__ */ React.createElement("div", { className: "field", key: inp.key }, /* @__PURE__ */ React.createElement("label", null, inp.label), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: vals[inp.key], onChange: (e) => setVals((v) => ({ ...v, [inp.key]: e.target.value })) }), inp.unit && /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, inp.unit)), inp.hint && /* @__PURE__ */ React.createElement("div", { className: "hint" }, inp.hint))), /* @__PURE__ */ React.createElement("button", { className: "calc-btn", onClick: run }, "\u8A08\u7B97"), svgType && /* @__PURE__ */ React.createElement(SectionSVG, { type: svgType, vals }), results && /* @__PURE__ */ React.createElement("div", { className: "results-divider" }, results.error ? /* @__PURE__ */ React.createElement("div", { style: { color: "var(--warn)", fontSize: 12 } }, "\u932F\u8AA4\uFF1A", results.error) : def.outputs.map((o) => /* @__PURE__ */ React.createElement("div", { className: "result-row", key: o.key }, /* @__PURE__ */ React.createElement("span", { className: "result-label" }, o.label), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("span", { className: `result-val${String(results[o.key]).includes("\u2705") ? " verdict-ok" : String(results[o.key]).includes("\u274C") ? " verdict-ng" : ""}` }, results[o.key] ?? "\u2014"), o.unit && /* @__PURE__ */ React.createElement("span", { className: "result-unit" }, o.unit))))), results && !results.error && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 8 } }, /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => exportPDF(def.name, def.inputs.map((i) => ({ ...i, val: vals[i.key] })), def.outputs, results) }, "\uD83D\uDCC4 \u532F\u51FA\u8A08\u7B97\u5831\u544A"), ["section_circle", "section_hollow_circle", "section_rect", "section_hollow_rect"].includes(calcId) && onLink && /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => onLink(calcId, results) }, "\uD83D\uDD17 \u5E36\u5165\u7ACB\u67F1\u8A08\u7B97")));
+  return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, def.name), def.desc && /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, def.desc), def.inputs.map((inp) => /* @__PURE__ */ React.createElement("div", { className: "field", key: inp.key }, /* @__PURE__ */ React.createElement("label", null, inp.label), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: vals[inp.key], onChange: (e) => setVals((v) => ({ ...v, [inp.key]: e.target.value })) }), inp.unit && /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, inp.unit)), inp.hint && /* @__PURE__ */ React.createElement("div", { className: "hint" }, inp.hint))), /* @__PURE__ */ React.createElement("button", { className: "calc-btn", onClick: run }, "\u8A08\u7B97"), svgType && /* @__PURE__ */ React.createElement(SectionSVG, { type: svgType, vals }), results && /* @__PURE__ */ React.createElement("div", { className: "results-divider" }, results.error ? /* @__PURE__ */ React.createElement("div", { style: { color: "var(--warn)", fontSize: 12 } }, "\u932F\u8AA4\uFF1A", results.error) : def.outputs.map((o) => /* @__PURE__ */ React.createElement("div", { className: "result-row", key: o.key }, /* @__PURE__ */ React.createElement("span", { className: "result-label" }, o.label), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("span", { className: `result-val${String(results[o.key]).includes("\u2705") ? " verdict-ok" : String(results[o.key]).includes("\u274C") ? " verdict-ng" : ""}` }, results[o.key] ?? "\u2014"), o.unit && /* @__PURE__ */ React.createElement("span", { className: "result-unit" }, o.unit))))), results && !results.error && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 8 } }, /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => exportPDF(def.name, def.inputs.map((i) => ({ ...i, val: vals[i.key] })), def.outputs, results) }, "\u{1F4C4} \u532F\u51FA\u8A08\u7B97\u5831\u544A"), ["section_circle", "section_hollow_circle", "section_rect", "section_hollow_rect"].includes(calcId) && onLink && /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => onLink(calcId, results) }, "\u{1F517} \u5E36\u5165\u7ACB\u67F1\u8A08\u7B97")));
 }
 function App() {
   const [activeCat, setActiveCat] = useState(null);
@@ -1285,11 +1336,12 @@ function App() {
   return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("style", null, CSS), /* @__PURE__ */ React.createElement("div", { className: "app" }, /* @__PURE__ */ React.createElement("nav", { className: "sidebar" }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-header" }, /* @__PURE__ */ React.createElement("h1", null, "\u975E\u6A19\u6A5F\u68B0"), /* @__PURE__ */ React.createElement("p", null, "\u81EA\u52D5\u8A08\u7B97\u5927\u5168")), /* @__PURE__ */ React.createElement("input", { className: "search-box", placeholder: "\u641C\u5C0B\u8A08\u7B97\u5668\u2026", value: search, onChange: (e) => setSearch(e.target.value) }), /* @__PURE__ */ React.createElement("div", { className: `nav-item${activeCat == null && !search ? " active" : ""}`, style: { marginTop: 4 }, onClick: () => {
     setActiveCat(null);
     setSearch("");
-  } }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, "\uD83C\uDFE0"), "\u7E3D\u89BD"), filteredCats.map((cat) => /* @__PURE__ */ React.createElement("div", { key: cat.id, className: `nav-item${activeCat === cat.id ? " active" : ""}`, onClick: () => setActiveCat(cat.id) }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, cat.icon), cat.label))), /* @__PURE__ */ React.createElement("div", { className: "main" }, /* @__PURE__ */ React.createElement("div", { className: "topbar" }, activeCat == null ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, "\u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\u81EA\u52D5\u8A08\u7B97\u5927\u5168"), /* @__PURE__ */ React.createElement("p", null, "163 \u500B\u539F\u59CB\u5DE5\u4F5C\u8868 \xB7 ", CATEGORIES.length, " \u500B\u5206\u985E \xB7 ", totalCalcs, " \u500B\u8A08\u7B97\u5668")) : /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, activeCategory?.icon, " ", activeCategory?.label), /* @__PURE__ */ React.createElement("p", null, visibleCalcs.length, " \u500B\u8A08\u7B97\u5668"))), activeCat == null ? /* @__PURE__ */ React.createElement("div", { className: "home-grid" }, CATEGORIES.map((cat) => /* @__PURE__ */ React.createElement("div", { className: "home-card", key: cat.id, onClick: () => setActiveCat(cat.id) }, /* @__PURE__ */ React.createElement("div", { className: "icon" }, cat.icon), /* @__PURE__ */ React.createElement("div", { className: "name" }, cat.label), /* @__PURE__ */ React.createElement("div", { className: "count" }, cat.calcs.length, " \u500B")))) : /* @__PURE__ */ React.createElement("div", { className: "content" }, activeCat === "cam" && /* @__PURE__ */ React.createElement(CamCurvePanel, null), visibleCalcs.map((id) => /* @__PURE__ */ React.createElement("div", { key: id, style: { position: "relative" } }, id === "column_buckling" && linkedSection && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "var(--accent2)", marginBottom: 6 } }, "\uD83D\uDD17 \u5DF2\u5F9E\u622A\u9762\u8A08\u7B97\u5E36\u5165\uFF1AI=", linkedSection.I.toFixed(0), " mm\u2074 / A=", linkedSection.A.toFixed(0), " mm\xB2"), /* @__PURE__ */ React.createElement(CalcCard, { calcId: id, onLink: handleLink })))))));
+  } }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, "\u{1F3E0}"), "\u7E3D\u89BD"), filteredCats.map((cat) => /* @__PURE__ */ React.createElement("div", { key: cat.id, className: `nav-item${activeCat === cat.id ? " active" : ""}`, onClick: () => setActiveCat(cat.id) }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, cat.icon), cat.label))), /* @__PURE__ */ React.createElement("div", { className: "main" }, /* @__PURE__ */ React.createElement("div", { className: "topbar" }, activeCat == null ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, "\u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\u81EA\u52D5\u8A08\u7B97\u5927\u5168"), /* @__PURE__ */ React.createElement("p", null, "163 \u500B\u539F\u59CB\u5DE5\u4F5C\u8868 \xB7 ", CATEGORIES.length, " \u500B\u5206\u985E \xB7 ", totalCalcs, " \u500B\u8A08\u7B97\u5668")) : /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, activeCategory?.icon, " ", activeCategory?.label), /* @__PURE__ */ React.createElement("p", null, visibleCalcs.length, " \u500B\u8A08\u7B97\u5668"))), activeCat == null ? /* @__PURE__ */ React.createElement("div", { className: "home-grid" }, CATEGORIES.map((cat) => /* @__PURE__ */ React.createElement("div", { className: "home-card", key: cat.id, onClick: () => setActiveCat(cat.id) }, /* @__PURE__ */ React.createElement("div", { className: "icon" }, cat.icon), /* @__PURE__ */ React.createElement("div", { className: "name" }, cat.label), /* @__PURE__ */ React.createElement("div", { className: "count" }, cat.calcs.length, " \u500B")))) : /* @__PURE__ */ React.createElement("div", { className: "content" }, activeCat === "cam" && /* @__PURE__ */ React.createElement(CamCurvePanel, null), visibleCalcs.map((id) => /* @__PURE__ */ React.createElement("div", { key: id, style: { position: "relative" } }, id === "column_buckling" && linkedSection && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "var(--accent2)", marginBottom: 6 } }, "\u{1F517} \u5DF2\u5F9E\u622A\u9762\u8A08\u7B97\u5E36\u5165\uFF1AI=", linkedSection.I.toFixed(0), " mm\u2074 / A=", linkedSection.A.toFixed(0), " mm\xB2"), /* @__PURE__ */ React.createElement(CalcCard, { calcId: id, onLink: handleLink })))))));
 }
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(React.createElement(App));
 
-</script>
 
-</body></html>
+  </script>
+</body>
+</html>
