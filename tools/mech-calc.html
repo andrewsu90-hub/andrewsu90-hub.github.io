@@ -1159,7 +1159,7 @@ function useExport() {
       const isResult = i > rows.findIndex((r) => r[0].startsWith("\u2500\u2500 \u8A08\u7B97"));
       return "<tr><td>" + a + '</td><td class="' + (isResult ? "result-val" : "") + '">' + b + "</td></tr>";
     }).filter(Boolean).join("");
-    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + calcName + " - \u8A08\u7B97\u5831\u544A</title><style>" + css + "</style></head><body><h1>\u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\u8A08\u7B97\u5831\u544A</h1><h2>" + calcName + "</h2><table>" + tableRows + '</table><div class="footer">\u8A08\u7B97\u6642\u9593\uFF1A' + (/* @__PURE__ */ new Date()).toLocaleString("zh-TW") + " \uFF0F \u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\u81EA\u52D5\u8A08\u7B97\u5927\u5168</div></body></html>";
+    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + calcName + " - \u8A08\u7B97\u5831\u544A</title><style>" + css + "</style></head><body><h1>\u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\u8A08\u7B97\u5831\u544A</h1><h2>" + calcName + "</h2><table>" + tableRows + '</table><div class="footer">\u8A08\u7B97\u6642\u9593\uFF1A' + (/* @__PURE__ */ new Date()).toLocaleString("zh-TW") + " \uFF0F \u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\自動計算工具</div></body></html>";
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const w = window.open(url, "_blank");
