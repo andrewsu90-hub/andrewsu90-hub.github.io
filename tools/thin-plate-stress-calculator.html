@@ -237,7 +237,7 @@
       <div class="grid g-4">
         <div class="field">
           <label>載荷類型 Loading</label>
-          <select id="loadType" onchange="calc()"></select>
+          <select id="loadType" onchange="onLoadTypeChange()"></select>
           <div class="hint">a：整個板面均佈載荷；b：中心小圓面集中力（因理論收斂限制，僅對稱之案例 1、8 提供集中力查表）</div>
         </div>
 
@@ -510,6 +510,11 @@ function onCaseChange() {
   renderCaseDiagram($('caseSel').value);
   calc();
 }
+
+                                 function onLoadTypeChange() {
+                                    $('rcField').style.display = ($('loadType').value === 'b') ? '' : 'none';
+                                    calc();
+                                 }
 
 /* ========================= Toggle Rect Tool ========================= */
 function toggleRectTool() {
