@@ -962,32 +962,31 @@ function useExport(){
       ...outputs.map(o=>[`${o.label}${o.unit?' ('+o.unit+')':''}`, results?.[o.key] ?? '']),
     ];
     // Build HTML printable page
-    const html=`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>${calcName} - 計算報告</title>
-<style>
-  body{font-family:'Noto Sans TC',sans-serif;font-size:13px;color:#1e293b;padding:32px;max-width:600px;margin:0 auto}
-  h1{font-size:18px;border-bottom:2px solid #4a7cff;padding-bottom:8px;color:#4a7cff}
-  h2{font-size:13px;color:#64748b;font-weight:400;margin-top:-4px}
-  table{width:100%;border-collapse:collapse;margin-top:20px}
-  th{background:#f1f5f9;text-align:left;padding:8px 12px;font-size:12px;color:#475569;border:1px solid #e2e8f0}
-  td{padding:8px 12px;border:1px solid #e2e8f0;font-family:monospace}
-  tr:nth-child(even) td{background:#fafafa}
-  .section-head td{background:#eff6ff;color:#1e40af;font-weight:600;font-family:sans-serif;letter-spacing:.04em}
-  .result-val{color:#0f766e;font-size:15px;font-weight:600}
-  .footer{margin-top:32px;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:12px}
-</style></head><body>
-<h1>非標機械設計計算報告</h1>
-<h2>${calcName}</h2>
-<table>
-${rows.map(([a,b],i)=>{
-  if(a.startsWith('──'))return`<tr class="section-head"><td colspan="2">${a}</td></tr>`;
-  if(!a&&!b)return'';
-  const isResult=i>rows.findIndex(r=>r[0].startsWith('── 計算'));
-  return`<tr><td>${a}</td><td class="${isResult?'result-val':''}">${b}</td></tr>`;
-}).filter(Boolean).join('')}
-</table>
-<div class="footer">計算時間：${new Date().toLocaleString('zh-TW')} ／ 非標機械設計自動計算大全</div>
-</body></html>`;
+    const css = [
+      'body{font-family:sans-serif;font-size:13px;color:#1e293b;padding:32px;max-width:600px;margin:0 auto}',
+      'h1{font-size:18px;border-bottom:2px solid #4a7cff;padding-bottom:8px;color:#4a7cff}',
+      'h2{font-size:13px;color:#64748b;font-weight:400;margin-top:-4px}',
+      'table{width:100%;border-collapse:collapse;margin-top:20px}',
+      'th{background:#f1f5f9;text-align:left;padding:8px 12px;font-size:12px;color:#475569;border:1px solid #e2e8f0}',
+      'td{padding:8px 12px;border:1px solid #e2e8f0;font-family:monospace}',
+      'tr:nth-child(even) td{background:#fafafa}',
+      '.section-head td{background:#eff6ff;color:#1e40af;font-weight:600;letter-spacing:.04em}',
+      '.result-val{color:#0f766e;font-size:15px;font-weight:600}',
+      '.footer{margin-top:32px;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:12px}',
+    ].join('');
+    const tableRows = rows.map(([a,b],i)=>{
+      if(!a&&!b) return '';
+      if(a.startsWith('──')) return '<tr class="section-head"><td colspan="2">'+a+'</td></tr>';
+      const isResult = i > rows.findIndex(r=>r[0].startsWith('── 計算'));
+      return '<tr><td>'+a+'</td><td class="'+(isResult?'result-val':'')+'">'+b+'</td></tr>';
+    }).filter(Boolean).join('');
+    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+calcName+' - 計算報告</title>'
+      + '<style>'+css+'</style></head><body>'
+      + '<h1>非標機械設計計算報告</h1>'
+      + '<h2>'+calcName+'</h2>'
+      + '<table>'+tableRows+'</table>'
+      + '<div class="footer">計算時間：'+new Date().toLocaleString('zh-TW')+' ／ 非標機械設計自動計算大全</div>'
+      + '</body></html>';
     const blob=new Blob([html],{type:'text/html'});
     const url=URL.createObjectURL(blob);
     const w=window.open(url,'_blank');
