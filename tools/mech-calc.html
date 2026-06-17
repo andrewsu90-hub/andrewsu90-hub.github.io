@@ -1208,7 +1208,8 @@ function MaterialDropdown({ title, desc, data, cols }) {
 }
 function BearingDropdown({ title, desc, data, cols }) {
   const dOptions = React.useMemo(function(){
-    return ["全部", ...([...new Set(data.map(function(r){return r.d;})]).sort(function(a,b){return a-b;}).map(String))];
+    var ds = Array.from(new Set(data.map(function(r){return r.d;}))).sort(function(a,b){return a-b;}).map(String);
+    return ["全部"].concat(ds);
   }, [data]);
   const [selD, setSelD] = React.useState("全部");
   const filtered = React.useMemo(function(){
