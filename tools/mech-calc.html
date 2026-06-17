@@ -951,7 +951,7 @@ body{font-family:var(--sans);font-weight:300;color:var(--primary);background:var
 }
 .sidebar-header{padding:14px 16px 10px;border-bottom:0.5px solid var(--border-color)}
 .sidebar-header h1{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--primary);text-transform:uppercase}
-.sidebar-header p{font-size:12px;color:var(--secondary);margin-top:2px}
+.sidebar-header p{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--primary);text-transform:uppercase;margin-top:2px}
 .search-box{display:block;margin:8px 10px 4px;width:calc(100% - 20px);padding:6px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-light);font:inherit;font-size:13px;color:var(--primary);outline:none}
 .search-box:focus{border-color:var(--primary)}
 .search-box::placeholder{color:var(--muted)}
@@ -966,26 +966,26 @@ body{font-family:var(--sans);font-weight:300;color:var(--primary);background:var
 .content{flex:1;padding:20px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;align-content:start}
 .home-grid{flex:1;padding:20px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-content:start}
 .card{background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:var(--radius-lg);overflow:hidden}
-.card-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--secondary);padding:14px 16px 0;margin-bottom:10px}
-.card-desc{font-size:12px;color:var(--muted);margin:-6px 16px 10px;line-height:1.5}
+.card-title{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--secondary);padding:14px 16px 0;margin-bottom:10px}
+.card-desc{font-size:13px;color:var(--muted);margin:-6px 16px 10px;line-height:1.5}
 .home-card{background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .2s}
 .home-card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.07)}
 .home-card .icon{font-size:26px;margin-bottom:8px}
 .home-card .name{font-size:15px;font-weight:700;color:var(--primary)}
 .home-card .count{font-size:12px;color:var(--secondary);margin-top:3px}
 .field{padding:0 16px;margin-bottom:10px}
-.field label{display:block;font-size:11.5px;font-weight:600;color:var(--secondary);margin-bottom:5px;letter-spacing:.3px}
-.field .hint{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--secondary);margin-bottom:5px;letter-spacing:.3px}
+.field .hint{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
 .field-row{display:flex;align-items:center;gap:6px}
-.field input{flex:1;padding:8px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-white);font:inherit;font-family:var(--mono);font-size:13px;color:var(--primary);outline:none;transition:border-color .15s}
+.field input{flex:1;padding:8px 10px;border:0.5px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-white);font:inherit;font-family:var(--mono);font-size:15px;color:var(--primary);outline:none;transition:border-color .15s}
 .field input:focus{border-color:var(--primary)}
-.field .unit-tag{font-size:11px;color:var(--muted);min-width:44px;text-align:right;font-family:var(--mono)}
+.field .unit-tag{font-size:13px;color:var(--muted);min-width:44px;text-align:right;font-family:var(--mono)}
 .calc-btn{display:block;width:calc(100% - 32px);margin:12px 16px 16px;padding:9px 0;border:none;border-radius:var(--radius-sm);background:var(--primary);color:var(--bg-white);font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;letter-spacing:.3px}
 .calc-btn:hover{opacity:.8}
 .results-divider{margin:0 16px 14px;border-top:0.5px solid var(--border-color);padding-top:12px}
 .result-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:0.5px solid var(--border-color)}
 .result-row:last-child{border-bottom:none}
-.result-label{font-size:11.5px;color:var(--secondary);font-weight:500}
+.result-label{font-size:13px;color:var(--secondary);font-weight:500}
 .result-val{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--primary)}
 .result-unit{font-size:10.5px;color:var(--muted);margin-left:3px}
 .verdict-ok{color:var(--accent2)!important}
@@ -1159,7 +1159,7 @@ function useExport() {
       const isResult = i > rows.findIndex((r) => r[0].startsWith("\u2500\u2500 \u8A08\u7B97"));
       return "<tr><td>" + a + '</td><td class="' + (isResult ? "result-val" : "") + '">' + b + "</td></tr>";
     }).filter(Boolean).join("");
-    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + calcName + " - \u8A08\u7B97\u5831\u544A</title><style>" + css + "</style></head><body><h1>\u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\u8A08\u7B97\u5831\u544A</h1><h2>" + calcName + "</h2><table>" + tableRows + '</table><div class="footer">\u8A08\u7B97\u6642\u9593\uFF1A' + (/* @__PURE__ */ new Date()).toLocaleString("zh-TW") + " \uFF0F \u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\自動計算工具</div></body></html>";
+    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + calcName + " - \u8A08\u7B97\u5831\u544A</title><style>" + css + "</style></head><body><h1>\u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\u8A08\u7B97\u5831\u544A</h1><h2>" + calcName + "</h2><table>" + tableRows + '</table><div class="footer">\u8A08\u7B97\u6642\u9593\uFF1A' + (/* @__PURE__ */ new Date()).toLocaleString("zh-TW") + " \uFF0F \u975E\u6A19\u6A5F\u68B0\u8A2D\u8A08\u81EA\u52D5\u8A08\u7B97\u5DE5\u5177</div></body></html>";
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const w = window.open(url, "_blank");
@@ -1301,7 +1301,7 @@ function App() {
     alert(`\u622A\u9762\u8CC7\u6599\u5DF2\u5E36\u5165\u7ACB\u67F1\u8A08\u7B97\uFF1AI=${I} mm\u2074, A=${A} mm\xB2
 \u8ACB\u81F3\u300C\u5176\u4ED6\u8A08\u7B97 \u2192 \u7ACB\u67F1\u7A69\u5B9A\u6027\u300D\u4F7F\u7528\u3002`);
   }, []);
-  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("style", null, CSS), /* @__PURE__ */ React.createElement("div", { className: "app" }, /* @__PURE__ */ React.createElement("nav", { className: "sidebar" }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-header" }, /* @__PURE__ */ React.createElement("h1", null, "常用機械"), /* @__PURE__ */ React.createElement("p", null, "\u81EA\u52D5\u8A08\u7B97\u5927\u5168")), /* @__PURE__ */ React.createElement("input", { className: "search-box", placeholder: "\u641C\u5C0B\u8A08\u7B97\u5668\u2026", value: search, onChange: (e) => setSearch(e.target.value) }), /* @__PURE__ */ React.createElement("div", { className: `nav-item${activeCat == null && !search ? " active" : ""}`, style: { marginTop: 4 }, onClick: () => {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("style", null, CSS), /* @__PURE__ */ React.createElement("div", { className: "app" }, /* @__PURE__ */ React.createElement("nav", { className: "sidebar" }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-header" }, /* @__PURE__ */ React.createElement("h1", null, "常用機械"), /* @__PURE__ */ React.createElement("p", null, "\u81EA\u52D5\u8A08\u7B97\u5DE5\u5177")), /* @__PURE__ */ React.createElement("input", { className: "search-box", placeholder: "\u641C\u5C0B\u8A08\u7B97\u5668\u2026", value: search, onChange: (e) => setSearch(e.target.value) }), /* @__PURE__ */ React.createElement("div", { className: `nav-item${activeCat == null && !search ? " active" : ""}`, style: { marginTop: 4 }, onClick: () => {
     setActiveCat(null);
     setSearch("");
   } }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, "\u{1F3E0}"), "\u7E3D\u89BD"), filteredCats.map((cat) => /* @__PURE__ */ React.createElement("div", { key: cat.id, className: `nav-item${activeCat === cat.id ? " active" : ""}`, onClick: () => setActiveCat(cat.id) }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, cat.icon), cat.label))), /* @__PURE__ */ React.createElement("div", { className: "main" }, /* @__PURE__ */ React.createElement("div", { className: "topbar" }, activeCat == null ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, "常用機械自動計算工具"), /* @__PURE__ */ React.createElement("p", null, "163 \u500B\u539F\u59CB\u5DE5\u4F5C\u8868 \xB7 ", CATEGORIES.length, " \u500B\u5206\u985E \xB7 ", totalCalcs, " \u500B\u8A08\u7B97\u5668")) : /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, activeCategory?.icon, " ", activeCategory?.label), /* @__PURE__ */ React.createElement("p", null, visibleCalcs.length, " \u500B\u8A08\u7B97\u5668"))), activeCat == null ? /* @__PURE__ */ React.createElement("div", { className: "home-grid" }, CATEGORIES.map((cat) => /* @__PURE__ */ React.createElement("div", { className: "home-card", key: cat.id, onClick: () => setActiveCat(cat.id) }, /* @__PURE__ */ React.createElement("div", { className: "icon" }, cat.icon), /* @__PURE__ */ React.createElement("div", { className: "name" }, cat.label), /* @__PURE__ */ React.createElement("div", { className: "count" }, cat.calcs.length, " \u500B")))) : /* @__PURE__ */ React.createElement("div", { className: "content" }, activeCat === "cam" && /* @__PURE__ */ React.createElement(CamCurvePanel, null), visibleCalcs.map((id) => /* @__PURE__ */ React.createElement("div", { key: id, style: { position: "relative" } }, id === "column_buckling" && linkedSection && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "var(--accent2)", marginBottom: 6 } }, "\u{1F517} \u5DF2\u5F9E\u622A\u9762\u8A08\u7B97\u5E36\u5165\uFF1AI=", linkedSection.I.toFixed(0), " mm\u2074 / A=", linkedSection.A.toFixed(0), " mm\xB2"), /* @__PURE__ */ React.createElement(CalcCard, { calcId: id, onLink: handleLink })))))));
