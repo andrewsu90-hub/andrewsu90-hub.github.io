@@ -1206,11 +1206,53 @@ function MaterialDropdown({ title, desc, data, cols }) {
     )
   );
 }
+function BearingDropdown({ title, desc, data, cols }) {
+  const dOptions = React.useMemo(function(){
+    return ["全部", ...([...new Set(data.map(function(r){return r.d;})]).sort(function(a,b){return a-b;}).map(String))];
+  }, [data]);
+  const [selD, setSelD] = React.useState("全部");
+  const filtered = React.useMemo(function(){
+    return selD === "全部" ? data : data.filter(function(r){ return String(r.d) === selD; });
+  }, [selD, data]);
+  const [selIdx, setSelIdx] = React.useState(0);
+  React.useEffect(function(){ setSelIdx(0); }, [selD]);
+  const row = filtered[selIdx] || filtered[0];
+  const SEL_STYLE = { width:"100%", padding:"8px 10px", border:"0.5px solid var(--border-color)",
+    borderRadius:"var(--radius-sm)", background:"var(--bg-white)",
+    font:"inherit", color:"var(--primary)", outline:"none" };
+  return React.createElement("div", { className: "card", style:{padding:0} },
+    React.createElement("div", { className: "card-title" }, title),
+    React.createElement("div", { className: "card-desc" }, desc),
+    React.createElement("div", { className: "field" },
+      React.createElement("label", null, "內徑 d (mm)"),
+      React.createElement("select", { value: selD, onChange: function(e){ setSelD(e.target.value); }, style: SEL_STYLE },
+        dOptions.map(function(v){ return React.createElement("option", { key: v, value: v }, v === "全部" ? "全部" : v + " mm"); })
+      )
+    ),
+    React.createElement("div", { className: "field" },
+      React.createElement("label", null, "型號"),
+      React.createElement("select", { value: selIdx, onChange: function(e){ setSelIdx(+e.target.value); }, style: SEL_STYLE },
+        filtered.map(function(r, i){ return React.createElement("option", { key: i, value: i }, r.model); })
+      )
+    ),
+    row && React.createElement("div", { style:{margin:"0 16px 14px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:8} },
+      cols.slice(1).map(function(c){
+        return React.createElement("div", { key: c.key,
+          style:{background:"var(--bg-light)",border:"0.5px solid var(--border-color)",
+                 borderRadius:"var(--radius-sm)",padding:"10px 12px"} },
+          React.createElement("div",{style:{fontSize:11,color:"var(--secondary)",fontWeight:600,marginBottom:4}}, c.label),
+          React.createElement("div",{style:{fontFamily:"var(--mono)",fontSize:16,fontWeight:700,color:"var(--primary)"}},
+            row[c.key] != null ? String(row[c.key]) : "—")
+        );
+      })
+    )
+  );
+}
 function CalcCard({ calcId, onLink }) {
   const def = CALCS[calcId];
   if (!def) return null;
-  if (def._type === "bearing_lookup") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(LookupPanel, { title: "\u6DF1\u6E9D\u7403\u8EF8\u627F\u67E5\u8A62", desc: "\u4F9D\u5167\u5F91(d)\u6216\u578B\u865F\u641C\u5C0B", data: BEARINGS_DEEP, columns: [{ key: "model", label: "\u578B\u865F" }, { key: "d", label: "d" }, { key: "D", label: "D" }, { key: "B", label: "B" }, { key: "Cr", label: "Cr(N)" }, { key: "Cor", label: "Cor(N)" }, { key: "nmax", label: "nmax\xD710\xB3" }], filterFn: (r, q) => r.model.toLowerCase().includes(q.toLowerCase()) || String(r.d) === q }));
-  if (def._type === "bearing_thrust_lookup") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(LookupPanel, { title: "\u63A8\u529B\u7403\u8EF8\u627F\u67E5\u8A62", desc: "\u4F9D\u5167\u5F91(d)\u6216\u578B\u865F\u641C\u5C0B", data: BEARINGS_THRUST, columns: [{ key: "model", label: "\u578B\u865F" }, { key: "d", label: "d(mm)" }, { key: "D", label: "D(mm)" }, { key: "T", label: "T(mm)" }], filterFn: (r, q) => r.model.toLowerCase().includes(q.toLowerCase()) || String(r.d) === q }));
+  if (def._type === "bearing_lookup") return React.createElement(BearingDropdown, { title: "深溝球軸承查詢", desc: "依內徑(d)篩選後選取型號", data: BEARINGS_DEEP, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "B", label: "B (mm)" }, { key: "Cr", label: "Cr (N)" }, { key: "Cor", label: "Cor (N)" }, { key: "nmax", label: "nmax ×10³" }] });
+  if (def._type === "bearing_thrust_lookup") return React.createElement(BearingDropdown, { title: "推力球軸承查詢", desc: "依內徑(d)篩選後選取型號", data: BEARINGS_THRUST, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "T", label: "T (mm)" }] });
   if (def._type === "it_tolerance") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(ITTolerance, null));
   if (def._type === "unit_pressure") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(PressureConv, null));
   if (def._type === "material_elastic") return React.createElement(MaterialDropdown, { title: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u5DE5\u7A0B\u6750\u6599", data: ELASTIC_TABLE, cols: [{key:"name",label:"\u6750\u6599"},{key:"E",label:"E (GPa)"},{key:"nu",label:"\u6CCA\u677E\u6BD4 \u03BD"},{key:"alpha",label:"\u7DDA\u81A8\u81A8 \u03B1"}] });
