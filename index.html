@@ -959,7 +959,7 @@
 <script>
 (function(){
   const PW   = "0000";
-  const DEST = "tools/mech-calc.html";
+  const DEST = "tools/engineering-calculators.html";
   window.openCalcGate = function(e){ e.preventDefault(); const gate = document.getElementById("calcGate"); gate.style.display = "flex"; document.body.style.overflow = "hidden"; const input = document.getElementById("calcPwInput"); input.value = ""; document.getElementById("calcPwMsg").textContent = ""; setTimeout(()=>input.focus(), 50); };
   window.closeCalcGate = function(){ document.getElementById("calcGate").style.display = "none"; document.body.style.overflow = ""; };
   window.checkCalcPw = function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); if(input.value === PW){ closeCalcGate(); location.href = DEST; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
