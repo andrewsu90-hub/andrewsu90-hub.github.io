@@ -238,8 +238,8 @@
     <canvas id="tech-bg"></canvas>
 
     <header>
-        <a href="../index.html" class="logo">Anzû Design Studio</a>
-        <a href="../index.html" class="back-btn">
+        <a href="../index.html" class="logo" onclick="return taGoHome(event)">Anzû Design Studio</a>
+        <a href="../index.html" class="back-btn" onclick="return taGoHome(event)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="15,18 9,12 15,6"/>
             </svg>
@@ -434,6 +434,19 @@
         frame();
         window.addEventListener('resize', () => { resize(); initMeteors(); });
     })();
+    </script>
+
+    <script>
+        function taGoHome(e) {
+            // Return to whichever homepage (English or Chinese) the user actually came from,
+            // instead of always hardcoding the English homepage.
+            if (document.referrer && window.history.length > 1) {
+                e.preventDefault();
+                window.history.back();
+                return false;
+            }
+            return true; // no usable history (e.g. direct visit) -> fall back to ../index.html
+        }
     </script>
 </body>
 </html>
