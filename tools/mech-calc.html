@@ -1067,9 +1067,15 @@ function CamCurvePanel() {
     if (tau <= 0.75) return Am / (4 * Math.PI ** 2) * (Math.PI * (tau - 0.25) + 1) - Am / (4 * Math.PI ** 2) * 1 / 2 * Math.sin(2 * Math.PI * tau);
     return 1 - Am / (4 * Math.PI ** 2) * (Math.PI / 2 * (1 - tau) + Math.sin(2 * Math.PI * tau) / 2);
   }
-  const W = 340, H = 260, cx = 170, cy = 130, scale = 0.85;
+  
+  // =========== 修正的部分在這裡 ===========
+  const W = 340, H = 260, cx = 170, cy = 130;
+  // 動態計算縮放比例：確保最大半徑不會超過 110，保留邊緣留白，並以 0.85 為預設最大值
+  const scale = Math.min(0.85, 110 / (rb + h));
   const maxR = (rb + h) * scale;
   const rbS = rb * scale;
+  // ======================================
+
   const pts = [];
   const N = 360;
   for (let deg = 0; deg < N; deg++) {
