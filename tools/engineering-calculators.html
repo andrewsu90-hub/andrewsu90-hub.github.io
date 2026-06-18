@@ -3,163 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工程計算工具 | Anzû Design Studio</title>
+    <meta name="description" content="工程計算工具 — 整合多項工程設計計算工具 | Anzû Design Studio">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
+    <title>工程計算工具 | Anzû Design Studio</title>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --primary-color: #e8e8e8;
-            --secondary-color: #888;
-            --border-color: #242430;
-            --bg-light: #12121a;
-            --bg-white: #0a0a12;
-            --accent: #4a9eff;
-            --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+            --primary-color: #f0f0f0;
+            --secondary-color: #a3a3a3;
+            --text-muted: #c8c8c8;
+            --border-color: #333333;
+            --bg-light: #181818;
+            --bg-white: #0c0c0c;
+            --accent: #E67E22;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
         }
+
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 300; color: var(--primary-color); background-color: var(--bg-white); line-height: 1.6; -webkit-font-smoothing: antialiased; }
-        header { position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 5%; border-bottom: 0.5px solid var(--border-color); background-color: rgba(10,10,18,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 
-        .logo { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: 1px; text-decoration: none; color: var(--primary-color); }
-        .back-link { font-size: 14px; color: var(--secondary-color); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
-        .back-link:hover { color: var(--primary-color); }
-        .hero { padding: 4rem 5% 2.5rem; max-width: 900px; margin: 0 auto; animation: fadeInDown 0.6s ease; }
-        .hero-label { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.75rem; }
-        .hero h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
-        .hero p { font-size: 16px; color: var(--secondary-color); line-height: 1.8; }
-        .tools-section { padding: 2rem 5% 5rem; max-width: 1100px; margin: 0 auto; animation: fadeInUp 0.7s ease; }
-        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-        .tool-card { display: block; padding: 2rem; background-color: var(--bg-light); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); text-decoration: none; color: inherit; transition: all 0.3s ease; cursor: pointer; position: relative; overflow: hidden; }
-        .tool-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #333, #888); opacity: 0; transition: opacity 0.3s; }
-        .tool-card:hover { border-color: var(--primary-color); transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
-        .tool-card:hover::before { opacity: 1; }
-        .tool-icon { font-size: 36px; margin-bottom: 1.25rem; display: block; }
-        .tool-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 0.75rem; color: var(--primary-color); }
-        .tool-card p { font-size: 14px; color: var(--secondary-color); line-height: 1.7; margin-bottom: 1.25rem; }
-        .tool-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .tool-tag { font-size: 12px; font-weight: 500; background-color: var(--bg-white); color: var(--secondary-color); padding: 4px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-color); }
-        .tool-arrow { position: absolute; bottom: 1.5rem; right: 1.5rem; font-size: 18px; color: var(--secondary-color); transition: transform 0.2s, color 0.2s; }
-        .tool-card:hover .tool-arrow { transform: translate(3px, -3px); color: var(--primary-color); }
-        footer { padding: 1.5rem 5%; border-top: 0.5px solid var(--border-color); text-align: center; font-size: 13px; color: var(--secondary-color); }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
+        body {
+            font-family: 'DM Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            color: var(--primary-color);
+            background-color: var(--bg-white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
 
-        /* ── Geometric Background ── */
-        #geo-bg {
+        #tech-bg {
             position: fixed;
-            inset: 0;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 0;
             pointer-events: none;
-            width: 100%; height: 100%;
-        }
-        section, footer {
-            position: relative;
-            z-index: 1;
         }
 
-        /* Combo card shared styles */
+        /* ── Header ── */
+        header {
+            position: sticky;
+            top: 0; z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.4rem 3%;
+            border-bottom: 0.5px solid var(--border-color);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            background-color: rgba(12, 12, 12, 0.92);
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px; font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 18px;
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-sm);
+            color: var(--primary-color);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11.5px; font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .back-btn:hover {
+            background-color: var(--accent);
+            color: var(--bg-white);
+        }
+
+        /* ── Main ── */
+        main {
+            position: relative; z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 5rem 3% 8rem;
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .breadcrumb {
+            font-size: 11px; font-weight: 500;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--secondary-color);
+            margin-bottom: 1.1rem;
+        }
+        .breadcrumb .accent { color: var(--accent); }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(46px, 6.5vw, 74px);
+            font-weight: 400; letter-spacing: 0.04em;
+            color: var(--primary-color); line-height: 1;
+            margin-bottom: 1.3rem;
+        }
+
+        .page-desc {
+            font-size: 15px; color: var(--text-muted);
+            max-width: 680px; line-height: 1.85;
+            margin-bottom: 3.5rem;
+        }
+
+        /* ── Section divider ── */
+        .section-line {
+            display: flex; align-items: center; gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .section-line span {
+            font-size: 11px; font-weight: 500;
+            letter-spacing: 0.16em; text-transform: uppercase;
+            color: var(--secondary-color); white-space: nowrap;
+        }
+        .section-line::after {
+            content: ''; flex: 1;
+            height: 0.5px; background: var(--border-color);
+        }
+
+        /* ── Tool grid ── */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+        }
+
+        /* ── Tool card ── */
+        .tool-card {
+            background-color: rgba(24, 24, 24, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem 2rem 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent) 0%, transparent 80%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .tool-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 52px rgba(230, 126, 34, 0.16);
+        }
+        .tool-card:hover::before { opacity: 1; }
         .combo-card { cursor: default; }
-        .combo-card:hover { transform: translateY(-5px); }
-        .combo-tabs { display: flex; gap: 0; margin-bottom: 1rem; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
-        .combo-tab { flex: 1; padding: 7px 10px; font-size: 12px; font-weight: 600; font-family: 'DM Sans', 'Noto Sans TC', sans-serif; background: var(--bg-white); color: var(--secondary-color); border: none; cursor: pointer; transition: all 0.2s; border-right: 0.5px solid var(--border-color); line-height: 1.4; }
+
+        /* icon box */
+        .tool-icon {
+            width: 48px; height: 48px;
+            background: rgba(230, 126, 34, 0.1);
+            border: 1px solid rgba(230, 126, 34, 0.28);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.3rem;
+            color: var(--accent);
+            font-size: 22px;
+        }
+
+        .tool-card h2 {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 16.5px; font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.8rem; line-height: 1.45;
+        }
+
+        .tool-card p {
+            font-size: 13.5px; color: var(--text-muted);
+            line-height: 1.8; margin-bottom: 1.3rem;
+        }
+
+        .tool-tags {
+            display: flex; flex-wrap: wrap; gap: 0.45rem;
+            margin-bottom: 1.5rem;
+        }
+        .tool-tag {
+            font-size: 11.5px;
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.04);
+            border: 0.5px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--secondary-color);
+        }
+
+        .tool-link {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 500;
+            color: var(--primary-color);
+            border-top: 0.5px solid var(--border-color);
+            padding-top: 1.3rem;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .tool-card:hover .tool-link,
+        .tool-link:hover { color: var(--accent); }
+
+        /* ── Glow dot on card ── */
+        .tool-card .status-dot {
+            position: absolute;
+            top: 1.5rem; right: 1.5rem;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #4caf50;
+            box-shadow: 0 0 8px rgba(76,175,80,0.6);
+        }
+
+        /* ── Combo tabs (multi-source tools) ── */
+        .combo-tabs {
+            display: flex; gap: 0;
+            margin-bottom: 1rem;
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .combo-tab {
+            flex: 1; padding: 7px 10px;
+            font-size: 11.5px; font-weight: 600;
+            font-family: 'DM Sans', 'Noto Sans TC', sans-serif;
+            background: var(--bg-white); color: var(--secondary-color);
+            border: none; cursor: pointer; transition: all 0.2s;
+            border-right: 0.5px solid var(--border-color);
+            line-height: 1.4;
+        }
         .combo-tab:last-child { border-right: none; }
-        .combo-tab.active { background: var(--primary-color); color: var(--bg-white); }
+        .combo-tab.active { background: var(--accent); color: var(--bg-white); }
         .combo-tab:hover:not(.active) { background: var(--border-color); }
         .combo-panel { display: none; }
         .combo-panel.active { display: block; }
-        .combo-link { display: inline-block; margin-top: 1rem; font-size: 13px; font-weight: 600; color: var(--primary-color); text-decoration: none; border-bottom: 1px solid var(--border-color); padding-bottom: 1px; transition: border-color 0.2s; }
-        .combo-link:hover { border-color: var(--primary-color); }
+
+        /* ── Footer ── */
+        footer {
+            position: relative; z-index: 1;
+            padding: 1.5rem 3%;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--secondary-color);
+        }
+
+        /* ── Animation ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-
-<svg id="geo-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%"   stop-color="#0a0a12"/>
-      <stop offset="50%"  stop-color="#0d0d1a"/>
-      <stop offset="100%" stop-color="#080810"/>
-    </linearGradient>
-    <linearGradient id="accentGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#4a9eff" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="accentGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#7b6fff" stop-opacity="0.1"/>
-      <stop offset="100%" stop-color="#7b6fff" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-  <rect width="1440" height="900" fill="url(#bgGrad)"/>
-  <ellipse cx="200" cy="150" rx="380" ry="280" fill="url(#accentGrad1)"/>
-  <ellipse cx="1280" cy="720" rx="340" ry="260" fill="url(#accentGrad2)"/>
-  <ellipse cx="900" cy="420" rx="260" ry="180" fill="rgba(74,158,255,0.04)"/>
-  <g stroke="rgba(74,158,255,0.08)" stroke-width="0.5">
-    <line x1="0" y1="100" x2="1440" y2="100"/>
-    <line x1="0" y1="200" x2="1440" y2="200"/>
-    <line x1="0" y1="300" x2="1440" y2="300"/>
-    <line x1="0" y1="400" x2="1440" y2="400"/>
-    <line x1="0" y1="500" x2="1440" y2="500"/>
-    <line x1="0" y1="600" x2="1440" y2="600"/>
-    <line x1="0" y1="700" x2="1440" y2="700"/>
-    <line x1="0" y1="800" x2="1440" y2="800"/>
-    <line x1="180" y1="0" x2="180" y2="900"/>
-    <line x1="360" y1="0" x2="360" y2="900"/>
-    <line x1="540" y1="0" x2="540" y2="900"/>
-    <line x1="720" y1="0" x2="720" y2="900"/>
-    <line x1="900" y1="0" x2="900" y2="900"/>
-    <line x1="1080" y1="0" x2="1080" y2="900"/>
-    <line x1="1260" y1="0" x2="1260" y2="900"/>
-  </g>
-  <polygon points="120,30 200,75 200,165 120,210 40,165 40,75"
-           fill="none" stroke="rgba(74,158,255,0.1)" stroke-width="1"/>
-  <polygon points="1320,60 1400,105 1400,195 1320,240 1240,195 1240,105"
-           fill="none" stroke="rgba(123,111,255,0.1)" stroke-width="1"/>
-  <polygon points="680,760 740,795 740,865 680,900 620,865 620,795"
-           fill="none" stroke="rgba(74,158,255,0.08)" stroke-width="1"/>
-  <line x1="0" y1="0" x2="400" y2="900" stroke="rgba(74,158,255,0.05)" stroke-width="1"/>
-  <line x1="1440" y1="0" x2="1040" y2="900" stroke="rgba(123,111,255,0.05)" stroke-width="1"/>
-  <circle cx="360" cy="300" r="60" fill="none" stroke="rgba(74,158,255,0.07)" stroke-width="1"/>
-  <circle cx="360" cy="300" r="40" fill="none" stroke="rgba(74,158,255,0.05)" stroke-width="0.5"/>
-  <circle cx="1080" cy="600" r="80" fill="none" stroke="rgba(123,111,255,0.07)" stroke-width="1"/>
-  <circle cx="1080" cy="600" r="52" fill="none" stroke="rgba(123,111,255,0.05)" stroke-width="0.5"/>
-  <g fill="rgba(74,158,255,0.18)">
-    <circle cx="1180" cy="80"  r="2"/><circle cx="1200" cy="60"  r="1.5"/>
-    <circle cx="1220" cy="90"  r="2"/><circle cx="1240" cy="70"  r="1.5"/>
-    <circle cx="1260" cy="100" r="2"/><circle cx="1160" cy="110" r="1.5"/>
-    <circle cx="1190" cy="130" r="2"/><circle cx="1210" cy="50"  r="1.5"/>
-  </g>
-  <g fill="rgba(123,111,255,0.15)">
-    <circle cx="80"  cy="780" r="2"/><circle cx="100" cy="800" r="1.5"/>
-    <circle cx="60"  cy="810" r="2"/><circle cx="120" cy="760" r="1.5"/>
-    <circle cx="140" cy="790" r="2"/><circle cx="50"  cy="840" r="1.5"/>
-  </g>
-  <g stroke="rgba(74,158,255,0.2)" stroke-width="1">
-    <line x1="720" y1="195" x2="720" y2="205"/><line x1="715" y1="200" x2="725" y2="200"/>
-    <line x1="540" y1="495" x2="540" y2="505"/><line x1="535" y1="500" x2="545" y2="500"/>
-    <line x1="900" y1="295" x2="900" y2="305"/><line x1="895" y1="300" x2="905" y2="300"/>
-    <line x1="180" y1="595" x2="180" y2="605"/><line x1="175" y1="600" x2="185" y2="600"/>
-    <line x1="1260" y1="395" x2="1260" y2="405"/><line x1="1255" y1="400" x2="1265" y2="400"/>
-  </g>
-</svg>
+    <canvas id="tech-bg"></canvas>
 
     <header>
         <a href="../index.html" class="logo">Anzû Design Studio</a>
-        <a href="../index.html" class="back-link">← 返回首頁</a>
+        <a href="../index.html" class="back-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="15,18 9,12 15,6"/>
+            </svg>
+            回到首頁
+        </a>
     </header>
-    <section class="hero">
-        <div class="hero-label">Python 自動化計算 / 工程計算</div>
+
+    <main>
+        <div class="breadcrumb">
+            PYTHON 自動化計算 &nbsp;/&nbsp; <span class="accent">工程計算</span>
+        </div>
+
         <h1>工程計算工具</h1>
-        <p>整合多項工程設計計算工具，取代繁瑣的 Excel 人工計算，提升設計驗證效率。所有計算均參照 CNS / ISO 標準及業界設計手冊。</p>
-    </section>
-    <section class="tools-section">
+
+        <p class="page-desc">
+            整合多項工程設計計算工具，取代繁瑣的 Excel 人工計算，提升設計驗證效率。
+            所有計算均參照 CNS / ISO 標準及業界設計手冊。
+        </p>
+
+        <div class="section-line"><span>可用工具</span></div>
+
         <div class="tools-grid">
 
-            <div class="tool-card combo-card">
-                <span class="tool-icon">🔩</span>
-                <h3>不銹鋼螺絲強度計算工具</h3>
+            <a href="screw-strength-calculator.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🔩</div>
+                <h2>不銹鋼螺絲強度計算工具</h2>
                 <p>計算不銹鋼螺絲的最大鎖固扭力、軸向夾持力與螺牙接合強度，依 CNS/ISO 標準自動查表輸出。</p>
                 <div class="tool-tags">
                     <span class="tool-tag">SUS 304/316</span>
@@ -167,12 +314,18 @@
                     <span class="tool-tag">軸向力</span>
                     <span class="tool-tag">螺牙強度</span>
                 </div>
-                <a class="combo-link" href="screw-strength-calculator.html">開啟工具 ↗</a>
-            </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
 
-            <div class="tool-card combo-card">
-                <span class="tool-icon">🔩</span>
-                <h3>碳鋼螺絲扭力計算工具</h3>
+            <a href="screw-torque-calculator.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🔩</div>
+                <h2>碳鋼螺絲扭力計算工具</h2>
                 <p>整合五種扭力計算方法（一般算法 / SP 安全負載 / 破壞扭矩 / 三柱 / 東日 T 系列），M1–M18 全強度等級即時推算。</p>
                 <div class="tool-tags">
                     <span class="tool-tag">M1–M18</span>
@@ -180,12 +333,18 @@
                     <span class="tool-tag">CNS 15590-7</span>
                     <span class="tool-tag">五種算法</span>
                 </div>
-                <a class="combo-link" href="screw-torque-calculator.html">開啟工具 ↗</a>
-            </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
 
             <div class="tool-card combo-card">
-                <span class="tool-icon">🔧</span>
-                <h3>鑽孔 / 攻牙深度查詢</h3>
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🔧</div>
+                <h2>鑽孔 / 攻牙深度查詢</h2>
                 <div class="combo-tabs">
                     <button class="combo-tab active" onclick="switchCombo(event,'drill',0)">機械設計圖表便覽</button>
                     <button class="combo-tab" onclick="switchCombo(event,'drill',1)">現代機械設計手冊</button>
@@ -198,7 +357,12 @@
                         <span class="tool-tag">攻牙底孔</span>
                         <span class="tool-tag">旋入深度</span>
                     </div>
-                    <a class="combo-link" href="drill-hole-table.html">開啟工具 ↗</a>
+                    <a class="tool-link" href="drill-hole-table.html">
+                        開啟工具
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                        </svg>
+                    </a>
                 </div>
                 <div class="combo-panel drill">
                     <p>依規格、材質與孔型（通孔／盲孔）查詢旋入深度、攻牙深度與鑽孔深度。M3～M16。</p>
@@ -208,13 +372,19 @@
                         <span class="tool-tag">盲孔 / 通孔</span>
                         <span class="tool-tag">旋入深度</span>
                     </div>
-                    <a class="combo-link" href="drill-hole-table.html?src=handbook">開啟工具 ↗</a>
+                    <a class="tool-link" href="drill-hole-table.html?src=handbook">
+                        開啟工具
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
 
-            <div class="tool-card combo-card">
-                <span class="tool-icon">📐</span>
-                <h3>螺絲承載面積計算工具</h3>
+            <a href="screw-bearing-area-calculator.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">📐</div>
+                <h2>螺絲承載面積計算工具</h2>
                 <p>計算盤頭螺釘與六角頭螺栓的承載面積 Ab 與應力截面積 As 之比值，依 GBT 16823-1 標準自動查表判定 OK / NG。</p>
                 <div class="tool-tags">
                     <span class="tool-tag">盤頭 / 六角頭</span>
@@ -222,12 +392,18 @@
                     <span class="tool-tag">GBT 16823-1</span>
                     <span class="tool-tag">Ab/As 判定</span>
                 </div>
-                <a class="combo-link" href="screw-bearing-area-calculator.html">開啟工具 ↗</a>
-            </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
 
             <div class="tool-card combo-card">
-                <span class="tool-icon">🏗️</span>
-                <h3>鐵板攻牙 引伸孔查詢</h3>
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🏗️</div>
+                <h2>鐵板攻牙 引伸孔查詢</h2>
                 <div class="combo-tabs">
                     <button class="combo-tab active" onclick="switchCombo(event,'sheet',0)">Trifast plc Group</button>
                     <button class="combo-tab" onclick="switchCombo(event,'sheet',1)">钣金结构设计工艺手册</button>
@@ -240,7 +416,12 @@
                         <span class="tool-tag">引伸孔</span>
                         <span class="tool-tag">有效牙數</span>
                     </div>
-                    <a class="combo-link" href="sheet-tap-table.html?src=trifast">開啟工具 ↗</a>
+                    <a class="tool-link" href="sheet-tap-table.html?src=trifast">
+                        開啟工具
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                        </svg>
+                    </a>
                 </div>
                 <div class="combo-panel sheet">
                     <p>輸入螺絲規格、長度、強度區分與係數，自動計算需要牙數並查詢適用抽牙鐵板厚度（★）與抽牙高度/h（★）。計算牙數未扣除無效牙，優先參考基準。M2.5～M5。</p>
@@ -250,13 +431,19 @@
                         <span class="tool-tag">抽牙高度</span>
                         <span class="tool-tag">計算牙數</span>
                     </div>
-                    <a class="combo-link" href="sheet-tap-table.html?src=handbook">開啟 operator ↗</a>
+                    <a class="tool-link" href="sheet-tap-table.html?src=handbook">
+                        開啟工具
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
 
-            <div class="tool-card combo-card">
-                <span class="tool-icon">🖥️</span>
-                <h3>VESA 螺絲受力計算工具</h3>
+            <a href="vesa_screw.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🖥️</div>
+                <h2>VESA 螺絲受力計算工具</h2>
                 <p>針對壁掛或機台，計算螺絲在受扭轉、剪力與拉力下的合力與安全係數。包含單顆螺絲剪力、降伏應力及三柱容許應力算法。</p>
                 <div class="tool-tags">
                     <span class="tool-tag">VESA</span>
@@ -264,12 +451,18 @@
                     <span class="tool-tag">降伏應力</span>
                     <span class="tool-tag">三柱算法</span>
                 </div>
-                <a class="combo-link" href="vesa_screw.html">開啟工具 ↗</a>
-            </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
 
-            <div class="tool-card combo-card">
-                <span class="tool-icon">🔲</span>
-                <h3>薄板應力承載計算工具</h3>
+            <a href="thin-plate-stress-calculator.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🔲</div>
+                <h2>薄板應力承載計算工具</h2>
                 <p>計算薄板在均佈載荷或中心集中力下的最大撓度與應力，支援多種邊界條件（四邊固定、四邊簡支、混合邊界），依據多本權威設計手冊進行比對。</p>
                 <div class="tool-tags">
                     <span class="tool-tag">Timoshenko</span>
@@ -277,12 +470,18 @@
                     <span class="tool-tag">應力承載</span>
                     <span class="tool-tag">邊界條件</span>
                 </div>
-                <a class="combo-link" href="thin-plate-stress-calculator.html">開啟工具 ↗</a>
-            </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
 
-            <div class="tool-card combo-card">
-                <span class="tool-icon">⚖️</span>
-                <h3>機台傾倒穩定性計算</h3>
+            <a href="stand_stability_calc.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">⚖️</div>
+                <h2>機台傾倒穩定性計算</h2>
                 <p>基於穩定力矩（Ms）與傾覆力矩（Mt）的靜態穩定性分析。計算安全係數 K = Ms/Mt，判斷機台在前後方向是否具備足夠的抗傾能力。</p>
                 <div class="tool-tags">
                     <span class="tool-tag">IEC 62368-1</span>
@@ -290,12 +489,18 @@
                     <span class="tool-tag">K ≥ 1.0</span>
                     <span class="tool-tag">前後傾覆</span>
                 </div>
-                <a class="combo-link" href="stand_stability_calc.html">開啟工具 ↗</a>
-            </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
 
-            <div class="tool-card combo-card">
-                <span class="tool-icon">⚙️</span>
-                <h3>常用機械設計自動計算</h3>
+            <a href="mech-calc.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">⚙️</div>
+                <h2>常用機械設計自動計算</h2>
                 <p>涵蓋 163 個原始工作表、19 個分類、57 個計算器與查詢表。包含電機選型、氣缸、絲桿、齒輪、彈簧、液壓、凸輪、截面力學、沖壓成型等完整機械設計計算工具。</p>
                 <div class="tool-tags">
                     <span class="tool-tag">電機選型</span>
@@ -304,12 +509,19 @@
                     <span class="tool-tag">截面力學</span>
                     <span class="tool-tag">57 calculators</span>
                 </div>
-                <a class="combo-link" href="mech-calc.html">開啟工具 ↗</a>
-            </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
+
         </div>
-    </section>
+    </main>
+
     <footer>
-        <p>&copy; 2026 Anzû Mechanical & Product Design Studio. All rights reserved.</p>
+        <p>&copy; 2026 Anzû Mechanical &amp; Product Design Studio. All rights reserved.</p>
     </footer>
 
     <script>
@@ -318,6 +530,98 @@
             card.querySelectorAll('.combo-tab').forEach((t, i) => t.classList.toggle('active', i === index));
             card.querySelectorAll(`.combo-panel.${group}`).forEach((p, i) => p.classList.toggle('active', i === index));
         }
+    </script>
+
+    <script>
+    (function () {
+        const canvas = document.getElementById('tech-bg');
+        const ctx    = canvas.getContext('2d');
+        let W, H, nodes = [], meteors = [];
+
+        function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+        function makeNodes(n) {
+            return Array.from({ length: n }, () => ({
+                x: Math.random() * W, y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.28, vy: (Math.random() - 0.5) * 0.28,
+                r: Math.random() * 1.5 + 0.6
+            }));
+        }
+
+        function makeMeteor() {
+            const ang = Math.PI / 5, spd = 5 + Math.random() * 6;
+            return {
+                x: Math.random() * W * 1.5 - W * 0.25,
+                y: -30,
+                vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+                len: 60 + Math.random() * 90,
+                alpha: 0.4 + Math.random() * 0.4,
+                width: 0.7 + Math.random() * 0.9
+            };
+        }
+
+        function initMeteors() {
+            meteors = [];
+            for (let i = 0; i < 5; i++) {
+                const m = makeMeteor();
+                m.x = Math.random() * W; m.y = Math.random() * H;
+                meteors.push(m);
+            }
+        }
+
+        function drawGrid() {
+            const step = 52;
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 0.8;
+            for (let x = 0; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+            for (let y = 0; y < H; y += step) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+        }
+
+        function frame() {
+            ctx.clearRect(0, 0, W, H);
+            drawGrid();
+
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+                    const d  = Math.hypot(dx, dy);
+                    if (d < 180) {
+                        ctx.strokeStyle = `rgba(255,255,255,${(1 - d / 180) * 0.18})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
+                    }
+                }
+            }
+
+            nodes.forEach(n => {
+                ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(230,126,34,0.55)'; ctx.fill();
+                n.x += n.vx; n.y += n.vy;
+                if (n.x < 0 || n.x > W) n.vx *= -1;
+                if (n.y < 0 || n.y > H) n.vy *= -1;
+            });
+
+            meteors.forEach((m, idx) => {
+                const h  = Math.hypot(m.vx, m.vy);
+                const tx = m.x - m.vx / h * m.len, ty = m.y - m.vy / h * m.len;
+                const g  = ctx.createLinearGradient(tx, ty, m.x, m.y);
+                g.addColorStop(0, 'rgba(230,126,34,0)');
+                g.addColorStop(1, `rgba(230,126,34,${m.alpha})`);
+                ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(m.x, m.y);
+                ctx.strokeStyle = g; ctx.lineWidth = m.width; ctx.stroke();
+                m.x += m.vx; m.y += m.vy;
+                if (m.x > W + 100 || m.y > H + 100) meteors[idx] = makeMeteor();
+            });
+
+            requestAnimationFrame(frame);
+        }
+
+        resize();
+        nodes = makeNodes(55);
+        initMeteors();
+        frame();
+        window.addEventListener('resize', () => { resize(); initMeteors(); });
+    })();
     </script>
 </body>
 </html>
