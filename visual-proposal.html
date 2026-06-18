@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>視覺提案 | Anzû Design Studio</title>
+    <meta name="description" content="視覺提案作品集 | Anzû Design Studio">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
+    <title>視覺提案 | Anzû Design Studio</title>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --primary-color: #e8e8e8;
-            --secondary-color: #888;
-            --border-color: #242430;
-            --bg-light: #12121a;
-            --bg-white: #0a0a12;
-            --accent: #4a9eff;
-            --geo-color: rgba(74, 158, 255, 0.07);
-            --geo-stroke: rgba(74, 158, 255, 0.12);
+            --primary-color: #f0f0f0;
+            --secondary-color: #a3a3a3;
+            --text-muted: #c8c8c8;
+            --border-color: #333333;
+            --bg-light: #181818;
+            --bg-white: #0c0c0c;
+            --accent: #E67E22;
             --spacing-xs: 0.5rem;
             --spacing-sm: 1rem;
             --spacing-md: 1.5rem;
@@ -40,18 +40,18 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             position: relative;
+            min-height: 100vh;
         }
 
-        /* ── Geometric Background ── */
-        #geo-bg {
+        #tech-bg {
             position: fixed;
-            inset: 0;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 0;
             pointer-events: none;
-            width: 100%; height: 100%;
         }
 
-        header, section, footer, .lightbox {
+        header, main, footer, .lightbox {
             position: relative;
             z-index: 1;
         }
@@ -64,20 +64,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--spacing-lg) 5%;
+            padding: 1.4rem 3%;
             border-bottom: 0.5px solid var(--border-color);
-            background-color: rgba(10,10,18,0.88);
+            background-color: rgba(12, 12, 12, 0.92);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
         }
 
-
-
         .logo {
             font-family: 'Montserrat', sans-serif;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 1px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             text-decoration: none;
             color: var(--primary-color);
         }
@@ -86,48 +84,74 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--secondary-color);
-            text-decoration: none;
-            padding: 8px 16px;
-            border: 0.5px solid var(--border-color);
+            padding: 7px 18px;
+            border: 1px solid var(--accent);
             border-radius: var(--radius-sm);
+            color: var(--primary-color);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11.5px;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .back-btn:hover {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
+            background-color: var(--accent);
+            color: var(--bg-white);
         }
 
-        /* ── Hero ── */
-        .page-hero {
-            padding: 4rem 5% 2.5rem;
+        /* ── Main / Hero ── */
+        main {
             max-width: 1200px;
             margin: 0 auto;
-            animation: fadeInDown 0.7s ease;
+            padding: 5rem 3% 8rem;
+            animation: fadeInUp 0.6s ease both;
         }
 
+        .breadcrumb {
+            font-size: 11px; font-weight: 500;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--secondary-color);
+            margin-bottom: 1.1rem;
+        }
+        .breadcrumb .accent { color: var(--accent); }
+
         .page-hero h1 {
-            font-size: clamp(28px, 4vw, 42px);
-            font-weight: 700;
-            margin-bottom: var(--spacing-sm);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(46px, 6.5vw, 74px);
+            font-weight: 400; letter-spacing: 0.04em;
+            color: var(--primary-color); line-height: 1;
+            margin-bottom: 1.3rem;
         }
 
         .page-hero p {
-            font-size: 16px;
-            color: var(--secondary-color);
-            max-width: 600px;
-            line-height: 1.8;
+            font-size: 15px;
+            color: var(--text-muted);
+            max-width: 620px;
+            line-height: 1.85;
+            margin-bottom: 3.5rem;
+        }
+
+        /* ── Section divider ── */
+        .section-line {
+            display: flex; align-items: center; gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .section-line span {
+            font-size: 11px; font-weight: 500;
+            letter-spacing: 0.16em; text-transform: uppercase;
+            color: var(--secondary-color); white-space: nowrap;
+        }
+        .section-line::after {
+            content: ''; flex: 1;
+            height: 0.5px; background: var(--border-color);
         }
 
         /* ── Gallery ── */
-        .gallery-section {
-            padding: 2rem 5% var(--spacing-xl);
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .gallery-section { }
 
         .filter-bar {
             display: flex;
@@ -138,7 +162,7 @@
 
         .filter-btn {
             padding: 7px 18px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             background: transparent;
             color: var(--secondary-color);
@@ -151,9 +175,9 @@
 
         .filter-btn:hover,
         .filter-btn.active {
-            background-color: var(--primary-color);
+            background-color: var(--accent);
             color: var(--bg-white);
-            border-color: var(--primary-color);
+            border-color: var(--accent);
         }
 
         .gallery-grid {
@@ -170,21 +194,19 @@
             border-radius: var(--radius-md);
             overflow: hidden;
             border: 0.5px solid var(--border-color);
-            background-color: rgba(18,18,26,0.78);
+            background-color: rgba(24, 24, 24, 0.85);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
             position: relative;
         }
 
         .gallery-item:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
-            border-color: var(--primary-color);
+            box-shadow: 0 20px 52px rgba(230, 126, 34, 0.16);
+            border-color: var(--accent);
         }
-
-
 
         .gallery-item img {
             width: 100%;
@@ -197,20 +219,22 @@
         .gallery-caption { padding: 14px var(--spacing-md); }
 
         .gallery-caption h3 {
+            font-family: 'Noto Sans TC', sans-serif;
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 600;
             margin-bottom: 4px;
+            color: var(--primary-color);
         }
 
         .gallery-caption p {
             font-size: 13px;
-            color: var(--secondary-color);
+            color: var(--text-muted);
             line-height: 1.6;
         }
 
         .gallery-tag {
             display: inline-block;
-            font-size: 12px;
+            font-size: 11.5px;
             padding: 3px 10px;
             border-radius: 99px;
             border: 0.5px solid var(--border-color);
@@ -223,8 +247,8 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(0,0,0,0.45);
-            color: #fff;
+            background: rgba(0,0,0,0.5);
+            color: var(--accent);
             border-radius: 50%;
             width: 32px;
             height: 32px;
@@ -245,7 +269,7 @@
             position: fixed;
             inset: 0;
             z-index: 999;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.88);
             backdrop-filter: blur(6px);
             align-items: center;
             justify-content: center;
@@ -269,7 +293,7 @@
             max-height: 80vh;
             border-radius: var(--radius-md);
             object-fit: contain;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
             display: block;
         }
 
@@ -290,13 +314,13 @@
             transition: color 0.2s ease;
         }
 
-        .lightbox-close:hover { color: #fff; }
+        .lightbox-close:hover { color: var(--accent); }
 
         .lightbox-arrow {
             position: fixed;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.1);
             border: none;
             color: #fff;
             font-size: 26px;
@@ -311,7 +335,7 @@
             z-index: 1001;
         }
 
-        .lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
+        .lightbox-arrow:hover { background: rgba(230,126,34,0.35); }
         .lightbox-arrow.prev  { left: 20px; }
         .lightbox-arrow.next  { right: 20px; }
 
@@ -326,15 +350,15 @@
         }
 
         footer {
-            padding: var(--spacing-lg) 5%;
+            padding: 1.5rem 3%;
             border-top: 0.5px solid var(--border-color);
             text-align: center;
-            font-size: 14px;
+            font-size: 12.5px;
             color: var(--secondary-color);
         }
 
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-16px); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes fadeIn {
@@ -352,7 +376,7 @@
             align-items: center;
             gap: 5px;
             padding: 7px 14px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 500;
             background: transparent;
             color: var(--secondary-color);
@@ -364,667 +388,596 @@
             letter-spacing: 0.04em;
         }
         .sub-back-btn:hover {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
+            color: var(--bg-white);
+            background-color: var(--accent);
+            border-color: var(--accent);
         }
     </style>
 </head>
 <body>
 
-<!-- ── Geometric Background SVG ── -->
-<svg id="geo-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%"   stop-color="#0a0a12"/>
-      <stop offset="50%"  stop-color="#0d0d1a"/>
-      <stop offset="100%" stop-color="#080810"/>
-    </linearGradient>
-    <linearGradient id="accentGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#4a9eff" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="accentGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#7b6fff" stop-opacity="0.1"/>
-      <stop offset="100%" stop-color="#7b6fff" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-
-  <!-- base fill -->
-  <rect width="1440" height="900" fill="url(#bgGrad)"/>
-
-  <!-- soft glow blobs -->
-  <ellipse cx="200" cy="150" rx="380" ry="280" fill="url(#accentGrad1)"/>
-  <ellipse cx="1280" cy="720" rx="340" ry="260" fill="url(#accentGrad2)"/>
-  <ellipse cx="900" cy="420" rx="260" ry="180" fill="rgba(74,158,255,0.04)"/>
-
-  <!-- fine grid -->
-  <g stroke="rgba(74,158,255,0.08)" stroke-width="0.5">
-    <line x1="0" y1="100" x2="1440" y2="100"/>
-    <line x1="0" y1="200" x2="1440" y2="200"/>
-    <line x1="0" y1="300" x2="1440" y2="300"/>
-    <line x1="0" y1="400" x2="1440" y2="400"/>
-    <line x1="0" y1="500" x2="1440" y2="500"/>
-    <line x1="0" y1="600" x2="1440" y2="600"/>
-    <line x1="0" y1="700" x2="1440" y2="700"/>
-    <line x1="0" y1="800" x2="1440" y2="800"/>
-    <line x1="180" y1="0" x2="180" y2="900"/>
-    <line x1="360" y1="0" x2="360" y2="900"/>
-    <line x1="540" y1="0" x2="540" y2="900"/>
-    <line x1="720" y1="0" x2="720" y2="900"/>
-    <line x1="900" y1="0" x2="900" y2="900"/>
-    <line x1="1080" y1="0" x2="1080" y2="900"/>
-    <line x1="1260" y1="0" x2="1260" y2="900"/>
-  </g>
-
-  <!-- large decorative hexagons -->
-  <polygon points="120,30 200,75 200,165 120,210 40,165 40,75"
-           fill="none" stroke="rgba(74,158,255,0.1)" stroke-width="1"/>
-  <polygon points="1320,60 1400,105 1400,195 1320,240 1240,195 1240,105"
-           fill="none" stroke="rgba(123,111,255,0.1)" stroke-width="1"/>
-  <polygon points="680,760 740,795 740,865 680,900 620,865 620,795"
-           fill="none" stroke="rgba(74,158,255,0.08)" stroke-width="1"/>
-
-  <!-- diagonal accent lines -->
-  <line x1="0" y1="0" x2="400" y2="900" stroke="rgba(74,158,255,0.05)" stroke-width="1"/>
-  <line x1="1440" y1="0" x2="1040" y2="900" stroke="rgba(123,111,255,0.05)" stroke-width="1"/>
-
-  <!-- small corner detail circles -->
-  <circle cx="360" cy="300" r="60" fill="none" stroke="rgba(74,158,255,0.07)" stroke-width="1"/>
-  <circle cx="360" cy="300" r="40" fill="none" stroke="rgba(74,158,255,0.05)" stroke-width="0.5"/>
-  <circle cx="1080" cy="600" r="80" fill="none" stroke="rgba(123,111,255,0.07)" stroke-width="1"/>
-  <circle cx="1080" cy="600" r="52" fill="none" stroke="rgba(123,111,255,0.05)" stroke-width="0.5"/>
-
-  <!-- tiny dot cluster top-right -->
-  <g fill="rgba(74,158,255,0.18)">
-    <circle cx="1180" cy="80"  r="2"/><circle cx="1200" cy="60"  r="1.5"/>
-    <circle cx="1220" cy="90"  r="2"/><circle cx="1240" cy="70"  r="1.5"/>
-    <circle cx="1260" cy="100" r="2"/><circle cx="1160" cy="110" r="1.5"/>
-    <circle cx="1190" cy="130" r="2"/><circle cx="1210" cy="50"  r="1.5"/>
-  </g>
-  <!-- tiny dot cluster bottom-left -->
-  <g fill="rgba(123,111,255,0.15)">
-    <circle cx="80"  cy="780" r="2"/><circle cx="100" cy="800" r="1.5"/>
-    <circle cx="60"  cy="810" r="2"/><circle cx="120" cy="760" r="1.5"/>
-    <circle cx="140" cy="790" r="2"/><circle cx="50"  cy="840" r="1.5"/>
-  </g>
-
-  <!-- thin cross marks -->
-  <g stroke="rgba(74,158,255,0.2)" stroke-width="1">
-    <line x1="720" y1="195" x2="720" y2="205"/><line x1="715" y1="200" x2="725" y2="200"/>
-    <line x1="540" y1="495" x2="540" y2="505"/><line x1="535" y1="500" x2="545" y2="500"/>
-    <line x1="900" y1="295" x2="900" y2="305"/><line x1="895" y1="300" x2="905" y2="300"/>
-    <line x1="180" y1="595" x2="180" y2="605"/><line x1="175" y1="600" x2="185" y2="600"/>
-    <line x1="1260" y1="395" x2="1260" y2="405"/><line x1="1255" y1="400" x2="1265" y2="400"/>
-  </g>
-</svg>
+<canvas id="tech-bg"></canvas>
 
 <header>
     <a href="index.html" class="logo">Anzû Design Studio</a>
-    <a href="index.html" class="back-btn">← 返回首頁</a>
+    <a href="index.html" class="back-btn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15,18 9,12 15,6"/>
+        </svg>
+        回到首頁
+    </a>
 </header>
 
-<section class="page-hero">
-    <h1>視覺提案作品集</h1>
-    <p>高質感材質設定、光影渲染與商業視覺呈現，適用於募資平台、產品型錄及品牌提案。</p>
-</section>
-
-<section class="gallery-section">
-
-    <!-- 主 filter bar -->
-    <div class="filter-bar" id="filterBar">
-        <button class="filter-btn active" data-filter="all">全部</button>
-        <button class="filter-btn" data-filter="概念草圖">概念草圖</button>
-        <button class="filter-btn" data-filter="3D渲染">3D 渲染</button>
-        <button class="filter-btn" data-filter="包裝設計">包裝設計</button>
+<main>
+    <div class="breadcrumb">
+        VISUAL PROPOSAL &nbsp;/&nbsp; <span class="accent">視覺提案</span>
     </div>
 
-    <!-- 3D 渲染 sub-filter bar -->
-    <div class="filter-bar" id="subFilterBar" style="display:none;margin-top:-8px;padding-top:14px;border-top:0.5px solid var(--border-color);">
-        <button class="sub-back-btn" id="subBackBtn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
-            返回
-        </button>
-        <button class="filter-btn active" data-sub="all-3d">全部 3D</button>
-        <button class="filter-btn" data-sub="KIOSK">KIOSK</button>
-        <button class="filter-btn" data-sub="3C Products">3C Products</button>
-        <button class="filter-btn" data-sub="Furniture">Furniture</button>
-        <button class="filter-btn" data-sub="Tools">Tools</button>
-        <button class="filter-btn" data-sub="Automobiles">Automobiles</button>
-    </div>
+    <section class="page-hero">
+        <h1>視覺提案作品集</h1>
+        <p>高質感材質設定、光影渲染與商業視覺呈現，適用於募資平台、產品型錄及品牌提案。</p>
+    </section>
 
-    <!-- ┌─────────────────────────────────────────────────────┐
-         │  新增圖片：複製任一 gallery-item 區塊，只需改：      │
-         │    src           → image01/檔名.jpg                 │
-         │    data-category → 對應上方 tab 的文字              │
-         │    <h3> 標題 與 <p> 描述                            │
-         └─────────────────────────────────────────────────────┘ -->
-    <div class="gallery-grid" id="galleryGrid">
+    <section class="gallery-section">
 
-        <!-- ── KIOSK 3D Renders ── -->
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/KIOSK/e1.png" alt="KIOSK Render 01" loading="lazy">
-            <div class="gallery-caption">
-                <h3>KIOSK E1</h3>
-                <p>KIOSK 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">KIOSK</span>
-            </div>
+        <div class="section-line"><span>作品分類</span></div>
+
+        <!-- 主 filter bar -->
+        <div class="filter-bar" id="filterBar">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="概念草圖">概念草圖</button>
+            <button class="filter-btn" data-filter="3D渲染">3D 渲染</button>
+            <button class="filter-btn" data-filter="包裝設計">包裝設計</button>
         </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/KIOSK/E2.jpg" alt="KIOSK Render 02" loading="lazy">
-            <div class="gallery-caption">
-                <h3>KIOSK E2</h3>
-                <p>KIOSK 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">KIOSK</span>
-            </div>
+        <!-- 3D 渲染 sub-filter bar -->
+        <div class="filter-bar" id="subFilterBar" style="display:none;margin-top:-8px;padding-top:14px;border-top:0.5px solid var(--border-color);">
+            <button class="sub-back-btn" id="subBackBtn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+                返回
+            </button>
+            <button class="filter-btn active" data-sub="all-3d">全部 3D</button>
+            <button class="filter-btn" data-sub="KIOSK">KIOSK</button>
+            <button class="filter-btn" data-sub="3C Products">3C Products</button>
+            <button class="filter-btn" data-sub="Furniture">Furniture</button>
+            <button class="filter-btn" data-sub="Tools">Tools</button>
+            <button class="filter-btn" data-sub="Automobiles">Automobiles</button>
         </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/KIOSK/E3.jpg" alt="KIOSK Render 03" loading="lazy">
-            <div class="gallery-caption">
-                <h3>KIOSK E3</h3>
-                <p>KIOSK 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">KIOSK</span>
-            </div>
-        </div>
+        <!-- ┌─────────────────────────────────────────────────────┐
+             │  新增圖片：複製任一 gallery-item 區塊，只需改：      │
+             │    src           → image01/檔名.jpg                 │
+             │    data-category → 對應上方 tab 的文字              │
+             │    <h3> 標題 與 <p> 描述                            │
+             └─────────────────────────────────────────────────────┘ -->
+        <div class="gallery-grid" id="galleryGrid">
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/KIOSK/E4.jpg" alt="KIOSK Render 04" loading="lazy">
-            <div class="gallery-caption">
-                <h3>KIOSK E4</h3>
-                <p>KIOSK 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">KIOSK</span>
+            <!-- ── KIOSK 3D Renders ── -->
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/KIOSK/e1.png" alt="KIOSK Render 01" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>KIOSK E1</h3>
+                    <p>KIOSK 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">KIOSK</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/01.jpg" alt="概念草圖 01" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 01</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/KIOSK/E2.jpg" alt="KIOSK Render 02" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>KIOSK E2</h3>
+                    <p>KIOSK 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">KIOSK</span>
+                </div>
             </div>
-        </div>
-        
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/KIOSK/E5.jpg" alt="KIOSK Render 04" loading="lazy">
-            <div class="gallery-caption">
-                <h3>KIOSK E5</h3>
-                <p>KIOSK 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">KIOSK</span>
-            </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/KIOSK/E6.jpg" alt="KIOSK Render 04" loading="lazy">
-            <div class="gallery-caption">
-                <h3>KIOSK E6</h3>
-                <p>KIOSK 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">KIOSK</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/KIOSK/E3.jpg" alt="KIOSK Render 03" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>KIOSK E3</h3>
+                    <p>KIOSK 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">KIOSK</span>
+                </div>
             </div>
-        </div>
 
-        <!-- ── 3C Products ── -->
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-1.jpg" alt="3C Products 01" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 01</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/KIOSK/E4.jpg" alt="KIOSK Render 04" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>KIOSK E4</h3>
+                    <p>KIOSK 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">KIOSK</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-2.png" alt="3C Products 02" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 02</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/01.jpg" alt="概念草圖 01" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 01</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-3.jpg" alt="3C Products 03" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 03</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/KIOSK/E5.jpg" alt="KIOSK Render 04" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>KIOSK E5</h3>
+                    <p>KIOSK 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">KIOSK</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-4.jpg" alt="3C Products 04" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 04</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="KIOSK" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/KIOSK/E6.jpg" alt="KIOSK Render 04" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>KIOSK E6</h3>
+                    <p>KIOSK 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">KIOSK</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-5.jpg" alt="3C Products 05" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 05</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <!-- ── 3C Products ── -->
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-1.jpg" alt="3C Products 01" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 01</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-6.jpg" alt="3C Products 06" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 06</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-2.png" alt="3C Products 02" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 02</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-7.jpg" alt="3C Products 07" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 07</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-3.jpg" alt="3C Products 03" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 03</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-8.png" alt="3C Products 08" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 08</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-4.jpg" alt="3C Products 04" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 04</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-9.png" alt="3C Products 09" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 09</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-5.jpg" alt="3C Products 05" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 05</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-10.jpg" alt="3C Products 10" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 10</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-6.jpg" alt="3C Products 06" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 06</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-11.jpg" alt="3C Products 11" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 11</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-7.jpg" alt="3C Products 07" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 07</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-12.jpg" alt="3C Products 12" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 12</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-8.png" alt="3C Products 08" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 08</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-13.jpg" alt="3C Products 13" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 13</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-9.png" alt="3C Products 09" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 09</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-14.jpg" alt="3C Products 14" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 14</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-10.jpg" alt="3C Products 10" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 10</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-15.jpg" alt="3C Products 15" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 15</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-11.jpg" alt="3C Products 11" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 11</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-16.jpg" alt="3C Products 16" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 16</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-12.jpg" alt="3C Products 12" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 12</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-17.jpg" alt="3C Products 17" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 17</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-13.jpg" alt="3C Products 13" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 13</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-18.jpg" alt="3C Products 18" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 18</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-14.jpg" alt="3C Products 14" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 14</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-19.jpg" alt="3C Products 19" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 19</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-15.jpg" alt="3C Products 15" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 15</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-         <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/3C/3-20.jpg" alt="3C Products 19" loading="lazy">
-            <div class="gallery-caption">
-                <h3>3C Products 20</h3>
-                <p>3C 產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">3C Products</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-16.jpg" alt="3C Products 16" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 16</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <!-- ── Furniture ── -->
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/furniture/h-1.jpg" alt="Furniture 01" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Furniture 01</h3>
-                <p>家具產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Furniture</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-17.jpg" alt="3C Products 17" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 17</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/furniture/h-2.png" alt="Furniture 02" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Furniture 02</h3>
-                <p>家具產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Furniture</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-18.jpg" alt="3C Products 18" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 18</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/furniture/h-3.jpg" alt="Furniture 03" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Furniture 03</h3>
-                <p>家具產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Furniture</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-19.jpg" alt="3C Products 19" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 19</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/furniture/h-4.jpg" alt="Furniture 04" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Furniture 04</h3>
-                <p>家具產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Furniture</span>
+             <div class="gallery-item" data-category="3D渲染" data-subcategory="3C Products" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/3C/3-20.jpg" alt="3C Products 19" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>3C Products 20</h3>
+                    <p>3C 產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">3C Products</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/furniture/h-5.jpg" alt="Furniture 05" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Furniture 05</h3>
-                <p>家具產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Furniture</span>
+            <!-- ── Furniture ── -->
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/furniture/h-1.jpg" alt="Furniture 01" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Furniture 01</h3>
+                    <p>家具產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Furniture</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/furniture/h-6.png" alt="Furniture 06" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Furniture 06</h3>
-                <p>家具產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Furniture</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/furniture/h-2.png" alt="Furniture 02" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Furniture 02</h3>
+                    <p>家具產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Furniture</span>
+                </div>
             </div>
-        </div>
 
-        <!-- ── Tools ── -->
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Tools" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/tools/t-1.jpg" alt="Tools 01" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Tools 01</h3>
-                <p>工具類產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Tools</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/furniture/h-3.jpg" alt="Furniture 03" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Furniture 03</h3>
+                    <p>家具產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Furniture</span>
+                </div>
             </div>
-        </div>
 
-        <!-- ── Automobiles ── -->
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Automobiles" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/car/c-1.jpg" alt="Automobiles 01" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Automobiles 01</h3>
-                <p>汽車產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Automobiles</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/furniture/h-4.jpg" alt="Furniture 04" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Furniture 04</h3>
+                    <p>家具產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Furniture</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="3D渲染" data-subcategory="Automobiles" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="../3D_RENDER/car/c-2.png" alt="Automobiles 02" loading="lazy">
-            <div class="gallery-caption">
-                <h3>Automobiles 02</h3>
-                <p>汽車產品 3D 渲染提案。</p>
-                <span class="gallery-tag">3D 渲染</span>
-                <span class="gallery-tag">Automobiles</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/furniture/h-5.jpg" alt="Furniture 05" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Furniture 05</h3>
+                    <p>家具產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Furniture</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/02.jpg" alt="概念草圖 02" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 02</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Furniture" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/furniture/h-6.png" alt="Furniture 06" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Furniture 06</h3>
+                    <p>家具產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Furniture</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/03.jpg" alt="概念草圖 03" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 03</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <!-- ── Tools ── -->
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Tools" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/tools/t-1.jpg" alt="Tools 01" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Tools 01</h3>
+                    <p>工具類產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Tools</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/04.jpg" alt="概念草圖 04" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 04</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <!-- ── Automobiles ── -->
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Automobiles" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/car/c-1.jpg" alt="Automobiles 01" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Automobiles 01</h3>
+                    <p>汽車產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Automobiles</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/05.jpg" alt="概念草圖 05" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 05</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="3D渲染" data-subcategory="Automobiles" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="../3D_RENDER/car/c-2.png" alt="Automobiles 02" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>Automobiles 02</h3>
+                    <p>汽車產品 3D 渲染提案。</p>
+                    <span class="gallery-tag">3D 渲染</span>
+                    <span class="gallery-tag">Automobiles</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/06.jpg" alt="概念草圖 06" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 06</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/02.jpg" alt="概念草圖 02" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 02</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/07.jpg" alt="概念草圖 07" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 07</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/03.jpg" alt="概念草圖 03" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 03</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/08.jpg" alt="概念草圖 08" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 08</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/04.jpg" alt="概念草圖 04" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 04</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/09.jpg" alt="概念草圖 09" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 09</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/05.jpg" alt="概念草圖 05" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 05</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/10.jpg" alt="概念草圖 10" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 10</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/06.jpg" alt="概念草圖 06" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 06</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/11.jpg" alt="概念草圖 11" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 11</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/07.jpg" alt="概念草圖 07" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 07</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/12.jpg" alt="概念草圖 12" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 12</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/08.jpg" alt="概念草圖 08" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 08</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-        <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
-            <div class="zoom-hint">⤢</div>
-            <img src="image01/13.jpg" alt="概念草圖 12" loading="lazy">
-            <div class="gallery-caption">
-                <h3>概念草圖 13</h3>
-                <p>產品造型初期概念發想與視覺化提案。</p>
-                <span class="gallery-tag">概念草圖</span>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/09.jpg" alt="概念草圖 09" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 09</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
             </div>
-        </div>
 
-    </div><!-- end .gallery-grid -->
-</section>
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/10.jpg" alt="概念草圖 10" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 10</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
+            </div>
+
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/11.jpg" alt="概念草圖 11" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 11</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
+            </div>
+
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/12.jpg" alt="概念草圖 12" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 12</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
+            </div>
+
+            <div class="gallery-item" data-category="概念草圖" onclick="openLightbox(this)">
+                <div class="zoom-hint">⤢</div>
+                <img src="image01/13.jpg" alt="概念草圖 12" loading="lazy">
+                <div class="gallery-caption">
+                    <h3>概念草圖 13</h3>
+                    <p>產品造型初期概念發想與視覺化提案。</p>
+                    <span class="gallery-tag">概念草圖</span>
+                </div>
+            </div>
+
+        </div><!-- end .gallery-grid -->
+    </section>
+</main>
 
 <footer>
-    <p>&copy; 2026 Anzû Mechanical & Product Design Studio. All rights reserved.</p>
+    <p>&copy; 2026 Anzû Mechanical &amp; Product Design Studio. All rights reserved.</p>
 </footer>
 
 <!-- ── Lightbox ── -->
@@ -1156,6 +1109,98 @@
         if (e.key === 'ArrowLeft')  shiftImage(-1);
         if (e.key === 'Escape')     closeLightbox();
     });
+</script>
+
+<script>
+(function () {
+    const canvas = document.getElementById('tech-bg');
+    const ctx    = canvas.getContext('2d');
+    let W, H, nodes = [], meteors = [];
+
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+    function makeNodes(n) {
+        return Array.from({ length: n }, () => ({
+            x: Math.random() * W, y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.28, vy: (Math.random() - 0.5) * 0.28,
+            r: Math.random() * 1.5 + 0.6
+        }));
+    }
+
+    function makeMeteor() {
+        const ang = Math.PI / 5, spd = 5 + Math.random() * 6;
+        return {
+            x: Math.random() * W * 1.5 - W * 0.25,
+            y: -30,
+            vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+            len: 60 + Math.random() * 90,
+            alpha: 0.4 + Math.random() * 0.4,
+            width: 0.7 + Math.random() * 0.9
+        };
+    }
+
+    function initMeteors() {
+        meteors = [];
+        for (let i = 0; i < 5; i++) {
+            const m = makeMeteor();
+            m.x = Math.random() * W; m.y = Math.random() * H;
+            meteors.push(m);
+        }
+    }
+
+    function drawGrid() {
+        const step = 52;
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+        ctx.lineWidth = 0.8;
+        for (let x = 0; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+        for (let y = 0; y < H; y += step) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    }
+
+    function frame() {
+        ctx.clearRect(0, 0, W, H);
+        drawGrid();
+
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+                const d  = Math.hypot(dx, dy);
+                if (d < 180) {
+                    ctx.strokeStyle = `rgba(255,255,255,${(1 - d / 180) * 0.18})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
+                }
+            }
+        }
+
+        nodes.forEach(n => {
+            ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(230,126,34,0.55)'; ctx.fill();
+            n.x += n.vx; n.y += n.vy;
+            if (n.x < 0 || n.x > W) n.vx *= -1;
+            if (n.y < 0 || n.y > H) n.vy *= -1;
+        });
+
+        meteors.forEach((m, idx) => {
+            const h  = Math.hypot(m.vx, m.vy);
+            const tx = m.x - m.vx / h * m.len, ty = m.y - m.vy / h * m.len;
+            const g  = ctx.createLinearGradient(tx, ty, m.x, m.y);
+            g.addColorStop(0, 'rgba(230,126,34,0)');
+            g.addColorStop(1, `rgba(230,126,34,${m.alpha})`);
+            ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(m.x, m.y);
+            ctx.strokeStyle = g; ctx.lineWidth = m.width; ctx.stroke();
+            m.x += m.vx; m.y += m.vy;
+            if (m.x > W + 100 || m.y > H + 100) meteors[idx] = makeMeteor();
+        });
+
+        requestAnimationFrame(frame);
+    }
+
+    resize();
+    nodes = makeNodes(55);
+    initMeteors();
+    frame();
+    window.addEventListener('resize', () => { resize(); initMeteors(); });
+})();
 </script>
 </body>
 </html>
