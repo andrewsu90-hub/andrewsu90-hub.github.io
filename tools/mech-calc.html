@@ -353,7 +353,7 @@ const CALCS = {
     calc(inp) {
       const { Mdu, Z1, Z2, q, xi } = inp;
       const d1 = q * Mdu, d2 = Mdu * Z2, A = 0.5 * Mdu * (Z2 + q + 2 * xi);
-      return { A: A.toFixed(2), d1: d1.toFixed(2), d2: d2.toFixed(2), da1: (Mdu * (q + 2)).toFixed(2), da2: (2 * (A - 0.5 * d1 + Mdu)).toFixed(2), i: (Z2 / Z1).toFixed(0), lam: (Math.atan(Z1 / q) * 180 / Math.PI).toFixed(3) };
+      return { A: A.toFixed(2), d1: d1.toFixed(2), d2: d2.toFixed(2), da1: (Mdu * (q + 2)).toFixed(2), da2: (Mdu * (Z2 + 2 + 2 * xi)).toFixed(2), i: (Z2 / Z1).toFixed(0), lam: (Math.atan(Z1 / q) * 180 / Math.PI).toFixed(3) };
     }
   },
   bevel_gear: {
@@ -362,7 +362,6 @@ const CALCS = {
     inputs: [{ key: "m", label: "\u5927\u7AEF\u6A21\u6578 m", unit: "mm", default: 3 }, { key: "z1", label: "\u5C0F\u9F52\u8F2A\u9F52\u6578 z\u2081", unit: "", default: 15 }, { key: "z2", label: "\u5927\u9F52\u8F2A\u9F52\u6578 z\u2082", unit: "", default: 30 }, { key: "alpha", label: "\u58D3\u529B\u89D2 \u03B1", unit: "\xB0", default: 20 }, { key: "b", label: "\u9F52\u5BEC b", unit: "mm", default: 20 }],
     outputs: [{ key: "delta1", label: "\u5C0F\u8F2A\u7BC0\u9310\u89D2 \u03B4\u2081", unit: "\xB0" }, { key: "delta2", label: "\u5927\u8F2A\u7BC0\u9310\u89D2 \u03B4\u2082", unit: "\xB0" }, { key: "R", label: "\u80CC\u9310\u8DDD R", unit: "mm" }, { key: "d1", label: "\u5C0F\u8F2A\u5206\u5EA6\u5713\u5F91", unit: "mm" }, { key: "d2", label: "\u5927\u8F2A\u5206\u5EA6\u5713\u5F91", unit: "mm" }, { key: "da1", label: "\u5C0F\u8F2A\u9F52\u9802\u5713", unit: "mm" }, { key: "da2", label: "\u5927\u8F2A\u9F52\u9802\u5713", unit: "mm" }],
     calc(i) {
-      const u = i.z2 / i.z1;
       const d1 = Math.atan(i.z1 / i.z2) * 180 / Math.PI;
       const d2 = 90 - d1;
       const R = Math.sqrt((i.m * i.z1) ** 2 + (i.m * i.z2) ** 2) / 2;
@@ -407,13 +406,13 @@ const CALCS = {
   spring_stiffness: {
     name: "\u5F48\u7C27\u525B\u5EA6\uFF08\u5DF2\u77E5\u5E7E\u4F55\uFF09",
     desc: "\u5DF2\u77E5\u92FC\u7D72\u76F4\u5F91\u3001\u4E2D\u5F91\u3001\u5708\u6578\u6C42\u525B\u5EA6",
-    inputs: [{ key: "G", label: "\u5207\u8B8A\u6A21\u91CF G", unit: "MPa", default: 79e3 }, { key: "d", label: "\u92FC\u7D72\u76F4\u5F91 d", unit: "mm", default: 2.2 }, { key: "D2", label: "\u5F48\u7C27\u4E2D\u5F91 D\u2082", unit: "mm", default: 24.5 }, { key: "n", label: "\u6709\u6548\u5708\u6578 n", unit: "\u5708", default: 30 }],
+    inputs: [{ key: "G", label: "\u5207\u8B8A\u6A21\u91CF G", unit: "MPa", default: 79e3 }, { key: "d", label: "\u92FC\u7D72\u76F4\u5F91 d", unit: "mm", default: 2.2 }, { key: "D2", label: "\u5F48\u7C27\u4E2D\u5F91 D\u2082", unit: "mm", default: 24.5 }, { key: "n", label: "\u6709\u6548\u5708\u6578 n", unit: "\u5708", default: 30 }, { key: "tau_allow", label: "\u8A31\u7528\u526A\u61C9\u529B [\u03C4]", unit: "MPa", default: 600, hint: "\u7434\u92FC\u7DDA\u7D04600 / \u6CB9\u56DE\u706B\u7DDA\u7D04500\uFF0C\u4F9D\u6750\u6599\u8ABF\u6574" }],
     outputs: [{ key: "k", label: "\u5F48\u7C27\u525B\u5EA6 k", unit: "N/mm" }, { key: "C", label: "\u65CB\u7E5E\u6BD4 C", unit: "" }, { key: "Pmax", label: "\u8A31\u7528\u6975\u9650\u8F09\u8377", unit: "N" }],
     calc(i) {
       const k = i.G * i.d ** 4 / (8 * i.D2 ** 3 * i.n);
       const C = i.D2 / i.d;
       const K = (4 * C - 1) / (4 * C - 4) + 0.615 / C;
-      return { k: k.toFixed(4), C: C.toFixed(2), Pmax: (600 * Math.PI * i.d ** 3 / (8 * K * i.D2)).toFixed(1) };
+      return { k: k.toFixed(4), C: C.toFixed(2), Pmax: (i.tau_allow * Math.PI * i.d ** 3 / (8 * K * i.D2)).toFixed(1) };
     }
   },
   // ══ 鏈條 ══
@@ -428,7 +427,9 @@ const CALCS = {
       let Lp0 = Math.ceil(Lp);
       if (Lp0 % 2 !== 0) Lp0++;
       const A = Lp0 - (i.z1 + i.z2) / 2;
-      return { Lp: Lp.toFixed(3), Lp0, L: (Lp0 * i.p).toFixed(1), a: (i.p / 4 * (A + Math.sqrt(A ** 2 - 8 * ((i.z2 - i.z1) / (2 * Math.PI)) ** 2))).toFixed(1) };
+      const disc = A ** 2 - 8 * ((i.z2 - i.z1) / (2 * Math.PI)) ** 2;
+      if (disc < 0) throw new Error("\u4E2D\u5FC3\u8DDD\u904E\u5C0F\uFF0C\u7121\u6CD5\u5BB9\u7D0D\u5169\u93C8\u8F2A\uFF0C\u8ACB\u52A0\u5927 a\u2080");
+      return { Lp: Lp.toFixed(3), Lp0, L: (Lp0 * i.p).toFixed(1), a: (i.p / 4 * (A + Math.sqrt(disc))).toFixed(1) };
     }
   },
   sprocket_basic: {
@@ -556,6 +557,7 @@ const CALCS = {
       const T_Nmm = i.T * 1e3;
       const Pfmin = 2 * T_Nmm / (Math.PI * i.df ** 2 * i.lf * i.mu);
       const qa = i.df / i.da, qi = i.di / i.df;
+      if (qa >= 1) throw new Error("\u7D50\u5408\u76F4\u5F91 df \u5FC5\u9808\u5C0F\u65BC\u5305\u5BB9\u4EF6\u5916\u5F91 da");
       const Ca = (1 + qa ** 2) / (1 - qa ** 2) + i.va, Ci = qi > 0 ? (1 + qi ** 2) / (1 - qi ** 2) - i.vi : 1 - i.vi;
       const dmin = (Pfmin * i.df * Ca / i.Ea + Pfmin * i.df * Ci / i.Ei) * 1e3;
       const Pfmax = Math.min(0.58 * i.ssa * (1 - qa ** 2), qi > 0 ? 0.58 * i.ssi * (1 - qi ** 2) : 0.58 * i.ssi);
@@ -602,8 +604,8 @@ const CALCS = {
   // ══ 新增計算器模組 ══
   // ── 凸輪（正弦加速度曲線）──
   cam_sine: {
-    name: "\u6B63\u5F26\u52A0\u901F\u5EA6\u51F8\u8F2A\u8A2D\u8A08",
-    desc: "\u8A08\u7B97\u51F8\u8F2A\u4F4D\u79FB\u3001\u901F\u5EA6\u3001\u52A0\u901F\u5EA6\uFF08\u4FEE\u6B63\u6B63\u5F26\u66F2\u7DDA\uFF09",
+    name: "\u64FA\u7DDA\uFF08\u6B63\u5F26\u52A0\u901F\u5EA6\uFF09\u51F8\u8F2A\u8A2D\u8A08",
+    desc: "\u64FA\u7DDA\u904B\u52D5\u898F\u5F8B\uFF08Cycloidal\uFF09\uFF1A\u52A0\u901F\u5EA6\u5448\u6B63\u5F26\u8B8A\u5316\uFF0C\u8D77\u8A16\u9EDE\u7121\u8E8D\u52D5\u8D33\u8DF3\u8B8A",
     inputs: [
       { key: "h", label: "\u884C\u7A0B h\uFF08\u5347\u7A0B\uFF09", unit: "mm", default: 30 },
       { key: "rb", label: "\u57FA\u5713\u534A\u5F91 rb", unit: "mm", default: 100 },
@@ -612,29 +614,19 @@ const CALCS = {
     ],
     outputs: [
       { key: "s", label: "\u4F4D\u79FB s", unit: "mm" },
-      { key: "v_coef", label: "\u901F\u5EA6\u4FC2\u6578 ds/d\u03C6", unit: "mm/\xB0" },
-      { key: "a_coef", label: "\u52A0\u901F\u5EA6\u4FC2\u6578", unit: "mm/\xB0\xB2" },
+      { key: "v_coef", label: "\u901F\u5EA6\u4FC2\u6578 ds/d\u03C6", unit: "mm/rad" },
+      { key: "a_coef", label: "\u52A0\u901F\u5EA6\u4FC2\u6578 d\xB2s/d\u03C6\xB2", unit: "mm/rad\xB2" },
       { key: "r", label: "\u51F8\u8F2A\u5411\u5F91 r", unit: "mm" }
     ],
     calc(i) {
-      const phi_r = i.phi * Math.PI / 180;
       const phi_o_r = i.phi_o * Math.PI / 180;
-      const tau = phi_r / phi_o_r;
-      const Vm = 1.76, Am = 5.53;
-      let s, v, a;
-      if (tau <= 0.25) {
-        s = i.h * (Am / (4 * Math.PI ** 2)) * (Math.PI / 2 * tau - Math.sin(2 * Math.PI * tau) / 2);
-        v = i.h / phi_o_r * Am / (4 * Math.PI) * (Math.PI / 2 * (1 - Math.cos(2 * Math.PI * tau)));
-        a = i.h / phi_o_r ** 2 * Am / 2 * Math.sin(2 * Math.PI * tau);
-      } else if (tau <= 0.75) {
-        s = i.h * (Am / (4 * Math.PI ** 2) * (Math.PI * (tau - 0.25) + 1) - 1 / (2 * Math.PI) * Math.sin(2 * Math.PI * tau));
-        v = i.h / phi_o_r * Am / (4 * Math.PI) * (Math.PI * (1 - Math.cos(2 * Math.PI * (tau - 0.25))));
-        a = i.h / phi_o_r ** 2 * Am / 2 * Math.sin(2 * Math.PI * (tau - 0.25));
-      } else {
-        s = i.h * (1 - Am / (4 * Math.PI ** 2) * (Math.PI / 2 * (1 - tau) + Math.sin(2 * Math.PI * tau) / 2));
-        v = i.h / phi_o_r * Am / (4 * Math.PI) * (Math.PI / 2 * (1 + Math.cos(2 * Math.PI * tau)));
-        a = -i.h / phi_o_r ** 2 * Am / 2 * Math.sin(2 * Math.PI * tau);
-      }
+      const phi_r = i.phi * Math.PI / 180;
+      const tau = Math.max(0, Math.min(1, phi_r / phi_o_r));   // \u593E\u5728 0~1\uFF0C\u907F\u514D\u8D85\u51FA\u63A8\u7A0B\u89D2
+      const TWO_PI = 2 * Math.PI;
+      // \u64FA\u7DDA\uFF08Cycloidal\uFF09\u6B63\u5F26\u52A0\u901F\u5EA6\u898F\u5F8B\uFF0C\u95C9\u503C\u5DF2\u9A57\u8B49\uFF1A\u8D77\u8A16\u9EDE s,v,a \u5747\u70BA 0
+      const s = i.h * (tau - Math.sin(TWO_PI * tau) / TWO_PI);
+      const v = (i.h / phi_o_r) * (1 - Math.cos(TWO_PI * tau));          // ds/d\u03C6
+      const a = (i.h / phi_o_r ** 2) * (TWO_PI * Math.sin(TWO_PI * tau)); // d\xB2s/d\u03C6\xB2
       const r = Math.sqrt((i.rb + s) ** 2 + v ** 2);
       return { s: s.toFixed(4), v_coef: v.toFixed(5), a_coef: a.toFixed(5), r: r.toFixed(3) };
     }
@@ -647,7 +639,7 @@ const CALCS = {
       { key: "N", label: "\u5206\u5272\u7B49\u4EFD N", unit: "", default: 12 },
       { key: "t1", label: "\u5B9A\u4F4D\u6642\u9593 t\u2081", unit: "s", default: 1 },
       { key: "t2", label: "\u9A45\u52D5\u6642\u9593 t\u2082", unit: "s", default: 3 },
-      { key: "n", label: "\u5165\u529B\u8EF8\u8F49\u901F n", unit: "rpm", default: 125 },
+      { key: "n", label: "\u5165\u529B\u8EF8\u8F49\u901F n\uFF08\u53C3\u8003\uFF09", unit: "rpm", default: 125 },
       { key: "D", label: "\u8F49\u76E4\u76F4\u5F91 D", unit: "cm", default: 60 },
       { key: "T", label: "\u8F49\u76E4\u539A\u5EA6 T", unit: "cm", default: 1.5 },
       { key: "M", label: "\u6750\u8CEA\u6BD4\u91CD\uFF08\u92FC:7.8\uFF09", unit: "kg/dm\xB3", default: 7.8 },
@@ -664,18 +656,22 @@ const CALCS = {
       { key: "P_min", label: "\u96FB\u6A5F\u6700\u5C0F\u529F\u7387", unit: "kW" }
     ],
     calc(i) {
-      const phi_h = 360 * i.t2 / (i.t1 + i.t2);
-      const W1 = Math.PI / 4 * i.D ** 2 * i.T * i.M * 0.1 ** 3;
+      const phi_h = 360 * i.t2 / (i.t1 + i.t2);          // \u9A45\u52D5\u89D2\uFF08\u51F8\u8F2A\u689D\u4EF6\uFF09
+      // \u8F49\u76E4\u8CEA\u91CF\uFF1A\u9AD4\u7A4D \u03C0/4\xB7D\xB2\xB7T (cm\xB3) \u2192 dm\xB3 \u2192 \xD7M(kg/dm\xB3)
+      const W1 = Math.PI / 4 * i.D ** 2 * i.T * i.M / 1e3; // kg
       const W2 = i.M1 * i.N, W3 = i.M2 * i.N;
-      const JT_disk = W1 * i.D ** 2 / 8;
-      const JT_fixture = (W2 + W3) * i.Re ** 2;
-      const JT = JT_disk + JT_fixture;
-      const omega = 2 * Math.PI * i.n / 60;
-      const Vm = 1.76, Am = 5.53;
-      const phi_h_r = phi_h * Math.PI / 180;
-      const T_motor = JT * omega ** 2 * Am * i.fe / (phi_h_r * i.n * 60 / i.t2);
-      const P_min = T_motor * omega / i.z / 1e3;
-      return { phi_h: phi_h.toFixed(1), W1: W1.toFixed(2), JT: JT.toFixed(1), P_min: P_min.toFixed(3) };
+      // \u8F49\u52D5\u6163\u91CF\u5168\u90E8\u63DB\u7B97\u70BA SI (kg\xB7m\xB2)\uFF1A\u534A\u5F91 cm \u2192 m
+      const J_disk = 0.5 * W1 * (i.D / 2 / 100) ** 2;      // kg\xB7m\xB2
+      const J_fix = (W2 + W3) * (i.Re / 100) ** 2;         // kg\xB7m\xB2
+      const J_SI = J_disk + J_fix;
+      const JT = J_SI * 1e4;                               // \u986F\u793A\u7528 kg\xB7cm\xB2
+      // \u51FA\u529B\u7AEF\u6BCF\u6B21\u5206\u5272\u89D2\u5EA6 \u0394\u03B8 = 2\u03C0/N\uFF0C\u5728 t2 \u5167\u4EE5\u64FA\u7DDA\u5B8C\u6210
+      const dtheta = 2 * Math.PI / i.N;                    // rad
+      const alpha_max = 2 * Math.PI * dtheta / i.t2 ** 2;  // \u64FA\u7DDA\u5CF0\u503C\u89D2\u52A0\u901F\u5EA6 rad/s\xB2
+      const omega_peak = 2 * dtheta / i.t2;                // \u64FA\u7DDA\u5CF0\u503C\u89D2\u901F\u5EA6 rad/s
+      const T_index = J_SI * alpha_max * i.fe;             // N\xB7m\uFF08\u542B\u5B89\u5168\u4FC2\u6578\uFF09
+      const P_min = T_index * omega_peak / i.z / 1e3;      // kW\uFF08\u542B\u96FB\u6A5F\u6548\u7387\uFF09
+      return { phi_h: phi_h.toFixed(1), W1: W1.toFixed(2), JT: JT.toFixed(1), P_min: P_min.toFixed(4) };
     }
   },
   // ── 液壓：泵與電機 ──
@@ -723,11 +719,12 @@ const CALCS = {
       const v = i.Q / 6e4 / A;
       const Re = v * (i.d / 1e3) / (i.nu * 1e-6);
       const laminar = Re < 2300;
-      let lambda;
+      let lambda, note = "";
       if (laminar) lambda = 64 / Re;
-      else lambda = 0.316 / Math.pow(Re, 0.25);
+      else if (Re <= 1e5) lambda = 0.316 / Math.pow(Re, 0.25);        // Blasius (Re \u2264 1e5)
+      else { lambda = 0.0032 + 0.221 / Math.pow(Re, 0.237); note = " (Nikuradse Re>1e5)"; } // \u9AD8\u96F7\u8AFE\u6578\u5340
       const dp = lambda * (i.L / (i.d / 1e3)) * (i.rho * v ** 2 / 2) / 1e5;
-      return { v: v.toFixed(3), Re: Re.toFixed(0), type: laminar ? "\u5C64\u6D41 (Re<2300)" : "\u7D0A\u6D41 (Re\u22652300)", dp: dp.toFixed(4) };
+      return { v: v.toFixed(3), Re: Re.toFixed(0), type: (laminar ? "\u5C64\u6D41 (Re<2300)" : "\u7D0A\u6D41 (Re\u22652300)") + note, dp: dp.toFixed(4) };
     }
   },
   // ── 液壓衝擊 ──
@@ -1056,16 +1053,10 @@ function CamCurvePanel() {
   const [phi_r, setPhi_r] = useState(60);
   const [phi_s, setPhi_s] = useState(60);
   function msDisp(tau) {
-    const Am = 5.53;
-    if (tau <= 0) {
-      return 0;
-    }
-    if (tau >= 1) {
-      return 1;
-    }
-    if (tau <= 0.25) return Am / (4 * Math.PI ** 2) * (Math.PI / 2 * tau - Math.sin(2 * Math.PI * tau) / 2);
-    if (tau <= 0.75) return Am / (4 * Math.PI ** 2) * (Math.PI * (tau - 0.25) + 1) - Am / (4 * Math.PI ** 2) * 1 / 2 * Math.sin(2 * Math.PI * tau);
-    return 1 - Am / (4 * Math.PI ** 2) * (Math.PI / 2 * (1 - tau) + Math.sin(2 * Math.PI * tau) / 2);
+    // \u64FA\u7DDA\uFF08Cycloidal\uFF09\u6B63\u5F26\u52A0\u901F\u5EA6\u898F\u5F8B\u4E4B\u6B78\u4E00\u5316\u4F4D\u79FB S(\u03C4) = \u03C4 - sin(2\u03C0\u03C4)/(2\u03C0)
+    if (tau <= 0) return 0;
+    if (tau >= 1) return 1;
+    return tau - Math.sin(2 * Math.PI * tau) / (2 * Math.PI);
   }
   
   // =========== 修正的部分在這裡 ===========
@@ -1113,7 +1104,7 @@ function CamCurvePanel() {
     dispPts.push([chartX + i / 72 * chartW, chartY + chartH - s / h * chartH]);
   }
   const dispPath = "M" + dispPts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join("L");
-  return /* @__PURE__ */ React.createElement("div", { className: "card", style: { gridColumn: "1 / -1" } }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "\u51F8\u8F2A\u8F2A\u5ED3\u66F2\u7DDA\u8996\u89BA\u5316"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "\u4FEE\u6B63\u6B63\u5F26\u66F2\u7DDA\uFF08MS\uFF09\uFF0C\u5373\u6642\u6E32\u67D3\u51F8\u8F2A\u8F2A\u5ED3"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 12 } }, [
+  return /* @__PURE__ */ React.createElement("div", { className: "card", style: { gridColumn: "1 / -1" } }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "\u51F8\u8F2A\u8F2A\u5ED3\u66F2\u7DDA\u8996\u89BA\u5316"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "\u64FA\u7DDA\u904B\u52D5\u898F\u5F8B\uFF08Cycloidal\uFF09\uFF0C\u5373\u6642\u6E32\u67D3\u51F8\u8F2A\u8F2A\u5ED3"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 12 } }, [
     { label: "\u57FA\u5713\u534A\u5F91 rb (mm)", val: rb, set: setRb, min: 20, max: 200 },
     { label: "\u884C\u7A0B h (mm)", val: h, set: setH, min: 5, max: 100 },
     { label: "\u5347\u7A0B\u89D2 \u03C6\u2080 (\xB0)", val: phi_o, set: setPhi_o, min: 30, max: 180 },
@@ -1287,8 +1278,20 @@ function CalcCard({ calcId, onLink }) {
   const [results, setResults] = useState(null);
   const run = useCallback(() => {
     try {
-      const nv = Object.fromEntries(Object.entries(vals).map(([k, v]) => [k, parseFloat(v)]));
-      setResults(def.calc(nv));
+      const nv = {};
+      for (const [k, v] of Object.entries(vals)) {
+        const n = parseFloat(v);
+        if (!Number.isFinite(n)) { setResults({ error: `\u8F38\u5165\u300C${k}\u300D\u4E0D\u662F\u6709\u6548\u6578\u503C` }); return; }
+        nv[k] = n;
+      }
+      const out = def.calc(nv);
+      // \u9632\u6B62 NaN / Infinity \u88AB .toFixed() \u6E32\u67D3\u70BA "NaN"\uFF1A\u6383\u63CF\u6240\u6709\u8F38\u51FA
+      for (const [k, v] of Object.entries(out)) {
+        if (typeof v === "string" && (v === "NaN" || v === "Infinity" || v === "-Infinity")) {
+          out[k] = "\u2014 (\u8F38\u5165\u8D85\u51FA\u6709\u6548\u7BC4\u570D)";
+        }
+      }
+      setResults(out);
     } catch (e) {
       setResults({ error: e.message });
     }
