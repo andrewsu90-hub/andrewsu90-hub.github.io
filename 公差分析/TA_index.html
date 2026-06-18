@@ -438,14 +438,23 @@
 
     <script>
         function taGoHome(e) {
-            // Return to whichever homepage (English or Chinese) the user actually came from,
-            // instead of always hardcoding the English homepage.
-            if (document.referrer && window.history.length > 1) {
-                e.preventDefault();
-                window.history.back();
-                return false;
+            // Navigate directly to the homepage URL the user actually arrived from
+            // (English root index.html, or the Chinese homepage), instead of relying on
+            // browser history (history.back() can land on the wrong entry if there were
+            // intermediate hash/anchor clicks). Falls back to the English homepage if the
+            // referrer isn't recognizable as a homepage (e.g. direct visit, bookmark).
+            var ref = document.referrer;
+            if (ref) {
+                try {
+                    var path = new URL(ref).pathname;
+                    if (/(^|\/)(index\.html)?$/.test(path)) {
+                        e.preventDefault();
+                        window.location.href = ref;
+                        return false;
+                    }
+                } catch (err) {}
             }
-            return true; // no usable history (e.g. direct visit) -> fall back to ../index.html
+            return true; // fallback: follow href to ../index.html
         }
     </script>
 </body>
