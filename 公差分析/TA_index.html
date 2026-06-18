@@ -238,8 +238,8 @@
     <canvas id="tech-bg"></canvas>
 
     <header>
-        <a href="../index.html" class="logo" onclick="return taGoHome(event)">Anzû Design Studio</a>
-        <a href="../index.html" class="back-btn" onclick="return taGoHome(event)">
+        <a href="../index.html" class="logo" id="taLogoLink">Anzû Design Studio</a>
+        <a href="../index.html" class="back-btn" id="taBackLink">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="15,18 9,12 15,6"/>
             </svg>
@@ -437,25 +437,20 @@
     </script>
 
     <script>
-        function taGoHome(e) {
-            // Navigate directly to the homepage URL the user actually arrived from
-            // (English root index.html, or the Chinese homepage), instead of relying on
-            // browser history (history.back() can land on the wrong entry if there were
-            // intermediate hash/anchor clicks). Falls back to the English homepage if the
-            // referrer isn't recognizable as a homepage (e.g. direct visit, bookmark).
-            var ref = document.referrer;
-            if (ref) {
-                try {
-                    var path = new URL(ref).pathname;
-                    if (/(^|\/)(index\.html)?$/.test(path)) {
-                        e.preventDefault();
-                        window.location.href = ref;
-                        return false;
-                    }
-                } catch (err) {}
-            }
-            return true; // fallback: follow href to ../index.html
-        }
+        // Hardcoded homepage URLs -- this tool page is shared by both the English
+        // and Chinese sites, so which one to return to is determined by the ?lang=
+        // query parameter each homepage's link passes in (not by browser history).
+        var TA_HOMEPAGES = {
+            en: "../index.html",
+            zh: "../zh-tw/index.html"
+        };
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var lang = params.get('lang') === 'zh' ? 'zh' : 'en';
+            var target = TA_HOMEPAGES[lang];
+            document.getElementById('taLogoLink').setAttribute('href', target);
+            document.getElementById('taBackLink').setAttribute('href', target);
+        })();
     </script>
 </body>
 </html>
