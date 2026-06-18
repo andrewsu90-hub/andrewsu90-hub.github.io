@@ -263,7 +263,7 @@
 
         <div class="tools-grid">
 
-            <a href="公差分析_v10.html" class="tool-card">
+            <a href="公差分析_v10.html" class="tool-card" id="taToolCardLink">
                 <div class="status-dot" title="線上可用"></div>
 
                 <div class="tool-icon">
@@ -450,6 +450,14 @@
             var target = TA_HOMEPAGES[lang];
             document.getElementById('taLogoLink').setAttribute('href', target);
             document.getElementById('taBackLink').setAttribute('href', target);
+
+            // Carry the ?lang= param forward into the tool itself, so its own
+            // "back to home" logo link (in 公差分析_v10.html) knows which
+            // homepage to return to as well.
+            var toolLink = document.getElementById('taToolCardLink');
+            if (toolLink) {
+                toolLink.setAttribute('href', '公差分析_v10.html?lang=' + lang);
+            }
         })();
     </script>
 </body>

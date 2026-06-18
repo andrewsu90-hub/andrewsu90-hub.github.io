@@ -151,8 +151,8 @@
 <body>
 
 <header style="position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 3%; border-bottom: 0.5px solid #333; backdrop-filter: blur(14px); background: rgba(244, 247, 246, 0.92);">
-    <a href="../index.html" style="font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 700; color: #333; text-decoration: none;">Anzû Design Studio</a>
-    <a href="TA_index.html" style="color: #333; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 5px; font-weight: bold;">
+    <a href="../index.html" id="v10LogoLink" style="font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 700; color: #333; text-decoration: none;">Anzû Design Studio</a>
+    <a href="TA_index.html" id="v10ToolMenuLink" style="color: #333; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 5px; font-weight: bold;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="15,18 9,12 15,6"/>
         </svg>
@@ -1077,5 +1077,25 @@
     };
 </script>
 
+
+<script>
+    // Same shared-file problem as TA_index.html: this tool page is reached from
+    // both the English and Chinese sites via TA_index.html, so where its logo
+    // link and "back to tool menu" link should go depends on the ?lang= param
+    // carried in this page's own URL (set by TA_index.html when linking here).
+    var V10_HOMEPAGES = {
+        en: "../index.html",
+        zh: "../zh-tw/index.html"
+    };
+    (function () {
+        var params = new URLSearchParams(window.location.search);
+        var lang = params.get('lang') === 'zh' ? 'zh' : 'en';
+        document.getElementById('v10LogoLink').setAttribute('href', V10_HOMEPAGES[lang]);
+        var toolMenuLink = document.getElementById('v10ToolMenuLink');
+        if (toolMenuLink) {
+            toolMenuLink.setAttribute('href', 'TA_index.html?lang=' + lang);
+        }
+    })();
+</script>
 </body>
 </h
