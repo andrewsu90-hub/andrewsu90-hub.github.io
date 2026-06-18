@@ -580,8 +580,8 @@
                     <h3>模擬驅動機構設計</h3>
                     <p>使用 Creo 運動學模組進行動態模擬——精確計算行程並消除干涉，確保機構順暢運作。</p>
                     <div class="project-tags">
-                        <span class="project-tag">Creo</span>
-                        <span class="project-tag">運動學分析</span>
+                        <a class="project-tag" href="#" onclick="openCreoVideoModal(event)" title="觀看Creo示範">Creo</a>
+                        <a class="project-tag" href="#" onclick="openKinematicVideoModal(event)" title="觀看運動學分析示範">運動學分析</a>
                         <a class="project-tag" href="#" onclick="openVideoModal(event)" title="觀看機構設計示範">機構設計</a>
                     </div>
                 </div>
@@ -593,8 +593,8 @@
                     <h3>消費性電子曲面建模</h3>
                     <p>運用進階曲面技術打造符合人體工學的流線造型——完整考量分模線與組裝邏輯。</p>
                     <div class="project-tags">
-                        <span class="project-tag">曲面建模</span>
-                        <span class="project-tag">工業設計</span>
+                        <a class="project-tag" href="#" onclick="openSurfaceVideoModal(event)" title="觀看曲面建模示範">曲面建模</a>
+                        <a class="project-tag" href="#" onclick="openIndustrialVideoModal(event)" title="觀看工業設計示範">工業設計</a>
                     </div>
                 </div>
             </div>
@@ -605,9 +605,9 @@
                     <h3>結構應力與 DFM 優化</h3>
                     <p>強化卡扣與承載件結構，優化壁厚設計以降低射出成型件縮水與翹曲問題。</p>
                     <div class="project-tags">
-                        <span class="project-tag">DFM</span>
+                        <a class="project-tag" href="#" onclick="openDfmVideoModal(event)" title="觀看DFM示範">DFM</a>
                         <a class="project-tag" href="#" onclick="openStressVideoModal(event)" title="觀看應力分析示範">應力分析</a>
-                        <span class="project-tag">射出成型</span>
+                        <a class="project-tag" href="#" onclick="openInjectionVideoModal(event)" title="觀看射出成型示範">射出成型</a>
                     </div>
                 </div>
             </div>
@@ -629,7 +629,7 @@
                     <h3>精密金屬零件設計</h3>
                     <p>專為壓鑄與鈑金件量身設計的結構方案——充分考量加工公差與表面處理製程需求。</p>
                     <div class="project-tags">
-                        <span class="project-tag">金屬加工</span>
+                        <a class="project-tag" href="#" onclick="openMetalVideoModal(event)" title="觀看金屬加工示範">金屬加工</a>
                         <span class="project-tag">公差分析</span>
                     </div>
                 </div>
@@ -703,7 +703,7 @@
     <div id="videoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
         <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
             <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
-            <button onclick="closeVideoModal()" style="background:none;border:none;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:0;cursor:pointer;transition:color 0.3s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--secondary-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回首頁</button>
+            <button onclick="closeVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
         </div>
         <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
             <div style="max-width:1520px;margin:0 auto;">
@@ -734,7 +734,7 @@
     <div id="stressVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
         <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
             <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
-            <button onclick="closeStressVideoModal()" style="background:none;border:none;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:0;cursor:pointer;transition:color 0.3s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--secondary-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>返回首頁</button>
+            <button onclick="closeStressVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
         </div>
         <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
             <div style="max-width:1520px;margin:0 auto;">
@@ -762,6 +762,230 @@
         </div>
     </div>
 
+
+    <div id="surfaceVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
+        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
+            <button onclick="closeSurfaceVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
+            <div style="max-width:1520px;margin:0 auto;">
+                <h2 class="section-title" style="margin-bottom:2rem;">曲面建模</h2>
+                <div id="surfaceVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+                    <div class="vcard" data-src="../video/surface.mp4" data-title="曲面建模示範"
+                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
+                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
+                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
+                            <video src="../video/surface.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
+                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
+                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:14px 16px;">
+                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">曲面建模示範</p>
+                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">surface.mp4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="industrialVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
+        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
+            <button onclick="closeIndustrialVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
+            <div style="max-width:1520px;margin:0 auto;">
+                <h2 class="section-title" style="margin-bottom:2rem;">工業設計</h2>
+                <div id="industrialVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+                    <div class="vcard" data-src="../video/industrial-design.mp4" data-title="工業設計示範"
+                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
+                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
+                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
+                            <video src="../video/industrial-design.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
+                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
+                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:14px 16px;">
+                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">工業設計示範</p>
+                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">industrial-design.mp4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="creoVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
+        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
+            <button onclick="closeCreoVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
+            <div style="max-width:1520px;margin:0 auto;">
+                <h2 class="section-title" style="margin-bottom:2rem;">Creo</h2>
+                <div id="creoVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+                    <div class="vcard" data-src="../video/creo.mp4" data-title="Creo示範"
+                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
+                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
+                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
+                            <video src="../video/creo.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
+                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
+                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:14px 16px;">
+                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">Creo示範</p>
+                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">creo.mp4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="kinematicVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
+        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
+            <button onclick="closeKinematicVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
+            <div style="max-width:1520px;margin:0 auto;">
+                <h2 class="section-title" style="margin-bottom:2rem;">運動學分析</h2>
+                <div id="kinematicVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+                    <div class="vcard" data-src="../video/kinematic-analysis.mp4" data-title="運動學分析示範"
+                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
+                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
+                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
+                            <video src="../video/kinematic-analysis.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
+                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
+                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:14px 16px;">
+                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">運動學分析示範</p>
+                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">kinematic-analysis.mp4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="dfmVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
+        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
+            <button onclick="closeDfmVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
+            <div style="max-width:1520px;margin:0 auto;">
+                <h2 class="section-title" style="margin-bottom:2rem;">DFM</h2>
+                <div id="dfmVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+                    <div class="vcard" data-src="../video/dfm.mp4" data-title="DFM示範"
+                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
+                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
+                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
+                            <video src="../video/dfm.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
+                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
+                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:14px 16px;">
+                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">DFM示範</p>
+                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">dfm.mp4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="injectionVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
+        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
+            <button onclick="closeInjectionVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
+            <div style="max-width:1520px;margin:0 auto;">
+                <h2 class="section-title" style="margin-bottom:2rem;">射出成型</h2>
+                <div id="injectionVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+                    <div class="vcard" data-src="../video/injection-molding.mp4" data-title="射出成型示範"
+                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
+                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
+                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
+                            <video src="../video/injection-molding.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
+                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
+                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:14px 16px;">
+                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">射出成型示範</p>
+                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">injection-molding.mp4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="metalVideoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
+        <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid var(--border-color);background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);">
+            <span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--primary-color);">Anzû Design Studio</span>
+            <button onclick="closeMetalVideoModal()" style="background-color:transparent;color:var(--secondary-color);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius-sm);border:0.5px solid var(--border-color);cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;" onmouseover="this.style.backgroundColor='var(--accent)';this.style.color='var(--bg-white)';this.style.borderColor='var(--accent)'" onmouseout="this.style.backgroundColor='transparent';this.style.color='var(--secondary-color)';this.style.borderColor='var(--border-color)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>回到首頁</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:3rem 3% 5rem;">
+            <div style="max-width:1520px;margin:0 auto;">
+                <h2 class="section-title" style="margin-bottom:2rem;">金屬加工</h2>
+                <div id="metalVideoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+                    <div class="vcard" data-src="../video/metal-fabrication.mp4" data-title="金屬加工示範"
+                        style="background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;"
+                        onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-4px)'"
+                        onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+                        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;">
+                            <video src="../video/metal-fabrication.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></video>
+                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
+                                <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:14px 16px;">
+                            <p style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:var(--primary-color);margin:0 0 4px;">金屬加工示範</p>
+                            <p style="font-size:12px;color:var(--secondary-color);margin:0;">metal-fabrication.mp4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="videoLightbox" style="display:none;position:fixed;inset:0;z-index:10000;flex-direction:column;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">
         <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3%;border-bottom:0.5px solid #2a2a2a;">
             <p id="lightboxTitle" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.06em;color:#fff;margin:0;"></p>
@@ -777,10 +1001,24 @@
         function closeVideoModal() { document.getElementById('videoModal').style.display = 'none'; document.body.style.overflow = ''; }
         function openStressVideoModal(e) { e.preventDefault(); document.getElementById('stressVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
         function closeStressVideoModal() { document.getElementById('stressVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
+        function openSurfaceVideoModal(e) { e.preventDefault(); document.getElementById('surfaceVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeSurfaceVideoModal() { document.getElementById('surfaceVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
+        function openIndustrialVideoModal(e) { e.preventDefault(); document.getElementById('industrialVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeIndustrialVideoModal() { document.getElementById('industrialVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
+        function openCreoVideoModal(e) { e.preventDefault(); document.getElementById('creoVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeCreoVideoModal() { document.getElementById('creoVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
+        function openKinematicVideoModal(e) { e.preventDefault(); document.getElementById('kinematicVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeKinematicVideoModal() { document.getElementById('kinematicVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
+        function openDfmVideoModal(e) { e.preventDefault(); document.getElementById('dfmVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeDfmVideoModal() { document.getElementById('dfmVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
+        function openInjectionVideoModal(e) { e.preventDefault(); document.getElementById('injectionVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeInjectionVideoModal() { document.getElementById('injectionVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
+        function openMetalVideoModal(e) { e.preventDefault(); document.getElementById('metalVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeMetalVideoModal() { document.getElementById('metalVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
         function openLightbox(src, title) { const lb = document.getElementById('videoLightbox'); const vid = document.getElementById('lightboxVideo'); document.getElementById('lightboxTitle').textContent = title; vid.src = src; lb.style.display = 'flex'; vid.play(); }
         function closeLightbox() { const lb = document.getElementById('videoLightbox'); const vid = document.getElementById('lightboxVideo'); lb.style.display = 'none'; vid.pause(); vid.src = ''; }
         document.querySelectorAll('.vcard').forEach(function(card) { card.addEventListener('click', function() { openLightbox(this.dataset.src, this.dataset.title); }); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { if (document.getElementById('videoLightbox').style.display === 'flex') { closeLightbox(); return; } if (document.getElementById('videoModal').style.display === 'flex') { closeVideoModal(); return; } if (document.getElementById('stressVideoModal').style.display === 'flex') { closeStressVideoModal(); return; } } });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { if (document.getElementById('videoLightbox').style.display === 'flex') { closeLightbox(); return; } if (document.getElementById('videoModal').style.display === 'flex') { closeVideoModal(); return; } if (document.getElementById('stressVideoModal').style.display === 'flex') { closeStressVideoModal(); return; } if (document.getElementById('surfaceVideoModal').style.display === 'flex') { closeSurfaceVideoModal(); return; } if (document.getElementById('industrialVideoModal').style.display === 'flex') { closeIndustrialVideoModal(); return; } if (document.getElementById('creoVideoModal').style.display === 'flex') { closeCreoVideoModal(); return; } if (document.getElementById('kinematicVideoModal').style.display === 'flex') { closeKinematicVideoModal(); return; } if (document.getElementById('dfmVideoModal').style.display === 'flex') { closeDfmVideoModal(); return; } if (document.getElementById('injectionVideoModal').style.display === 'flex') { closeInjectionVideoModal(); return; } if (document.getElementById('metalVideoModal').style.display === 'flex') { closeMetalVideoModal(); return; } } });
         function smoothScroll(sectionId) { const element = document.getElementById(sectionId); if (element) { element.scrollIntoView({ behavior: 'smooth' }); } }
         function openContactModal() { document.getElementById('contactModal').classList.add('active'); document.body.style.overflow = 'hidden'; }
         function closeContactModal() { document.getElementById('contactModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
