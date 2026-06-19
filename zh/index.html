@@ -11,6 +11,29 @@
     <meta name="keywords" content="product design, mechanical engineering, Creo, 3D modeling, Python, stress analysis, DFM">
     <meta name="author" content="Andrew">
     <title>Anzû | 產品設計與機械工程</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="icon" sizes="48x48" type="image/png" href="../favicon-48.png">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Anzû | 產品設計與機械工程">
+    <meta property="og:description" content="Andrew — 產品設計與機械工程 — Creo 3D 建模、機構設計與製造設計優化">
+    <meta property="og:image" content="https://andrewsu90-hub.github.io/image/04.webp">
+    <meta property="og:url" content="https://andrewsu90-hub.github.io/zh/index.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Anzû | 產品設計與機械工程">
+    <meta name="twitter:description" content="Andrew — 產品設計與機械工程 — Creo 3D 建模、機構設計與製造設計優化">
+    <meta name="twitter:image" content="https://andrewsu90-hub.github.io/image/04.webp">
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Andrew",
+    "jobTitle": "產品與機械設計工程師",
+    "url": "https://andrewsu90-hub.github.io/zh/index.html",
+    "description": "產品設計與機械工程 — Creo 3D 建模、機構設計與製造設計優化",
+    "email": "mailto:andrewsu90@gmail.com"
+}
+    </script>
     
     <style>
         * {
@@ -128,7 +151,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: url('../Gemini_Generated_Image_l4799rl4799rl479.png') center 45% / 100% auto no-repeat;
+            background: url('../hero-bg.webp') center 45% / 100% auto no-repeat;
             opacity: 1;
             z-index: 0;
         }
@@ -510,18 +533,6 @@
             .modal-content { padding: var(--spacing-lg); }
         }
 
-        .visitor-count {
-            margin-top: 10px;
-            font-size: 13px;
-            opacity: 0.6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .visitor-item { display: inline-flex; align-items: center; }
-        .visitor-sep { opacity: 0.4; }
     </style>
 </head>
 <body>
@@ -575,7 +586,7 @@
         <h2 class="section-title">精選工程作品</h2>
         <div class="project-grid">
             <div class="project-card">
-               <div class="project-image"><img src="../image/04.webp" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;"></div>
+               <div class="project-image"><img src="../image/04.webp" loading="lazy" alt="Creo 機構運動模擬，顯示行程與動作分析" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
                     <h3>模擬驅動機構設計</h3>
                     <p>使用 Creo 運動學模組進行動態模擬——精確計算行程並消除干涉，確保機構順暢運作。</p>
@@ -588,7 +599,7 @@
             </div>
 
             <div class="project-card">
-                <div class="project-image"><img src="../image/01.webp" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-image"><img src="../image/01.webp" loading="lazy" alt="消費性電子產品外殼的進階曲面建模" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
                     <h3>消費性電子曲面建模</h3>
                     <p>運用進階曲面技術打造符合人體工學的流線造型——完整考量分模線與組裝邏輯。</p>
@@ -600,7 +611,7 @@
             </div>
 
             <div class="project-card">
-                <div class="project-image"><img src="../image/dfm.webp" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-image"><img src="../image/dfm.webp" loading="lazy" alt="射出成型零件的 DFM 應力分析與卡勾結構強化" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
                     <h3>結構應力與 DFM 優化</h3>
                     <p>強化卡扣與承載件結構，優化壁厚設計以降低射出成型件縮水與翹曲問題。</p>
@@ -613,7 +624,7 @@
             </div>
 
             <div class="project-card">
-                <div class="project-image"><img src="../image/py.gif" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-image"><img src="../image/py.gif" loading="lazy" alt="Python 腳本自動化工程計算" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
                     <h3>Python 自動化工程計算</h3>
                     <p>以 Python 腳本取代繁瑣的 Excel 手動計算——大幅縮短參數化設計驗證時間。</p>
@@ -624,7 +635,7 @@
             </div>
             
             <div class="project-card">
-                <div class="project-image"><img src="../image/03.webp" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-image"><img src="../image/03.webp" loading="lazy" alt="壓鑄與沖壓金屬零件的精密結構設計" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
                     <h3>精密金屬零件設計</h3>
                     <p>專為壓鑄與鈑金件量身設計的結構方案——充分考量加工公差與表面處理製程需求。</p>
@@ -636,7 +647,7 @@
             </div>
 
             <div class="project-card">
-                <div class="project-image"><img src="../image/05.webp" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                <div class="project-image"><img src="../image/05.webp" loading="lazy" alt="商業用途寫實渲染圖" style="width: 100%; height: 100%; object-fit: cover;"></div>
                 <div class="project-info">
                     <h3>商業寫實渲染</h3>
                     <p>高擬真材質與燈光設定，產出適用於募資平台或商業型錄的產品級寫實影像。</p>
@@ -681,23 +692,18 @@
                     <textarea id="message" name="message" required placeholder="請簡述您的專案需求..."></textarea>
                 </div>
                 <button type="submit" class="cta-button" style="width: 100%; border: none;">送出詢問</button>
+                <div id="formFallback" style="display:none;margin-top:14px;padding:14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-white);">
+                    <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:8px;line-height:1.6;">如果你的郵件軟體沒有自動開啟，請複製以下內容寄到 <strong>andrewsu90@gmail.com</strong>：</p>
+                    <textarea id="formFallbackText" readonly style="width:100%;min-height:110px;font-size:12px;background:var(--bg-light);color:var(--primary-color);border:1px solid var(--border-color);border-radius:6px;padding:8px;"></textarea>
+                    <button type="button" onclick="copyFallbackText()" style="margin-top:8px;padding:8px 14px;border-radius:6px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:12.5px;cursor:pointer;">複製內容</button>
+                    <span id="copyFallbackMsg" style="font-size:12px;color:var(--accent);margin-left:8px;"></span>
+                </div>
             </form>
         </div>
     </div>
 
     <footer>
         <p>&copy; 2026 Anzû 機械與產品設計工作室。保留所有權利。</p>
-        <p class="visitor-count">
-            <span class="visitor-item">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                獨立訪客 <span id="stat-uv" style="color:var(--accent);font-weight:600;margin:0 3px">--</span>
-            </span>
-            <span class="visitor-sep">·</span>
-            <span class="visitor-item">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;opacity:0.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                總瀏覽次數 <span id="stat-pv" style="color:var(--accent);font-weight:600;margin:0 3px">--</span>
-            </span>
-        </p>
     </footer>
 
     <div id="videoModal" style="display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;background:var(--bg-white);">
@@ -1040,7 +1046,24 @@
         function openContactModal() { document.getElementById('contactModal').classList.add('active'); document.body.style.overflow = 'hidden'; }
         function closeContactModal() { document.getElementById('contactModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
         document.getElementById('contactModal').addEventListener('click', function(e) { if (e.target === this) { closeContactModal(); } });
-        function handleFormSubmit(event) { event.preventDefault(); const formData = { name: document.getElementById('name').value, email: document.getElementById('email').value, company: document.getElementById('company').value, phone: document.getElementById('phone').value, message: document.getElementById('message').value }; const mailtoLink = `mailto:andrewsu90@gmail.com?subject=Project Inquiry - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nPhone: ${formData.phone}\n\nProject Description:\n${formData.message}`)}`; window.location.href = mailtoLink; document.querySelector('form').reset(); setTimeout(closeContactModal, 500); }
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const formData = { name: document.getElementById('name').value, email: document.getElementById('email').value, company: document.getElementById('company').value, phone: document.getElementById('phone').value, message: document.getElementById('message').value };
+            const bodyText = `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nPhone: ${formData.phone}\n\nProject Description:\n${formData.message}`;
+            const mailtoLink = `mailto:andrewsu90@gmail.com?subject=Project Inquiry - ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(bodyText)}`;
+            window.location.href = mailtoLink;
+            const fallback = document.getElementById('formFallback');
+            document.getElementById('formFallbackText').value = bodyText;
+            fallback.style.display = 'block';
+        }
+        function copyFallbackText() {
+            const ta = document.getElementById('formFallbackText');
+            navigator.clipboard.writeText(ta.value).then(() => {
+                const msg = document.getElementById('copyFallbackMsg');
+                msg.textContent = '已複製';
+                setTimeout(() => { msg.textContent = ''; }, 2000);
+            });
+        }
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeContactModal(); } });
 
         // ── Tech Background: 顏色已配合工業橘主題調整 ──
@@ -1158,20 +1181,21 @@
                 animId = requestAnimationFrame(frame);
             }
 
-            resize(); nodes = makeNodes(85); initMeteors(); frame(); window.addEventListener('resize', () => { resize(); initMeteors(); });
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            resize(); nodes = makeNodes(85); initMeteors();
+            if (!reduceMotion) {
+                frame();
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) { cancelAnimationFrame(animId); }
+                    else { frame(); }
+                });
+            }
+            window.addEventListener('resize', () => { resize(); initMeteors(); });
         })();
 
         const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
         const observer = new IntersectionObserver(function(entries) { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = '1'; } }); }, observerOptions);
         document.querySelectorAll('section').forEach(section => { section.style.opacity = '0.95'; });
-
-        (function() {
-            const PV_KEY = 'andrew_site_pv'; const UV_KEY = 'andrew_site_uv'; const SESSION_KEY = 'andrew_site_session';
-            const pv = (parseInt(localStorage.getItem(PV_KEY)) || 0) + 1; localStorage.setItem(PV_KEY, pv);
-            let uv = parseInt(localStorage.getItem(UV_KEY)) || 0;
-            if (!sessionStorage.getItem(SESSION_KEY)) { uv += 1; localStorage.setItem(UV_KEY, uv); sessionStorage.setItem(SESSION_KEY, '1'); }
-            document.getElementById('stat-pv').textContent = pv.toLocaleString(); document.getElementById('stat-uv').textContent = uv.toLocaleString();
-        })();
     </script>
 
 <div id="calcGate" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,12,12,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;">
@@ -1195,11 +1219,12 @@
 
 <script>
 (function(){
-  const PW   = "0000";
+  const PW_HASH = "36a740dcfcaa253c1a1328dcb524edd1cb7104d8e7a2e356cc63739323750812"; // SHA-256，僅為軟性遮擋，非真正後端驗證
+  async function sha256Hex(str){ const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join(""); }
   const DEST = "tools/engineering-calculators.html";
   window.openCalcGate = function(e){ e.preventDefault(); const gate = document.getElementById("calcGate"); gate.style.display = "flex"; document.body.style.overflow = "hidden"; const input = document.getElementById("calcPwInput"); input.value = ""; document.getElementById("calcPwMsg").textContent = ""; setTimeout(()=>input.focus(), 50); };
   window.closeCalcGate = function(){ document.getElementById("calcGate").style.display = "none"; document.body.style.overflow = ""; };
-  window.checkCalcPw = function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); if(input.value === PW){ closeCalcGate(); location.href = "../" + DEST + "?lang=zh"; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
+  window.checkCalcPw = async function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); const hash = await sha256Hex(input.value); if(hash === PW_HASH){ closeCalcGate(); location.href = "../" + DEST + "?lang=zh"; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
   document.getElementById("calcGate").addEventListener("click", function(e){ if(e.target === this) closeCalcGate(); });
   document.addEventListener("keydown", function(e){ if(document.getElementById("calcGate").style.display === "flex"){ if(e.key === "Enter") checkCalcPw(); if(e.key === "Escape") closeCalcGate(); } });
 })();
