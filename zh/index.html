@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-TW">
 <head>
     <meta name="google-site-verification" content="pHM1QBJWZEMnjr29tqK_GY-fQ6lJJJWl4DvodGUvozE" />
     <meta charset="UTF-8">
@@ -641,7 +641,7 @@
                     <h3>商業寫實渲染</h3>
                     <p>高擬真材質與燈光設定，產出適用於募資平台或商業型錄的產品級寫實影像。</p>
                     <div class="project-tags">
-                        <a class="project-tag" href="../visual-proposal.html" title="查看視覺提案作品集">視覺提案</a>
+                        <a class="project-tag" href="../visual-proposal.html?lang=zh" title="查看視覺提案作品集">視覺提案</a>
                     </div>
                 </div>
             </div>
@@ -1182,7 +1182,7 @@
   const DEST = "tools/engineering-calculators.html";
   window.openCalcGate = function(e){ e.preventDefault(); const gate = document.getElementById("calcGate"); gate.style.display = "flex"; document.body.style.overflow = "hidden"; const input = document.getElementById("calcPwInput"); input.value = ""; document.getElementById("calcPwMsg").textContent = ""; setTimeout(()=>input.focus(), 50); };
   window.closeCalcGate = function(){ document.getElementById("calcGate").style.display = "none"; document.body.style.overflow = ""; };
-  window.checkCalcPw = function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); if(input.value === PW){ closeCalcGate(); location.href = "../" + DEST; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
+  window.checkCalcPw = function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); if(input.value === PW){ closeCalcGate(); location.href = "../" + DEST + "?lang=zh"; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
   document.getElementById("calcGate").addEventListener("click", function(e){ if(e.target === this) closeCalcGate(); });
   document.addEventListener("keydown", function(e){ if(document.getElementById("calcGate").style.display === "flex"){ if(e.key === "Enter") checkCalcPw(); if(e.key === "Escape") closeCalcGate(); } });
 })();
