@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="工程計算工具 — 整合多項工程設計計算工具 | Anzû Design Studio">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Bebas+Neue&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&display=swap" rel="stylesheet">
+    <title>工程計算工具 | Anzû Design Studio</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary-color: #f0f0f0;
+            --secondary-color: #a3a3a3;
+            --text-muted: #c8c8c8;
+            --border-color: #333333;
+            --bg-light: #181818;
+            --bg-white: #0c0c0c;
+            --accent: #E67E22;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            color: var(--primary-color);
+            background-color: var(--bg-white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        #tech-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ── Header ── */
+        header {
+            position: sticky;
+            top: 0; z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.4rem 3%;
+            border-bottom: 0.5px solid var(--border-color);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            background-color: rgba(12, 12, 12, 0.92);
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px; font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 18px;
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-sm);
+            color: var(--primary-color);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11.5px; font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .back-btn:hover {
+            background-color: var(--accent);
+            color: var(--bg-white);
+        }
+
+        /* ── Main ── */
+        main {
+            position: relative; z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 5rem 3% 8rem;
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .breadcrumb {
+            font-size: 11px; font-weight: 500;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--secondary-color);
+            margin-bottom: 1.1rem;
+        }
+        .breadcrumb .accent { color: var(--accent); }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(46px, 6.5vw, 74px);
+            font-weight: 400; letter-spacing: 0.04em;
+            color: var(--primary-color); line-height: 1;
+            margin-bottom: 1.3rem;
+        }
+
+        .page-desc {
+            font-size: 15px; color: var(--text-muted);
+            max-width: 680px; line-height: 1.85;
+            margin-bottom: 3.5rem;
+        }
+
+        /* ── Section divider ── */
+        .section-line {
+            display: flex; align-items: center; gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .section-line span {
+            font-size: 11px; font-weight: 500;
+            letter-spacing: 0.16em; text-transform: uppercase;
+            color: var(--secondary-color); white-space: nowrap;
+        }
+        .section-line::after {
+            content: ''; flex: 1;
+            height: 0.5px; background: var(--border-color);
+        }
+
+        /* ── Tool grid ── */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+        }
+
+        /* ── Tool card ── */
+        .tool-card {
+            background-color: rgba(24, 24, 24, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem 2rem 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent) 0%, transparent 80%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .tool-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 52px rgba(230, 126, 34, 0.16);
+        }
+        .tool-card:hover::before { opacity: 1; }
+        .combo-card { cursor: default; }
+
+        /* icon box */
+        .tool-icon {
+            width: 48px; height: 48px;
+            background: rgba(230, 126, 34, 0.1);
+            border: 1px solid rgba(230, 126, 34, 0.28);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.3rem;
+            color: var(--accent);
+            font-size: 22px;
+        }
+
+        .tool-card h2 {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 16.5px; font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.8rem; line-height: 1.45;
+        }
+
+        .tool-card p {
+            font-size: 13.5px; color: var(--text-muted);
+            line-height: 1.8; margin-bottom: 1.3rem;
+        }
+
+        .tool-tags {
+            display: flex; flex-wrap: wrap; gap: 0.45rem;
+            margin-bottom: 1.5rem;
+        }
+        .tool-tag {
+            font-size: 11.5px;
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.04);
+            border: 0.5px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--secondary-color);
+        }
+
+        .tool-link {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 500;
+            color: var(--primary-color);
+            border-top: 0.5px solid var(--border-color);
+            padding-top: 1.3rem;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .tool-card:hover .tool-link,
+        .tool-link:hover { color: var(--accent); }
+
+        /* ── Glow dot on card ── */
+        .tool-card .status-dot {
+            position: absolute;
+            top: 1.5rem; right: 1.5rem;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #4caf50;
+            box-shadow: 0 0 8px rgba(76,175,80,0.6);
+        }
+
+        /* ── Combo tabs (multi-source tools) ── */
+        .combo-tabs {
+            display: flex; gap: 0;
+            margin-bottom: 1rem;
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .combo-tab {
+            flex: 1; padding: 7px 10px;
+            font-size: 11.5px; font-weight: 600;
+            font-family: 'DM Sans', 'Noto Sans TC', sans-serif;
+            background: var(--bg-white); color: var(--secondary-color);
+            border: none; cursor: pointer; transition: all 0.2s;
+            border-right: 0.5px solid var(--border-color);
+            line-height: 1.4;
+        }
+        .combo-tab:last-child { border-right: none; }
+        .combo-tab.active { background: var(--accent); color: var(--bg-white); }
+        .combo-tab:hover:not(.active) { background: var(--border-color); }
+        .combo-panel { display: none; }
+        .combo-panel.active { display: block; }
+
+        /* ── Footer ── */
+        footer {
+            position: relative; z-index: 1;
+            padding: 1.5rem 3%;
+            border-top: 0.5px solid var(--border-color);
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--secondary-color);
+        }
+
+        /* ── Animation ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <canvas id="tech-bg"></canvas>
+
+    <header>
+        <a href="../index.html" class="logo" id="ecLogoLink">Anzû Design Studio</a>
+        <a href="../index.html" class="back-btn" id="ecBackLink">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="15,18 9,12 15,6"/>
+            </svg>
+            回到首頁
+        </a>
+    </header>
+
+    <main>
+        <div class="breadcrumb">
+            PYTHON 自動化計算 &nbsp;/&nbsp; <span class="accent">工程計算</span>
+        </div>
+
+        <h1>工程計算工具</h1>
+
+        <p class="page-desc">
+            整合多項工程設計計算工具，取代繁瑣的 Excel 人工計算，提升設計驗證效率。
+            所有計算均參照 CNS / ISO 標準及業界設計手冊。
+        </p>
+
+        <div class="section-line"><span>可用工具</span></div>
+
+        <div class="tools-grid">
+
+            <a href="screw-strength-calculator.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🔩</div>
+                <h2>不銹鋼螺絲強度計算工具</h2>
+                <p>計算不銹鋼螺絲的最大鎖固扭力、軸向夾持力與螺牙接合強度，依 CNS/ISO 標準自動查表輸出。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">SUS 304/316</span>
+                    <span class="tool-tag">扭力計算</span>
+                    <span class="tool-tag">軸向力</span>
+                    <span class="tool-tag">螺牙強度</span>
+                </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
+
+            <a href="screw-torque-calculator.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🔩</div>
+                <h2>碳鋼螺絲扭力計算工具</h2>
+                <p>整合五種扭力計算方法（一般算法 / SP 安全負載 / 破壞扭矩 / 三柱 / 東日 T 系列），M1–M18 全強度等級即時推算。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">M1–M18</span>
+                    <span class="tool-tag">3.6–12.9</span>
+                    <span class="tool-tag">CNS 15590-7</span>
+                    <span class="tool-tag">五種算法</span>
+                </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
+
+            <div class="tool-card combo-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🔧</div>
+                <h2>鑽孔 / 攻牙深度查詢</h2>
+                <div class="combo-tabs">
+                    <button class="combo-tab active" onclick="switchCombo(event,'drill',0)">機械設計圖表便覽</button>
+                    <button class="combo-tab" onclick="switchCombo(event,'drill',1)">現代機械設計手冊</button>
+                </div>
+                <div class="combo-panel drill active">
+                    <p>依規格、材質（鋼 / 鑄鐵 / 鋁）快速查詢攻牙深度、鑽孔深度與建議旋入深度。M3～M7。</p>
+                    <div class="tool-tags">
+                        <span class="tool-tag">M3～M7</span>
+                        <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
+                        <span class="tool-tag">攻牙底孔</span>
+                        <span class="tool-tag">旋入深度</span>
+                    </div>
+                    <a class="tool-link" href="drill-hole-table.html">
+                        開啟工具
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="combo-panel drill">
+                    <p>依規格、材質與孔型（通孔／盲孔）查詢旋入深度、攻牙深度與鑽孔深度。M3～M16。</p>
+                    <div class="tool-tags">
+                        <span class="tool-tag">M3～M16</span>
+                        <span class="tool-tag">鋼 / 鑄鐵 / 鋁</span>
+                        <span class="tool-tag">盲孔 / 通孔</span>
+                        <span class="tool-tag">旋入深度</span>
+                    </div>
+                    <a class="tool-link" href="drill-hole-table.html?src=handbook">
+                        開啟工具
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <a href="screw-bearing-area-calculator.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">📐</div>
+                <h2>螺絲承載面積計算工具</h2>
+                <p>計算盤頭螺釘與六角頭螺栓的承載面積 Ab 與應力截面積 As 之比值，依 GBT 16823-1 標準自動查表判定 OK / NG。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">盤頭 / 六角頭</span>
+                    <span class="tool-tag">M1.6–M24</span>
+                    <span class="tool-tag">GBT 16823-1</span>
+                    <span class="tool-tag">Ab/As 判定</span>
+                </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
+
+            <div class="tool-card combo-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🏗️</div>
+                <h2>鐵板攻牙 引伸孔查詢</h2>
+                <div class="combo-tabs">
+                    <button class="combo-tab active" onclick="switchCombo(event,'sheet',0)">Trifast plc Group</button>
+                    <button class="combo-tab" onclick="switchCombo(event,'sheet',1)">钣金结构设计工艺手册</button>
+                </div>
+                <div class="combo-panel sheet active">
+                    <p>輸入螺絲規格、長度、強度區分與係數，自動計算需要牙數並查詢適用抽牙鐵板厚度（★）與抽牙高度/h（★）。亦可依 d 與 t 手動篩選完整參考表。M2.5～M12。</p>
+                    <div class="tool-tags">
+                        <span class="tool-tag">M2.5～M12</span>
+                        <span class="tool-tag">板厚 0.5～5.5mm</span>
+                        <span class="tool-tag">引伸孔</span>
+                        <span class="tool-tag">有效牙數</span>
+                    </div>
+                    <a class="tool-link" href="sheet-tap-table.html?src=trifast">
+                        開啟工具
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="combo-panel sheet">
+                    <p>輸入螺絲規格、長度、強度區分與係數，自動計算需要牙數並查詢適用抽牙鐵板厚度（★）與抽牙高度/h（★）。計算牙數未扣除無效牙，優先參考基準。M2.5～M5。</p>
+                    <div class="tool-tags">
+                        <span class="tool-tag">M2.5～M5</span>
+                        <span class="tool-tag">板厚 0.6～2.5mm</span>
+                        <span class="tool-tag">抽牙高度</span>
+                        <span class="tool-tag">計算牙數</span>
+                    </div>
+                    <a class="tool-link" href="sheet-tap-table.html?src=handbook">
+                        開啟工具
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <a href="vesa_screw.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🖥️</div>
+                <h2>VESA 螺絲受力計算工具</h2>
+                <p>針對壁掛或機台，計算螺絲在受扭轉、剪力與拉力下的合力與安全係數。包含單顆螺絲剪力、降伏應力及三柱容許應力算法。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">VESA</span>
+                    <span class="tool-tag">螺絲受力</span>
+                    <span class="tool-tag">降伏應力</span>
+                    <span class="tool-tag">三柱算法</span>
+                </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
+
+            <a href="thin-plate-stress-calculator.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">🔲</div>
+                <h2>薄板應力承載計算工具</h2>
+                <p>計算薄板在均佈載荷或中心集中力下的最大撓度與應力，支援多種邊界條件（四邊固定、四邊簡支、混合邊界），依據多本權威設計手冊進行比對。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Timoshenko</span>
+                    <span class="tool-tag">薄板撓度</span>
+                    <span class="tool-tag">應力承載</span>
+                    <span class="tool-tag">邊界條件</span>
+                </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
+
+            <a href="stand_stability_calc.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">⚖️</div>
+                <h2>機台傾倒穩定性計算</h2>
+                <p>基於穩定力矩（Ms）與傾覆力矩（Mt）的靜態穩定性分析。計算安全係數 K = Ms/Mt，判斷機台在前後方向是否具備足夠的抗傾能力。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">IEC 62368-1</span>
+                    <span class="tool-tag">Ms / Mt</span>
+                    <span class="tool-tag">K ≥ 1.0</span>
+                    <span class="tool-tag">前後傾覆</span>
+                </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
+
+            <a href="mech-calc.html" class="tool-card">
+                <div class="status-dot" title="線上可用"></div>
+                <div class="tool-icon">⚙️</div>
+                <h2>常用機械設計自動計算</h2>
+                <p>涵蓋 163 個原始工作表、19 個分類、57 個計算器與查詢表。包含電機選型、氣缸、絲桿、齒輪、彈簧、液壓、凸輪、截面力學、沖壓成型等完整機械設計計算工具。</p>
+                <div class="tool-tags">
+                    <span class="tool-tag">電機選型</span>
+                    <span class="tool-tag">氣動液壓</span>
+                    <span class="tool-tag">齒輪蝸桿</span>
+                    <span class="tool-tag">截面力學</span>
+                    <span class="tool-tag">57 calculators</span>
+                </div>
+                <div class="tool-link">
+                    開啟工具
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>
+                    </svg>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Anzû Mechanical &amp; Product Design Studio. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function switchCombo(e, group, index) {
+            const card = e.target.closest('.combo-card');
+            card.querySelectorAll('.combo-tab').forEach((t, i) => t.classList.toggle('active', i === index));
+            card.querySelectorAll(`.combo-panel.${group}`).forEach((p, i) => p.classList.toggle('active', i === index));
+        }
+    </script>
+
+    <script>
+    (function () {
+        const canvas = document.getElementById('tech-bg');
+        const ctx    = canvas.getContext('2d');
+        let W, H, nodes = [], meteors = [];
+
+        function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+        function makeNodes(n) {
+            return Array.from({ length: n }, () => ({
+                x: Math.random() * W, y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.28, vy: (Math.random() - 0.5) * 0.28,
+                r: Math.random() * 1.5 + 0.6
+            }));
+        }
+
+        function makeMeteor() {
+            const ang = Math.PI / 5, spd = 5 + Math.random() * 6;
+            return {
+                x: Math.random() * W * 1.5 - W * 0.25,
+                y: -30,
+                vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+                len: 60 + Math.random() * 90,
+                alpha: 0.4 + Math.random() * 0.4,
+                width: 0.7 + Math.random() * 0.9
+            };
+        }
+
+        function initMeteors() {
+            meteors = [];
+            for (let i = 0; i < 5; i++) {
+                const m = makeMeteor();
+                m.x = Math.random() * W; m.y = Math.random() * H;
+                meteors.push(m);
+            }
+        }
+
+        function drawGrid() {
+            const step = 52;
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 0.8;
+            for (let x = 0; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+            for (let y = 0; y < H; y += step) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+        }
+
+        function frame() {
+            ctx.clearRect(0, 0, W, H);
+            drawGrid();
+
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+                    const d  = Math.hypot(dx, dy);
+                    if (d < 180) {
+                        ctx.strokeStyle = `rgba(255,255,255,${(1 - d / 180) * 0.18})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
+                    }
+                }
+            }
+
+            nodes.forEach(n => {
+                ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(230,126,34,0.55)'; ctx.fill();
+                n.x += n.vx; n.y += n.vy;
+                if (n.x < 0 || n.x > W) n.vx *= -1;
+                if (n.y < 0 || n.y > H) n.vy *= -1;
+            });
+
+            meteors.forEach((m, idx) => {
+                const h  = Math.hypot(m.vx, m.vy);
+                const tx = m.x - m.vx / h * m.len, ty = m.y - m.vy / h * m.len;
+                const g  = ctx.createLinearGradient(tx, ty, m.x, m.y);
+                g.addColorStop(0, 'rgba(230,126,34,0)');
+                g.addColorStop(1, `rgba(230,126,34,${m.alpha})`);
+                ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(m.x, m.y);
+                ctx.strokeStyle = g; ctx.lineWidth = m.width; ctx.stroke();
+                m.x += m.vx; m.y += m.vy;
+                if (m.x > W + 100 || m.y > H + 100) meteors[idx] = makeMeteor();
+            });
+
+            requestAnimationFrame(frame);
+        }
+
+        resize();
+        nodes = makeNodes(55);
+        initMeteors();
+        frame();
+        window.addEventListener('resize', () => { resize(); initMeteors(); });
+    })();
+    </script>
+
+<script>
+  var EC_HOMEPAGES = {
+      en: "../index.html",
+      zh: "../zh/index.html"
+  };
+  (function () {
+      var params = new URLSearchParams(window.location.search);
+      var lang = params.get('lang') === 'zh' ? 'zh' : 'en';
+      var target = EC_HOMEPAGES[lang];
+      var logo = document.getElementById('ecLogoLink');
+      var back = document.getElementById('ecBackLink');
+      if (logo) logo.setAttribute('href', target);
+      if (back) back.setAttribute('href', target);
+  })();
+</script>
+</body>
+</html>
