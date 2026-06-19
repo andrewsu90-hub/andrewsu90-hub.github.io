@@ -642,7 +642,7 @@
                     <h3>Commercial Photorealistic Rendering</h3>
                     <p>High-fidelity material and lighting setups producing photorealistic product images ready for crowdfunding platforms or commercial catalogs.</p>
                     <div class="project-tags">
-                        <a class="project-tag" href="visual-proposal.html" title="View Visual Proposal Portfolio">Visual Proposals</a>
+                        <a class="project-tag" href="visual-proposal.html?lang=en" title="View Visual Proposal Portfolio">Visual Proposals</a>
                     </div>
                 </div>
             </div>
@@ -1200,7 +1200,7 @@
   const DEST = "tools/engineering-calculators.html";
   window.openCalcGate = function(e){ e.preventDefault(); const gate = document.getElementById("calcGate"); gate.style.display = "flex"; document.body.style.overflow = "hidden"; const input = document.getElementById("calcPwInput"); input.value = ""; document.getElementById("calcPwMsg").textContent = ""; setTimeout(()=>input.focus(), 50); };
   window.closeCalcGate = function(){ document.getElementById("calcGate").style.display = "none"; document.body.style.overflow = ""; };
-  window.checkCalcPw = function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); if(input.value === PW){ closeCalcGate(); location.href = DEST; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
+  window.checkCalcPw = function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); if(input.value === PW){ closeCalcGate(); location.href = DEST + "?lang=en"; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
   document.getElementById("calcGate").addEventListener("click", function(e){ if(e.target === this) closeCalcGate(); });
   document.addEventListener("keydown", function(e){ if(document.getElementById("calcGate").style.display === "flex"){ if(e.key === "Enter") checkCalcPw(); if(e.key === "Escape") closeCalcGate(); } });
 })();
