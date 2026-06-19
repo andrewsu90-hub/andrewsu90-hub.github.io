@@ -1219,7 +1219,7 @@
 
 <script>
 (function(){
-  const PW_HASH = "36a740dcfcaa253c1a1328dcb524edd1cb7104d8e7a2e356cc63739323750812"; // SHA-256，僅為軟性遮擋，非真正後端驗證
+  const PW_HASH = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0"; // SHA-256，僅為軟性遮擋，非真正後端驗證
   async function sha256Hex(str){ const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join(""); }
   const DEST = "tools/engineering-calculators.html";
   window.openCalcGate = function(e){ e.preventDefault(); const gate = document.getElementById("calcGate"); gate.style.display = "flex"; document.body.style.overflow = "hidden"; const input = document.getElementById("calcPwInput"); input.value = ""; document.getElementById("calcPwMsg").textContent = ""; setTimeout(()=>input.focus(), 50); };
