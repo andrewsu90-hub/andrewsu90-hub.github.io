@@ -215,6 +215,7 @@ const CALCS = {
   cylinder_bore: {
     name: "\u6C23\u7F38\u5167\u5F91\u9078\u578B",
     desc: "\u4F9D\u8CA0\u8F09\u8207\u5DE5\u4F5C\u58D3\u529B\u8A08\u7B97\u7F38\u5F91",
+    ref: "F=P·A 氣壓缸出力基本公式，參考 SMC／CKD 氣壓元件技術資料及《氣壓工程學》",
     inputs: [{ key: "F", label: "\u5BE6\u969B\u8CA0\u8F09 F", unit: "N", default: 98 }, { key: "P", label: "\u5DE5\u4F5C\u58D3\u529B P", unit: "MPa", default: 0.5 }, { key: "beta", label: "\u8CA0\u8F09\u7387 \u03B2", unit: "", default: 0.5, hint: "\u4F4E\u901F\u963B\u60270.65 / \u9AD8\u901F\u6163\u60270.3 / \u4E00\u822C0.5" }],
     outputs: [{ key: "Fth", label: "\u7406\u8AD6\u51FA\u529B", unit: "N" }, { key: "D_calc", label: "\u8A08\u7B97\u7F38\u5F91", unit: "mm" }, { key: "D_sel", label: "\u5EFA\u8B70\u9078\u7528\u7F38\u5F91", unit: "mm" }],
     calc(i) {
@@ -227,6 +228,7 @@ const CALCS = {
   cylinder_thrust: {
     name: "\u6C23\u7F38\u63A8\u529B\u8A08\u7B97",
     desc: "\u7121\u687F\u5074\u8207\u6709\u687F\u5074\u63A8\u529B",
+    ref: "氣壓缸推力公式（含有桿側環形面積修正），參考 SMC 氣壓缸技術資料",
     inputs: [{ key: "P", label: "\u6C23\u58D3", unit: "MPa", default: 0.5 }, { key: "D", label: "\u7F38\u5F91", unit: "mm", default: 63 }, { key: "d", label: "\u687F\u5F91", unit: "mm", default: 20 }, { key: "eta", label: "\u6548\u7387 \u03B7", unit: "", default: 0.8 }],
     outputs: [{ key: "F_push", label: "\u7121\u687F\u5074\u63A8\u529B", unit: "N" }, { key: "F_pull", label: "\u6709\u687F\u5074\u63A8\u529B", unit: "N" }],
     calc(i) {
@@ -238,6 +240,7 @@ const CALCS = {
   vacuum_pad: {
     name: "\u771F\u7A7A\u5438\u76E4\u9078\u578B",
     desc: "\u8A08\u7B97\u6240\u9700\u5438\u529B\u8207\u5438\u76E4\u5C3A\u5BF8",
+    ref: "真空吸盤吸力與安全係數計算，參考 SMC／CONVUM 真空元件選型手冊",
     inputs: [{ key: "W", label: "\u5DE5\u4EF6\u91CD\u91CF", unit: "kg", default: 2 }, { key: "n", label: "\u5438\u76E4\u6578\u91CF", unit: "\u500B", default: 2 }, { key: "sf", label: "\u5B89\u5168\u4FC2\u6578", unit: "", default: 2, hint: "\u6C34\u5E73:2 / \u5782\u76F4\u5074\u5438:4" }, { key: "vac", label: "\u771F\u7A7A\u5EA6", unit: "kPa", default: 60 }],
     outputs: [{ key: "F_req", label: "\u6BCF\u76E4\u6240\u9700\u5438\u529B", unit: "N" }, { key: "D_min", label: "\u6700\u5C0F\u5438\u76E4\u76F4\u5F91", unit: "mm" }],
     calc(i) {
@@ -250,6 +253,7 @@ const CALCS = {
   motor_torque: {
     name: "\u8CA0\u8F09\u8F49\u77E9\u8A08\u7B97\uFF08\u7D72\u687F\u9A45\u52D5\uFF09",
     desc: "\u7D72\u687F\u9A45\u52D5\u96FB\u6A5F\u8CA0\u8F09\u8F49\u77E9",
+    ref: "滾珠螺桿驅動負載轉矩公式 T=(F+F0μ0)·PB/(2πη·i)，參考 THK／NSK 滾珠螺桿技術資料及伺服馬達選型手冊",
     inputs: [{ key: "F", label: "\u8EF8\u5411\u8CA0\u8F09 F", unit: "N", default: 500 }, { key: "F0", label: "\u9810\u8CA0\u8F09 F0", unit: "N", default: 167 }, { key: "PB", label: "\u87BA\u8DDD PB", unit: "mm", default: 10 }, { key: "mu0", label: "\u9810\u58D3\u6469\u64E6\u4FC2\u6578 \u03BC\u2080", unit: "", default: 0.2 }, { key: "eta", label: "\u6A5F\u68B0\u6548\u7387 \u03B7", unit: "", default: 0.9 }, { key: "i", label: "\u6E1B\u901F\u6BD4 i", unit: "", default: 1 }],
     outputs: [{ key: "TL", label: "\u8CA0\u8F09\u8F49\u77E9", unit: "N\xB7m" }],
     calc(inp) {
@@ -259,6 +263,7 @@ const CALCS = {
   motor_inertia: {
     name: "\u6163\u91CF\uFF08\u6163\u6027\u77E9\uFF09\u8A08\u7B97",
     desc: "\u5713\u67F1/\u5713\u74B0/\u77E9\u5F62\u677F\u65CB\u8F49\u6163\u91CF",
+    ref: "圓柱／圓環／矩形板迴轉慣性矩標準公式，參考工程力學（動力學）教材，如 Hibbeler《工程力學》",
     inputs: [{ key: "type", label: "\u5F62\u72C0 (1=\u5713\u67F1 2=\u5713\u74B0 3=\u77E9\u5F62)", unit: "", default: 1 }, { key: "m", label: "\u8CEA\u91CF m", unit: "kg", default: 2 }, { key: "R", label: "\u5916\u5F91\u534A\u5F91 R", unit: "m", default: 0.05 }, { key: "r", label: "\u5167\u5F91\u534A\u5F91 r\uFF08\u5713\u74B0\uFF09", unit: "m", default: 0 }, { key: "a", label: "\u9577 a\uFF08\u77E9\u5F62\uFF09", unit: "m", default: 0.1 }, { key: "b", label: "\u5BEC b\uFF08\u77E9\u5F62\uFF09", unit: "m", default: 0.05 }],
     outputs: [{ key: "J", label: "\u8F49\u52D5\u6163\u91CF J", unit: "kg\xB7m\xB2" }],
     calc(i) {
@@ -270,6 +275,7 @@ const CALCS = {
   servo_select: {
     name: "\u4F3A\u670D\u96FB\u6A5F\u9078\u578B\u9A57\u8B49",
     desc: "\u9A57\u8B49\u8F49\u77E9\u88D5\u5EA6\u8207\u6163\u91CF\u6BD4",
+    ref: "伺服馬達選型驗證準則（轉矩裕度、慣量比上限），參考三菱電機／安川電機伺服系統技術手冊",
     inputs: [{ key: "TL", label: "\u8CA0\u8F09\u8F49\u77E9 TL", unit: "N\xB7m", default: 1.5 }, { key: "TM", label: "\u96FB\u6A5F\u984D\u5B9A\u8F49\u77E9", unit: "N\xB7m", default: 3 }, { key: "JL", label: "\u8CA0\u8F09\u6163\u91CF JL", unit: "kg\xB7m\xB2", default: 1e-3 }, { key: "JM", label: "\u96FB\u6A5F\u6163\u91CF JM", unit: "kg\xB7m\xB2", default: 5e-4 }, { key: "ratio_max", label: "\u5141\u8A31\u6700\u5927\u6163\u91CF\u6BD4", unit: "", default: 5 }],
     outputs: [{ key: "torque_ok", label: "\u8F49\u77E9\u88D5\u5EA6", unit: "%" }, { key: "ratio", label: "\u5BE6\u969B\u6163\u91CF\u6BD4", unit: "\u500D" }, { key: "verdict", label: "\u5224\u5B9A\u7D50\u679C", unit: "" }],
     calc(i) {
@@ -281,6 +287,7 @@ const CALCS = {
   power_calc: {
     name: "\u529F\u7387 \u2194 \u8F49\u77E9\u63DB\u7B97",
     desc: "\u8F49\u901F\xD7\u8F49\u77E9\u2192\u529F\u7387\uFF0C\u529F\u7387\u2192\u8F49\u77E9",
+    ref: "功率與轉矩轉換公式 P=2πnT/60，機械設計通用公式",
     inputs: [{ key: "P", label: "\u529F\u7387 P", unit: "W", default: 750 }, { key: "T", label: "\u8F49\u77E9 T", unit: "N\xB7m", default: 5 }, { key: "n", label: "\u8F49\u901F n", unit: "rpm", default: 1450 }],
     outputs: [{ key: "T_from_P", label: "\u7531P\u8A08\u7B97\u8F49\u77E9", unit: "N\xB7m" }, { key: "P_from_T", label: "\u7531T\u8A08\u7B97\u529F\u7387", unit: "W" }],
     calc(i) {
@@ -290,6 +297,7 @@ const CALCS = {
   belt_drive: {
     name: "\u76AE\u5E36\u50B3\u52D5\u6163\u91CF\u8A08\u7B97",
     desc: "\u76AE\u5E36\u8F2A\u9A45\u52D5\u6A5F\u69CB\u6163\u91CF\u6BD4",
+    ref: "皮帶傳動機構負載慣量換算，參考伺服馬達選型手冊（負載慣量計算範例）",
     inputs: [{ key: "WA", label: "\u5DE5\u4EF6\u8CEA\u91CF", unit: "kg", default: 2 }, { key: "PD", label: "\u5E36\u8F2A\u76F4\u5F91", unit: "m", default: 0.05 }, { key: "WP", label: "\u5E36\u8F2A\u8CEA\u91CF", unit: "kg", default: 0.5 }, { key: "BN", label: "\u6A5F\u69CB\u6548\u7387", unit: "", default: 0.8 }, { key: "mu", label: "\u6469\u64E6\u4FC2\u6578", unit: "", default: 0.1 }, { key: "F", label: "\u5916\u529B F", unit: "N", default: 0 }, { key: "JM", label: "\u96FB\u6A5F\u6163\u91CF", unit: "kg\xB7m\xB2", default: 1e-4 }],
     outputs: [{ key: "JL", label: "\u8CA0\u8F09\u6163\u91CF JL", unit: "kg\xB7m\xB2" }, { key: "ratio", label: "\u6163\u91CF\u6BD4 JL/JM", unit: "\u500D" }, { key: "TL", label: "\u8CA0\u8F09\u8F49\u77E9", unit: "N\xB7m" }],
     calc(i) {
@@ -303,6 +311,7 @@ const CALCS = {
   ballscrew_horiz: {
     name: "\u6EFE\u73E0\u7D72\u687F\u6C34\u5E73\u904B\u52D5",
     desc: "\u8A08\u7B97\u6163\u91CF\u6BD4\u8207\u8CA0\u8F09\u8F49\u77E9",
+    ref: "滾珠螺桿水平驅動負載慣量與轉矩公式，參考 THK 滾珠螺桿技術資料",
     inputs: [{ key: "WA", label: "\u5DE5\u4EF6\u8CEA\u91CF", unit: "kg", default: 20 }, { key: "BL", label: "\u7D72\u687F\u9577\u5EA6", unit: "m", default: 0.5 }, { key: "BD", label: "\u7D72\u687F\u76F4\u5F91", unit: "m", default: 0.025 }, { key: "BP", label: "\u87BA\u8DDD Lead", unit: "m", default: 0.01 }, { key: "BN", label: "\u6548\u7387 \u03B7", unit: "", default: 0.9 }, { key: "mu", label: "\u6469\u64E6\u4FC2\u6578 \u03BC", unit: "", default: 0.1 }, { key: "F", label: "\u5916\u529B F", unit: "N", default: 0 }, { key: "JM", label: "\u96FB\u6A5F\u6163\u91CF JM", unit: "kg\xB7m\xB2", default: 1e-4 }],
     outputs: [{ key: "JL", label: "\u8CA0\u8F09\u6163\u91CF JL", unit: "kg\xB7m\xB2" }, { key: "ratio", label: "\u6163\u91CF\u6BD4 JL/JM", unit: "\u500D" }, { key: "TL", label: "\u8CA0\u8F09\u8F49\u77E9", unit: "N\xB7m" }],
     calc(i) {
@@ -316,6 +325,7 @@ const CALCS = {
   ballscrew_vert: {
     name: "\u6EFE\u73E0\u7D72\u687F\u5782\u76F4\u904B\u52D5",
     desc: "\u542B\u91CD\u529B\u9805\u5782\u76F4\u7D72\u687F\u8F49\u77E9",
+    ref: "滾珠螺桿垂直驅動轉矩公式（含重力項與摩擦項），參考 THK／NSK 技術資料",
     inputs: [{ key: "WA", label: "\u5DE5\u4EF6\u8CEA\u91CF", unit: "kg", default: 10 }, { key: "BP", label: "\u87BA\u8DDD Lead", unit: "m", default: 0.01 }, { key: "BN", label: "\u6548\u7387 \u03B7", unit: "", default: 0.9 }, { key: "mu", label: "\u6469\u64E6\u4FC2\u6578", unit: "", default: 0.1 }, { key: "F", label: "\u984D\u5916\u5916\u529B", unit: "N", default: 0 }],
     outputs: [{ key: "T_up", label: "\u4E0A\u5347\u8F49\u77E9", unit: "N\xB7m" }, { key: "T_down", label: "\u4E0B\u964D\u8F49\u77E9", unit: "N\xB7m" }],
     calc(i) {
@@ -328,6 +338,7 @@ const CALCS = {
   gear_rack_motor: {
     name: "\u9F52\u8F2A\u9F52\u689D\u96FB\u6A5F\u9078\u578B",
     desc: "\u76F4\u7DDA\u904B\u52D5\u6240\u9700\u96FB\u6A5F\u529F\u7387\u8207\u8F49\u77E9",
+    ref: "齒輪齒條傳動功率與轉矩計算，參考 JIS B 1701 齒輪標準及機械設計便覽",
     inputs: [{ key: "F", label: "\u79FB\u52D5\u963B\u529B F", unit: "N", default: 200 }, { key: "v", label: "\u79FB\u52D5\u901F\u5EA6 v", unit: "m/s", default: 0.5 }, { key: "m", label: "\u9F52\u8F2A\u6A21\u6578", unit: "mm", default: 2 }, { key: "z", label: "\u9F52\u8F2A\u9F52\u6578", unit: "", default: 20 }, { key: "eta", label: "\u50B3\u52D5\u6548\u7387 \u03B7", unit: "", default: 0.85 }],
     outputs: [{ key: "D", label: "\u7BC0\u5713\u76F4\u5F91", unit: "mm" }, { key: "n", label: "\u6240\u9700\u8F49\u901F", unit: "rpm" }, { key: "T", label: "\u6240\u9700\u8F49\u77E9", unit: "N\xB7m" }, { key: "P", label: "\u6240\u9700\u529F\u7387", unit: "W" }],
     calc(i) {
@@ -338,6 +349,7 @@ const CALCS = {
   gear_rack_design: {
     name: "\u9F52\u8F2A\u9F52\u689D\u5E7E\u4F55\u5C3A\u5BF8",
     desc: "\u6A19\u6E96\u9F52\u8F2A\u5E7E\u4F55\u5C3A\u5BF8\u8A08\u7B97",
+    ref: "標準齒輪幾何尺寸公式（齒頂圓 da=d+2m、齒根圓 df=d-2.5m、全齒高 h=2.25m），參考 JIS B 1701 標準齒輪",
     inputs: [{ key: "m", label: "\u6A21\u6578 m", unit: "mm", default: 2 }, { key: "z", label: "\u9F52\u6578 z", unit: "", default: 20 }, { key: "alpha", label: "\u58D3\u529B\u89D2 \u03B1", unit: "\xB0", default: 20 }],
     outputs: [{ key: "d", label: "\u7BC0\u5713\u76F4\u5F91", unit: "mm" }, { key: "da", label: "\u9F52\u9802\u5713", unit: "mm" }, { key: "df", label: "\u9F52\u6839\u5713", unit: "mm" }, { key: "p", label: "\u9F52\u8DDD", unit: "mm" }, { key: "h", label: "\u5168\u9F52\u9AD8", unit: "mm" }],
     calc(i) {
@@ -348,6 +360,7 @@ const CALCS = {
   worm_gear: {
     name: "\u5713\u67F1\u8778\u6746\u50B3\u52D5\u5E7E\u4F55\u5C3A\u5BF8",
     desc: "\u8778\u6746\u8778\u8F2A\u57FA\u672C\u5E7E\u4F55\u5C3A\u5BF8",
+    ref: "圓柱蝸桿傳動幾何尺寸與導程角公式，參考 JIS B 1741 蝸桿蝸輪標準",
     inputs: [{ key: "Mdu", label: "\u6A21\u6578 m", unit: "mm", default: 2 }, { key: "Z1", label: "\u8778\u6746\u982D\u6578", unit: "", default: 1 }, { key: "Z2", label: "\u8778\u8F2A\u9F52\u6578", unit: "", default: 40 }, { key: "q", label: "\u7279\u6027\u4FC2\u6578 q", unit: "", default: 10 }, { key: "xi", label: "\u8B8A\u4F4D\u4FC2\u6578 \u03BE", unit: "", default: 0 }],
     outputs: [{ key: "A", label: "\u4E2D\u5FC3\u8DDD A", unit: "mm" }, { key: "d1", label: "\u8778\u6746\u5206\u5EA6\u5713", unit: "mm" }, { key: "d2", label: "\u8778\u8F2A\u5206\u5EA6\u5713", unit: "mm" }, { key: "da1", label: "\u8778\u6746\u9F52\u9802\u5713", unit: "mm" }, { key: "da2", label: "\u8778\u8F2A\u9F52\u9802\u5713", unit: "mm" }, { key: "i", label: "\u50B3\u52D5\u6BD4", unit: "" }, { key: "lam", label: "\u5C0E\u89D2 \u03BB", unit: "\xB0" }],
     calc(inp) {
@@ -359,6 +372,7 @@ const CALCS = {
   bevel_gear: {
     name: "\u76F4\u9F52\u9310\u9F52\u8F2A\u5E7E\u4F55\u5C3A\u5BF8",
     desc: "\u5927\u7AEF\u5E7E\u4F55\u5C3A\u5BF8\u57FA\u672C\u8A08\u7B97",
+    ref: "直齒傘齒輪節錐角與幾何尺寸計算，參考 JIS B 1704 傘齒輪標準及機械設計便覽",
     inputs: [{ key: "m", label: "\u5927\u7AEF\u6A21\u6578 m", unit: "mm", default: 3 }, { key: "z1", label: "\u5C0F\u9F52\u8F2A\u9F52\u6578 z\u2081", unit: "", default: 15 }, { key: "z2", label: "\u5927\u9F52\u8F2A\u9F52\u6578 z\u2082", unit: "", default: 30 }, { key: "alpha", label: "\u58D3\u529B\u89D2 \u03B1", unit: "\xB0", default: 20 }, { key: "b", label: "\u9F52\u5BEC b", unit: "mm", default: 20 }],
     outputs: [{ key: "delta1", label: "\u5C0F\u8F2A\u7BC0\u9310\u89D2 \u03B4\u2081", unit: "\xB0" }, { key: "delta2", label: "\u5927\u8F2A\u7BC0\u9310\u89D2 \u03B4\u2082", unit: "\xB0" }, { key: "R", label: "\u80CC\u9310\u8DDD R", unit: "mm" }, { key: "d1", label: "\u5C0F\u8F2A\u5206\u5EA6\u5713\u5F91", unit: "mm" }, { key: "d2", label: "\u5927\u8F2A\u5206\u5EA6\u5713\u5F91", unit: "mm" }, { key: "da1", label: "\u5C0F\u8F2A\u9F52\u9802\u5713", unit: "mm" }, { key: "da2", label: "\u5927\u8F2A\u9F52\u9802\u5713", unit: "mm" }],
     calc(i) {
@@ -374,6 +388,7 @@ const CALCS = {
   coupler_universal: {
     name: "\u842C\u5411\u806F\u8EF8\u5668\u8A08\u7B97",
     desc: "\u8A08\u7B97\u8F49\u77E9\u8207\u9A57\u7B97",
+    ref: "聯軸器傳遞轉矩 T=9.55P/n 與工況係數選用，參考聯軸器廠商技術手冊（如 NBK、協育）",
     inputs: [{ key: "P", label: "\u50B3\u52D5\u529F\u7387 P", unit: "kW", default: 5.5 }, { key: "n", label: "\u8F49\u901F n", unit: "rpm", default: 73 }, { key: "K", label: "\u5DE5\u6CC1\u4FC2\u6578 K", unit: "", default: 5, hint: "\u8F15\u5FAE\u885D\u64CA:3~4 / \u4E2D\u7B49\u885D\u64CA:5~6 / \u56B4\u91CD\u885D\u64CA:7~8" }, { key: "Tn", label: "\u9078\u7528\u806F\u8EF8\u5668\u516C\u7A31\u8F49\u77E9 Tn", unit: "kN\xB7m", default: 12.5 }],
     outputs: [{ key: "T", label: "\u7406\u8AD6\u8F49\u77E9 T", unit: "kN\xB7m" }, { key: "Tc", label: "\u8A08\u7B97\u8F49\u77E9 Tc", unit: "kN\xB7m" }, { key: "verdict", label: "\u9A57\u7B97 Tn\u2265Tc", unit: "" }],
     calc(i) {
@@ -385,6 +400,7 @@ const CALCS = {
   coupler_gear: {
     name: "\u9F52\u5F0F\u806F\u8EF8\u5668\u8A08\u7B97",
     desc: "\u8A08\u7B97\u8F49\u77E9\u9A57\u7B97\u516C\u7A31\u8F49\u77E9",
+    ref: "齒式聯軸器計算轉矩公式（含溫度、啟動、工況修正係數），參考聯軸器技術手冊",
     inputs: [{ key: "T", label: "\u7406\u8AD6\u8F49\u77E9 T", unit: "N\xB7m", default: 2387.5 }, { key: "Kw", label: "\u52D5\u529B\u6A5F\u4FC2\u6578 Kw", unit: "", default: 1 }, { key: "K", label: "\u5DE5\u6CC1\u4FC2\u6578 K", unit: "", default: 2 }, { key: "Kt", label: "\u6EAB\u5EA6\u4FC2\u6578 Kt", unit: "", default: 1 }, { key: "Kz", label: "\u555F\u52D5\u4FC2\u6578 Kz", unit: "", default: 1 }, { key: "Tn", label: "\u9078\u7528\u806F\u8EF8\u5668\u516C\u7A31\u8F49\u77E9 Tn", unit: "N\xB7m", default: 14e3 }],
     outputs: [{ key: "Tc", label: "\u8A08\u7B97\u8F49\u77E9 Tc", unit: "N\xB7m" }, { key: "verdict", label: "\u9A57\u7B97 Tn\u2265Tc", unit: "" }],
     calc(i) {
@@ -396,6 +412,7 @@ const CALCS = {
   spring_calc: {
     name: "\u5713\u67F1\u87BA\u65CB\u5F48\u7C27",
     desc: "\u5F48\u7C27\u525B\u5EA6\u3001\u6709\u6548\u5708\u6578\u3001\u526A\u61C9\u529B",
+    ref: "圓柱螺旋彈簧設計公式（Wahl 應力修正係數 K），參考 JIS B 2704 彈簧標準及 Shigley《機械設計》",
     inputs: [{ key: "P1", label: "\u6700\u5C0F\u8F09\u8377 P1", unit: "N", default: 0 }, { key: "Pn", label: "\u6700\u5927\u8F09\u8377 Pn", unit: "N", default: 500 }, { key: "h", label: "\u5DE5\u4F5C\u884C\u7A0B h", unit: "mm", default: 20 }, { key: "D", label: "\u5F48\u7C27\u4E2D\u5F91 D", unit: "mm", default: 25 }, { key: "d", label: "\u92FC\u7D72\u76F4\u5F91 d", unit: "mm", default: 3 }, { key: "G", label: "\u5207\u8B8A\u6A21\u91CF G", unit: "MPa", default: 79e3 }],
     outputs: [{ key: "C", label: "\u65CB\u7E5E\u6BD4 C", unit: "" }, { key: "K", label: "\u66F2\u5EA6\u4FC2\u6578 K", unit: "" }, { key: "tau", label: "\u6700\u5927\u526A\u61C9\u529B \u03C4", unit: "MPa" }, { key: "k", label: "\u5F48\u7C27\u525B\u5EA6 k", unit: "N/mm" }, { key: "n", label: "\u6709\u6548\u5708\u6578 n", unit: "\u5708" }],
     calc(i) {
@@ -406,6 +423,7 @@ const CALCS = {
   spring_stiffness: {
     name: "\u5F48\u7C27\u525B\u5EA6\uFF08\u5DF2\u77E5\u5E7E\u4F55\uFF09",
     desc: "\u5DF2\u77E5\u92FC\u7D72\u76F4\u5F91\u3001\u4E2D\u5F91\u3001\u5708\u6578\u6C42\u525B\u5EA6",
+    ref: "彈簧剛度公式 k=Gd^4/(8D^3n)，參考 JIS B 2704 壓縮／拉伸彈簧標準",
     inputs: [{ key: "G", label: "\u5207\u8B8A\u6A21\u91CF G", unit: "MPa", default: 79e3 }, { key: "d", label: "\u92FC\u7D72\u76F4\u5F91 d", unit: "mm", default: 2.2 }, { key: "D2", label: "\u5F48\u7C27\u4E2D\u5F91 D\u2082", unit: "mm", default: 24.5 }, { key: "n", label: "\u6709\u6548\u5708\u6578 n", unit: "\u5708", default: 30 }, { key: "tau_allow", label: "\u8A31\u7528\u526A\u61C9\u529B [\u03C4]", unit: "MPa", default: 600, hint: "\u7434\u92FC\u7DDA\u7D04600 / \u6CB9\u56DE\u706B\u7DDA\u7D04500\uFF0C\u4F9D\u6750\u6599\u8ABF\u6574" }],
     outputs: [{ key: "k", label: "\u5F48\u7C27\u525B\u5EA6 k", unit: "N/mm" }, { key: "C", label: "\u65CB\u7E5E\u6BD4 C", unit: "" }, { key: "Pmax", label: "\u8A31\u7528\u6975\u9650\u8F09\u8377", unit: "N" }],
     calc(i) {
@@ -419,6 +437,7 @@ const CALCS = {
   chain_length: {
     name: "\u6EFE\u5B50\u93C8\u689D\u9577\u5EA6\u8A08\u7B97",
     desc: "\u8A08\u7B97\u93C8\u689D\u7BC0\u6578\u8207\u5BE6\u969B\u4E2D\u5FC3\u8DDD",
+    ref: "滾子鏈節數與實際中心距公式，參考 JIS B 1801 滾子鏈標準／ISO 606",
     inputs: [{ key: "z1", label: "\u5C0F\u93C8\u8F2A\u9F52\u6578 z\u2081", unit: "", default: 17 }, { key: "z2", label: "\u5927\u93C8\u8F2A\u9F52\u6578 z\u2082", unit: "", default: 34 }, { key: "a0", label: "\u521D\u5B9A\u4E2D\u5FC3\u8DDD a\u2080", unit: "mm", default: 400 }, { key: "p", label: "\u93C8\u689D\u7BC0\u8DDD P", unit: "mm", default: 12.7 }],
     outputs: [{ key: "Lp", label: "\u8A08\u7B97\u7BC0\u6578", unit: "\u7BC0" }, { key: "Lp0", label: "\u9078\u7528\u7BC0\u6578\uFF08\u5076\u6578\uFF09", unit: "\u7BC0" }, { key: "L", label: "\u93C8\u689D\u9577\u5EA6", unit: "mm" }, { key: "a", label: "\u5BE6\u969B\u4E2D\u5FC3\u8DDD", unit: "mm" }],
     calc(i) {
@@ -435,6 +454,7 @@ const CALCS = {
   sprocket_basic: {
     name: "\u93C8\u8F2A\u57FA\u672C\u5C3A\u5BF8",
     desc: "\u5206\u5EA6\u5713\u3001\u9F52\u9802\u5713\u3001\u9F52\u6839\u5713",
+    ref: "鏈輪分度圓、齒頂圓、齒根圓公式，參考 JIS B 1802 鏈輪標準",
     inputs: [{ key: "z", label: "\u9F52\u6578 z", unit: "", default: 17 }, { key: "p", label: "\u7BC0\u8DDD P", unit: "mm", default: 12.7 }, { key: "d1", label: "\u6EFE\u5B50\u5916\u5F91 d\u2081", unit: "mm", default: 7.95 }],
     outputs: [{ key: "d", label: "\u5206\u5EA6\u5713\u76F4\u5F91", unit: "mm" }, { key: "da_max", label: "\u9F52\u9802\u5713\uFF08\u6700\u5927\uFF09", unit: "mm" }, { key: "da_min", label: "\u9F52\u9802\u5713\uFF08\u6700\u5C0F\uFF09", unit: "mm" }, { key: "df", label: "\u9F52\u6839\u5713\u76F4\u5F91", unit: "mm" }],
     calc(i) {
@@ -446,6 +466,7 @@ const CALCS = {
   sync_belt: {
     name: "\u540C\u6B65\u5E36\u50B3\u52D5\u8A2D\u8A08",
     desc: "\u7BC0\u5713\u76F4\u5F91\u3001\u5E36\u9577\u3001\u50B3\u52D5\u6BD4",
+    ref: "同步帶傳動節徑與帶長計算公式，參考 JIS B 1856 同步帶標準",
     inputs: [{ key: "p", label: "\u7BC0\u8DDD P", unit: "mm", default: 5 }, { key: "z1", label: "\u4E3B\u52D5\u8F2A\u9F52\u6578 z\u2081", unit: "", default: 24 }, { key: "z2", label: "\u5F9E\u52D5\u8F2A\u9F52\u6578 z\u2082", unit: "", default: 48 }, { key: "a0", label: "\u8A2D\u8A08\u4E2D\u5FC3\u8DDD a\u2080", unit: "mm", default: 200 }],
     outputs: [{ key: "d1", label: "\u4E3B\u52D5\u8F2A\u7BC0\u5F91", unit: "mm" }, { key: "d2", label: "\u5F9E\u52D5\u8F2A\u7BC0\u5F91", unit: "mm" }, { key: "i", label: "\u50B3\u52D5\u6BD4", unit: "" }, { key: "Lp", label: "\u5E36\u7BC0\u7DDA\u9577", unit: "mm" }, { key: "Lp0", label: "\u5EFA\u8B70\u5E36\u9577\uFF08\u53D6\u6574\uFF09", unit: "mm" }],
     calc(i) {
@@ -459,6 +480,7 @@ const CALCS = {
   section_circle: {
     name: "\u5713\u622A\u9762\u6163\u6027\u77E9",
     desc: "\u5BE6\u5FC3\u5713\u622A\u9762\u7279\u6027",
+    ref: "實心圓截面慣性矩標準公式，參考材料力學教材，如 Beer & Johnston《材料力學》",
     inputs: [{ key: "D", label: "\u76F4\u5F91 D", unit: "mm", default: 30 }],
     outputs: [{ key: "A", label: "\u622A\u9762\u7A4D", unit: "mm\xB2" }, { key: "I", label: "\u6163\u6027\u77E9", unit: "mm\u2074" }, { key: "W", label: "\u622A\u9762\u6A21\u6578", unit: "mm\xB3" }, { key: "i_r", label: "\u8FF4\u8F49\u534A\u5F91", unit: "mm" }],
     calc(inp) {
@@ -469,6 +491,7 @@ const CALCS = {
   section_hollow_circle: {
     name: "\u7A7A\u5FC3\u5713\u622A\u9762\u6163\u6027\u77E9",
     desc: "\u5713\u7BA1\u622A\u9762\u7279\u6027",
+    ref: "空心圓（圓管）截面慣性矩標準公式，參考材料力學教材",
     inputs: [{ key: "D", label: "\u5916\u5F91 D", unit: "mm", default: 50 }, { key: "d", label: "\u5167\u5F91 d", unit: "mm", default: 40 }],
     outputs: [{ key: "A", label: "\u622A\u9762\u7A4D", unit: "mm\xB2" }, { key: "I", label: "\u6163\u6027\u77E9", unit: "mm\u2074" }, { key: "W", label: "\u622A\u9762\u6A21\u6578", unit: "mm\xB3" }, { key: "i_r", label: "\u8FF4\u8F49\u534A\u5F91", unit: "mm" }],
     calc(inp) {
@@ -479,6 +502,7 @@ const CALCS = {
   section_rect: {
     name: "\u77E9\u5F62\u622A\u9762\u6163\u6027\u77E9",
     desc: "\u77E9\u5F62\u622A\u9762\uFF08\u5C0D\u5F62\u5FC3\u8EF8\uFF09",
+    ref: "矩形截面慣性矩標準公式，參考材料力學教材",
     inputs: [{ key: "b", label: "\u5BEC\u5EA6 b", unit: "mm", default: 40 }, { key: "h", label: "\u9AD8\u5EA6 h", unit: "mm", default: 60 }],
     outputs: [{ key: "A", label: "\u622A\u9762\u7A4D", unit: "mm\xB2" }, { key: "Ix", label: "Ix\uFF08\u5F37\u8EF8\uFF09", unit: "mm\u2074" }, { key: "Wx", label: "\u622A\u9762\u6A21\u6578 Wx", unit: "mm\xB3" }, { key: "Iy", label: "Iy\uFF08\u5F31\u8EF8\uFF09", unit: "mm\u2074" }, { key: "i_r", label: "x\u8EF8\u8FF4\u8F49\u534A\u5F91", unit: "mm" }],
     calc(inp) {
@@ -489,6 +513,7 @@ const CALCS = {
   section_hollow_rect: {
     name: "\u7A7A\u5FC3\u77E9\u5F62\u622A\u9762\u6163\u6027\u77E9",
     desc: "\u65B9\u7BA1\u622A\u9762\u7279\u6027",
+    ref: "空心矩形（方管）截面慣性矩標準公式，參考材料力學教材",
     inputs: [{ key: "B", label: "\u5916\u5BEC B", unit: "mm", default: 60 }, { key: "H", label: "\u5916\u9AD8 H", unit: "mm", default: 80 }, { key: "t", label: "\u58C1\u539A t", unit: "mm", default: 4 }],
     outputs: [{ key: "A", label: "\u622A\u9762\u7A4D", unit: "mm\xB2" }, { key: "Ix", label: "Ix", unit: "mm\u2074" }, { key: "Wx", label: "\u622A\u9762\u6A21\u6578", unit: "mm\xB3" }],
     calc(inp) {
@@ -501,6 +526,7 @@ const CALCS = {
   blank_force: {
     name: "\u7E3D\u6C96\u88C1\u529B\u8A08\u7B97",
     desc: "\u4FEE\u6B63\u4FC2\u6578\u6CD5",
+    ref: "沖裁力計算公式（含修正係數法），參考沖壓模具設計手冊",
     inputs: [{ key: "L", label: "\u6C96\u88C1\u5468\u9577 L", unit: "mm", default: 100 }, { key: "t", label: "\u6599\u539A t", unit: "mm", default: 2 }, { key: "tau", label: "\u6297\u526A\u5F37\u5EA6 \u03C4", unit: "MPa", default: 300 }, { key: "k", label: "\u4FEE\u6B63\u4FC2\u6578 k", unit: "", default: 1.3, hint: "\u4E00\u822C\u53D61.3" }],
     outputs: [{ key: "F", label: "\u7406\u8AD6\u6C96\u88C1\u529B", unit: "N" }, { key: "F_cor", label: "\u4FEE\u6B63\u6C96\u88C1\u529B", unit: "N" }, { key: "F_kN", label: "\u4FEE\u6B63\u6C96\u88C1\u529B", unit: "kN" }],
     calc(i) {
@@ -511,6 +537,7 @@ const CALCS = {
   bend_v: {
     name: "V\u578B\u5F4E\u66F2\u529B\u8A08\u7B97",
     desc: "V\u5F62\u6A21\u5F4E\u66F2\u6240\u9700\u58D3\u529B",
+    ref: "V 型彎曲力計算公式，參考沖壓模具設計手冊",
     inputs: [{ key: "b", label: "\u5F4E\u66F2\u5BEC\u5EA6 b", unit: "mm", default: 50 }, { key: "t", label: "\u6599\u539A t", unit: "mm", default: 2 }, { key: "r", label: "\u5F4E\u66F2\u534A\u5F91 r", unit: "mm", default: 3 }, { key: "sigma", label: "\u6297\u62C9\u5F37\u5EA6 \u03C3", unit: "MPa", default: 400 }],
     outputs: [{ key: "F", label: "V\u578B\u5F4E\u66F2\u529B", unit: "N" }],
     calc(i) {
@@ -520,6 +547,7 @@ const CALCS = {
   bend_u: {
     name: "U\u578B\u5F4E\u66F2\u529B\u8A08\u7B97",
     desc: "U\u5F62\u6A21\u5F4E\u66F2\u6240\u9700\u58D3\u529B",
+    ref: "U 型彎曲力計算公式，參考沖壓模具設計手冊",
     inputs: [{ key: "b", label: "\u5F4E\u66F2\u5BEC\u5EA6 b", unit: "mm", default: 50 }, { key: "t", label: "\u6599\u539A t", unit: "mm", default: 2 }, { key: "r", label: "\u5F4E\u66F2\u534A\u5F91 r", unit: "mm", default: 3 }, { key: "sigma", label: "\u6297\u62C9\u5F37\u5EA6 \u03C3", unit: "MPa", default: 400 }],
     outputs: [{ key: "F", label: "U\u578B\u5F4E\u66F2\u529B", unit: "N" }],
     calc(i) {
@@ -530,6 +558,7 @@ const CALCS = {
   key_strength: {
     name: "\u5E73\u9375\u5F37\u5EA6\u8A08\u7B97",
     desc: "\u64E0\u58D3\u8207\u526A\u5207\u61C9\u529B\u9A57\u7B97",
+    ref: "平鍵擠壓應力與剪切應力驗算公式，參考 JIS B 1301 平鍵標準及機械設計便覽",
     inputs: [{ key: "T", label: "\u50B3\u905E\u8F49\u77E9 T", unit: "N\xB7m", default: 50 }, { key: "D", label: "\u8EF8\u5F91 D", unit: "mm", default: 30 }, { key: "L", label: "\u9375\u9577 L", unit: "mm", default: 50 }, { key: "b", label: "\u9375\u5BEC b", unit: "mm", default: 10 }, { key: "h", label: "\u9375\u9AD8 h", unit: "mm", default: 8 }, { key: "Ppp", label: "\u8A31\u7528\u64E0\u58D3\u61C9\u529B [\u03C3]", unit: "MPa", default: 80, hint: "\u975C\u8F09\u8F15\u885D:100~120 / \u885D\u64CA:60~70" }, { key: "tp", label: "\u8A31\u7528\u526A\u5207\u61C9\u529B [\u03C4]", unit: "MPa", default: 40 }],
     outputs: [{ key: "l", label: "\u6709\u6548\u9375\u9577 l", unit: "mm" }, { key: "sigma", label: "\u64E0\u58D3\u61C9\u529B \u03C3", unit: "MPa" }, { key: "tau", label: "\u526A\u5207\u61C9\u529B \u03C4", unit: "MPa" }, { key: "v_sigma", label: "\u64E0\u58D3\u9A57\u7B97", unit: "" }, { key: "v_tau", label: "\u526A\u5207\u9A57\u7B97", unit: "" }],
     calc(i) {
@@ -541,6 +570,7 @@ const CALCS = {
   pin_strength: {
     name: "\u5713\u67F1\u92B7\u5F37\u5EA6\u8A08\u7B97",
     desc: "\u5E73\u9762\u578B\u5713\u67F1\u92B7\u526A\u5207\u61C9\u529B\u9A57\u7B97",
+    ref: "圓柱銷剪切應力驗算公式，參考機械設計便覽",
     inputs: [{ key: "F", label: "\u6A6B\u5411\u529B F", unit: "N", default: 5e3 }, { key: "d", label: "\u92B7\u76F4\u5F91 d", unit: "mm", default: 10 }, { key: "Z", label: "\u92B7\u6578\u91CF Z", unit: "\u500B", default: 2 }, { key: "Tp", label: "\u8A31\u7528\u526A\u5207 [\u03C4]", unit: "MPa", default: 80 }],
     outputs: [{ key: "tau", label: "\u526A\u5207\u61C9\u529B \u03C4", unit: "MPa" }, { key: "verdict", label: "\u9A57\u7B97\u7D50\u679C", unit: "" }],
     calc(i) {
@@ -551,6 +581,7 @@ const CALCS = {
   press_fit: {
     name: "\u904E\u76C8\u914D\u5408\u8A08\u7B97",
     desc: "\u6700\u5C0F\u6709\u6548\u904E\u76C8\u91CF\u8207\u6700\u5927\u5141\u8A31\u58D3\u529B",
+    ref: "過盈配合最小／最大過盈量計算（Lamé 厚壁圓筒公式），參考機械設計便覽及 Shigley《機械設計》",
     inputs: [{ key: "da", label: "\u5305\u5BB9\u4EF6\u5916\u5F91 da", unit: "mm", default: 100 }, { key: "df", label: "\u7D50\u5408\u76F4\u5F91 df", unit: "mm", default: 50 }, { key: "di", label: "\u88AB\u5305\u5BB9\u4EF6\u5167\u5F91 di", unit: "mm", default: 0 }, { key: "lf", label: "\u7D50\u5408\u9577\u5EA6 lf", unit: "mm", default: 60 }, { key: "mu", label: "\u6469\u64E6\u4FC2\u6578 \u03BC", unit: "", default: 0.14 }, { key: "T", label: "\u50B3\u905E\u8F49\u77E9 T", unit: "N\xB7m", default: 500 }, { key: "Ea", label: "\u5305\u5BB9\u4EF6\u5F48\u6027\u6A21\u91CF", unit: "MPa", default: 2e5 }, { key: "Ei", label: "\u88AB\u5305\u5BB9\u4EF6\u5F48\u6027\u6A21\u91CF", unit: "MPa", default: 2e5 }, { key: "va", label: "\u5305\u5BB9\u4EF6\u6CCA\u677E\u6BD4", unit: "", default: 0.3 }, { key: "vi", label: "\u88AB\u5305\u5BB9\u4EF6\u6CCA\u677E\u6BD4", unit: "", default: 0.3 }, { key: "ssa", label: "\u5305\u5BB9\u4EF6\u5C48\u670D\u5F37\u5EA6", unit: "MPa", default: 295 }, { key: "ssi", label: "\u88AB\u5305\u5BB9\u4EF6\u5C48\u670D\u5F37\u5EA6", unit: "MPa", default: 275 }],
     outputs: [{ key: "Pfmin", label: "\u6700\u5C0F\u63A5\u5408\u58D3\u5F37", unit: "MPa" }, { key: "delta_min", label: "\u6700\u5C0F\u6709\u6548\u904E\u76C8\u91CF", unit: "\u03BCm" }, { key: "Pfmax", label: "\u6700\u5927\u5141\u8A31\u58D3\u5F37", unit: "MPa" }, { key: "delta_max", label: "\u6700\u5927\u5141\u8A31\u904E\u76C8\u91CF", unit: "\u03BCm" }],
     calc(i) {
@@ -568,6 +599,7 @@ const CALCS = {
   thread_dims: {
     name: "\u516C\u5236\u87BA\u7D0B\u4E2D\u5C0F\u5F91\u8A08\u7B97",
     desc: "\u5167\u87BA\u7D0B\u4E2D\u5F91\u3001\u5C0F\u5F91\u8A08\u7B97",
+    ref: "公制螺紋中徑／小徑計算公式 D2=D-0.6495P、D1=D-1.0825P，參考 JIS B 0205／ISO 724 公制螺紋標準",
     inputs: [{ key: "D", label: "\u516C\u7A31\u76F4\u5F91 D", unit: "mm", default: 20 }, { key: "P", label: "\u87BA\u8DDD P", unit: "mm", default: 2.5 }],
     outputs: [{ key: "D1", label: "\u5C0F\u5F91 D\u2081", unit: "mm" }, { key: "D2", label: "\u4E2D\u5F91 D\u2082", unit: "mm" }, { key: "da_min", label: "\u5916\u87BA\u7D0B\u5927\u5F91\u6700\u5C0F d_min", unit: "mm" }, { key: "pitch_remark", label: "\u5E38\u7528\u87BA\u8DDD\u5099\u8A3B", unit: "" }],
     calc(i) {
@@ -582,6 +614,7 @@ const CALCS = {
   bearing_life: {
     name: "\u8EF8\u627F\u58FD\u547D\u8A08\u7B97\uFF08L10\uFF09",
     desc: "\u4F9D\u52D5\u8CA0\u8377\u8A08\u7B97\u57FA\u672C\u984D\u5B9A\u58FD\u547D",
+    ref: "滾動軸承基本額定壽命公式 L10=(Cr/P)^p，參考 ISO 281／JIS B 1518 軸承壽命標準",
     inputs: [{ key: "Cr", label: "\u984D\u5B9A\u52D5\u8CA0\u8377 Cr", unit: "N", default: 5590 }, { key: "P", label: "\u7576\u91CF\u52D5\u8CA0\u8377 P", unit: "N", default: 800 }, { key: "n", label: "\u8F49\u901F n", unit: "rpm", default: 1450 }, { key: "p", label: "\u6307\u6578 p\uFF08\u7403:3 \u6EFE:3.33\uFF09", unit: "", default: 3 }],
     outputs: [{ key: "L10", label: "L\u2081\u2080", unit: "\xD710\u2076\u8F49" }, { key: "L10h", label: "L\u2081\u2080h \u58FD\u547D", unit: "hr" }],
     calc(i) {
@@ -593,6 +626,7 @@ const CALCS = {
   column_buckling: {
     name: "\u7ACB\u67F1\uFF08\u8EF8\u5FC3\u58D3\u67F1\uFF09\u7A69\u5B9A\u6027",
     desc: "\u6B50\u62C9\u516C\u5F0F\u8A08\u7B97\u81E8\u754C\u529B",
+    ref: "尤拉（Euler）柱挫曲臨界力公式，參考材料力學教材",
     inputs: [{ key: "N", label: "\u8EF8\u5411\u58D3\u529B N", unit: "N", default: 5e4 }, { key: "L", label: "\u7ACB\u67F1\u9577\u5EA6 L", unit: "mm", default: 1e3 }, { key: "I", label: "\u622A\u9762\u6163\u6027\u77E9", unit: "mm\u2074", default: 25e4 }, { key: "A", label: "\u622A\u9762\u7A4D A", unit: "mm\xB2", default: 500 }, { key: "E", label: "\u5F48\u6027\u6A21\u91CF E", unit: "MPa", default: 206e3 }, { key: "mu1", label: "\u7D04\u675F\u4FC2\u6578 \u03BC\u2081", unit: "", default: 2, hint: "\u5169\u7AEF\u56FA\u5B9A:0.5 / \u4E00\u56FA\u4E00\u9278:0.7 / \u5169\u7AEF\u9278:1 / \u4E00\u56FA\u4E00\u81EA\u7531:2" }],
     outputs: [{ key: "i_r", label: "\u8FF4\u8F49\u534A\u5F91", unit: "mm" }, { key: "lam", label: "\u9577\u7D30\u6BD4 \u03BB", unit: "" }, { key: "Fcr", label: "\u6B50\u62C9\u81E8\u754C\u529B", unit: "N" }, { key: "safety", label: "\u7A69\u5B9A\u5B89\u5168\u4FC2\u6578", unit: "" }],
     calc(i) {
@@ -606,6 +640,7 @@ const CALCS = {
   cam_sine: {
     name: "\u64FA\u7DDA\uFF08\u6B63\u5F26\u52A0\u901F\u5EA6\uFF09\u51F8\u8F2A\u8A2D\u8A08",
     desc: "\u64FA\u7DDA\u904B\u52D5\u898F\u5F8B\uFF08Cycloidal\uFF09\uFF1A\u52A0\u901F\u5EA6\u5448\u6B63\u5F26\u8B8A\u5316\uFF0C\u8D77\u8A16\u9EDE\u7121\u8E8D\u52D5\u8D33\u8DF3\u8B8A",
+    ref: "擺線（Cycloidal）凸輪運動曲線公式，參考 Norton《機構設計》（Design of Machinery）",
     inputs: [
       { key: "h", label: "\u884C\u7A0B h\uFF08\u5347\u7A0B\uFF09", unit: "mm", default: 30 },
       { key: "rb", label: "\u57FA\u5713\u534A\u5F91 rb", unit: "mm", default: 100 },
@@ -635,6 +670,7 @@ const CALCS = {
   indexer_select: {
     name: "\u51F8\u8F2A\u5206\u5272\u5668\u9078\u578B\u8A08\u7B97",
     desc: "\u9593\u6B47\u56DE\u8F49\u8F49\u76E4\u96FB\u6A5F\u529F\u7387\u9078\u578B",
+    ref: "間歇分割器選型計算（慣量、驅動轉矩），參考分割器廠商技術手冊（如三共技研 Sankyo）",
     inputs: [
       { key: "N", label: "\u5206\u5272\u7B49\u4EFD N", unit: "", default: 12 },
       { key: "t1", label: "\u5B9A\u4F4D\u6642\u9593 t\u2081", unit: "s", default: 1 },
@@ -678,6 +714,7 @@ const CALCS = {
   hydraulic_pump: {
     name: "\u6DB2\u58D3\u6CF5\u8207\u96FB\u6A5F\u9078\u578B",
     desc: "\u4F9D\u7CFB\u7D71\u58D3\u529B\u6D41\u91CF\u8A08\u7B97\u6CF5\u6392\u91CF\u8207\u96FB\u6A5F\u529F\u7387",
+    ref: "液壓泵排量與驅動功率計算公式，參考油壓工程便覽",
     inputs: [
       { key: "Q", label: "\u7CFB\u7D71\u6D41\u91CF Q", unit: "L/min", default: 135 },
       { key: "P", label: "\u7CFB\u7D71\u58D3\u529B P", unit: "bar", default: 200 },
@@ -701,6 +738,7 @@ const CALCS = {
   hydraulic_pipe: {
     name: "\u6DB2\u58D3\u7BA1\u8DEF\u58D3\u529B\u640D\u5931",
     desc: "\u8A08\u7B97\u76F4\u7BA1\u6BB5\u58D3\u640D\u8207\u6D41\u901F\uFF08\u5C64\u6D41/\u7D0A\u6D41\uFF09",
+    ref: "管路雷諾數與摩擦損失計算（層流 64/Re、Blasius 公式），參考流體力學教材，如 White《Fluid Mechanics》",
     inputs: [
       { key: "Q", label: "\u6D41\u91CF Q", unit: "L/min", default: 70 },
       { key: "d", label: "\u7BA1\u8DEF\u5167\u5F91 d", unit: "mm", default: 15 },
@@ -731,6 +769,7 @@ const CALCS = {
   hydraulic_shock: {
     name: "\u6DB2\u58D3\u885D\u64CA\u8A08\u7B97",
     desc: "\u8A08\u7B97\u885D\u64CA\u6CE2\u901F\u5EA6\u8207\u6700\u5927\u58D3\u529B\u5347\u9AD8\u503C",
+    ref: "液壓衝擊（水擊）壓力公式，參考 Joukowsky 水擊方程式及油壓工程便覽",
     inputs: [
       { key: "E0", label: "\u6DB2\u9AD4\u9AD4\u7A4D\u5F48\u6027\u6A21\u91CF E\u2080", unit: "GPa", default: 1.4 },
       { key: "rho", label: "\u6DB2\u9AD4\u5BC6\u5EA6 \u03C1", unit: "kg/m\xB3", default: 870 },
@@ -764,6 +803,7 @@ const CALCS = {
   accumulator: {
     name: "\u84C4\u80FD\u5668\u5BB9\u7A4D\u8A08\u7B97",
     desc: "\u4F9D\u5DE5\u4F5C\u5BB9\u7A4D\u8207\u58D3\u529B\u6BD4\u8A08\u7B97\u84C4\u80FD\u5668\u5BB9\u7A4D",
+    ref: "蓄能器容積計算（氣體多變過程方程），參考油壓工程便覽",
     inputs: [
       { key: "Vw", label: "\u5DE5\u4F5C\u5BB9\u7A4D Vw", unit: "L", default: 10 },
       { key: "P1", label: "\u6700\u4F4E\u5DE5\u4F5C\u58D3\u529B P\u2081", unit: "bar", default: 100 },
@@ -787,6 +827,7 @@ const CALCS = {
   air_consumption: {
     name: "\u6C23\u7F38\u8017\u6C23\u91CF\u8A08\u7B97",
     desc: "\u6700\u5927\u8017\u6C23\u91CF\u8207\u96FB\u78C1\u95A5 Cv \u503C\u9078\u578B",
+    ref: "氣壓缸耗氣量計算公式，參考 SMC 氣動系統設計手冊",
     inputs: [
       { key: "D", label: "\u6C23\u7F38\u7F38\u5F91 D", unit: "mm", default: 63 },
       { key: "Vmax", label: "\u6700\u5927\u901F\u5EA6 Vmax", unit: "mm/s", default: 420 },
@@ -811,6 +852,7 @@ const CALCS = {
   conveyor_chain: {
     name: "\u500D\u901F\u93C8\u96FB\u6A5F\u529F\u7387\u8A08\u7B97",
     desc: "\u8F38\u9001\u6A5F\u96FB\u6A5F\u9078\u578B\u8A08\u7B97",
+    ref: "倍速鏈輸送機電機功率計算，參考輸送機設計手冊",
     inputs: [
       { key: "V", label: "\u8F38\u9001\u901F\u5EA6 V", unit: "m/min", default: 20 },
       { key: "A", label: "\u901F\u5EA6\u500D\u901F A", unit: "", default: 2.5 },
@@ -845,6 +887,7 @@ const CALCS = {
   tank_thermal: {
     name: "\u6CB9\u7BB1\u71B1\u5E73\u8861\u8A08\u7B97",
     desc: "\u6563\u71B1\u9762\u7A4D\u3001\u71B1\u5E73\u8861\u6EAB\u5EA6\u3001\u98A8\u51B7/\u6C34\u51B7\u529F\u7387",
+    ref: "油箱散熱面積與熱平衡溫度計算，參考油壓系統設計手冊",
     inputs: [
       { key: "Pheat", label: "\u7CFB\u7D71\u767C\u71B1\u529F\u7387", unit: "kW", default: 11 },
       { key: "A", label: "\u6CB9\u7BB1\u6563\u71B1\u9762\u7A4D", unit: "m\xB2", default: 2 },
@@ -869,6 +912,7 @@ const CALCS = {
   ratchet_calc: {
     name: "\u68D8\u8F2A\u8A08\u7B97\uFF08CONTACT\u578B\uFF09",
     desc: "\u6599\u5E36\u68D8\u8F2A\u7BC0\u5713\u8207\u5E7E\u4F55\u5C3A\u5BF8",
+    ref: "棘輪／料帶傳動幾何尺寸計算（依 Pitch 孔距推算），參考精密傳動機構設計手冊",
     inputs: [{ key: "P", label: "\u6599\u5E36PITCH\u5B54\u8DDD P", unit: "mm", default: 5.3 }, { key: "T", label: "\u6599\u539A T", unit: "mm", default: 0.12 }, { key: "D", label: "PITCH\u5B54\u5F91 D", unit: "mm", default: 1 }, { key: "N", label: "\u68D8\u8F2A\u9F52\u6578 N", unit: "", default: 25 }],
     outputs: [{ key: "S", label: "\u7406\u8AD6\u5468\u9577 S", unit: "mm" }, { key: "D1", label: "\u7406\u8AD6\u76F4\u5F91 D\u2081", unit: "mm" }, { key: "D2", label: "\u5BE6\u969B\u76F4\u5F91 D\u2082", unit: "mm" }, { key: "D3", label: "\u8170\u9AD8 D\u2083", unit: "mm" }],
     calc(i) {
@@ -877,10 +921,11 @@ const CALCS = {
     }
   },
   // ══ 單位換算 ══
-  unit_pressure: { _type: "unit_pressure", name: "\u58D3\u529B\u55AE\u4F4D\u63DB\u7B97", desc: "Pa/kPa/MPa/bar/atm/psi \u4E92\u63DB" },
+  unit_pressure: { _type: "unit_pressure", name: "\u58D3\u529B\u55AE\u4F4D\u63DB\u7B97", desc: "Pa/kPa/MPa/bar/atm/psi \u4E92\u63DB", ref: "壓力單位換算係數，參考 NIST SP811 國際單位制使用指南" },
   unit_power: {
     name: "\u529F\u7387\u55AE\u4F4D\u63DB\u7B97",
     desc: "W / kW / hp / PS \u4E92\u63DB",
+    ref: "功率單位換算係數（W／kW／hp／PS），參考 NIST SP811 國際單位制使用指南",
     inputs: [{ key: "val", label: "\u8F38\u5165\u503C", unit: "", default: 1 }, { key: "from", label: "\u55AE\u4F4D (1=W 2=kW 3=hp 4=PS)", unit: "", default: 2 }],
     outputs: [{ key: "W", label: "W" }, { key: "kW", label: "kW" }, { key: "hp", label: "hp\uFF08\u82F1\u5236\uFF09" }, { key: "PS", label: "PS\uFF08\u516C\u5236\u99AC\u529B\uFF09" }],
     calc(i) {
@@ -892,6 +937,7 @@ const CALCS = {
   unit_torque: {
     name: "\u8F49\u77E9\u55AE\u4F4D\u63DB\u7B97",
     desc: "N\xB7m / kN\xB7m / kgf\xB7m / lbf\xB7ft \u4E92\u63DB",
+    ref: "轉矩單位換算係數，參考 NIST SP811 國際單位制使用指南",
     inputs: [{ key: "val", label: "\u8F38\u5165\u503C", unit: "", default: 10 }, { key: "from", label: "\u55AE\u4F4D (1=N\xB7m 2=kN\xB7m 3=kgf\xB7m 4=lbf\xB7ft)", unit: "", default: 1 }],
     outputs: [{ key: "Nm", label: "N\xB7m" }, { key: "kNm", label: "kN\xB7m" }, { key: "kgfm", label: "kgf\xB7m" }, { key: "lbft", label: "lbf\xB7ft" }],
     calc(i) {
@@ -903,6 +949,7 @@ const CALCS = {
   unit_length: {
     name: "\u9577\u5EA6\u55AE\u4F4D\u63DB\u7B97",
     desc: "mm / cm / m / in / ft \u4E92\u63DB",
+    ref: "長度單位換算係數，參考 NIST SP811 國際單位制使用指南",
     inputs: [{ key: "val", label: "\u8F38\u5165\u503C", unit: "", default: 100 }, { key: "from", label: "\u55AE\u4F4D (1=mm 2=cm 3=m 4=in 5=ft)", unit: "", default: 1 }],
     outputs: [{ key: "mm", label: "mm" }, { key: "cm", label: "cm" }, { key: "m", label: "m" }, { key: "inch", label: "inch" }, { key: "ft", label: "ft" }],
     calc(i) {
@@ -912,13 +959,13 @@ const CALCS = {
     }
   },
   // ══ 查詢型（特殊 _type） ══
-  bearing_lookup: { _type: "bearing_lookup", name: "\u6DF1\u6E9D\u7403\u8EF8\u627F\u67E5\u8A62", desc: "\u4F9D\u5167\u5F91\u6216\u578B\u865F\u641C\u5C0B" },
-  bearing_thrust_lookup: { _type: "bearing_thrust_lookup", name: "\u63A8\u529B\u7403\u8EF8\u627F\u67E5\u8A62", desc: "\u4F9D\u5167\u5F91\u6216\u578B\u865F\u641C\u5C0B" },
-  it_tolerance: { _type: "it_tolerance", name: "IT\u516C\u5DEE\u7B49\u7D1A\u67E5\u8A62", desc: "\u4F9D\u57FA\u672C\u5C3A\u5BF8\u67E5 IT5~IT11" },
-  material_elastic: { _type: "material_elastic", name: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u6750\u6599\u5F48\u6027\u6A21\u91CF\u67E5\u8A62" },
-  material_density: { _type: "material_density", name: "\u6750\u6599\u5BC6\u5EA6\u67E5\u8A62", desc: "\u5E38\u7528\u91D1\u5C6C\u8207\u5DE5\u7A0B\u6750\u6599\u5BC6\u5EA6" },
-  material_friction: { _type: "material_friction", name: "\u6750\u6599\u6469\u64E6\u4FC2\u6578", desc: "\u5E38\u7528\u6750\u6599\u526F\u6469\u64E6\u4FC2\u6578" },
-  bolt_torque_lookup: { _type: "bolt_torque_lookup", name: "\u87BA\u6813\u9396\u7DCA\u626D\u77E9\u6A19\u6E96", desc: "M6~M100 \u65E5\u672C/DIN \u6A19\u6E96\u626D\u77E9" }
+  bearing_lookup: { _type: "bearing_lookup", name: "\u6DF1\u6E9D\u7403\u8EF8\u627F\u67E5\u8A62", desc: "\u4F9D\u5167\u5F91\u6216\u578B\u865F\u641C\u5C0B", ref: "深溝球軸承尺寸與基本額定負荷數據，參考 JIS B 1521／ISO 15 軸承標準及 NSK／NTN 型錄" },
+  bearing_thrust_lookup: { _type: "bearing_thrust_lookup", name: "\u63A8\u529B\u7403\u8EF8\u627F\u67E5\u8A62", desc: "\u4F9D\u5167\u5F91\u6216\u578B\u865F\u641C\u5C0B", ref: "推力球軸承尺寸數據，參考 JIS B 1532 推力軸承標準及 NSK 型錄" },
+  it_tolerance: { _type: "it_tolerance", name: "IT\u516C\u5DEE\u7B49\u7D1A\u67E5\u8A62", desc: "\u4F9D\u57FA\u672C\u5C3A\u5BF8\u67E5 IT5~IT11", ref: "IT 公差等級數值，參考 JIS B 0401／ISO 286 公差與配合標準" },
+  material_elastic: { _type: "material_elastic", name: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u6750\u6599\u5F48\u6027\u6A21\u91CF\u67E5\u8A62", ref: "材料彈性模數、泊松比、線膨脹係數數據，參考機械工程材料手冊" },
+  material_density: { _type: "material_density", name: "\u6750\u6599\u5BC6\u5EA6\u67E5\u8A62", desc: "\u5E38\u7528\u91D1\u5C6C\u8207\u5DE5\u7A0B\u6750\u6599\u5BC6\u5EA6", ref: "工程材料密度數據，參考機械工程材料手冊／ASM Metals Handbook" },
+  material_friction: { _type: "material_friction", name: "\u6750\u6599\u6469\u64E6\u4FC2\u6578", desc: "\u5E38\u7528\u6750\u6599\u526F\u6469\u64E6\u4FC2\u6578", ref: "材料摩擦係數數據，參考機械設計便覽摩擦係數表" },
+  bolt_torque_lookup: { _type: "bolt_torque_lookup", name: "\u87BA\u6813\u9396\u7DCA\u626D\u77E9\u6A19\u6E96", desc: "M6~M100 \u65E5\u672C/DIN \u6A19\u6E96\u626D\u77E9", ref: "螺栓鎖緊扭矩標準值（4.8 級），參考 JIS B 1083／DIN 螺栓扭矩標準" }
 };
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
@@ -965,6 +1012,8 @@ body{font-family:var(--sans);font-weight:300;color:var(--primary);background:var
 .card{background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:var(--radius-lg);overflow:hidden}
 .card-title{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--secondary);padding:14px 16px 0;margin-bottom:10px}
 .card-desc{font-size:13px;color:var(--muted);margin:-6px 16px 10px;line-height:1.5}
+.ref-note{font-size:11px;color:var(--muted);margin:-4px 16px 12px;line-height:1.5;font-style:italic;padding-left:14px;border-left:2px solid var(--border-color)}
+.ref-note b{font-style:normal;font-weight:600;color:var(--secondary)}
 .home-card{background:var(--bg-light);border:0.5px solid var(--border-color);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .2s}
 .home-card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.07)}
 .home-card .icon{font-size:26px;margin-bottom:8px}
@@ -1017,13 +1066,13 @@ function LookupPanel({ title, desc, data, columns, filterFn }) {
 function ITTolerance() {
   const [dim, setDim] = useState(30);
   const row = useMemo(() => IT_TABLE.find((r) => dim > r.from && dim <= r.to) || IT_TABLE[0], [dim]);
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "IT\u516C\u5DEE\u7B49\u7D1A\u67E5\u8A62"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "\u4F9D\u57FA\u672C\u5C3A\u5BF8\u67E5 IT5~IT11 \u516C\u5DEE\u503C\uFF08\u03BCm\uFF09"), /* @__PURE__ */ React.createElement("div", { className: "field" }, /* @__PURE__ */ React.createElement("label", null, "\u57FA\u672C\u5C3A\u5BF8 (mm)"), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: dim, onChange: (e) => setDim(parseFloat(e.target.value) || 0) }), /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, "mm"))), row && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "var(--muted)", marginBottom: 6 } }, "\u5C3A\u5BF8\u6BB5\uFF1A", row.from, " \uFF1C d \u2264 ", row.to, " mm"), /* @__PURE__ */ React.createElement("table", { className: "it-table" }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("th", { key: g }, g)))), /* @__PURE__ */ React.createElement("tbody", null, /* @__PURE__ */ React.createElement("tr", { className: "hl" }, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("td", { key: g }, row[g]))))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: "var(--muted)" } }, ["IT6", "IT7", "IT8", "IT9", "IT10"].map((g) => /* @__PURE__ */ React.createElement("span", { key: g, className: "it-badge" }, g, "=", row[g], "\u03BCm")))));
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "IT\u516C\u5DEE\u7B49\u7D1A\u67E5\u8A62"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "\u4F9D\u57FA\u672C\u5C3A\u5BF8\u67E5 IT5~IT11 \u516C\u5DEE\u503C\uFF08\u03BCm\uFF09"), CALCS.it_tolerance?.ref && /* @__PURE__ */ React.createElement("div", { className: "ref-note" }, /* @__PURE__ */ React.createElement("b", null, "\u4F86\u6E90\uFF1A"), CALCS.it_tolerance.ref), /* @__PURE__ */ React.createElement("div", { className: "field" }, /* @__PURE__ */ React.createElement("label", null, "\u57FA\u672C\u5C3A\u5BF8 (mm)"), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: dim, onChange: (e) => setDim(parseFloat(e.target.value) || 0) }), /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, "mm"))), row && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "var(--muted)", marginBottom: 6 } }, "\u5C3A\u5BF8\u6BB5\uFF1A", row.from, " \uFF1C d \u2264 ", row.to, " mm"), /* @__PURE__ */ React.createElement("table", { className: "it-table" }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("th", { key: g }, g)))), /* @__PURE__ */ React.createElement("tbody", null, /* @__PURE__ */ React.createElement("tr", { className: "hl" }, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("td", { key: g }, row[g]))))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: "var(--muted)" } }, ["IT6", "IT7", "IT8", "IT9", "IT10"].map((g) => /* @__PURE__ */ React.createElement("span", { key: g, className: "it-badge" }, g, "=", row[g], "\u03BCm")))));
 }
 function PressureConv() {
   const [val, setVal] = useState(0.5);
   const [fi, setFi] = useState(2);
   const pa = useMemo(() => val * PRESSURE_TO_PA[fi], [val, fi]);
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "\u58D3\u529B\u55AE\u4F4D\u63DB\u7B97"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "Pa/kPa/MPa/bar/atm/kgf/cm\xB2/psi \u4E92\u63DB"), /* @__PURE__ */ React.createElement("div", { className: "lookup-input" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: val, onChange: (e) => setVal(parseFloat(e.target.value) || 0) }), /* @__PURE__ */ React.createElement("select", { value: fi, onChange: (e) => setFi(+e.target.value) }, PRESSURE_UNITS.map((u, i) => /* @__PURE__ */ React.createElement("option", { key: u, value: i }, u)))), /* @__PURE__ */ React.createElement("div", { className: "conv-grid" }, PRESSURE_UNITS.map((u, i) => /* @__PURE__ */ React.createElement("div", { className: "conv-item", key: u }, /* @__PURE__ */ React.createElement("label", null, u), /* @__PURE__ */ React.createElement("div", { className: "val" }, (pa / PRESSURE_TO_PA[i]).toPrecision(5))))));
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "\u58D3\u529B\u55AE\u4F4D\u63DB\u7B97"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "Pa/kPa/MPa/bar/atm/kgf/cm\xB2/psi \u4E92\u63DB"), CALCS.unit_pressure?.ref && /* @__PURE__ */ React.createElement("div", { className: "ref-note" }, /* @__PURE__ */ React.createElement("b", null, "\u4F86\u6E90\uFF1A"), CALCS.unit_pressure.ref), /* @__PURE__ */ React.createElement("div", { className: "lookup-input" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: val, onChange: (e) => setVal(parseFloat(e.target.value) || 0) }), /* @__PURE__ */ React.createElement("select", { value: fi, onChange: (e) => setFi(+e.target.value) }, PRESSURE_UNITS.map((u, i) => /* @__PURE__ */ React.createElement("option", { key: u, value: i }, u)))), /* @__PURE__ */ React.createElement("div", { className: "conv-grid" }, PRESSURE_UNITS.map((u, i) => /* @__PURE__ */ React.createElement("div", { className: "conv-item", key: u }, /* @__PURE__ */ React.createElement("label", null, u), /* @__PURE__ */ React.createElement("div", { className: "val" }, (pa / PRESSURE_TO_PA[i]).toPrecision(5))))));
 }
 function SectionSVG({ type, vals }) {
   const W = 180, H = 160, cx = 90, cy = 85, sc = 2.2;
@@ -1190,12 +1239,13 @@ function useExport() {
   return { exportPDF };
 }
 
-function MaterialDropdown({ title, desc, data, cols }) {
+function MaterialDropdown({ title, desc, data, cols, refText }) {
   const [sel, setSel] = React.useState(0);
   const row = data[sel] || data[0];
   return React.createElement("div", { className: "card", style:{padding:0} },
     React.createElement("div", { className: "card-title" }, title),
     React.createElement("div", { className: "card-desc" }, desc),
+    refText && React.createElement("div", { className: "ref-note" }, React.createElement("b", null, "來源："), refText),
     React.createElement("div", { className: "field" },
       React.createElement("label", null, "\u9078\u64C7"),
       React.createElement("select", {
@@ -1218,7 +1268,7 @@ function MaterialDropdown({ title, desc, data, cols }) {
     )
   );
 }
-function BearingDropdown({ title, desc, data, cols }) {
+function BearingDropdown({ title, desc, data, cols, refText }) {
   const dOptions = React.useMemo(function(){
     var ds = Array.from(new Set(data.map(function(r){return r.d;}))).sort(function(a,b){return a-b;}).map(String);
     return ["全部"].concat(ds);
@@ -1236,6 +1286,7 @@ function BearingDropdown({ title, desc, data, cols }) {
   return React.createElement("div", { className: "card", style:{padding:0} },
     React.createElement("div", { className: "card-title" }, title),
     React.createElement("div", { className: "card-desc" }, desc),
+    refText && React.createElement("div", { className: "ref-note" }, React.createElement("b", null, "來源："), refText),
     React.createElement("div", { className: "field" },
       React.createElement("label", null, "內徑 d (mm)"),
       React.createElement("select", { value: selD, onChange: function(e){ setSelD(e.target.value); }, style: SEL_STYLE },
@@ -1264,14 +1315,14 @@ function BearingDropdown({ title, desc, data, cols }) {
 function CalcCard({ calcId, onLink }) {
   const def = CALCS[calcId];
   if (!def) return null;
-  if (def._type === "bearing_lookup") return React.createElement(BearingDropdown, { title: "深溝球軸承查詢", desc: "依內徑(d)篩選後選取型號", data: BEARINGS_DEEP, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "B", label: "B (mm)" }, { key: "Cr", label: "Cr (N)" }, { key: "Cor", label: "Cor (N)" }, { key: "nmax", label: "nmax ×10³" }] });
-  if (def._type === "bearing_thrust_lookup") return React.createElement(BearingDropdown, { title: "推力球軸承查詢", desc: "依內徑(d)篩選後選取型號", data: BEARINGS_THRUST, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "T", label: "T (mm)" }] });
+  if (def._type === "bearing_lookup") return React.createElement(BearingDropdown, { title: "深溝球軸承查詢", desc: "依內徑(d)篩選後選取型號", data: BEARINGS_DEEP, refText: def.ref, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "B", label: "B (mm)" }, { key: "Cr", label: "Cr (N)" }, { key: "Cor", label: "Cor (N)" }, { key: "nmax", label: "nmax ×10³" }] });
+  if (def._type === "bearing_thrust_lookup") return React.createElement(BearingDropdown, { title: "推力球軸承查詢", desc: "依內徑(d)篩選後選取型號", data: BEARINGS_THRUST, refText: def.ref, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "T", label: "T (mm)" }] });
   if (def._type === "it_tolerance") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(ITTolerance, null));
   if (def._type === "unit_pressure") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(PressureConv, null));
-  if (def._type === "material_elastic") return React.createElement(MaterialDropdown, { title: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u5DE5\u7A0B\u6750\u6599", data: ELASTIC_TABLE, cols: [{key:"name",label:"\u6750\u6599"},{key:"E",label:"E (GPa)"},{key:"nu",label:"\u6CCA\u677E\u6BD4 \u03BD"},{key:"alpha",label:"\u7DDA\u81A8\u81A8 \u03B1"}] });
-  if (def._type === "material_density") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u5BC6\u5EA6\u67E5\u8A62", desc: "\u5E38\u7528\u91D1\u5C6C\u8207\u5DE5\u7A0B\u6750\u6599", data: DENSITY_TABLE, cols: [{key:"name",label:"\u6750\u6599"},{key:"rho",label:"\u5BC6\u5EA6 kg/m\xB3"}] });
-  if (def._type === "material_friction") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u6469\u64E6\u4FC2\u6578", desc: "\u7121\u6F64\u6ED1 / \u6709\u6F64\u6ED1", data: FRICTION_TABLE, cols: [{key:"pair",label:"\u6750\u6599\u526F"},{key:"dry",label:"\u7121\u6F64\u6ED1"},{key:"wet",label:"\u6709\u6F64\u6ED1"}] });
-  if (def._type === "bolt_torque_lookup") return React.createElement(MaterialDropdown, { title: "\u87BA\u6813\u9396\u7DCA\u626D\u77E9\u6A19\u6E96", desc: "\u55AE\u4F4D: kgf\xB7m\uFF0C4.8\u7D1A", data: BOLT_TORQUE, cols: [{key:"size",label:"\u898F\u683C"},{key:"jp",label:"\u65E5\u672C\u6A19\u6E96"},{key:"din",label:"DIN\u6A19\u6E96"}] });
+  if (def._type === "material_elastic") return React.createElement(MaterialDropdown, { title: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u5DE5\u7A0B\u6750\u6599", data: ELASTIC_TABLE, refText: def.ref, cols: [{key:"name",label:"\u6750\u6599"},{key:"E",label:"E (GPa)"},{key:"nu",label:"\u6CCA\u677E\u6BD4 \u03BD"},{key:"alpha",label:"\u7DDA\u81A8\u81A8 \u03B1"}] });
+  if (def._type === "material_density") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u5BC6\u5EA6\u67E5\u8A62", desc: "\u5E38\u7528\u91D1\u5C6C\u8207\u5DE5\u7A0B\u6750\u6599", data: DENSITY_TABLE, refText: def.ref, cols: [{key:"name",label:"\u6750\u6599"},{key:"rho",label:"\u5BC6\u5EA6 kg/m\xB3"}] });
+  if (def._type === "material_friction") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u6469\u64E6\u4FC2\u6578", desc: "\u7121\u6F64\u6ED1 / \u6709\u6F64\u6ED1", data: FRICTION_TABLE, refText: def.ref, cols: [{key:"pair",label:"\u6750\u6599\u526F"},{key:"dry",label:"\u7121\u6F64\u6ED1"},{key:"wet",label:"\u6709\u6F64\u6ED1"}] });
+  if (def._type === "bolt_torque_lookup") return React.createElement(MaterialDropdown, { title: "\u87BA\u6813\u9396\u7DCA\u626D\u77E9\u6A19\u6E96", desc: "\u55AE\u4F4D: kgf\xB7m\uFF0C4.8\u7D1A", data: BOLT_TORQUE, refText: def.ref, cols: [{key:"size",label:"\u898F\u683C"},{key:"jp",label:"\u65E5\u672C\u6A19\u6E96"},{key:"din",label:"DIN\u6A19\u6E96"}] });
   const { exportPDF } = useExport();
   const init = () => Object.fromEntries(def.inputs.map((i) => [i.key, i.default]));
   const [vals, setVals] = useState(init);
@@ -1297,7 +1348,7 @@ function CalcCard({ calcId, onLink }) {
     }
   }, [vals, def]);
   const svgType = calcId === "section_circle" ? "circle" : calcId === "section_hollow_circle" ? "hollow_circle" : calcId === "section_rect" ? "rect" : calcId === "section_hollow_rect" ? "hollow_rect" : null;
-  return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, def.name), def.desc && /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, def.desc), def.inputs.map((inp) => /* @__PURE__ */ React.createElement("div", { className: "field", key: inp.key }, /* @__PURE__ */ React.createElement("label", null, inp.label), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: vals[inp.key], onChange: (e) => setVals((v) => ({ ...v, [inp.key]: e.target.value })) }), inp.unit && /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, inp.unit)), inp.hint && /* @__PURE__ */ React.createElement("div", { className: "hint" }, inp.hint))), /* @__PURE__ */ React.createElement("button", { className: "calc-btn", onClick: run }, "\u8A08\u7B97"), svgType && /* @__PURE__ */ React.createElement(SectionSVG, { type: svgType, vals }), results && /* @__PURE__ */ React.createElement("div", { className: "results-divider" }, results.error ? /* @__PURE__ */ React.createElement("div", { style: { color: "var(--warn)", fontSize: 12 } }, "\u932F\u8AA4\uFF1A", results.error) : def.outputs.map((o) => /* @__PURE__ */ React.createElement("div", { className: "result-row", key: o.key }, /* @__PURE__ */ React.createElement("span", { className: "result-label" }, o.label), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("span", { className: `result-val${String(results[o.key]).includes("\u2705") ? " verdict-ok" : String(results[o.key]).includes("\u274C") ? " verdict-ng" : ""}` }, results[o.key] ?? "\u2014"), o.unit && /* @__PURE__ */ React.createElement("span", { className: "result-unit" }, o.unit))))), results && !results.error && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 8 } }, /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => exportPDF(def.name, def.inputs.map((i) => ({ ...i, val: vals[i.key] })), def.outputs, results) }, "\u{1F4C4} \u532F\u51FA\u8A08\u7B97\u5831\u544A"), ["section_circle", "section_hollow_circle", "section_rect", "section_hollow_rect"].includes(calcId) && onLink && /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => onLink(calcId, results) }, "\u{1F517} \u5E36\u5165\u7ACB\u67F1\u8A08\u7B97")));
+  return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, def.name), def.desc && /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, def.desc), def.ref && /* @__PURE__ */ React.createElement("div", { className: "ref-note" }, /* @__PURE__ */ React.createElement("b", null, "來源："), def.ref), def.inputs.map((inp) => /* @__PURE__ */ React.createElement("div", { className: "field", key: inp.key }, /* @__PURE__ */ React.createElement("label", null, inp.label), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: vals[inp.key], onChange: (e) => setVals((v) => ({ ...v, [inp.key]: e.target.value })) }), inp.unit && /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, inp.unit)), inp.hint && /* @__PURE__ */ React.createElement("div", { className: "hint" }, inp.hint))), /* @__PURE__ */ React.createElement("button", { className: "calc-btn", onClick: run }, "\u8A08\u7B97"), svgType && /* @__PURE__ */ React.createElement(SectionSVG, { type: svgType, vals }), results && /* @__PURE__ */ React.createElement("div", { className: "results-divider" }, results.error ? /* @__PURE__ */ React.createElement("div", { style: { color: "var(--warn)", fontSize: 12 } }, "\u932F\u8AA4\uFF1A", results.error) : def.outputs.map((o) => /* @__PURE__ */ React.createElement("div", { className: "result-row", key: o.key }, /* @__PURE__ */ React.createElement("span", { className: "result-label" }, o.label), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("span", { className: `result-val${String(results[o.key]).includes("\u2705") ? " verdict-ok" : String(results[o.key]).includes("\u274C") ? " verdict-ng" : ""}` }, results[o.key] ?? "\u2014"), o.unit && /* @__PURE__ */ React.createElement("span", { className: "result-unit" }, o.unit))))), results && !results.error && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 8 } }, /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => exportPDF(def.name, def.inputs.map((i) => ({ ...i, val: vals[i.key] })), def.outputs, results) }, "\u{1F4C4} \u532F\u51FA\u8A08\u7B97\u5831\u544A"), ["section_circle", "section_hollow_circle", "section_rect", "section_hollow_rect"].includes(calcId) && onLink && /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => onLink(calcId, results) }, "\u{1F517} \u5E36\u5165\u7ACB\u67F1\u8A08\u7B97")));
 }
 function App() {
   const [activeCat, setActiveCat] = useState(null);
