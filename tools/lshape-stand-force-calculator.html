@@ -61,6 +61,23 @@
         .status-bar.neutral { background-color: var(--bg-light); color: var(--secondary-color); border: 0.5px solid var(--border-color); }
         .tip-box { background-color: var(--bg-light); border-radius: var(--radius-md); border-left: 3px solid var(--primary-color); padding: 0.85rem 1.1rem; font-size: 12.5px; color: var(--secondary-color); line-height: 1.75; }
         .tip-box strong { color: var(--primary-color); }
+        .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 1.1rem; font-size: 13px; }
+        .compare-table th, .compare-table td { padding: 0.65rem 0.7rem; border-bottom: 0.5px solid var(--border-color); text-align: left; white-space: nowrap; }
+        .compare-table th { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--secondary-color); font-weight: 700; }
+        .compare-table tr.basis-row td { color: var(--secondary-color); }
+        .compare-table tr.basis-row td:first-child { color: var(--primary-color); font-weight: 600; }
+        .compare-table td.num { font-weight: 700; font-family: 'SF Mono', Menlo, Consolas, monospace; color: var(--primary-color); }
+        .ma-callout { background-color: var(--primary-color); border-radius: var(--radius-md); padding: 1.1rem 1.25rem; margin-bottom: 1.1rem; }
+        .ma-callout .label { font-size: 11.5px; color: var(--bg-white); opacity: 0.75; font-weight: 600; margin-bottom: 0.4rem; }
+        .ma-callout .value { font-size: 26px; font-weight: 700; color: var(--bg-white); line-height: 1; }
+        .ma-callout .sub { font-size: 12px; color: var(--bg-white); opacity: 0.75; margin-top: 4px; }
+        details.detail-box { background-color: var(--bg-light); border-radius: var(--radius-md); border: 0.5px solid var(--border-color); padding: 0.85rem 1.1rem; margin-bottom: 1.1rem; font-size: 12.5px; }
+        details.detail-box summary { cursor: pointer; font-weight: 600; color: var(--secondary-color); }
+        details.detail-box[open] summary { margin-bottom: 0.85rem; }
+        details.detail-box .result-grid { margin-top: 0; margin-bottom: 0; }
+        @media (max-width: 600px) {
+            .compare-table { display: block; overflow-x: auto; }
+        }
 
         /* Tabs */
         .tabs { display: flex; gap: 4px; margin-bottom: 1rem; border-bottom: 0.5px solid var(--border-color); overflow-x: auto; scrollbar-width: thin; }
@@ -227,8 +244,8 @@
         <!-- TAB 2：無底板 / 底板鎖固於地面 -->
         <div class="tab-panel" id="t-fixed">
             <div class="method-card">
-                <h3>底板鎖固：兩種算法並列對照</h3>
-                <span class="formula-note">無底板長度 L2 可換算水平反力。下方同時列出你 Excel 的分力疊加法（算法1/2/2-1）與嚴格靜力平衡解（Av/Ah/M_A），並說明兩者的物理意義差異。</span>
+                <h3>底板鎖固：受力比較表＋反力矩</h3>
+                <span class="formula-note">無底板長度 L2 可換算水平反力。下方以一張表比較 ΣF 基準、Excel 算法2/2-1、與嚴格靜力平衡解 Av，並單獨強調 M_A 反力矩（結構設計實際要用的值）。</span>
             </div>
             <div class="selector-card">
                 <h2>輸入參數</h2>
@@ -264,39 +281,71 @@
             </div>
 
             <div class="result-card">
-                <h2>計算結果 A：你的分力疊加法（算法1 / 2 / 2-1）</h2>
+                <h2>計算結果：受力量級比較 + 反力矩</h2>
                 <div id="resultStatusFixed"><div class="status-bar neutral">尚未計算</div></div>
-                <div class="result-grid" id="resultGridFixed">
-                    <div class="result-item"><div class="label">LCD 重力 F</div><div class="value" id="rf_f_lcd">—</div><div class="unit">N</div></div>
-                    <div class="result-item"><div class="label">支架自重 F</div><div class="value" id="rf_f_stand">—</div><div class="unit">N</div></div>
-                    <div class="result-item highlight"><div class="label">ΣF 總重（垂直）</div><div class="value" id="rf_fv_total">—</div><div class="unit">N</div></div>
-                    <div class="result-item"><div class="label">垂直分力加總（cosθ）</div><div class="value" id="rf_fv_sum">—</div><div class="unit">N</div></div>
-                    <div class="result-item"><div class="label">水平分力加總（sinθ）</div><div class="value" id="rf_fh_sum">—</div><div class="unit">N</div></div>
-                    <div class="result-item"><div class="label">LCD 水平分力（sinθ）</div><div class="value" id="rf_fh_lcd">—</div><div class="unit">N</div></div>
-                    <div class="result-item highlight"><div class="label">算法1：F-total（＝ΣF，恆等式）</div><div class="value" id="rf_algo1">—</div><div class="unit" id="rf_algo1_kgf">N</div></div>
-                    <div class="result-item highlight"><div class="label">算法2：F-total（最保守）</div><div class="value" id="rf_algo2">—</div><div class="unit" id="rf_algo2_kgf">N</div></div>
-                    <div class="result-item highlight"><div class="label">算法2-1：F-total（折衷）</div><div class="value" id="rf_algo21">—</div><div class="unit" id="rf_algo21_kgf">N</div></div>
-                </div>
-                <div class="tip-box" id="resultTipFixed">
-                    <strong>📌 公式</strong>　F=m·g　　Fv=cosθ·F　　Fh=sinθ·F<br>
-                    算法1：F-total=√(ΣFv²+ΣFh²)＝ΣF（cos²θ+sin²θ=1 恆等式，無額外安全餘裕）<br>
-                    算法2：F-total=√(ΣF²+ΣFh²)（最保守）　｜　算法2-1：F-total=√(ΣF²+Fh_LCD²)（介於算法1、2之間）
-                </div>
-            </div>
+                <table class="compare-table">
+                    <thead>
+                        <tr><th>方法</th><th>Fv 項</th><th>Fh 項</th><th>F-total</th><th>約</th><th>性質</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="basis-row">
+                            <td>設備總重 ΣF（基準）</td>
+                            <td id="rf_sigma_fv">—</td>
+                            <td>—</td>
+                            <td class="num" id="rf_sigma_total">—</td>
+                            <td id="rf_sigma_kgf">—</td>
+                            <td>恆等於總重，無額外餘裕</td>
+                        </tr>
+                        <tr>
+                            <td>算法2</td>
+                            <td>ΣF</td>
+                            <td id="rf_fh_sum_t">—</td>
+                            <td class="num" id="rf_algo2">—</td>
+                            <td id="rf_algo2_kgf">—</td>
+                            <td>最保守（最大）</td>
+                        </tr>
+                        <tr>
+                            <td>算法2-1</td>
+                            <td>ΣF</td>
+                            <td id="rf_fh_lcd_t">—</td>
+                            <td class="num" id="rf_algo21">—</td>
+                            <td id="rf_algo21_kgf">—</td>
+                            <td>折衷值</td>
+                        </tr>
+                        <tr class="basis-row">
+                            <td>嚴格解 Av（平衡方程式）</td>
+                            <td>ΣF</td>
+                            <td id="rf_ah">—</td>
+                            <td class="num" id="rf_av">—</td>
+                            <td id="rf_av_kgf">—</td>
+                            <td>＝ΣF，因 Ah 恆為 0</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <div class="result-card">
-                <h2>計算結果 B：嚴格靜力平衡解（Av / Ah / M_A）</h2>
-                <div class="result-grid" id="resultGridFixedRigorous">
-                    <div class="result-item highlight"><div class="label">Av 垂直反力（＝ΣF）</div><div class="value" id="rf_av">—</div><div class="unit" id="rf_av_kgf">N</div></div>
-                    <div class="result-item"><div class="label">Ah 水平反力（無外加水平力恆為0）</div><div class="value" id="rf_ah">—</div><div class="unit">N</div></div>
-                    <div class="result-item highlight"><div class="label">M_A 反力矩（焊道/螺栓群設計關鍵值）</div><div class="value" id="rf_ma">—</div><div class="unit" id="rf_ma_kgfcm">N·m</div></div>
+                <div class="ma-callout">
+                    <div class="label">⚠ M_A 反力矩（單位 N·m，與上表 F-total 不可直接比大小）</div>
+                    <div class="value" id="rf_ma">—</div>
+                    <div class="sub" id="rf_ma_kgfcm">—</div>
                 </div>
-                <div class="tip-box">
-                    <strong>📌 見解</strong>　固定／鎖固支點是「結構連續」的邊界條件，嚴格靜力平衡（ΣFx=0、ΣFy=0、ΣM=0）只有唯一解：
-                    Av＝總重、Ah＝0（沒有外加水平力，平衡方程式本來就要求水平反力為零）、M_A＝對固定端取矩的總和。<br><br>
-                    算法1/2/2-1 是把重力沿「支架軸向」分解（cosθ＝壓向支架的分量、sinθ＝沿支架下滑的分量），這是分析支架本身受力（軸力/剪力）的角度，不是地面對支點的水平反力方向；
-                    算法1因 cos²θ+sin²θ=1 必然等於 ΣF，是恆等式而非新資訊；算法2、2-1把同一個重力的下滑分量再疊加一次到總重上，屬於刻意加大的保守安全係數，不是平衡方程式的解。<br><br>
-                    實務上：若要檢核焊道、螺栓群或植入深度，<strong>M_A</strong> 才是真正決定性的數字（本例 ≈ ${''}<span id="rf_ma_inline">—</span>N·m）；若只是想快速抓一個偏保守的受力量級當安全係數，算法2／2-1可以當參考，但不能取代 M_A 的檢核。
+
+                <details class="detail-box">
+                    <summary>詳細分量（對應 Excel 逐項數值，點此展開）</summary>
+                    <div class="result-grid">
+                        <div class="result-item"><div class="label">LCD 重力 F</div><div class="value" id="rf_f_lcd">—</div><div class="unit">N</div></div>
+                        <div class="result-item"><div class="label">支架自重 F</div><div class="value" id="rf_f_stand">—</div><div class="unit">N</div></div>
+                        <div class="result-item"><div class="label">垂直分力加總（cosθ）</div><div class="value" id="rf_fv_sum">—</div><div class="unit">N</div></div>
+                        <div class="result-item"><div class="label">水平分力加總（sinθ）</div><div class="value" id="rf_fh_sum">—</div><div class="unit">N</div></div>
+                        <div class="result-item"><div class="label">LCD 水平分力（sinθ）</div><div class="value" id="rf_fh_lcd">—</div><div class="unit">N</div></div>
+                        <div class="result-item"><div class="label">LCD 力矩</div><div class="value" id="rf_m_lcd">—</div><div class="unit">N·m</div></div>
+                        <div class="result-item"><div class="label">支架力矩</div><div class="value" id="rf_m_stand">—</div><div class="unit">N·m</div></div>
+                    </div>
+                </details>
+
+                <div class="tip-box" id="resultTipFixed">
+                    <strong>📌 見解</strong>　固定／鎖固支點是「結構連續」邊界條件，嚴格靜力平衡（ΣFx=0、ΣFy=0、ΣM=0）只有唯一解：Av＝總重、Ah＝0（沒有外加水平力）、M_A＝對固定端取矩的總和。<br><br>
+                    算法2、2-1是把重力沿支架軸向分解出的下滑分量（sinθ）以向量合成（√，非直接相加）疊加到總重上，當作人為保守係數，不是平衡方程式的解；其方向定義（沿支架軸向）也跟 Ah（全域水平反力）不同，不能互相替代。原 Excel 的「算法1」因 cos²θ+sin²θ=1 必然恆等於 ΣF，已併入上表的基準列，不再單獨列出。<br><br>
+                    實務上：若要檢核焊道、螺栓群或植入深度，<strong>M_A</strong> 才是真正決定性的數字；算法2／2-1可以當一個快速、偏保守的力量級參考，但不能取代 M_A 的檢核。
                 </div>
             </div>
         </div>
@@ -495,31 +544,32 @@
 
             document.getElementById('rf_f_lcd').textContent    = fmt(d.f_lcd_n, 'N');
             document.getElementById('rf_f_stand').textContent  = fmt(d.f_stand_n, 'N');
-            document.getElementById('rf_fv_total').textContent = fmt(d.fv_total_n, 'N');
             document.getElementById('rf_fv_sum').textContent   = fmt(d.fv_sum_n, 'N');
             document.getElementById('rf_fh_sum').textContent   = fmt(d.fh_sum_n, 'N');
             document.getElementById('rf_fh_lcd').textContent   = fmt(d.fh_lcd_n, 'N');
-            document.getElementById('rf_algo1').textContent      = fmt(d.f_total_algo1_n, 'N');
-            document.getElementById('rf_algo1_kgf').textContent  = fmt(d.f_total_algo1_kgf, 'kgf');
-            document.getElementById('rf_algo2').textContent      = fmt(d.f_total_algo2_n, 'N');
-            document.getElementById('rf_algo2_kgf').textContent  = fmt(d.f_total_algo2_kgf, 'kgf');
-            document.getElementById('rf_algo21').textContent     = fmt(d.f_total_algo21_n, 'N');
-            document.getElementById('rf_algo21_kgf').textContent = fmt(d.f_total_algo21_kgf, 'kgf');
+            document.getElementById('rf_m_lcd').textContent    = fmt(d.m_lcd_nm, 'N·m');
+            document.getElementById('rf_m_stand').textContent  = fmt(d.m_stand_nm, 'N·m');
 
-            document.getElementById('rf_av').textContent      = fmt(d.av_n, 'N');
-            document.getElementById('rf_av_kgf').textContent  = fmt(d.av_kgf, 'kgf');
+            document.getElementById('rf_sigma_fv').textContent    = fmt(d.fv_total_n, 'N');
+            document.getElementById('rf_sigma_total').textContent = fmt(d.fv_total_n, 'N');
+            document.getElementById('rf_sigma_kgf').textContent   = '≈ ' + fmt(d.av_kgf, 'kgf');
+
+            document.getElementById('rf_fh_sum_t').textContent   = fmt(d.fh_sum_n, 'N');
+            document.getElementById('rf_algo2').textContent      = fmt(d.f_total_algo2_n, 'N');
+            document.getElementById('rf_algo2_kgf').textContent  = '≈ ' + fmt(d.f_total_algo2_kgf, 'kgf');
+
+            document.getElementById('rf_fh_lcd_t').textContent   = fmt(d.fh_lcd_n, 'N');
+            document.getElementById('rf_algo21').textContent     = fmt(d.f_total_algo21_n, 'N');
+            document.getElementById('rf_algo21_kgf').textContent = '≈ ' + fmt(d.f_total_algo21_kgf, 'kgf');
+
             document.getElementById('rf_ah').textContent      = fmt(d.ah_n, 'N');
-            document.getElementById('rf_ma').textContent      = fmt(d.m_a_nm, 'N·m');
-            document.getElementById('rf_ma_kgfcm').textContent = fmt(d.m_a_kgfcm, 'kgf·cm');
-            document.getElementById('rf_ma_inline').textContent = fmt(d.m_a_nm, '').trim();
+            document.getElementById('rf_av').textContent      = fmt(d.av_n, 'N');
+            document.getElementById('rf_av_kgf').textContent  = '≈ ' + fmt(d.av_kgf, 'kgf');
+
+            document.getElementById('rf_ma').textContent       = fmt(d.m_a_nm, 'N·m');
+            document.getElementById('rf_ma_kgfcm').textContent = '≈ ' + fmt(d.m_a_kgfcm, 'kgf·cm');
 
             document.getElementById('resultStatusFixed').innerHTML = `<div class="status-bar ok">✓ 計算完成</div>`;
-            document.getElementById('resultTipFixed').innerHTML = `
-                <strong>📌 公式</strong>　F=m·g　　Fv=cosθ·F　　Fh=sinθ·F<br>
-                算法1：F-total=√(ΣFv²+ΣFh²)＝ΣF＝<strong>${fmt(d.f_total_algo1_n,'N')}</strong>（恆等式，無額外餘裕）<br>
-                算法2：F-total=√(ΣF²+ΣFh²)＝<strong>${fmt(d.f_total_algo2_n,'N')}</strong>（約 ${fmt(d.f_total_algo2_kgf,'kgf')}，三者最保守）<br>
-                算法2-1：F-total=√(ΣF²+Fh_LCD²)＝<strong>${fmt(d.f_total_algo21_n,'N')}</strong>（約 ${fmt(d.f_total_algo21_kgf,'kgf')}，折衷值）
-            `;
             setApiStatus('ok');
         } catch (e) {
             errBox.textContent = e.message || '計算失敗，請確認後端服務狀態。';
