@@ -217,6 +217,15 @@
                         <input type="number" id="l_center_stand_m" placeholder="自動 = L1/2" step="0.001" oninput="updateLCenterNote()">
                         <span class="formula-note" id="l_center_auto_note">自動 = L1/2 = — 米</span>
                     </div>
+                    <div class="field-group">
+                        <label>外部施力 F_ext（N，安全規範測試用，0＝不考慮）</label>
+                        <input type="number" id="f_ext_n" value="250" step="1" min="0">
+                        <span class="formula-note">純水平推力，最不利方向；例：安全規範要求最高處施加最大250N推力，設備不能傾倒變形</span>
+                    </div>
+                    <div class="field-group">
+                        <label>施力作用點 l_ext（沿支架距支點，米，留空＝L1最高處）</label>
+                        <input type="number" id="l_ext_m" placeholder="自動 = L1" step="0.001">
+                    </div>
                 </div>
                 <button class="calc-btn" id="calcBtn" onclick="runCalc()">計算</button>
                 <div class="err-box" id="errBox"></div>
@@ -230,7 +239,8 @@
                     <div class="result-item"><div class="label">支架自重 F</div><div class="value" id="r_f_stand">—</div><div class="unit">N</div></div>
                     <div class="result-item"><div class="label">LCD 力矩</div><div class="value" id="r_m_lcd">—</div><div class="unit">N·m</div></div>
                     <div class="result-item"><div class="label">支架力矩</div><div class="value" id="r_m_stand">—</div><div class="unit">N·m</div></div>
-                    <div class="result-item highlight"><div class="label">總力矩 ΣM</div><div class="value" id="r_m_total">—</div><div class="unit">N·m</div></div>
+                    <div class="result-item"><div class="label">外部施力力矩 M_ext</div><div class="value" id="r_m_ext">—</div><div class="unit">N·m（F_ext × l_ext × sinθ）</div></div>
+                    <div class="result-item highlight"><div class="label">總力矩 ΣM（含外部施力）</div><div class="value" id="r_m_total">—</div><div class="unit">N·m</div></div>
                     <div class="result-item"><div class="label">Fv 垂直反作用力</div><div class="value" id="r_fv">—</div><div class="unit" id="r_fv_kgf">N</div></div>
                     <div class="result-item"><div class="label">Fh 水平反作用力</div><div class="value" id="r_fh">—</div><div class="unit" id="r_fh_kgf">N</div></div>
                     <div class="result-item highlight"><div class="label">F-total 總受力</div><div class="value" id="r_ftotal">—</div><div class="unit" id="r_ftotal_kgf">N</div></div>
@@ -275,6 +285,15 @@
                         <label>L重心（支架重心，米，留空＝L1/2）</label>
                         <input type="number" id="l_center_stand_m_f" placeholder="自動 = L1/2" step="0.001" oninput="updateLCenterNoteFixed()">
                         <span class="formula-note" id="l_center_auto_note_f">自動 = L1/2 = — 米</span>
+                    </div>
+                    <div class="field-group">
+                        <label>外部施力 F_ext（N，安全規範測試用，0＝不考慮）</label>
+                        <input type="number" id="f_ext_n_f" value="250" step="1" min="0">
+                        <span class="formula-note">純水平推力，最不利方向；例：安全規範要求最高處施加最大250N推力，設備不能傾倒變形</span>
+                    </div>
+                    <div class="field-group">
+                        <label>施力作用點 l_ext（沿支架距固定端，米，留空＝L1最高處）</label>
+                        <input type="number" id="l_ext_m_f" placeholder="自動 = L1" step="0.001">
                     </div>
                 </div>
                 <button class="calc-btn" id="calcBtnFixed" onclick="runCalcFixed()">計算</button>
@@ -326,9 +345,16 @@
                 <span class="formula-note">「保守合力法－全構件下滑量」對應 Excel 原始算法2；「保守合力法－LCD下滑量」對應 Excel 原始算法2-1。</span>
 
                 <div class="ma-callout">
-                    <div class="label">⚠ M_A 反力矩（單位 N·m，與上表 F-total 不可直接比大小）</div>
+                    <div class="label">⚠ M_A 反力矩（純自重，單位 N·m，與上表 F-total 不可直接比大小）</div>
                     <div class="value" id="rf_ma">—</div>
                     <div class="sub" id="rf_ma_kgfcm">—</div>
+                </div>
+
+                <div class="ma-callout" id="rf_ext_callout" style="border-color:var(--accent);">
+                    <div class="label">🔧 含外部施力測試後合計（螺栓/焊道檢核請優先採用此值）</div>
+                    <div class="value" id="rf_ma_total">—</div>
+                    <div class="sub" id="rf_ma_total_kgfcm">—</div>
+                    <div class="sub" style="margin-top:6px;">M_ext = <span id="rf_m_ext">—</span> N·m　｜　Ah 合計 = <span id="rf_ah_total">—</span> N　｜　Av 合計 = <span id="rf_av_total">—</span> N（純水平施力對 Av 無影響）</div>
                 </div>
 
                 <details class="detail-box">
@@ -347,7 +373,8 @@
                 <div class="tip-box" id="resultTipFixed">
                     <strong>📌 見解</strong>　固定／鎖固支點是「結構連續」邊界條件，嚴格靜力平衡（ΣFx=0、ΣFy=0、ΣM=0）只有唯一解：Av＝總重、Ah＝0（沒有外加水平力）、M_A＝對固定端取矩的總和。<br><br>
                     兩種保守合力法是把重力沿支架軸向分解出的下滑分量（sinθ）以向量合成（√，非直接相加）疊加到總重上，當作人為保守係數，不是平衡方程式的解；其方向定義（沿支架軸向）也跟 Ah（全域水平反力）不同，不能互相替代。原 Excel 的「算法1」因 cos²θ+sin²θ=1 必然恆等於 ΣF，已併入上表的基準列，不再單獨列出。<br><br>
-                    實務上：若要檢核焊道、螺栓群或植入深度，<strong>M_A</strong> 才是真正決定性的數字；兩種保守合力法可以當一個快速、偏保守的力量級參考，但不能取代 M_A 的檢核。
+                    實務上：若要檢核焊道、螺栓群或植入深度，<strong>M_A</strong> 才是真正決定性的數字；兩種保守合力法可以當一個快速、偏保守的力量級參考，但不能取代 M_A 的檢核。<br><br>
+                    若輸入外部施力 F_ext（純水平推力，如安全規範250N測試），其力臂是作用點的<strong>垂直高度</strong>（l_ext·sinθ，跟自重力矩用 cosθ 不同），且直接疊加到 Ah（ΣFx=0：水平力必須由固定端直接平衡，無須換算）。上方「含外部施力測試後合計」才是螺栓/焊道檢核應採用的最不利設計值。
                 </div>
             </div>
         </div>
@@ -582,9 +609,12 @@
             l1_m: parseFloat(document.getElementById('l1_m').value),
             l2_m: parseFloat(document.getElementById('l2_m').value),
             l_lcd_m: parseFloat(document.getElementById('l_lcd_m').value),
+            f_ext_n: parseFloat(document.getElementById('f_ext_n').value || '0'),
         };
         const lCenter = document.getElementById('l_center_stand_m').value;
         if (lCenter !== '') payload.l_center_stand_m = parseFloat(lCenter);
+        const lExt = document.getElementById('l_ext_m').value;
+        if (lExt !== '') payload.l_ext_m = parseFloat(lExt);
 
         for (const [k, v] of Object.entries(payload)) {
             if (isNaN(v)) {
@@ -613,6 +643,7 @@
             document.getElementById('r_f_stand').textContent = fmt(d.f_stand_n, 'N');
             document.getElementById('r_m_lcd').textContent   = fmt(d.m_lcd_nm, 'N·m');
             document.getElementById('r_m_stand').textContent = fmt(d.m_stand_nm, 'N·m');
+            document.getElementById('r_m_ext').textContent   = fmt(d.m_ext_nm, 'N·m');
             document.getElementById('r_m_total').textContent = fmt(d.m_total_nm, 'N·m');
             document.getElementById('r_fv').textContent      = fmt(d.fv_n, 'N');
             document.getElementById('r_fv_kgf').textContent  = fmt(d.fv_kgf, 'kgf');
@@ -623,8 +654,8 @@
 
             document.getElementById('resultStatus').innerHTML = `<div class="status-bar ok">✓ 計算完成</div>`;
             document.getElementById('resultTip').innerHTML = `
-                <strong>📌 公式</strong>　F = m·g　　τ = F·cosθ·d　　Fh = ΣM / L2　　F-total = √(Fv²+Fh²)<br>
-                ΣM = LCD力矩 + 支架力矩 = <strong>${fmt(d.m_total_nm,'N·m')}</strong>　→　Fh = ΣM / L2 = <strong>${fmt(d.fh_n,'N')}</strong><br>
+                <strong>📌 公式</strong>　F = m·g　　τ = F·cosθ·d　　M_ext = F_ext·l_ext·sinθ（水平施力，力臂為垂直高度）　　Fh = ΣM / L2　　F-total = √(Fv²+Fh²)<br>
+                ΣM = LCD力矩 + 支架力矩 + M_ext(${fmt(d.m_ext_nm,'N·m')}) = <strong>${fmt(d.m_total_nm,'N·m')}</strong>　→　Fh = ΣM / L2 = <strong>${fmt(d.fh_n,'N')}</strong><br>
                 F-total = √(Fv² + Fh²) = <strong>${fmt(d.f_total_n,'N')}</strong>（約 ${fmt(d.f_total_kgf,'kgf')}）
             `;
             setApiStatus('ok');
@@ -649,9 +680,12 @@
             lcd_weight_kg: parseFloat(document.getElementById('lcd_weight_kg_f').value),
             l1_m: parseFloat(document.getElementById('l1_m_f').value),
             l_lcd_m: parseFloat(document.getElementById('l_lcd_m_f').value),
+            f_ext_n: parseFloat(document.getElementById('f_ext_n_f').value || '0'),
         };
         const lCenterF = document.getElementById('l_center_stand_m_f').value;
         if (lCenterF !== '') payload.l_center_stand_m = parseFloat(lCenterF);
+        const lExtF = document.getElementById('l_ext_m_f').value;
+        if (lExtF !== '') payload.l_ext_m = parseFloat(lExtF);
 
         for (const [k, v] of Object.entries(payload)) {
             if (isNaN(v)) {
@@ -704,6 +738,12 @@
             document.getElementById('rf_ma').textContent       = fmt(d.m_a_nm, 'N·m');
             document.getElementById('rf_ma_kgfcm').textContent = '≈ ' + fmt(d.m_a_kgfcm, 'kgf·cm');
 
+            document.getElementById('rf_ma_total').textContent       = fmt(d.m_a_total_nm, 'N·m');
+            document.getElementById('rf_ma_total_kgfcm').textContent = '≈ ' + fmt(d.m_a_total_kgfcm, 'kgf·cm');
+            document.getElementById('rf_m_ext').textContent    = fmt(d.m_ext_nm, 'N·m');
+            document.getElementById('rf_ah_total').textContent = fmt(d.ah_total_n, 'N');
+            document.getElementById('rf_av_total').textContent = fmt(d.av_total_n, 'N');
+
             document.getElementById('resultStatusFixed').innerHTML = `<div class="status-bar ok">✓ 計算完成</div>`;
             setApiStatus('ok');
         } catch (e) {
@@ -722,9 +762,9 @@
             note.textContent = '尚未複製；請先到「固定支點」頁籤計算一次。';
             return;
         }
-        document.getElementById('ma_bw').value = lastFixedResult.m_a_nm;
-        document.getElementById('av_bw').value = lastFixedResult.av_n;
-        note.textContent = '已複製固定支點模式結果：M_A = ' + fmt(lastFixedResult.m_a_nm, 'N·m') + '，Av = ' + fmt(lastFixedResult.av_n, 'N');
+        document.getElementById('ma_bw').value = lastFixedResult.m_a_total_nm;
+        document.getElementById('av_bw').value = lastFixedResult.av_total_n;
+        note.textContent = '已複製固定支點模式「含外部施力測試後合計」結果（螺栓/焊道應檢核此最不利情況）：M_A = ' + fmt(lastFixedResult.m_a_total_nm, 'N·m') + '，Av = ' + fmt(lastFixedResult.av_total_n, 'N');
     }
 
     async function runBoltCheck() {
