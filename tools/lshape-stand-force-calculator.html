@@ -176,6 +176,7 @@
         <div class="tabs" role="tablist">
             <button class="tab active" data-tab="t-baseplate" onclick="switchMode(event,'t-baseplate')">自由底板（Fh / F-total）</button>
             <button class="tab" data-tab="t-fixed" onclick="switchMode(event,'t-fixed')">固定支點（Av / M_A）</button>
+            <button class="tab" data-tab="t-boltweld" onclick="switchMode(event,'t-boltweld')">螺栓群／焊道檢核</button>
         </div>
 
         <!-- TAB 1：底板自由放置於地面 -->
@@ -351,6 +352,131 @@
             </div>
         </div>
 
+        <div class="tab-panel" id="t-boltweld">
+            <div class="method-card">
+                <h3>螺栓群／焊道檢核（依 M_A、Av 換算）</h3>
+                <span class="formula-note">輸入固定端反力矩 M_A 與垂直反力 Av（可直接從「固定支點」頁籤的結果複製過來），分別檢核螺栓群或焊道是否足夠承受該反力矩。兩種檢核互相獨立，視實際接合方式選用其中一種即可。</span>
+            </div>
+
+            <div class="selector-card">
+                <h2>共用輸入：反力矩與垂直反力</h2>
+                <div class="selector-grid">
+                    <div class="field-group">
+                        <label>M_A 反力矩（N·m）</label>
+                        <input type="number" id="ma_bw" value="152.55" step="0.01">
+                    </div>
+                    <div class="field-group">
+                        <label>Av 垂直反力（N）</label>
+                        <input type="number" id="av_bw" value="931.95" step="0.01">
+                    </div>
+                </div>
+                <button class="calc-btn" id="copyFromFixedBtn" onclick="copyFromFixed()" style="background:#6b7280;">↻ 從固定支點模式結果複製</button>
+                <span class="formula-note" id="copyFromFixedNote">尚未複製；請先到「固定支點」頁籤計算一次。</span>
+            </div>
+
+            <div class="selector-card">
+                <h2>A. 螺栓群檢核</h2>
+                <div class="selector-grid">
+                    <div class="field-group">
+                        <label>力臂 e（受拉螺栓列到中性軸距離，米）</label>
+                        <input type="number" id="e_bolt" value="0.06" step="0.001">
+                    </div>
+                    <div class="field-group">
+                        <label>受拉側螺栓數量</label>
+                        <input type="number" id="n_tension" value="2" step="1" min="1">
+                    </div>
+                    <div class="field-group">
+                        <label>螺栓總數量（受拉+受壓）</label>
+                        <input type="number" id="n_total" value="4" step="1" min="1">
+                    </div>
+                    <div class="field-group">
+                        <label>螺栓規格</label>
+                        <select id="bolt_size">
+                            <option value="4">M4</option>
+                            <option value="5">M5</option>
+                            <option value="6">M6</option>
+                            <option value="8" selected>M8</option>
+                            <option value="10">M10</option>
+                            <option value="12">M12</option>
+                            <option value="16">M16</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>螺栓等級</label>
+                        <select id="bolt_grade">
+                            <option value="4.8">4.8</option>
+                            <option value="8.8" selected>8.8</option>
+                            <option value="10.9">10.9</option>
+                            <option value="12.9">12.9</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>安全係數 SF</label>
+                        <input type="number" id="sf_bolt" value="2.5" step="0.1" min="1.1">
+                    </div>
+                </div>
+                <button class="calc-btn" id="calcBtnBolt" onclick="runBoltCheck()">計算螺栓群</button>
+                <div class="err-box" id="errBoxBolt"></div>
+            </div>
+
+            <div class="result-card">
+                <h2>螺栓群檢核結果</h2>
+                <div id="resultStatusBolt"><div class="status-bar neutral">尚未計算</div></div>
+                <div class="result-grid">
+                    <div class="result-item"><div class="label">受拉側總拉力</div><div class="value" id="rb_f_tension_total">—</div><div class="unit">N</div></div>
+                    <div class="result-item"><div class="label">每根受拉螺栓拉力</div><div class="value" id="rb_f_tension">—</div><div class="unit">N</div></div>
+                    <div class="result-item"><div class="label">每根螺栓剪力</div><div class="value" id="rb_f_shear">—</div><div class="unit">N</div></div>
+                    <div class="result-item"><div class="label">單根容許拉力</div><div class="value" id="rb_f_tension_allow">—</div><div class="unit">N</div></div>
+                    <div class="result-item"><div class="label">單根容許剪力</div><div class="value" id="rb_f_shear_allow">—</div><div class="unit">N</div></div>
+                    <div class="result-item highlight"><div class="label">合格判定比 UR</div><div class="value" id="rb_ur">—</div><div class="unit">≤1 合格</div></div>
+                </div>
+                <div class="tip-box" id="resultTipBolt"></div>
+            </div>
+
+            <div class="selector-card">
+                <h2>B. 焊道檢核（雙線焊道法）</h2>
+                <div class="selector-grid">
+                    <div class="field-group">
+                        <label>單條焊道長度 b（mm）</label>
+                        <input type="number" id="b_weld" value="50" step="0.1">
+                    </div>
+                    <div class="field-group">
+                        <label>兩焊道間距 d（mm，力臂）</label>
+                        <input type="number" id="d_weld" value="60" step="0.1">
+                    </div>
+                    <div class="field-group">
+                        <label>焊道腳長 leg size（mm）</label>
+                        <input type="number" id="leg_weld" value="3" step="0.1">
+                    </div>
+                    <div class="field-group">
+                        <label>焊條極限抗拉強度 UTS（MPa）</label>
+                        <input type="number" id="electrode_uts" value="482" step="1">
+                        <span class="formula-note">預設 482 MPa 約當 E70 系列焊條</span>
+                    </div>
+                    <div class="field-group">
+                        <label>安全係數 SF</label>
+                        <input type="number" id="sf_weld" value="2.5" step="0.1" min="1.1">
+                    </div>
+                </div>
+                <button class="calc-btn" id="calcBtnWeld" onclick="runWeldCheck()">計算焊道</button>
+                <div class="err-box" id="errBoxWeld"></div>
+            </div>
+
+            <div class="result-card">
+                <h2>焊道檢核結果</h2>
+                <div id="resultStatusWeld"><div class="status-bar neutral">尚未計算</div></div>
+                <div class="result-grid">
+                    <div class="result-item"><div class="label">彎曲單位長度力 f_b</div><div class="value" id="rw_fb">—</div><div class="unit">N/mm</div></div>
+                    <div class="result-item"><div class="label">剪力單位長度力 f_v</div><div class="value" id="rw_fv">—</div><div class="unit">N/mm</div></div>
+                    <div class="result-item"><div class="label">合力 f_r</div><div class="value" id="rw_fr">—</div><div class="unit">N/mm</div></div>
+                    <div class="result-item"><div class="label">焊道應力</div><div class="value" id="rw_stress">—</div><div class="unit">MPa</div></div>
+                    <div class="result-item"><div class="label">容許應力</div><div class="value" id="rw_allow">—</div><div class="unit">MPa</div></div>
+                    <div class="result-item highlight"><div class="label">合格判定比 UR</div><div class="value" id="rw_ur">—</div><div class="unit">≤1 合格</div></div>
+                </div>
+                <div class="tip-box" id="resultTipWeld"></div>
+            </div>
+        </div>
+
     </section>
 
     <footer>
@@ -367,10 +493,15 @@
     const CALC_ENDPOINT = API_BASE_URL + '/api/lshape-stand-force/calc';
     const CALC_FIXED_ENDPOINT = API_BASE_URL + '/api/lshape-stand-force/calc-fixed';
     const PING_ENDPOINT = API_BASE_URL + '/api/lshape-stand-force/ping';
+    const BOLT_CHECK_ENDPOINT = API_BASE_URL + '/api/lshape-stand-force/bolt-check';
+    const WELD_CHECK_ENDPOINT = API_BASE_URL + '/api/lshape-stand-force/weld-check';
+
+    let lastFixedResult = null;
 
     const MODE_NOTES = {
         't-baseplate': 'F = m·g　｜　τ = F·cosθ·d　｜　Fh = ΣM / L2　｜　F-total = √(Fv²+Fh²)',
-        't-fixed': 'F = m·g　｜　τ = F·cosθ·d　｜　Av = ΣF　｜　M_A = ΣM（固定端，不經 L2 換算）'
+        't-fixed': 'F = m·g　｜　τ = F·cosθ·d　｜　Av = ΣF　｜　M_A = ΣM（固定端，不經 L2 換算）',
+        't-boltweld': 'F_tension = M_A / e　｜　f_b = M_A / (b·d)　｜　UR = 應力 / 容許應力（≤1 合格）'
     };
 
     function switchMode(evt, tabId) {
@@ -542,6 +673,7 @@
                 throw new Error('API 錯誤：' + res.status + ' ' + t);
             }
             const d = await res.json();
+            lastFixedResult = d;
 
             document.getElementById('rf_f_lcd').textContent    = fmt(d.f_lcd_n, 'N');
             document.getElementById('rf_f_stand').textContent  = fmt(d.f_stand_n, 'N');
@@ -579,6 +711,154 @@
             setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
         } finally {
             btn.disabled = false; btn.textContent = '計算';
+        }
+    }
+
+    function copyFromFixed() {
+        const note = document.getElementById('copyFromFixedNote');
+        if (!lastFixedResult) {
+            note.textContent = '尚未複製；請先到「固定支點」頁籤計算一次。';
+            return;
+        }
+        document.getElementById('ma_bw').value = lastFixedResult.m_a_nm;
+        document.getElementById('av_bw').value = lastFixedResult.av_n;
+        note.textContent = '已複製固定支點模式結果：M_A = ' + fmt(lastFixedResult.m_a_nm, 'N·m') + '，Av = ' + fmt(lastFixedResult.av_n, 'N');
+    }
+
+    async function runBoltCheck() {
+        const errBox = document.getElementById('errBoxBolt');
+        errBox.style.display = 'none';
+        const btn = document.getElementById('calcBtnBolt');
+
+        const payload = {
+            m_a_nm: parseFloat(document.getElementById('ma_bw').value),
+            av_n: parseFloat(document.getElementById('av_bw').value),
+            e_m: parseFloat(document.getElementById('e_bolt').value),
+            n_tension: parseInt(document.getElementById('n_tension').value, 10),
+            n_total: parseInt(document.getElementById('n_total').value, 10),
+            bolt_size: document.getElementById('bolt_size').value,
+            bolt_grade: document.getElementById('bolt_grade').value,
+            sf: parseFloat(document.getElementById('sf_bolt').value),
+        };
+
+        for (const [k, v] of Object.entries(payload)) {
+            if (typeof v === 'number' && isNaN(v)) {
+                errBox.textContent = '請完整填寫所有必要欄位。';
+                errBox.style.display = 'block';
+                return;
+            }
+        }
+
+        btn.disabled = true; btn.textContent = '計算中…';
+        document.getElementById('resultStatusBolt').innerHTML = `<div class="status-bar neutral">計算中…</div>`;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(BOLT_CHECK_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const t = await res.text();
+                throw new Error('API 錯誤：' + res.status + ' ' + t);
+            }
+            const d = await res.json();
+
+            document.getElementById('rb_f_tension_total').textContent = fmt(d.f_tension_total_n, 'N');
+            document.getElementById('rb_f_tension').textContent       = fmt(d.f_tension_per_bolt_n, 'N');
+            document.getElementById('rb_f_shear').textContent         = fmt(d.f_shear_per_bolt_n, 'N');
+            document.getElementById('rb_f_tension_allow').textContent = fmt(d.f_tension_allow_n, 'N');
+            document.getElementById('rb_f_shear_allow').textContent   = fmt(d.f_shear_allow_n, 'N');
+            document.getElementById('rb_ur').textContent              = d.ur;
+
+            const urEl = document.getElementById('rb_ur').parentElement;
+            urEl.classList.remove('warn');
+            if (!d.pass_check) urEl.classList.add('warn');
+
+            document.getElementById('resultStatusBolt').innerHTML = d.pass_check
+                ? `<div class="status-bar ok">✓ 合格（UR = ${d.ur} ≤ 1）</div>`
+                : `<div class="status-bar warn">✗ 不合格（UR = ${d.ur} > 1，請加大螺栓規格、增加數量或縮短力臂）</div>`;
+            document.getElementById('resultTipBolt').innerHTML = `
+                <strong>📌 公式</strong>　F_tension_total = M_A / e = <strong>${fmt(d.f_tension_total_n,'N')}</strong>　→　每根受拉螺栓 = <strong>${fmt(d.f_tension_per_bolt_n,'N')}</strong><br>
+                每根剪力 = Av / n_total = <strong>${fmt(d.f_shear_per_bolt_n,'N')}</strong>　｜　At = ${d.at_mm2} mm²　｜　保證應力 = ${d.proof_stress_mpa} MPa<br>
+                UR = √((拉力/容許拉力)² + (剪力/容許剪力)²) = <strong>${d.ur}</strong>
+            `;
+            setApiStatus('ok');
+        } catch (e) {
+            errBox.textContent = e.message || '計算失敗，請確認後端服務狀態。';
+            errBox.style.display = 'block';
+            document.getElementById('resultStatusBolt').innerHTML = `<div class="status-bar warn">✗ 計算失敗</div>`;
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+        } finally {
+            btn.disabled = false; btn.textContent = '計算螺栓群';
+        }
+    }
+
+    async function runWeldCheck() {
+        const errBox = document.getElementById('errBoxWeld');
+        errBox.style.display = 'none';
+        const btn = document.getElementById('calcBtnWeld');
+
+        const payload = {
+            m_a_nm: parseFloat(document.getElementById('ma_bw').value),
+            av_n: parseFloat(document.getElementById('av_bw').value),
+            b_mm: parseFloat(document.getElementById('b_weld').value),
+            d_mm: parseFloat(document.getElementById('d_weld').value),
+            leg_mm: parseFloat(document.getElementById('leg_weld').value),
+            electrode_uts_mpa: parseFloat(document.getElementById('electrode_uts').value),
+            sf: parseFloat(document.getElementById('sf_weld').value),
+        };
+
+        for (const [k, v] of Object.entries(payload)) {
+            if (isNaN(v)) {
+                errBox.textContent = '請完整填寫所有必要欄位。';
+                errBox.style.display = 'block';
+                return;
+            }
+        }
+
+        btn.disabled = true; btn.textContent = '計算中…';
+        document.getElementById('resultStatusWeld').innerHTML = `<div class="status-bar neutral">計算中…</div>`;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(WELD_CHECK_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const t = await res.text();
+                throw new Error('API 錯誤：' + res.status + ' ' + t);
+            }
+            const d = await res.json();
+
+            document.getElementById('rw_fb').textContent     = fmt(d.f_b_n_per_mm, 'N/mm');
+            document.getElementById('rw_fv').textContent     = fmt(d.f_v_n_per_mm, 'N/mm');
+            document.getElementById('rw_fr').textContent     = fmt(d.f_r_n_per_mm, 'N/mm');
+            document.getElementById('rw_stress').textContent = fmt(d.stress_mpa, 'MPa');
+            document.getElementById('rw_allow').textContent  = fmt(d.allow_stress_mpa, 'MPa');
+            document.getElementById('rw_ur').textContent     = d.ur;
+
+            const urEl = document.getElementById('rw_ur').parentElement;
+            urEl.classList.remove('warn');
+            if (!d.pass_check) urEl.classList.add('warn');
+
+            document.getElementById('resultStatusWeld').innerHTML = d.pass_check
+                ? `<div class="status-bar ok">✓ 合格（UR = ${d.ur} ≤ 1）</div>`
+                : `<div class="status-bar warn">✗ 不合格（UR = ${d.ur} > 1，請加大腳長、加長焊道或增加間距 d）</div>`;
+            document.getElementById('resultTipWeld').innerHTML = `
+                <strong>📌 公式</strong>　Z_w = b·d = <strong>${d.z_w_mm2} mm²</strong>　｜　f_b = M_A / Z_w = <strong>${fmt(d.f_b_n_per_mm,'N/mm')}</strong>　｜　f_v = Av/(2b) = <strong>${fmt(d.f_v_n_per_mm,'N/mm')}</strong><br>
+                f_r = √(f_b²+f_v²) = <strong>${fmt(d.f_r_n_per_mm,'N/mm')}</strong>　｜　喉厚 = 0.707×leg = ${d.throat_mm} mm　｜　應力 = f_r/喉厚 = <strong>${fmt(d.stress_mpa,'MPa')}</strong><br>
+                UR = 應力 / 容許應力 = <strong>${d.ur}</strong>
+            `;
+            setApiStatus('ok');
+        } catch (e) {
+            errBox.textContent = e.message || '計算失敗，請確認後端服務狀態。';
+            errBox.style.display = 'block';
+            document.getElementById('resultStatusWeld').innerHTML = `<div class="status-bar warn">✗ 計算失敗</div>`;
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+        } finally {
+            btn.disabled = false; btn.textContent = '計算焊道';
         }
     }
     </script>
