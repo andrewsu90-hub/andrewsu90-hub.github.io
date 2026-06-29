@@ -245,7 +245,7 @@
         <div class="tab-panel" id="t-fixed">
             <div class="method-card">
                 <h3>底板鎖固：受力比較表＋反力矩</h3>
-                <span class="formula-note">無底板長度 L2 可換算水平反力。下方以一張表比較 ΣF 基準、Excel 算法2/2-1、與嚴格靜力平衡解 Av，並單獨強調 M_A 反力矩（結構設計實際要用的值）。</span>
+                <span class="formula-note">無底板長度 L2 可換算水平反力。下方以一張表比較 ΣF 基準、兩種保守合力法、與嚴格靜力平衡解 Av，並單獨強調 M_A 反力矩（結構設計實際要用的值）。</span>
             </div>
             <div class="selector-card">
                 <h2>輸入參數</h2>
@@ -297,7 +297,7 @@
                             <td>恆等於總重，無額外餘裕</td>
                         </tr>
                         <tr>
-                            <td>算法2</td>
+                            <td>保守合力法－全構件下滑量</td>
                             <td>ΣF</td>
                             <td id="rf_fh_sum_t">—</td>
                             <td class="num" id="rf_algo2">—</td>
@@ -305,7 +305,7 @@
                             <td>最保守（最大）</td>
                         </tr>
                         <tr>
-                            <td>算法2-1</td>
+                            <td>保守合力法－LCD下滑量</td>
                             <td>ΣF</td>
                             <td id="rf_fh_lcd_t">—</td>
                             <td class="num" id="rf_algo21">—</td>
@@ -322,6 +322,7 @@
                         </tr>
                     </tbody>
                 </table>
+                <span class="formula-note">「保守合力法－全構件下滑量」對應 Excel 原始算法2；「保守合力法－LCD下滑量」對應 Excel 原始算法2-1。</span>
 
                 <div class="ma-callout">
                     <div class="label">⚠ M_A 反力矩（單位 N·m，與上表 F-total 不可直接比大小）</div>
@@ -344,8 +345,8 @@
 
                 <div class="tip-box" id="resultTipFixed">
                     <strong>📌 見解</strong>　固定／鎖固支點是「結構連續」邊界條件，嚴格靜力平衡（ΣFx=0、ΣFy=0、ΣM=0）只有唯一解：Av＝總重、Ah＝0（沒有外加水平力）、M_A＝對固定端取矩的總和。<br><br>
-                    算法2、2-1是把重力沿支架軸向分解出的下滑分量（sinθ）以向量合成（√，非直接相加）疊加到總重上，當作人為保守係數，不是平衡方程式的解；其方向定義（沿支架軸向）也跟 Ah（全域水平反力）不同，不能互相替代。原 Excel 的「算法1」因 cos²θ+sin²θ=1 必然恆等於 ΣF，已併入上表的基準列，不再單獨列出。<br><br>
-                    實務上：若要檢核焊道、螺栓群或植入深度，<strong>M_A</strong> 才是真正決定性的數字；算法2／2-1可以當一個快速、偏保守的力量級參考，但不能取代 M_A 的檢核。
+                    兩種保守合力法是把重力沿支架軸向分解出的下滑分量（sinθ）以向量合成（√，非直接相加）疊加到總重上，當作人為保守係數，不是平衡方程式的解；其方向定義（沿支架軸向）也跟 Ah（全域水平反力）不同，不能互相替代。原 Excel 的「算法1」因 cos²θ+sin²θ=1 必然恆等於 ΣF，已併入上表的基準列，不再單獨列出。<br><br>
+                    實務上：若要檢核焊道、螺栓群或植入深度，<strong>M_A</strong> 才是真正決定性的數字；兩種保守合力法可以當一個快速、偏保守的力量級參考，但不能取代 M_A 的檢核。
                 </div>
             </div>
         </div>
