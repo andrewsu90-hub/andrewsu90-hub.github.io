@@ -163,7 +163,7 @@
                 </div>
                 <div class="field-group">
                     <label>L1 支架長度（米）</label>
-                    <input type="number" id="l1_m" value="1.87" step="0.001">
+                    <input type="number" id="l1_m" value="1.87" step="0.001" oninput="updateLCenterNote()">
                 </div>
                 <div class="field-group">
                     <label>L2 底座長度（米）</label>
@@ -175,7 +175,8 @@
                 </div>
                 <div class="field-group">
                     <label>L重心（支架重心，米，留空＝L1/2）</label>
-                    <input type="number" id="l_center_stand_m" placeholder="自動 = L1/2" step="0.001">
+                    <input type="number" id="l_center_stand_m" placeholder="自動 = L1/2" step="0.001" oninput="updateLCenterNote()">
+                    <span class="formula-note" id="l_center_auto_note">自動 = L1/2 = — 米</span>
                 </div>
             </div>
             <button class="calc-btn" id="calcBtn" onclick="runCalc()">計算</button>
@@ -234,6 +235,22 @@
         }
     }
     checkStatus();
+
+    function updateLCenterNote() {
+        const note = document.getElementById('l_center_auto_note');
+        const manual = document.getElementById('l_center_stand_m').value;
+        if (manual !== '') {
+            note.textContent = '已手動輸入，將以此值計算（不使用 L1/2）。';
+            return;
+        }
+        const l1 = parseFloat(document.getElementById('l1_m').value);
+        if (isNaN(l1)) {
+            note.textContent = '自動 = L1/2 = — 米';
+            return;
+        }
+        note.textContent = '自動 = L1/2 = ' + (l1 / 2).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' 米';
+    }
+    updateLCenterNote();
 
     function fmt(n, unit) {
         if (n === null || n === undefined || isNaN(n)) return '—';
