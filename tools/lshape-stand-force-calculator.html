@@ -355,7 +355,7 @@
         <div class="tab-panel" id="t-boltweld">
             <div class="method-card">
                 <h3>螺栓群／焊道檢核（依 M_A、Av 換算）</h3>
-                <span class="formula-note">輸入固定端反力矩 M_A 與垂直反力 Av（可直接從「固定支點」頁籤的結果複製過來），分別檢核螺栓群或焊道是否足夠承受該反力矩。兩種檢核互相獨立，視實際接合方式選用其中一種即可。</span>
+                <span class="formula-note">M_A 這個反力矩，物理上是想把支架從固定端「翹開」的力；具體做法是想像固定端一邊的螺栓（或焊道）被拉開（受拉），另一邊被壓緊（受壓），力臂越短，被拉開的力就越大。Av 是支架的總重量直接往下壓在所有螺栓（或焊道）上，造成剪力。下面分別檢核：螺栓夠不夠多/夠不夠粗，或焊道夠不夠長/夠不夠厚。輸入固定端反力矩 M_A 與垂直反力 Av（可直接從「固定支點」頁籤的結果複製過來），兩種檢核互相獨立，視實際接合方式選用其中一種即可。</span>
             </div>
 
             <div class="selector-card">
@@ -422,13 +422,14 @@
             <div class="result-card">
                 <h2>螺栓群檢核結果</h2>
                 <div id="resultStatusBolt"><div class="status-bar neutral">尚未計算</div></div>
+                <span class="formula-note">下面前 3 項是「螺栓實際要扛多少力」，後 2 項是「這顆螺栓最多扛得住多少力」，兩邊比較就是 UR。</span>
                 <div class="result-grid">
-                    <div class="result-item"><div class="label">受拉側總拉力</div><div class="value" id="rb_f_tension_total">—</div><div class="unit">N</div></div>
-                    <div class="result-item"><div class="label">每根受拉螺栓拉力</div><div class="value" id="rb_f_tension">—</div><div class="unit">N</div></div>
-                    <div class="result-item"><div class="label">每根螺栓剪力</div><div class="value" id="rb_f_shear">—</div><div class="unit">N</div></div>
-                    <div class="result-item"><div class="label">單根容許拉力</div><div class="value" id="rb_f_tension_allow">—</div><div class="unit">N</div></div>
-                    <div class="result-item"><div class="label">單根容許剪力</div><div class="value" id="rb_f_shear_allow">—</div><div class="unit">N</div></div>
-                    <div class="result-item highlight"><div class="label">合格判定比 UR</div><div class="value" id="rb_ur">—</div><div class="unit">≤1 合格</div></div>
+                    <div class="result-item"><div class="label">M_A 換算成受拉側總拉力</div><div class="value" id="rb_f_tension_total">—</div><div class="unit">N（受拉側全部螺栓共同分攤）</div></div>
+                    <div class="result-item"><div class="label">→ 平均每根受拉螺栓要扛的拉力</div><div class="value" id="rb_f_tension">—</div><div class="unit">N（實際受力）</div></div>
+                    <div class="result-item"><div class="label">Av 換算成每根螺栓要扛的剪力</div><div class="value" id="rb_f_shear">—</div><div class="unit">N（實際受力，全部螺栓平均分攤）</div></div>
+                    <div class="result-item"><div class="label">這顆螺栓最多能扛的拉力</div><div class="value" id="rb_f_tension_allow">—</div><div class="unit">N（容許值，已含安全係數）</div></div>
+                    <div class="result-item"><div class="label">這顆螺栓最多能扛的剪力</div><div class="value" id="rb_f_shear_allow">—</div><div class="unit">N（容許值，已含安全係數）</div></div>
+                    <div class="result-item highlight"><div class="label">合格判定比 UR＝實際受力／容許值</div><div class="value" id="rb_ur">—</div><div class="unit">≤1 表示螺栓夠用，越接近 1 越接近極限</div></div>
                 </div>
                 <div class="tip-box" id="resultTipBolt"></div>
             </div>
@@ -465,13 +466,14 @@
             <div class="result-card">
                 <h2>焊道檢核結果</h2>
                 <div id="resultStatusWeld"><div class="status-bar neutral">尚未計算</div></div>
+                <span class="formula-note">f_b、f_v、f_r 是「沿焊道每 1mm 長度要扛的力」，換算成材料應力後跟容許應力比較就是 UR。</span>
                 <div class="result-grid">
-                    <div class="result-item"><div class="label">彎曲單位長度力 f_b</div><div class="value" id="rw_fb">—</div><div class="unit">N/mm</div></div>
-                    <div class="result-item"><div class="label">剪力單位長度力 f_v</div><div class="value" id="rw_fv">—</div><div class="unit">N/mm</div></div>
-                    <div class="result-item"><div class="label">合力 f_r</div><div class="value" id="rw_fr">—</div><div class="unit">N/mm</div></div>
-                    <div class="result-item"><div class="label">焊道應力</div><div class="value" id="rw_stress">—</div><div class="unit">MPa</div></div>
-                    <div class="result-item"><div class="label">容許應力</div><div class="value" id="rw_allow">—</div><div class="unit">MPa</div></div>
-                    <div class="result-item highlight"><div class="label">合格判定比 UR</div><div class="value" id="rw_ur">—</div><div class="unit">≤1 合格</div></div>
+                    <div class="result-item"><div class="label">M_A 造成的彎曲分量 f_b</div><div class="value" id="rw_fb">—</div><div class="unit">N/mm（M_A 把焊道往外拉/壓的力，沿焊道每mm長度）</div></div>
+                    <div class="result-item"><div class="label">Av 造成的剪力分量 f_v</div><div class="value" id="rw_fv">—</div><div class="unit">N/mm（重量往下剪的力，沿焊道每mm長度）</div></div>
+                    <div class="result-item"><div class="label">合力 f_r（焊道實際總受力）</div><div class="value" id="rw_fr">—</div><div class="unit">N/mm（f_b 與 f_v 向量合成）</div></div>
+                    <div class="result-item"><div class="label">焊道實際應力</div><div class="value" id="rw_stress">—</div><div class="unit">MPa（f_r 除以喉厚換算成材料應力）</div></div>
+                    <div class="result-item"><div class="label">焊道最多能扛的應力</div><div class="value" id="rw_allow">—</div><div class="unit">MPa（容許值，已含安全係數）</div></div>
+                    <div class="result-item highlight"><div class="label">合格判定比 UR＝實際應力／容許值</div><div class="value" id="rw_ur">—</div><div class="unit">≤1 表示焊道夠用，越接近 1 越接近極限</div></div>
                 </div>
                 <div class="tip-box" id="resultTipWeld"></div>
             </div>
@@ -779,9 +781,10 @@
                 ? `<div class="status-bar ok">✓ 合格（UR = ${d.ur} ≤ 1）</div>`
                 : `<div class="status-bar warn">✗ 不合格（UR = ${d.ur} > 1，請加大螺栓規格、增加數量或縮短力臂）</div>`;
             document.getElementById('resultTipBolt').innerHTML = `
-                <strong>📌 公式</strong>　F_tension_total = M_A / e = <strong>${fmt(d.f_tension_total_n,'N')}</strong>　→　每根受拉螺栓 = <strong>${fmt(d.f_tension_per_bolt_n,'N')}</strong><br>
-                每根剪力 = Av / n_total = <strong>${fmt(d.f_shear_per_bolt_n,'N')}</strong>　｜　At = ${d.at_mm2} mm²　｜　保證應力 = ${d.proof_stress_mpa} MPa<br>
-                UR = √((拉力/容許拉力)² + (剪力/容許剪力)²) = <strong>${d.ur}</strong>
+                <strong>📌 這代表什麼</strong>　M_A 反力矩把受拉側 ${payload.n_tension} 根螺栓共同拉開 <strong>${fmt(d.f_tension_total_n,'N')}</strong>，平均每根要扛 <strong>${fmt(d.f_tension_per_bolt_n,'N')}</strong> 的拉力；同時 Av 的重量讓全部 ${payload.n_total} 根螺栓平均每根扛 <strong>${fmt(d.f_shear_per_bolt_n,'N')}</strong> 的剪力。<br>
+                這顆 M${payload.bolt_size}／等級${payload.bolt_grade} 的螺栓（有效拉伸面積 At=${d.at_mm2} mm²、保證應力 ${d.proof_stress_mpa} MPa），扣掉安全係數後最多能扛 <strong>${fmt(d.f_tension_allow_n,'N')}</strong> 拉力、<strong>${fmt(d.f_shear_allow_n,'N')}</strong> 剪力。<br>
+                兩者一起看（拉力佔比與剪力佔比的向量合成）＝ UR = <strong>${d.ur}</strong>，${d.pass_check ? '在容許範圍內。' : '已超過容許範圍，需要加大規格、增加數量或縮短力臂 e。'}
+                <br><span style="font-size:11px;color:var(--secondary-color);">公式：F_tension_total = M_A/e　｜　每根剪力 = Av/n_total　｜　UR = √((拉力/容許拉力)²+(剪力/容許剪力)²)</span>
             `;
             setApiStatus('ok');
         } catch (e) {
@@ -847,9 +850,10 @@
                 ? `<div class="status-bar ok">✓ 合格（UR = ${d.ur} ≤ 1）</div>`
                 : `<div class="status-bar warn">✗ 不合格（UR = ${d.ur} > 1，請加大腳長、加長焊道或增加間距 d）</div>`;
             document.getElementById('resultTipWeld').innerHTML = `
-                <strong>📌 公式</strong>　Z_w = b·d = <strong>${d.z_w_mm2} mm²</strong>　｜　f_b = M_A / Z_w = <strong>${fmt(d.f_b_n_per_mm,'N/mm')}</strong>　｜　f_v = Av/(2b) = <strong>${fmt(d.f_v_n_per_mm,'N/mm')}</strong><br>
-                f_r = √(f_b²+f_v²) = <strong>${fmt(d.f_r_n_per_mm,'N/mm')}</strong>　｜　喉厚 = 0.707×leg = ${d.throat_mm} mm　｜　應力 = f_r/喉厚 = <strong>${fmt(d.stress_mpa,'MPa')}</strong><br>
-                UR = 應力 / 容許應力 = <strong>${d.ur}</strong>
+                <strong>📌 這代表什麼</strong>　M_A 反力矩讓焊道沿長度方向每 1mm 承受 <strong>${fmt(d.f_b_n_per_mm,'N/mm')}</strong> 的彎曲力，Av 的重量讓每 1mm 再承受 <strong>${fmt(d.f_v_n_per_mm,'N/mm')}</strong> 的剪力；兩者合成後，焊道每 1mm 實際要扛 <strong>${fmt(d.f_r_n_per_mm,'N/mm')}</strong>。<br>
+                以腳長 ${payload.leg_mm}mm 換算喉厚 ${d.throat_mm}mm 後，焊道實際應力為 <strong>${fmt(d.stress_mpa,'MPa')}</strong>；這個焊條（UTS=${payload.electrode_uts_mpa}MPa）扣掉安全係數後最多能扛 <strong>${fmt(d.allow_stress_mpa,'MPa')}</strong>。<br>
+                實際應力／容許應力＝ UR = <strong>${d.ur}</strong>，${d.pass_check ? '在容許範圍內。' : '已超過容許範圍，需要加大腳長、加長焊道 b 或增加間距 d。'}
+                <br><span style="font-size:11px;color:var(--secondary-color);">公式：Z_w=b·d　｜　f_b=M_A/Z_w　｜　f_v=Av/(2b)　｜　f_r=√(f_b²+f_v²)　｜　喉厚=0.707×leg　｜　UR=應力/容許應力</span>
             `;
             setApiStatus('ok');
         } catch (e) {
