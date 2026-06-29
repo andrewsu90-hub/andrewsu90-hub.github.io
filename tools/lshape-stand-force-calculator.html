@@ -227,8 +227,8 @@
         <!-- TAB 2：無底板 / 底板鎖固於地面 -->
         <div class="tab-panel" id="t-fixed">
             <div class="method-card">
-                <h3>底板鎖固（無 L2 可用，以分力法估算）</h3>
-                <span class="formula-note">沒有底板，或底板鎖固／焊死於地面：無底板長度 L2 可換算水平反力，改用角度將 LCD、支架自重各自分解成垂直分力（cosθ）與下滑分力（sinθ），以三種保守程度不同的方式疊加成支點總受力 F-total。</span>
+                <h3>底板鎖固：兩種算法並列對照</h3>
+                <span class="formula-note">無底板長度 L2 可換算水平反力。下方同時列出你 Excel 的分力疊加法（算法1/2/2-1）與嚴格靜力平衡解（Av/Ah/M_A），並說明兩者的物理意義差異。</span>
             </div>
             <div class="selector-card">
                 <h2>輸入參數</h2>
@@ -245,13 +245,26 @@
                         <label>LCD 模組重量（公斤）</label>
                         <input type="number" id="lcd_weight_kg_f" value="25" step="0.1">
                     </div>
+                    <div class="field-group">
+                        <label>L1 支架長度（米）</label>
+                        <input type="number" id="l1_m_f" value="1.87" step="0.001" oninput="updateLCenterNoteFixed()">
+                    </div>
+                    <div class="field-group">
+                        <label>L-LCD（LCD重心沿支架距固定端，米）</label>
+                        <input type="number" id="l_lcd_m_f" value="0.95" step="0.001">
+                    </div>
+                    <div class="field-group">
+                        <label>L重心（支架重心，米，留空＝L1/2）</label>
+                        <input type="number" id="l_center_stand_m_f" placeholder="自動 = L1/2" step="0.001" oninput="updateLCenterNoteFixed()">
+                        <span class="formula-note" id="l_center_auto_note_f">自動 = L1/2 = — 米</span>
+                    </div>
                 </div>
                 <button class="calc-btn" id="calcBtnFixed" onclick="runCalcFixed()">計算</button>
                 <div class="err-box" id="errBoxFixed"></div>
             </div>
 
             <div class="result-card">
-                <h2>計算結果</h2>
+                <h2>計算結果 A：你的分力疊加法（算法1 / 2 / 2-1）</h2>
                 <div id="resultStatusFixed"><div class="status-bar neutral">尚未計算</div></div>
                 <div class="result-grid" id="resultGridFixed">
                     <div class="result-item"><div class="label">LCD 重力 F</div><div class="value" id="rf_f_lcd">—</div><div class="unit">N</div></div>
@@ -268,6 +281,22 @@
                     <strong>📌 公式</strong>　F=m·g　　Fv=cosθ·F　　Fh=sinθ·F<br>
                     算法1：F-total=√(ΣFv²+ΣFh²)＝ΣF（cos²θ+sin²θ=1 恆等式，無額外安全餘裕）<br>
                     算法2：F-total=√(ΣF²+ΣFh²)（最保守）　｜　算法2-1：F-total=√(ΣF²+Fh_LCD²)（介於算法1、2之間）
+                </div>
+            </div>
+
+            <div class="result-card">
+                <h2>計算結果 B：嚴格靜力平衡解（Av / Ah / M_A）</h2>
+                <div class="result-grid" id="resultGridFixedRigorous">
+                    <div class="result-item highlight"><div class="label">Av 垂直反力（＝ΣF）</div><div class="value" id="rf_av">—</div><div class="unit" id="rf_av_kgf">N</div></div>
+                    <div class="result-item"><div class="label">Ah 水平反力（無外加水平力恆為0）</div><div class="value" id="rf_ah">—</div><div class="unit">N</div></div>
+                    <div class="result-item highlight"><div class="label">M_A 反力矩（焊道/螺栓群設計關鍵值）</div><div class="value" id="rf_ma">—</div><div class="unit" id="rf_ma_kgfcm">N·m</div></div>
+                </div>
+                <div class="tip-box">
+                    <strong>📌 見解</strong>　固定／鎖固支點是「結構連續」的邊界條件，嚴格靜力平衡（ΣFx=0、ΣFy=0、ΣM=0）只有唯一解：
+                    Av＝總重、Ah＝0（沒有外加水平力，平衡方程式本來就要求水平反力為零）、M_A＝對固定端取矩的總和。<br><br>
+                    算法1/2/2-1 是把重力沿「支架軸向」分解（cosθ＝壓向支架的分量、sinθ＝沿支架下滑的分量），這是分析支架本身受力（軸力/剪力）的角度，不是地面對支點的水平反力方向；
+                    算法1因 cos²θ+sin²θ=1 必然等於 ΣF，是恆等式而非新資訊；算法2、2-1把同一個重力的下滑分量再疊加一次到總重上，屬於刻意加大的保守安全係數，不是平衡方程式的解。<br><br>
+                    實務上：若要檢核焊道、螺栓群或植入深度，<strong>M_A</strong> 才是真正決定性的數字（本例 ≈ ${''}<span id="rf_ma_inline">—</span>N·m）；若只是想快速抓一個偏保守的受力量級當安全係數，算法2／2-1可以當參考，但不能取代 M_A 的檢核。
                 </div>
             </div>
         </div>
@@ -336,6 +365,22 @@
         note.textContent = '自動 = L1/2 = ' + (l1 / 2).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' 米';
     }
     updateLCenterNote();
+
+    function updateLCenterNoteFixed() {
+        const note = document.getElementById('l_center_auto_note_f');
+        const manual = document.getElementById('l_center_stand_m_f').value;
+        if (manual !== '') {
+            note.textContent = '已手動輸入，將以此值計算（不使用 L1/2）。';
+            return;
+        }
+        const l1 = parseFloat(document.getElementById('l1_m_f').value);
+        if (isNaN(l1)) {
+            note.textContent = '自動 = L1/2 = — 米';
+            return;
+        }
+        note.textContent = '自動 = L1/2 = ' + (l1 / 2).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' 米';
+    }
+    updateLCenterNoteFixed();
 
     function fmt(n, unit) {
         if (n === null || n === undefined || isNaN(n)) return '—';
@@ -419,7 +464,11 @@
             angle_deg: parseFloat(document.getElementById('angle_deg_f').value),
             stand_weight_kg: parseFloat(document.getElementById('stand_weight_kg_f').value),
             lcd_weight_kg: parseFloat(document.getElementById('lcd_weight_kg_f').value),
+            l1_m: parseFloat(document.getElementById('l1_m_f').value),
+            l_lcd_m: parseFloat(document.getElementById('l_lcd_m_f').value),
         };
+        const lCenterF = document.getElementById('l_center_stand_m_f').value;
+        if (lCenterF !== '') payload.l_center_stand_m = parseFloat(lCenterF);
 
         for (const [k, v] of Object.entries(payload)) {
             if (isNaN(v)) {
@@ -456,6 +505,13 @@
             document.getElementById('rf_algo2_kgf').textContent  = fmt(d.f_total_algo2_kgf, 'kgf');
             document.getElementById('rf_algo21').textContent     = fmt(d.f_total_algo21_n, 'N');
             document.getElementById('rf_algo21_kgf').textContent = fmt(d.f_total_algo21_kgf, 'kgf');
+
+            document.getElementById('rf_av').textContent      = fmt(d.av_n, 'N');
+            document.getElementById('rf_av_kgf').textContent  = fmt(d.av_kgf, 'kgf');
+            document.getElementById('rf_ah').textContent      = fmt(d.ah_n, 'N');
+            document.getElementById('rf_ma').textContent      = fmt(d.m_a_nm, 'N·m');
+            document.getElementById('rf_ma_kgfcm').textContent = fmt(d.m_a_kgfcm, 'kgf·cm');
+            document.getElementById('rf_ma_inline').textContent = fmt(d.m_a_nm, '').trim();
 
             document.getElementById('resultStatusFixed').innerHTML = `<div class="status-bar ok">✓ 計算完成</div>`;
             document.getElementById('resultTipFixed').innerHTML = `
