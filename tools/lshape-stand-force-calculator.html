@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L型支架力矩計算器 | 工程計算工具</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --line:#2a2f3a; --text:#e6e8ec; --sub:#9aa3b2;
+    --accent:#4f8cff; --accent2:#ffb84f; --ok:#3ddc84; --warn:#ff5f5f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background:var(--bg); color:var(--text); padding:24px 16px 80px;
+  }
+  .wrap{max-width:1080px; margin:0 auto;}
+  h1{font-size:20px; margin:0 0 4px;}
+  .desc{color:var(--sub); font-size:13px; margin-bottom:20px;}
+  .grid{display:grid; grid-template-columns: 1.05fr 1fr; gap:20px;}
+  @media (max-width:880px){ .grid{grid-template-columns:1fr;} }
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px 20px;}
+  .panel h2{font-size:14px; color:var(--sub); margin:0 0 14px; font-weight:600; letter-spacing:.02em;}
+  label{display:block; font-size:13px; color:var(--sub); margin-bottom:4px;}
+  .field{margin-bottom:12px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  input[type=number]{
+    width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--line);
+    background:#0e1015; color:var(--text); font-size:14px;
+  }
+  input[type=number]:focus{outline:none; border-color:var(--accent);}
+  .hint{font-size:11px; color:#697288; margin-top:2px;}
+  button.calc{
+    margin-top:8px; width:100%; padding:10px 14px; border:none; border-radius:8px;
+    background:var(--accent); color:#fff; font-size:14px; font-weight:600; cursor:pointer;
+  }
+  button.calc:hover{background:#3b78ee;}
+  button.calc:disabled{background:#33384a; cursor:not-allowed;}
+  .results table{width:100%; border-collapse:collapse; font-size:13px;}
+  .results td{padding:6px 4px; border-bottom:1px solid var(--line);}
+  .results td.k{color:var(--sub);}
+  .results td.v{text-align:right; font-weight:600; font-variant-numeric:tabular-nums;}
+  .results tr.total td{color:var(--accent2); font-size:15px; font-weight:700;}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--sub);
+    position:fixed; right:16px; bottom:16px; background:var(--panel); border:1px solid var(--line);
+    padding:6px 12px; border-radius:999px;
+  }
+  .dot{width:8px; height:8px; border-radius:50%; background:#697288;}
+  .dot.ok{background:var(--ok);}
+  .dot.bad{background:var(--warn);}
+  .dot.pending{background:var(--accent2); animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .diagram-box{display:flex; justify-content:center; padding:6px 0;}
+  .formula-note{font-size:11.5px; color:var(--sub); line-height:1.6; margin-top:10px; border-top:1px solid var(--line); padding-top:10px;}
+  .err{color:var(--warn); font-size:13px; margin-top:10px; display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>L型支架力矩計算器</h1>
+  <div class="desc">支架（含上方 LCD 模組）對底座的力矩與反作用力估算 — 公式邏輯由後端計算，本頁僅顯示輸入與結果。</div>
+
+  <div class="grid">
+
+    <!-- 左：示意圖 + 輸入 -->
+    <div>
+      <div class="panel">
+        <h2>結構示意圖</h2>
+        <div class="diagram-box">
+          <svg id="diagram" viewBox="0 0 340 720" width="100%" style="max-width:300px; background:#e8eaed; border-radius:8px;">
+            <!-- 原始 CAD 參考圖（使用者提供） -->
+            <image href="支架_底座.png" x="0" y="0" width="340" height="720" preserveAspectRatio="xMidYMid meet"/>
+
+            <!-- 角度 theta 標示 (支架與底座水平線夾角) -->
+            <path d="M 75.0 655.0 L 140.0 655.0" stroke="#3a3f4a" stroke-width="1" stroke-dasharray="4 3" fill="none"/>
+            <path d="M 95.0 655.0 A 36 36 0 0 1 134.6 622.0" fill="none" stroke="#1f3fb0" stroke-width="2"/>
+            <text x="112.0" y="645.0" fill="#1f3fb0" font-size="14" font-weight="700" stroke="#fff" stroke-width="3" paint-order="stroke fill">θ</text>
+
+            <text x="125.0" y="710.0" fill="#3a3f4a" font-size="12" text-anchor="middle" stroke="#fff" stroke-width="3" paint-order="stroke fill">L2（底座長度）</text>
+            <text x="148.0" y="500.0" fill="#3a3f4a" font-size="12" stroke="#fff" stroke-width="3" paint-order="stroke fill">L1</text>
+
+            <!-- mg / N 局部受力分解（於 LCD 模組右上方空白處） -->
+            <line x1="298.0" y1="68.0" x2="298.0" y2="112.0" stroke="#d68a00" stroke-width="2" marker-end="url(#arrowOrange)"/>
+            <text x="303.0" y="94.0" fill="#d68a00" font-size="12" stroke="#fff" stroke-width="3" paint-order="stroke fill">mg</text>
+            <line x1="298.0" y1="68.0" x2="232.0" y2="68.0" stroke="#1f3fb0" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+            <text x="150.0" y="60.0" fill="#1f3fb0" font-size="12" stroke="#fff" stroke-width="3" paint-order="stroke fill">N=mg·cosθ</text>
+
+            <!-- 重心位置標示 -->
+            <circle cx="178.0" cy="250.0" r="4" fill="#d68a00"/>
+            <text x="186.0" y="247.0" fill="#3a3f4a" font-size="11" stroke="#fff" stroke-width="3" paint-order="stroke fill">LCD 重心 (L-LCD)</text>
+            <circle cx="162.5" cy="335.0" r="4" fill="#1f9d55"/>
+            <text x="170.5" y="332.0" fill="#3a3f4a" font-size="11" stroke="#fff" stroke-width="3" paint-order="stroke fill">支架重心 (L重心=L1/2)</text>
+
+            <!-- Fv / Fh / F-total 向量圖 -->
+            <g transform="translate(235,640)">
+              <line x1="0" y1="0" x2="0" y2="-58" stroke="#1f3fb0" stroke-width="2" marker-end="url(#arrowBlue)"/>
+              <text x="5" y="-60" fill="#1f3fb0" font-size="12" stroke="#fff" stroke-width="3" paint-order="stroke fill">Fv</text>
+              <line x1="0" y1="0" x2="64" y2="0" stroke="#1f9d55" stroke-width="2" marker-end="url(#arrowGreen)"/>
+              <text x="60" y="14" fill="#1f9d55" font-size="12" stroke="#fff" stroke-width="3" paint-order="stroke fill">Fh</text>
+              <line x1="0" y1="0" x2="62" y2="-54" stroke="#d68a00" stroke-width="2" marker-end="url(#arrowOrange)"/>
+              <text x="48" y="-58" fill="#d68a00" font-size="12" stroke="#fff" stroke-width="3" paint-order="stroke fill">F-total</text>
+            </g>
+
+            <defs>
+              <marker id="arrowOrange" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#d68a00"/></marker>
+              <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1f3fb0"/></marker>
+              <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1f9d55"/></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="formula-note">
+          F = m·g　｜　τ = F·cosθ·d（θ：支架與水平底座夾角）　｜　Fh = ΣM / L2　｜　F-total = √(Fv²+Fh²)
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：輸入表單 + 結果 -->
+    <div>
+      <div class="panel">
+        <h2>輸入參數</h2>
+        <div class="field">
+          <label>stand 角度 θ（度，與水平底座夾角）</label>
+          <input type="number" id="angle_deg" value="80" step="0.1">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>支架重量（公斤）</label>
+            <input type="number" id="stand_weight_kg" value="70" step="0.1">
+          </div>
+          <div class="field">
+            <label>LCD 模組重量（公斤）</label>
+            <input type="number" id="lcd_weight_kg" value="25" step="0.1">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>L1 支架長度（米）</label>
+            <input type="number" id="l1_m" value="1.87" step="0.001">
+          </div>
+          <div class="field">
+            <label>L2 底座長度（米）</label>
+            <input type="number" id="l2_m" value="0.355" step="0.001">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>L-LCD（LCD重心沿支架距支點，米）</label>
+            <input type="number" id="l_lcd_m" value="0.95" step="0.001">
+          </div>
+          <div class="field">
+            <label>L重心（支架重心，米，留空＝L1/2）</label>
+            <input type="number" id="l_center_stand_m" placeholder="自動 = L1/2" step="0.001">
+          </div>
+        </div>
+        <button class="calc" id="calcBtn" onclick="runCalc()">計算</button>
+        <div class="err" id="errBox"></div>
+      </div>
+
+      <div class="panel results" style="margin-top:16px;">
+        <h2>計算結果</h2>
+        <table id="resultTable">
+          <tr><td class="k">LCD 重力 F</td><td class="v" id="r_f_lcd">—</td></tr>
+          <tr><td class="k">支架自重 F</td><td class="v" id="r_f_stand">—</td></tr>
+          <tr><td class="k">Fv 垂直反作用力</td><td class="v" id="r_fv">—</td></tr>
+          <tr><td class="k">LCD 力矩</td><td class="v" id="r_m_lcd">—</td></tr>
+          <tr><td class="k">支架力矩</td><td class="v" id="r_m_stand">—</td></tr>
+          <tr><td class="k">總力矩 ΣM</td><td class="v" id="r_m_total">—</td></tr>
+          <tr><td class="k">Fh 水平反作用力</td><td class="v" id="r_fh">—</td></tr>
+          <tr class="total"><td class="k">F-total 總受力</td><td class="v" id="r_ftotal">—</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="badge"><span class="dot pending" id="statusDot"></span><span id="statusText">連線中…</span></div>
+
+<script>
+  // ※ 公式不在前端：所有計算都送到後端 API，這裡只負責收送資料與顯示。
+  const API_BASE_URL = 'https://anzu-calc-api.onrender.com';
+  const CALC_ENDPOINT = API_BASE_URL + '/api/lshape-stand-force/calc';
+  const PING_ENDPOINT = API_BASE_URL + '/api/lshape-stand-force/ping';
+
+  function setStatus(state){
+    const dot = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    dot.className = 'dot ' + state;
+    text.textContent = state === 'ok' ? '已連線' : (state === 'bad' ? '離線（喚醒中或無法連線）' : '連線中…');
+  }
+
+  async function checkStatus(){
+    try{
+      const res = await fetch(PING_ENDPOINT);
+      setStatus(res.ok ? 'ok' : 'bad');
+    }catch(e){
+      setStatus('bad');
+    }
+  }
+  checkStatus();
+
+  function fmt(n, unit){
+    if(n === null || n === undefined || isNaN(n)) return '—';
+    return Number(n).toLocaleString(undefined,{maximumFractionDigits:2}) + ' ' + unit;
+  }
+
+  async function runCalc(){
+    const errBox = document.getElementById('errBox');
+    errBox.style.display = 'none';
+    const btn = document.getElementById('calcBtn');
+
+    const payload = {
+      angle_deg: parseFloat(document.getElementById('angle_deg').value),
+      stand_weight_kg: parseFloat(document.getElementById('stand_weight_kg').value),
+      lcd_weight_kg: parseFloat(document.getElementById('lcd_weight_kg').value),
+      l1_m: parseFloat(document.getElementById('l1_m').value),
+      l2_m: parseFloat(document.getElementById('l2_m').value),
+      l_lcd_m: parseFloat(document.getElementById('l_lcd_m').value),
+    };
+    const lCenter = document.getElementById('l_center_stand_m').value;
+    if(lCenter !== '') payload.l_center_stand_m = parseFloat(lCenter);
+
+    for(const [k,v] of Object.entries(payload)){
+      if(isNaN(v)){
+        errBox.textContent = '請完整填寫所有必要欄位。';
+        errBox.style.display = 'block';
+        return;
+      }
+    }
+
+    btn.disabled = true; btn.textContent = '計算中…';
+    try{
+      const res = await fetch(CALC_ENDPOINT, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){
+        const t = await res.text();
+        throw new Error('API 錯誤：' + res.status + ' ' + t);
+      }
+      const d = await res.json();
+      document.getElementById('r_f_lcd').textContent   = fmt(d.f_lcd_n,'N');
+      document.getElementById('r_f_stand').textContent = fmt(d.f_stand_n,'N');
+      document.getElementById('r_fv').textContent      = fmt(d.fv_n,'N') + '（' + fmt(d.fv_kgf,'kgf') + '）';
+      document.getElementById('r_m_lcd').textContent   = fmt(d.m_lcd_nm,'N·m');
+      document.getElementById('r_m_stand').textContent = fmt(d.m_stand_nm,'N·m');
+      document.getElementById('r_m_total').textContent = fmt(d.m_total_nm,'N·m');
+      document.getElementById('r_fh').textContent      = fmt(d.fh_n,'N') + '（' + fmt(d.fh_kgf,'kgf') + '）';
+      document.getElementById('r_ftotal').textContent  = fmt(d.f_total_n,'N') + '（' + fmt(d.f_total_kgf,'kgf') + '）';
+      setStatus('ok');
+    }catch(e){
+      errBox.textContent = e.message || '計算失敗，請確認後端服務狀態。';
+      errBox.style.display = 'block';
+      setStatus('bad');
+    }finally{
+      btn.disabled = false; btn.textContent = '計算';
+    }
+  }
+</script>
+</body>
+</html>
