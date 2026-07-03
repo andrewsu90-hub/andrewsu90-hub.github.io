@@ -222,6 +222,10 @@
                     <input type="number" id="p-area" step="50" min="1" value="3000" oninput="calcPartDebounced()">
                 </div>
                 <div class="field-group">
+                    <label>材料流動性（決定模內壓）</label>
+                    <select id="p-flow" onchange="calcPart()"></select>
+                </div>
+                <div class="field-group">
                     <label>穴數</label>
                     <select id="p-cav" onchange="calcPart()">
                         <option value="1" selected>1</option><option value="2">2</option>
@@ -328,6 +332,13 @@
                 if (c.key === 'medium') opt.selected = true;
                 compSel.appendChild(opt);
             });
+            const flowSel = document.getElementById('p-flow');
+            data.flows.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.key; opt.textContent = f.label;
+                if (f.key === 'medium') opt.selected = true;
+                flowSel.appendChild(opt);
+            });
             setApiStatus('ok');
             calcAll();
         } catch (err) {
@@ -416,6 +427,7 @@
             runnerRecycle: (parseFloat(document.getElementById('p-recycle').value) || 0) / 100,
             projArea: parseFloat(document.getElementById('p-area').value) || 0,
             cavities: parseInt(document.getElementById('p-cav').value) || 1,
+            flowClass: document.getElementById('p-flow').value || 'medium',
             cycleTime: parseFloat(document.getElementById('p-cycle').value) || 0,
             wallThickness: parseFloat(document.getElementById('p-wall').value) || 2.0,
             yieldRate: (parseFloat(document.getElementById('p-yield').value) || 98) / 100,
@@ -452,7 +464,7 @@
 
         const cur = data.currency;
         document.getElementById('p-status').innerHTML =
-            `<div class="status-bar ok">✓ 鎖模力 ${data.clampForceTon} ton → 建議 ${data.machineTon} ton 機台</div>`;
+            `<div class="status-bar ok">✓ ${data.flowLabel}｜鎖模力 ${data.clampForceTon} ton → 建議 ${data.machineTon} ton 機台</div>`;
 
         const amortHTML = data.amortize > 0 ? `
             <div class="result-item"><div class="label">模具攤提/件</div><div class="value">${data.amortize}</div><div class="unit">${cur}</div></div>
