@@ -487,8 +487,10 @@
         }
 
         const cur = data.currency;
-        document.getElementById('p-status').innerHTML =
-            `<div class="status-bar ok">✓ ${data.flowLabel}｜鎖模力 ${data.clampForceTon} ton → 建議 ${data.machineTon} ton 機台</div>`;
+        const utilWarn = data.utilizationWarn && data.machineTonNext;
+        document.getElementById('p-status').innerHTML = utilWarn
+            ? `<div class="status-bar warn">⚠ ${data.flowLabel}｜鎖模力 ${data.clampForceTon} ton → ${data.machineTon} ton 機台稼動率 ${data.utilization}% 偏高，保守建議 ${data.machineTonNext} ton</div>`
+            : `<div class="status-bar ok">✓ ${data.flowLabel}｜鎖模力 ${data.clampForceTon} ton → 建議 ${data.machineTon} ton 機台（稼動率 ${data.utilization}%）</div>`;
 
         const amortHTML = data.amortize > 0 ? `
             <div class="result-item"><div class="label">模具攤提/件</div><div class="value">${data.amortize}</div><div class="unit">${cur}</div></div>
@@ -497,7 +499,8 @@
             <div class="result-item highlight"><div class="label">成型單價</div><div class="value">${data.unitPrice}</div><div class="unit">${cur} / 件</div></div>
             <div class="result-item"><div class="label">材料費/件</div><div class="value">${data.materialCost}</div><div class="unit">${cur}</div></div>
             <div class="result-item"><div class="label">加工費/件</div><div class="value">${data.processCost}</div><div class="unit">${cur}</div></div>
-            <div class="result-item"><div class="label">建議機台</div><div class="value">${data.machineTon}</div><div class="unit">ton（鎖模力 ${data.clampForceTon} ton）</div></div>
+            <div class="result-item"><div class="label">建議機台</div><div class="value">${utilWarn ? data.machineTon + ' / ' + data.machineTonNext : data.machineTon}</div><div class="unit">ton（鎖模力 ${data.clampForceTon} ton）</div></div>
+            <div class="result-item ${utilWarn ? 'warn' : ''}"><div class="label">鎖模力稼動率</div><div class="value">${data.utilization}</div><div class="unit">%（≤90% 為宜${utilWarn ? '，建議升級 ' + data.machineTonNext + ' ton' : ''}）</div></div>
             <div class="result-item"><div class="label">機台費率</div><div class="value">${fmt(data.machineRate)}</div><div class="unit">${cur} / hr</div></div>
             <div class="result-item"><div class="label">週期</div><div class="value">${data.cycleTime}</div><div class="unit">s（${data.cycleSource}）</div></div>
             ${amortHTML}
