@@ -79,6 +79,26 @@
         .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .api-status.loading { background: #fdfae6; color: #d35400; }
         .api-status.error { background: #fdf3f2; color: #c0392b; }
+
+        /* 報告輸出 */
+        .report-bar { display: flex; justify-content: flex-end; margin-bottom: 1rem; }
+        .report-btn { padding: 10px 22px; border: 0.5px solid var(--primary-color); border-radius: var(--radius-sm); background: var(--primary-color); color: var(--bg-white); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+        .report-btn:hover { opacity: 0.8; }
+        #report-area { display: none; }
+        @media print {
+            body > :not(#report-area) { display: none !important; }
+            #report-area { display: block !important; color: #000; background: #fff; font-size: 12px; line-height: 1.6; }
+            #report-area h1 { font-size: 20px; margin-bottom: 2px; }
+            #report-area h2 { font-size: 15px; margin: 14px 0 6px; border-bottom: 1px solid #000; padding-bottom: 3px; }
+            #report-area .rpt-meta { font-size: 11px; color: #444; margin-bottom: 8px; }
+            #report-area table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 11.5px; }
+            #report-area th, #report-area td { border: 0.5px solid #999; padding: 4px 8px; text-align: left; color: #000; background: #fff; }
+            #report-area th { background: #eee; font-weight: 700; white-space: nowrap; }
+            #report-area td.num { text-align: right; font-variant-numeric: tabular-nums; }
+            #report-area tr.total td { font-weight: 700; border-top: 1.5px solid #000; }
+            #report-area .rpt-warn { color: #b00; font-weight: 700; }
+            #report-area .rpt-foot { font-size: 10px; color: #555; margin-top: 12px; border-top: 0.5px solid #999; padding-top: 6px; }
+        }
     </style>
 </head>
 <body>
@@ -117,6 +137,10 @@
                     <input type="number" id="fx-rmb" step="0.1" min="1" value="7.2" oninput="calcAll()">
                 </div>
             </div>
+        </div>
+
+        <div class="report-bar">
+            <button class="report-btn" onclick="printReport()">🖨 輸出報告（列印 / PDF）</button>
         </div>
 
         <!-- ================= 區塊一：模具估價 ================= -->
@@ -290,6 +314,8 @@
 
     <div class="api-status" id="api-status" style="display:none;">計算中...</div>
 
+    <div id="report-area"></div>
+
     <script>
     /* =========================================================
        計算邏輯與係數表全在伺服器端，前端只送輸入、收結果並渲染
@@ -297,6 +323,12 @@
     const API_BASE_URL = 'https://anzu-calc-api.onrender.com';
 
     let moldTimer = null, partTimer = null;
+    let lastMold = null, lastPart = null;   // 報告輸出用：最近一次成功計算的輸入與結果
+
+    function selText(id) {
+        const el = document.getElementById(id);
+        return el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : '';
+    }
 
     function setApiStatus(state, msg) {
         const el = document.getElementById('api-status');
@@ -414,6 +446,11 @@
             return;
         }
 
+        lastMold = {
+            body, data,
+            labels: { steel: selText('m-steel'), comp: selText('m-comp'), type: selText('m-type') }
+        };
+
         const cur = data.currency;
         const statusClass = data.materialPctOk ? 'ok' : 'warn';
         const statusText = data.materialPctOk
@@ -486,6 +523,8 @@
             return;
         }
 
+        lastPart = { body, data, labels: { flow: selText('p-flow') } };
+
         const cur = data.currency;
         const utilWarn = data.utilizationWarn && data.machineTonNext;
         document.getElementById('p-status').innerHTML = utilWarn
@@ -510,6 +549,94 @@
             材料費 ${data.materialCost} + 加工費 ${data.processCost} + 包裝費 ${data.packCost} → 加利潤後 ${data.unitBeforeAmortize} ${cur}${data.amortize > 0 ? `，攤提 ${data.amortize} ${cur} → <strong>${data.unitPrice} ${cur}</strong>` : ''}<br>
             冷卻時間約與壁厚平方成正比，減薄壁厚與縮短週期是降低單價最有效的手段。
         `;
+    }
+
+    // ============================================================
+    // 報告輸出（列印 / PDF）
+    // ============================================================
+    function rptRow(label, value, cls) {
+        return `<tr><th>${label}</th><td class="${cls || ''}">${value}</td></tr>`;
+    }
+
+    function buildReport() {
+        const today = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        const fx = fxInputs();
+        let html = `
+            <h1>塑膠模具與成型單價估算報告</h1>
+            <div class="rpt-meta">Anzû Design Studio｜報告日期：${today}｜幣別：${fx.currency}（TWD/USD=${fx.twdPerUsd}，RMB/USD=${fx.rmbPerUsd}）</div>
+        `;
+
+        if (lastMold) {
+            const b = lastMold.body, d = lastMold.data, L = lastMold.labels;
+            html += `
+            <h2>① 模具估價</h2>
+            <table>
+                ${rptRow('產品尺寸 L×W×H', `${b.length} × ${b.width} × ${b.height} mm`)}
+                ${rptRow('穴數 / 排布', `${b.cavities}（${d.layout}）`)}
+                ${rptRow('模仁鋼材', L.steel)}
+                ${rptRow('複雜度', L.comp)}
+                ${rptRow('模具型式', L.type + (b.moldType === 'hot_runner' ? `，熱嘴 ${b.hotDrops} 點` : ''))}
+                ${rptRow('滑塊 / 斜頂', `${b.sliders} 組 / ${b.lifters} 組`)}
+                ${rptRow('模仁尺寸（推算）', `${d.insertSize} mm（${d.steelWeightKg} kg）`)}
+                ${rptRow('模架尺寸（推算）', `${d.baseSize} mm`)}
+            </table>
+            <table>
+                <tr><th>費用項目</th><th style="text-align:right;">金額（${d.currency}）</th></tr>
+                <tr><td>模仁材料費</td><td class="num">${fmt(d.coreMaterial)}</td></tr>
+                <tr><td>模架費</td><td class="num">${fmt(d.moldBase)}</td></tr>
+                <tr><td>標準件</td><td class="num">${fmt(d.stdParts)}</td></tr>
+                <tr><td>加工費合計</td><td class="num">${fmt(d.machining)}</td></tr>
+                ${d.hotRunner > 0 ? `<tr><td>熱澆道系統</td><td class="num">${fmt(d.hotRunner)}</td></tr>` : ''}
+                <tr><td>設計費</td><td class="num">${fmt(d.design)}</td></tr>
+                <tr><td>試模費</td><td class="num">${fmt(d.trial)}</td></tr>
+                <tr><td>管銷利潤（${Math.round(b.profitRate * 100)}%）</td><td class="num">${fmt(d.profit)}</td></tr>
+                <tr class="total"><td>模具總價</td><td class="num">${fmt(d.total)} ${d.currency}</td></tr>
+            </table>
+            <div class="rpt-meta">材料費占比 ${d.materialPct}%${d.materialPctOk ? '（業界合理區間 16–32%）' : '<span class="rpt-warn">（超出 16–32% 合理區間，建議覆核）</span>'}</div>
+            `;
+        }
+
+        if (lastPart) {
+            const b = lastPart.body, d = lastPart.data, L = lastPart.labels;
+            const utilWarn = d.utilizationWarn && d.machineTonNext;
+            html += `
+            <h2>② 塑膠產品成型單價</h2>
+            <table>
+                ${rptRow('單件重 / 整模水口重', `${b.partWeight} g / ${b.runnerWeight} g（回收 ${Math.round(b.runnerRecycle * 100)}%）`)}
+                ${rptRow('材料單價 / 損耗率', `${b.resinPrice} /kg / ${Math.round(b.scrapRate * 100)}%`)}
+                ${rptRow('材料流動性', L.flow)}
+                ${rptRow('單穴投影面積 / 穴數', `${fmt(b.projArea)} mm² / ${b.cavities}`)}
+                ${rptRow('壁厚 / 週期', `${b.wallThickness} mm / ${d.cycleTime} s（${d.cycleSource}）`)}
+                ${rptRow('良率 / 管銷利潤', `${Math.round(b.yieldRate * 100)}% / ${Math.round(b.profitRate * 100)}%`)}
+                ${rptRow('鎖模力（含安全係數）', `${d.clampForceTon} ton`)}
+                ${rptRow('建議機台', utilWarn
+                    ? `<span class="rpt-warn">${d.machineTon} ton（稼動率 ${d.utilization}% 偏高，保守建議 ${d.machineTonNext} ton）</span>`
+                    : `${d.machineTon} ton（稼動率 ${d.utilization}%）`)}
+                ${rptRow('機台費率', `${fmt(d.machineRate)} ${d.currency}/hr${b.machineRateOverride > 0 ? '（手動覆寫）' : '（依噸數自動）'}`)}
+            </table>
+            <table>
+                <tr><th>單價組成</th><th style="text-align:right;">金額（${d.currency}/件）</th></tr>
+                <tr><td>材料費</td><td class="num">${d.materialCost}</td></tr>
+                <tr><td>加工費</td><td class="num">${d.processCost}</td></tr>
+                <tr><td>包裝費</td><td class="num">${d.packCost}</td></tr>
+                <tr><td>小計 ×（1＋管銷利潤 ${Math.round(b.profitRate * 100)}%）</td><td class="num">${d.unitBeforeAmortize}</td></tr>
+                ${d.amortize > 0 ? `<tr><td>模具攤提（${fmt(b.moldCost)} ÷ ${fmt(b.totalQty)} pcs）</td><td class="num">${d.amortize}</td></tr>` : ''}
+                <tr class="total"><td>成型單價</td><td class="num">${d.unitPrice} ${d.currency}/件</td></tr>
+            </table>
+            `;
+        }
+
+        html += `<div class="rpt-foot">本報告為參數化估算，僅供報價參考；正式報價請以模具廠與成型廠實際評估為準。｜Anzû Mechanical &amp; Product Design Studio</div>`;
+        return html;
+    }
+
+    function printReport() {
+        if (!lastMold && !lastPart) {
+            setApiStatus('error', '⚠ 尚無計算結果可輸出，請先完成任一區塊計算');
+            return;
+        }
+        document.getElementById('report-area').innerHTML = buildReport();
+        window.print();
     }
 
     // 初始化
