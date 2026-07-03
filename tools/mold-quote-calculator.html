@@ -81,7 +81,9 @@
         .api-status.error { background: #fdf3f2; color: #c0392b; }
 
         /* 報告輸出 */
-        .report-bar { display: flex; justify-content: flex-end; margin-bottom: 1rem; }
+        .report-bar { display: flex; justify-content: flex-end; align-items: flex-end; gap: 1rem; margin-bottom: 1rem; }
+        .report-bar .field-group { flex: 1; max-width: 340px; }
+        .report-bar input { cursor: text; }
         .report-btn { padding: 10px 22px; border: 0.5px solid var(--primary-color); border-radius: var(--radius-sm); background: var(--primary-color); color: var(--bg-white); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
         .report-btn:hover { opacity: 0.8; }
         #report-area { display: none; }
@@ -140,6 +142,10 @@
         </div>
 
         <div class="report-bar">
+            <div class="field-group">
+                <label>機種名稱（顯示於報告抬頭）</label>
+                <input type="text" id="rpt-model" placeholder="例：LCD-4650 前殼" maxlength="60">
+            </div>
             <button class="report-btn" onclick="printReport()">🖨 輸出報告（列印 / PDF）</button>
         </div>
 
@@ -561,9 +567,10 @@
     function buildReport() {
         const today = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
         const fx = fxInputs();
+        const model = document.getElementById('rpt-model').value.trim();
         let html = `
             <h1>塑膠模具與成型單價估算報告</h1>
-            <div class="rpt-meta">Anzû Design Studio｜報告日期：${today}｜幣別：${fx.currency}（TWD/USD=${fx.twdPerUsd}，RMB/USD=${fx.rmbPerUsd}）</div>
+            <div class="rpt-meta">${model ? `機種名稱：<strong>${model.replace(/</g, '&lt;')}</strong>｜` : ''}Anzû Design Studio｜報告日期：${today}｜幣別：${fx.currency}（TWD/USD=${fx.twdPerUsd}，RMB/USD=${fx.rmbPerUsd}）</div>
         `;
 
         if (lastMold) {
