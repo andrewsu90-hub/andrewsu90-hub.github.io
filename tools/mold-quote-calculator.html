@@ -162,6 +162,14 @@
                     <select id="m-comp" onchange="calcMold()"></select>
                 </div>
                 <div class="field-group">
+                    <label>模具型式</label>
+                    <select id="m-type" onchange="onMoldTypeChange()"></select>
+                </div>
+                <div class="field-group" id="m-drops-group" style="display:none;">
+                    <label>熱嘴點數 (點)</label>
+                    <input type="number" id="m-drops" step="1" min="0" value="1" oninput="calcMoldDebounced()">
+                </div>
+                <div class="field-group">
                     <label>滑塊 (組)</label>
                     <input type="number" id="m-sliders" step="1" min="0" value="0" oninput="calcMoldDebounced()">
                 </div>
@@ -332,6 +340,13 @@
                 if (c.key === 'medium') opt.selected = true;
                 compSel.appendChild(opt);
             });
+            const typeSel = document.getElementById('m-type');
+            data.moldTypes.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.key; opt.textContent = t.label;
+                if (t.key === 'two_plate') opt.selected = true;
+                typeSel.appendChild(opt);
+            });
             const flowSel = document.getElementById('p-flow');
             data.flows.forEach(f => {
                 const opt = document.createElement('option');
@@ -345,6 +360,12 @@
             console.error('mold-quote/tables API 失敗', err);
             setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
         }
+    }
+
+    function onMoldTypeChange() {
+        const isHot = document.getElementById('m-type').value === 'hot_runner';
+        document.getElementById('m-drops-group').style.display = isHot ? '' : 'none';
+        calcMold();
     }
 
     function calcAll() { calcMold(); calcPart(); }
@@ -362,6 +383,8 @@
             cavities: parseInt(document.getElementById('m-cav').value) || 1,
             steel: document.getElementById('m-steel').value || 'P20',
             complexity: document.getElementById('m-comp').value || 'medium',
+            moldType: document.getElementById('m-type').value || 'two_plate',
+            hotDrops: parseInt(document.getElementById('m-drops').value) || 0,
             sliders: parseInt(document.getElementById('m-sliders').value) || 0,
             lifters: parseInt(document.getElementById('m-lifters').value) || 0,
             profitRate: (parseFloat(document.getElementById('m-profit').value) || 0) / 100,
@@ -404,13 +427,14 @@
             <div class="result-item"><div class="label">模架費</div><div class="value">${fmt(data.moldBase)}</div><div class="unit">${cur}</div></div>
             <div class="result-item"><div class="label">標準件</div><div class="value">${fmt(data.stdParts)}</div><div class="unit">${cur}</div></div>
             <div class="result-item"><div class="label">加工費合計</div><div class="value">${fmt(data.machining)}</div><div class="unit">${cur}</div></div>
+            ${data.hotRunner > 0 ? `<div class="result-item"><div class="label">熱澆道系統</div><div class="value">${fmt(data.hotRunner)}</div><div class="unit">${cur}</div></div>` : ''}
             <div class="result-item"><div class="label">設計費</div><div class="value">${fmt(data.design)}</div><div class="unit">${cur}</div></div>
             <div class="result-item"><div class="label">試模費</div><div class="value">${fmt(data.trial)}</div><div class="unit">${cur}</div></div>
             <div class="result-item"><div class="label">管銷利潤</div><div class="value">${fmt(data.profit)}</div><div class="unit">${cur}</div></div>
         `;
         document.getElementById('m-tip').innerHTML = `
             <strong>📌 推算明細</strong><br>
-            穴數排布 ${data.layout}　｜　模仁尺寸 ${data.insertSize} mm　｜　模架約 ${data.baseSize} mm<br>
+            ${data.moldTypeLabel}　｜　穴數排布 ${data.layout}　｜　模仁尺寸 ${data.insertSize} mm　｜　模架約 ${data.baseSize} mm<br>
             模具價 = 材料費(模仁+模架+標準件) + 加工費 + 設計費 + 試模費 + 管銷利潤。首次對外報價常在估價基礎上再加 10–30% 談判空間。
         `;
     }
