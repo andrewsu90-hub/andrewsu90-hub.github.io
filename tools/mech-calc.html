@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
@@ -20,175 +20,70 @@
 </head>
 <body>
   <header style="position:sticky;top:0;z-index:200;display:flex;justify-content:space-between;align-items:center;padding:0 5%;height:56px;border-bottom:0.5px solid #e0e0e0;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);">
-    <a href="../index.html" style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:1px;text-decoration:none;color:inherit;">Anzû Design Studio</a>
-    <a href="#" onclick="history.back();return false;" style="font-size:13px;color:#666;text-decoration:none;">← 返回工具選單</a>
+    <a href="#" style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:1px;text-decoration:none;color:inherit;">Anzû Design Studio</a>
+    <a href="#" id="back-link" onclick="history.back();return false;" style="font-size:13px;color:#666;text-decoration:none;">← 返回工具選單</a>
   </header>
   <style>@media(prefers-color-scheme:dark){header{background:rgba(13,13,13,0.95)!important;border-bottom-color:#2a2a2a!important}header a{color:#f0f0f0!important}header a:last-child{color:#999!important}}</style>
 
   <div id="root"><div id="loading">LOADING CALC ENGINE…</div></div>
+  <div class="api-status" id="api-status" style="display:none;"></div>
   <script>
 const { useState, useMemo, useCallback } = React;
-const BEARINGS_DEEP = [
-  { model: "684zz", d: 4, D: 9, B: 2.5, Cr: 641, Cor: 227, nmax: 53 },
-  { model: "694zz", d: 4, D: 11, B: 4, Cr: 957, Cor: 350, nmax: 48 },
-  { model: "604zz", d: 4, D: 12, B: 4, Cr: 957, Cor: 350, nmax: 48 },
-  { model: "624zz", d: 4, D: 13, B: 5, Cr: 1301, Cor: 488, nmax: 40 },
-  { model: "634zz", d: 4, D: 16, B: 5, Cr: 1340, Cor: 523, nmax: 36 },
-  { model: "685zz", d: 5, D: 11, B: 3, Cr: 716, Cor: 282, nmax: 45 },
-  { model: "695zz", d: 5, D: 13, B: 4, Cr: 1077, Cor: 432, nmax: 43 },
-  { model: "605zz", d: 5, D: 14, B: 5, Cr: 1329, Cor: 507, nmax: 40 },
-  { model: "625zz", d: 5, D: 16, B: 5, Cr: 1729, Cor: 675, nmax: 36 },
-  { model: "635zz", d: 5, D: 19, B: 6, Cr: 2336, Cor: 896, nmax: 32 },
-  { model: "686zz", d: 6, D: 13, B: 3.5, Cr: 1082, Cor: 442, nmax: 40 },
-  { model: "696zz", d: 6, D: 15, B: 5, Cr: 1340, Cor: 523, nmax: 40 },
-  { model: "606zz", d: 6, D: 17, B: 6, Cr: 2263, Cor: 846, nmax: 38 },
-  { model: "626zz", d: 6, D: 19, B: 6, Cr: 2336, Cor: 896, nmax: 32 },
-  { model: "636zz", d: 6, D: 22, B: 7, Cr: 3333, Cor: 1423, nmax: 30 },
-  { model: "687zz", d: 7, D: 14, B: 3.5, Cr: 1173, Cor: 513, nmax: 40 },
-  { model: "697zz", d: 7, D: 17, B: 5, Cr: 1605, Cor: 719, nmax: 36 },
-  { model: "607zz", d: 7, D: 19, B: 6, Cr: 2336, Cor: 896, nmax: 36 },
-  { model: "627zz", d: 7, D: 22, B: 7, Cr: 3287, Cor: 1379, nmax: 30 },
-  { model: "637zz", d: 7, D: 26, B: 9, Cr: 4563, Cor: 1983, nmax: 28 },
-  { model: "688zz", d: 8, D: 16, B: 4, Cr: 1252, Cor: 592, nmax: 36 },
-  { model: "698zz", d: 8, D: 19, B: 6, Cr: 2100, Cor: 919, nmax: 34 },
-  { model: "608zz", d: 8, D: 22, B: 7, Cr: 3287, Cor: 1379, nmax: 30 },
-  { model: "628zz", d: 8, D: 24, B: 8, Cr: 4106, Cor: 1734, nmax: 28 },
-  { model: "6000zz", d: 10, D: 26, B: 8, Cr: 4575, Cor: 1960, nmax: 28 },
-  { model: "6001zz", d: 12, D: 28, B: 8, Cr: 5070, Cor: 2360, nmax: 24 },
-  { model: "6002zz", d: 15, D: 32, B: 9, Cr: 5590, Cor: 2850, nmax: 20 },
-  { model: "6003zz", d: 17, D: 35, B: 10, Cr: 6050, Cor: 3250, nmax: 18 },
-  { model: "6004zz", d: 20, D: 42, B: 12, Cr: 9360, Cor: 5e3, nmax: 15 },
-  { model: "6005zz", d: 25, D: 47, B: 12, Cr: 10100, Cor: 5850, nmax: 13 },
-  { model: "6006zz", d: 30, D: 55, B: 13, Cr: 13300, Cor: 8300, nmax: 11 },
-  { model: "6007zz", d: 35, D: 62, B: 14, Cr: 16e3, Cor: 10200, nmax: 9 },
-  { model: "6008zz", d: 40, D: 68, B: 15, Cr: 17e3, Cor: 11200, nmax: 9 },
-  { model: "6009zz", d: 45, D: 75, B: 16, Cr: 21200, Cor: 14600, nmax: 8 },
-  { model: "6010zz", d: 50, D: 80, B: 16, Cr: 22500, Cor: 16e3, nmax: 7 },
-  { model: "6200zz", d: 10, D: 30, B: 9, Cr: 5070, Cor: 2360, nmax: 24 },
-  { model: "6201zz", d: 12, D: 32, B: 10, Cr: 6630, Cor: 3050, nmax: 22 },
-  { model: "6202zz", d: 15, D: 35, B: 11, Cr: 7650, Cor: 3750, nmax: 18 },
-  { model: "6203zz", d: 17, D: 40, B: 12, Cr: 9360, Cor: 4800, nmax: 17 },
-  { model: "6204zz", d: 20, D: 47, B: 14, Cr: 12800, Cor: 6550, nmax: 14 },
-  { model: "6205zz", d: 25, D: 52, B: 15, Cr: 14e3, Cor: 7800, nmax: 11 },
-  { model: "6206zz", d: 30, D: 62, B: 16, Cr: 2e4, Cor: 11200, nmax: 9 }
-];
-const BEARINGS_THRUST = [
-  { model: "51100CE", d: 10, D: 24, T: 9 },
-  { model: "51200CE", d: 10, D: 26, T: 11 },
-  { model: "51101CE", d: 12, D: 24, T: 9 },
-  { model: "51201CE", d: 12, D: 28, T: 11 },
-  { model: "51102CE", d: 15, D: 28, T: 9 },
-  { model: "51202CE", d: 15, D: 32, T: 12 },
-  { model: "51103CE", d: 17, D: 30, T: 9 },
-  { model: "51203CE", d: 17, D: 35, T: 12 },
-  { model: "51104CE", d: 20, D: 35, T: 10 },
-  { model: "51204CE", d: 20, D: 40, T: 14 },
-  { model: "51304CE", d: 20, D: 47, T: 18 },
-  { model: "51105CE", d: 25, D: 42, T: 11 },
-  { model: "51205CE", d: 25, D: 47, T: 15 },
-  { model: "51305CE", d: 25, D: 52, T: 18 },
-  { model: "51405CE", d: 25, D: 60, T: 24 },
-  { model: "51106CE", d: 30, D: 47, T: 11 },
-  { model: "51206CE", d: 30, D: 52, T: 16 },
-  { model: "51306CE", d: 30, D: 60, T: 21 },
-  { model: "51406CE", d: 30, D: 70, T: 28 },
-  { model: "51107CE", d: 35, D: 52, T: 12 },
-  { model: "51207CE", d: 35, D: 62, T: 18 },
-  { model: "51307CE", d: 35, D: 68, T: 24 },
-  { model: "51407CE", d: 35, D: 80, T: 32 },
-  { model: "51108CE", d: 40, D: 60, T: 13 },
-  { model: "51208CE", d: 40, D: 68, T: 19 },
-  { model: "51308CE", d: 40, D: 78, T: 26 },
-  { model: "51109CE", d: 45, D: 65, T: 14 },
-  { model: "51209CE", d: 45, D: 73, T: 20 },
-  { model: "51309CE", d: 45, D: 85, T: 28 },
-  { model: "51110CE", d: 50, D: 70, T: 14 },
-  { model: "51210CE", d: 50, D: 78, T: 22 },
-  { model: "51310CE", d: 50, D: 95, T: 31 }
-];
-const BOLT_TORQUE = [
-  { size: "M6", jp: 1.2, din: null },
-  { size: "M8", jp: 2.5, din: 2.4 },
-  { size: "M10", jp: 5.5, din: 4.6 },
-  { size: "M12", jp: 9, din: 8 },
-  { size: "M14", jp: 14, din: null },
-  { size: "M16", jp: 23.5, din: 19.9 },
-  { size: "M18", jp: 32, din: null },
-  { size: "M20", jp: 47, din: 38.8 },
-  { size: "M22", jp: 66.5, din: null },
-  { size: "M24", jp: 82.5, din: 67 },
-  { size: "M27", jp: 120, din: 98.3 },
-  { size: "M30", jp: 155, din: 134 },
-  { size: "M33", jp: 200, din: null },
-  { size: "M36", jp: 250, din: 233 },
-  { size: "M39", jp: 300, din: 303 },
-  { size: "M42", jp: null, din: 373 },
-  { size: "M48", jp: null, din: 561 },
-  { size: "M52", jp: null, din: 725 },
-  { size: "M56", jp: null, din: 907 },
-  { size: "M64", jp: null, din: 1360 },
-  { size: "M72", jp: null, din: 2090 },
-  { size: "M80", jp: null, din: 2870 },
-  { size: "M90", jp: null, din: 4110 },
-  { size: "M100", jp: null, din: 5670 }
-];
-const FRICTION_TABLE = [
-  { pair: "\u92FC-\u92FC", dry: "0.07~0.16", wet: "0.05~0.13" },
-  { pair: "\u92FC-\u9444\u92FC", dry: "0.11", wet: "0.07" },
-  { pair: "\u92FC-\u7D50\u69CB\u92FC", dry: "0.10", wet: "0.08" },
-  { pair: "\u92FC-\u512A\u8CEA\u7D50\u69CB\u92FC", dry: "0.11", wet: "0.07" },
-  { pair: "\u92FC-\u9752\u9285", dry: "0.15~0.20", wet: "0.03~0.06" },
-  { pair: "\u92FC-\u9444\u9435", dry: "0.12~0.15", wet: "0.05~0.10" },
-  { pair: "\u9444\u9435-\u9444\u9435", dry: "0.15~0.25", wet: "0.05~0.10" }
-];
-const ELASTIC_TABLE = [
-  { name: "\u78B3\u92FC\u3001\u4F4E\u5408\u91D1\u92FC\u3001\u5408\u91D1\u7D50\u69CB\u92FC", E: "200~235", nu: "0.30~0.31", alpha: "11" },
-  { name: "\u7070\u9444\u9435 HT150\u3001HT200", E: "70~80", nu: "0.24~0.25", alpha: "11" },
-  { name: "\u7070\u9444\u9435 HT250\u3001HT300", E: "105~130", nu: "0.24~0.26", alpha: "10" },
-  { name: "\u53EF\u935B\u9444\u9435", E: "90~100", nu: "0.25", alpha: "10" },
-  { name: "\u975E\u5408\u91D1\u7403\u58A8\u9444\u9435", E: "160~180", nu: "0.28~0.29", alpha: "10" },
-  { name: "\u9752\u9285", E: "85", nu: "0.35", alpha: "17" },
-  { name: "\u92C1\u5408\u91D1", E: "69~72", nu: "0.33", alpha: "23" },
-  { name: "\u4E0D\u93FD\u92FC 304", E: "196", nu: "0.28", alpha: "16" }
-];
-const DENSITY_TABLE = [
-  { name: "\u666E\u901A\u78B3\u7D20\u92FC", rho: 7850 },
-  { name: "\u512A\u8CEA\u78B3\u7D20\u92FC", rho: 7850 },
-  { name: "\u4E0D\u93FD\u92FC 304", rho: 7930 },
-  { name: "\u4E0D\u93FD\u92FC 316", rho: 8030 },
-  { name: "\u7070\u53E3\u9444\u9435", rho: 7200 },
-  { name: "\u7403\u58A8\u9444\u9435", rho: 7060 },
-  { name: "\u7D14\u9285", rho: 8900 },
-  { name: "\u9EC3\u9285 (\u901A\u7528)", rho: 8500 },
-  { name: "\u9752\u9285", rho: 8800 },
-  { name: "\u7D14\u92C1", rho: 2700 },
-  { name: "\u92C1\u5408\u91D1 (\u901A\u7528)", rho: 2750 },
-  { name: "\u786C\u92C1 LY12", rho: 2780 },
-  { name: "\u9226\u5408\u91D1 TC4", rho: 4430 },
-  { name: "\u5C3C\u9F8D PA66", rho: 1140 },
-  { name: "PTFE", rho: 2200 },
-  { name: "POM \u8CFD\u92FC", rho: 1410 },
-  { name: "ABS", rho: 1050 },
-  { name: "PC \u805A\u78B3\u9178\u916F", rho: 1200 }
-];
-const IT_TABLE = [
-  { from: 0, to: 3, IT5: 4, IT6: 6, IT7: 10, IT8: 14, IT9: 25, IT10: 40, IT11: 60 },
-  { from: 3, to: 6, IT5: 5, IT6: 8, IT7: 12, IT8: 18, IT9: 30, IT10: 48, IT11: 75 },
-  { from: 6, to: 10, IT5: 6, IT6: 9, IT7: 15, IT8: 22, IT9: 36, IT10: 58, IT11: 90 },
-  { from: 10, to: 18, IT5: 8, IT6: 11, IT7: 18, IT8: 27, IT9: 43, IT10: 70, IT11: 110 },
-  { from: 18, to: 30, IT5: 9, IT6: 13, IT7: 21, IT8: 33, IT9: 52, IT10: 84, IT11: 130 },
-  { from: 30, to: 50, IT5: 11, IT6: 16, IT7: 25, IT8: 39, IT9: 62, IT10: 100, IT11: 160 },
-  { from: 50, to: 80, IT5: 13, IT6: 19, IT7: 30, IT8: 46, IT9: 74, IT10: 120, IT11: 190 },
-  { from: 80, to: 120, IT5: 15, IT6: 22, IT7: 35, IT8: 54, IT9: 87, IT10: 140, IT11: 220 },
-  { from: 120, to: 180, IT5: 18, IT6: 25, IT7: 40, IT8: 63, IT9: 100, IT10: 160, IT11: 250 },
-  { from: 180, to: 250, IT5: 20, IT6: 29, IT7: 46, IT8: 72, IT9: 115, IT10: 185, IT11: 290 },
-  { from: 250, to: 315, IT5: 23, IT6: 32, IT7: 52, IT8: 81, IT9: 130, IT10: 210, IT11: 320 },
-  { from: 315, to: 400, IT5: 25, IT6: 36, IT7: 57, IT8: 89, IT9: 140, IT10: 230, IT11: 360 },
-  { from: 400, to: 500, IT5: 27, IT6: 40, IT7: 63, IT8: 97, IT9: 155, IT10: 250, IT11: 400 }
-];
-const STD_BORES = [16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 320];
+// ============================================================
+// 所有公式與係數表已移至後端 anzu-calc-api（/api/mech-calc）。
+// 前端僅保留輸入/輸出欄位定義與畫面渲染。
+// ============================================================
+const API_BASE_URL = 'https://anzu-calc-api.onrender.com';
+const API = API_BASE_URL + '/api/mech-calc';
+function setApiStatus(state, msg) {
+  const el = document.getElementById('api-status');
+  if (!el) return;
+  if (!msg) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.className = 'api-status' + (state ? ' ' + state : '');
+  el.textContent = msg;
+}
+async function apiCalc(id, inputs) {
+  setApiStatus('loading', '計算中…');
+  let res;
+  try {
+    res = await fetch(API + '/calc', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, inputs }) });
+  } catch (e) {
+    setApiStatus('error', '⚠ 無法連線到計算伺服器');
+    throw new Error('無法連線到計算伺服器（伺服器喚醒約需 30~60 秒），請稍候再試');
+  }
+  if (!res.ok) { setApiStatus('error', '⚠ 伺服器錯誤 ' + res.status); throw new Error('伺服器回應錯誤（' + res.status + '）'); }
+  const json = await res.json();
+  setApiStatus('', '✓ 已連線計算伺服器');
+  if (json.error) throw new Error(json.error);
+  return json.results;
+}
+const _tableCache = {};
+async function getTable(name) {
+  if (_tableCache[name]) return _tableCache[name];
+  setApiStatus('loading', '載入資料表…');
+  let res;
+  try {
+    res = await fetch(API + '/tables/' + name);
+  } catch (e) {
+    setApiStatus('error', '⚠ 無法連線到計算伺服器');
+    throw new Error('無法連線到計算伺服器');
+  }
+  if (!res.ok) { setApiStatus('error', '⚠ 伺服器錯誤 ' + res.status); throw new Error('伺服器回應錯誤'); }
+  const json = await res.json();
+  _tableCache[name] = json.rows;
+  setApiStatus('', '✓ 已連線計算伺服器');
+  return json.rows;
+}
+(function pingAPI() {
+  setApiStatus('loading', '連線計算伺服器中（喚醒約需 30~60 秒）…');
+  fetch(API + '/ping').then((r) => {
+    if (!r.ok) throw new Error();
+    setApiStatus('', '✓ 已連線計算伺服器');
+    setTimeout(() => setApiStatus('', ''), 4000);
+  }).catch(() => setApiStatus('error', '⚠ 無法連線到計算伺服器'));
+})();
 const PRESSURE_UNITS = ["Pa", "kPa", "MPa", "bar", "atm", "kgf/cm\xB2", "psi"];
-const PRESSURE_TO_PA = [1, 1e3, 1e6, 1e5, 101325, 98066.5, 6894.76];
 const CATEGORIES = [
   { id: "motor", label: "\u96FB\u6A5F\u9078\u578B", icon: "\u26A1", calcs: ["motor_torque", "motor_inertia", "servo_select", "power_calc", "belt_drive"] },
   { id: "cylinder", label: "\u6C23\u52D5\u9078\u578B", icon: "\u{1F4A8}", calcs: ["cylinder_bore", "cylinder_thrust", "vacuum_pad"] },
@@ -218,12 +113,6 @@ const CALCS = {
     ref: "F=P·A 氣壓缸出力基本公式，參考 SMC／CKD 氣壓元件技術資料及《氣壓工程學》",
     inputs: [{ key: "F", label: "\u5BE6\u969B\u8CA0\u8F09 F", unit: "N", default: 98 }, { key: "P", label: "\u5DE5\u4F5C\u58D3\u529B P", unit: "MPa", default: 0.5 }, { key: "beta", label: "\u8CA0\u8F09\u7387 \u03B2", unit: "", default: 0.5, hint: "\u4F4E\u901F\u963B\u60270.65 / \u9AD8\u901F\u6163\u60270.3 / \u4E00\u822C0.5" }],
     outputs: [{ key: "Fth", label: "\u7406\u8AD6\u51FA\u529B", unit: "N" }, { key: "D_calc", label: "\u8A08\u7B97\u7F38\u5F91", unit: "mm" }, { key: "D_sel", label: "\u5EFA\u8B70\u9078\u7528\u7F38\u5F91", unit: "mm" }],
-    calc(i) {
-      const Fth = i.F / i.beta;
-      const D_calc = Math.sqrt(4 * Fth / (Math.PI * i.P * 1e6)) * 1e3;
-      const D_sel = STD_BORES.find((d) => d >= D_calc) ?? STD_BORES[STD_BORES.length - 1];
-      return { Fth: Fth.toFixed(1), D_calc: D_calc.toFixed(2), D_sel };
-    }
   },
   cylinder_thrust: {
     name: "\u6C23\u7F38\u63A8\u529B\u8A08\u7B97",
@@ -231,11 +120,6 @@ const CALCS = {
     ref: "氣壓缸推力公式（含有桿側環形面積修正），參考 SMC 氣壓缸技術資料",
     inputs: [{ key: "P", label: "\u6C23\u58D3", unit: "MPa", default: 0.5 }, { key: "D", label: "\u7F38\u5F91", unit: "mm", default: 63 }, { key: "d", label: "\u687F\u5F91", unit: "mm", default: 20 }, { key: "eta", label: "\u6548\u7387 \u03B7", unit: "", default: 0.8 }],
     outputs: [{ key: "F_push", label: "\u7121\u687F\u5074\u63A8\u529B", unit: "N" }, { key: "F_pull", label: "\u6709\u687F\u5074\u63A8\u529B", unit: "N" }],
-    calc(i) {
-      const A1 = Math.PI / 4 * i.D ** 2;
-      const A2 = Math.PI / 4 * (i.D ** 2 - i.d ** 2);
-      return { F_push: (i.P * 1e6 * A1 * 1e-6 * i.eta).toFixed(1), F_pull: (i.P * 1e6 * A2 * 1e-6 * i.eta).toFixed(1) };
-    }
   },
   vacuum_pad: {
     name: "\u771F\u7A7A\u5438\u76E4\u9078\u578B",
@@ -243,11 +127,6 @@ const CALCS = {
     ref: "真空吸盤吸力與安全係數計算，參考 SMC／CONVUM 真空元件選型手冊",
     inputs: [{ key: "W", label: "\u5DE5\u4EF6\u91CD\u91CF", unit: "kg", default: 2 }, { key: "n", label: "\u5438\u76E4\u6578\u91CF", unit: "\u500B", default: 2 }, { key: "sf", label: "\u5B89\u5168\u4FC2\u6578", unit: "", default: 2, hint: "\u6C34\u5E73:2 / \u5782\u76F4\u5074\u5438:4" }, { key: "vac", label: "\u771F\u7A7A\u5EA6", unit: "kPa", default: 60 }],
     outputs: [{ key: "F_req", label: "\u6BCF\u76E4\u6240\u9700\u5438\u529B", unit: "N" }, { key: "D_min", label: "\u6700\u5C0F\u5438\u76E4\u76F4\u5F91", unit: "mm" }],
-    calc(i) {
-      const F_req = i.W * 9.8 * i.sf / i.n;
-      const D_min = Math.sqrt(4 * F_req / (Math.PI * i.vac * 1e3) * 1e6);
-      return { F_req: F_req.toFixed(1), D_min: D_min.toFixed(1) };
-    }
   },
   // ══ 電機 ══
   motor_torque: {
@@ -256,9 +135,6 @@ const CALCS = {
     ref: "滾珠螺桿驅動負載轉矩公式 T=(F+F0μ0)·PB/(2πη·i)，參考 THK／NSK 滾珠螺桿技術資料及伺服馬達選型手冊",
     inputs: [{ key: "F", label: "\u8EF8\u5411\u8CA0\u8F09 F", unit: "N", default: 500 }, { key: "F0", label: "\u9810\u8CA0\u8F09 F0", unit: "N", default: 167 }, { key: "PB", label: "\u87BA\u8DDD PB", unit: "mm", default: 10 }, { key: "mu0", label: "\u9810\u58D3\u6469\u64E6\u4FC2\u6578 \u03BC\u2080", unit: "", default: 0.2 }, { key: "eta", label: "\u6A5F\u68B0\u6548\u7387 \u03B7", unit: "", default: 0.9 }, { key: "i", label: "\u6E1B\u901F\u6BD4 i", unit: "", default: 1 }],
     outputs: [{ key: "TL", label: "\u8CA0\u8F09\u8F49\u77E9", unit: "N\xB7m" }],
-    calc(inp) {
-      return { TL: ((inp.F + inp.F0 * inp.mu0) * (inp.PB / 1e3) / (2 * Math.PI * inp.eta * inp.i)).toFixed(5) };
-    }
   },
   motor_inertia: {
     name: "\u6163\u91CF\uFF08\u6163\u6027\u77E9\uFF09\u8A08\u7B97",
@@ -266,11 +142,6 @@ const CALCS = {
     ref: "圓柱／圓環／矩形板迴轉慣性矩標準公式，參考工程力學（動力學）教材，如 Hibbeler《工程力學》",
     inputs: [{ key: "type", label: "\u5F62\u72C0 (1=\u5713\u67F1 2=\u5713\u74B0 3=\u77E9\u5F62)", unit: "", default: 1 }, { key: "m", label: "\u8CEA\u91CF m", unit: "kg", default: 2 }, { key: "R", label: "\u5916\u5F91\u534A\u5F91 R", unit: "m", default: 0.05 }, { key: "r", label: "\u5167\u5F91\u534A\u5F91 r\uFF08\u5713\u74B0\uFF09", unit: "m", default: 0 }, { key: "a", label: "\u9577 a\uFF08\u77E9\u5F62\uFF09", unit: "m", default: 0.1 }, { key: "b", label: "\u5BEC b\uFF08\u77E9\u5F62\uFF09", unit: "m", default: 0.05 }],
     outputs: [{ key: "J", label: "\u8F49\u52D5\u6163\u91CF J", unit: "kg\xB7m\xB2" }],
-    calc(i) {
-      const t = Math.round(i.type);
-      const J = t === 1 ? 0.5 * i.m * i.R ** 2 : t === 2 ? 0.5 * i.m * (i.R ** 2 + i.r ** 2) : i.m * (i.a ** 2 + i.b ** 2) / 12;
-      return { J: J.toExponential(4) };
-    }
   },
   servo_select: {
     name: "\u4F3A\u670D\u96FB\u6A5F\u9078\u578B\u9A57\u8B49",
@@ -278,11 +149,6 @@ const CALCS = {
     ref: "伺服馬達選型驗證準則（轉矩裕度、慣量比上限），參考三菱電機／安川電機伺服系統技術手冊",
     inputs: [{ key: "TL", label: "\u8CA0\u8F09\u8F49\u77E9 TL", unit: "N\xB7m", default: 1.5 }, { key: "TM", label: "\u96FB\u6A5F\u984D\u5B9A\u8F49\u77E9", unit: "N\xB7m", default: 3 }, { key: "JL", label: "\u8CA0\u8F09\u6163\u91CF JL", unit: "kg\xB7m\xB2", default: 1e-3 }, { key: "JM", label: "\u96FB\u6A5F\u6163\u91CF JM", unit: "kg\xB7m\xB2", default: 5e-4 }, { key: "ratio_max", label: "\u5141\u8A31\u6700\u5927\u6163\u91CF\u6BD4", unit: "", default: 5 }],
     outputs: [{ key: "torque_ok", label: "\u8F49\u77E9\u88D5\u5EA6", unit: "%" }, { key: "ratio", label: "\u5BE6\u969B\u6163\u91CF\u6BD4", unit: "\u500D" }, { key: "verdict", label: "\u5224\u5B9A\u7D50\u679C", unit: "" }],
-    calc(i) {
-      const torque_ok = ((i.TM - i.TL) / i.TM * 100).toFixed(1);
-      const ratio = (i.JL / i.JM).toFixed(2);
-      return { torque_ok, ratio, verdict: parseFloat(torque_ok) > 0 && parseFloat(ratio) <= i.ratio_max ? "\u2705 \u7B26\u5408" : "\u274C \u4E0D\u7B26\u5408\uFF0C\u9700\u91CD\u9078" };
-    }
   },
   power_calc: {
     name: "\u529F\u7387 \u2194 \u8F49\u77E9\u63DB\u7B97",
@@ -290,9 +156,6 @@ const CALCS = {
     ref: "功率與轉矩轉換公式 P=2πnT/60，機械設計通用公式",
     inputs: [{ key: "P", label: "\u529F\u7387 P", unit: "W", default: 750 }, { key: "T", label: "\u8F49\u77E9 T", unit: "N\xB7m", default: 5 }, { key: "n", label: "\u8F49\u901F n", unit: "rpm", default: 1450 }],
     outputs: [{ key: "T_from_P", label: "\u7531P\u8A08\u7B97\u8F49\u77E9", unit: "N\xB7m" }, { key: "P_from_T", label: "\u7531T\u8A08\u7B97\u529F\u7387", unit: "W" }],
-    calc(i) {
-      return { T_from_P: (i.P * 60 / (2 * Math.PI * i.n)).toFixed(4), P_from_T: (i.T * 2 * Math.PI * i.n / 60).toFixed(2) };
-    }
   },
   belt_drive: {
     name: "\u76AE\u5E36\u50B3\u52D5\u6163\u91CF\u8A08\u7B97",
@@ -300,12 +163,6 @@ const CALCS = {
     ref: "皮帶傳動機構負載慣量換算，參考伺服馬達選型手冊（負載慣量計算範例）",
     inputs: [{ key: "WA", label: "\u5DE5\u4EF6\u8CEA\u91CF", unit: "kg", default: 2 }, { key: "PD", label: "\u5E36\u8F2A\u76F4\u5F91", unit: "m", default: 0.05 }, { key: "WP", label: "\u5E36\u8F2A\u8CEA\u91CF", unit: "kg", default: 0.5 }, { key: "BN", label: "\u6A5F\u69CB\u6548\u7387", unit: "", default: 0.8 }, { key: "mu", label: "\u6469\u64E6\u4FC2\u6578", unit: "", default: 0.1 }, { key: "F", label: "\u5916\u529B F", unit: "N", default: 0 }, { key: "JM", label: "\u96FB\u6A5F\u6163\u91CF", unit: "kg\xB7m\xB2", default: 1e-4 }],
     outputs: [{ key: "JL", label: "\u8CA0\u8F09\u6163\u91CF JL", unit: "kg\xB7m\xB2" }, { key: "ratio", label: "\u6163\u91CF\u6BD4 JL/JM", unit: "\u500D" }, { key: "TL", label: "\u8CA0\u8F09\u8F49\u77E9", unit: "N\xB7m" }],
-    calc(i) {
-      const JP = 0.5 * i.WP * (i.PD / 2) ** 2;
-      const JW = i.WA * (i.PD / 2) ** 2;
-      const JL = JP + JW;
-      return { JL: JL.toExponential(3), ratio: (JL / i.JM).toFixed(2), TL: ((i.WA * 9.8 * i.mu + i.F) * (i.PD / 2) / i.BN).toFixed(4) };
-    }
   },
   // ══ 絲桿 ══
   ballscrew_horiz: {
@@ -314,13 +171,6 @@ const CALCS = {
     ref: "滾珠螺桿水平驅動負載慣量與轉矩公式，參考 THK 滾珠螺桿技術資料",
     inputs: [{ key: "WA", label: "\u5DE5\u4EF6\u8CEA\u91CF", unit: "kg", default: 20 }, { key: "BL", label: "\u7D72\u687F\u9577\u5EA6", unit: "m", default: 0.5 }, { key: "BD", label: "\u7D72\u687F\u76F4\u5F91", unit: "m", default: 0.025 }, { key: "BP", label: "\u87BA\u8DDD Lead", unit: "m", default: 0.01 }, { key: "BN", label: "\u6548\u7387 \u03B7", unit: "", default: 0.9 }, { key: "mu", label: "\u6469\u64E6\u4FC2\u6578 \u03BC", unit: "", default: 0.1 }, { key: "F", label: "\u5916\u529B F", unit: "N", default: 0 }, { key: "JM", label: "\u96FB\u6A5F\u6163\u91CF JM", unit: "kg\xB7m\xB2", default: 1e-4 }],
     outputs: [{ key: "JL", label: "\u8CA0\u8F09\u6163\u91CF JL", unit: "kg\xB7m\xB2" }, { key: "ratio", label: "\u6163\u91CF\u6BD4 JL/JM", unit: "\u500D" }, { key: "TL", label: "\u8CA0\u8F09\u8F49\u77E9", unit: "N\xB7m" }],
-    calc(i) {
-      const BW = 7900 * Math.PI / 4 * i.BD ** 2 * i.BL;
-      const JB = BW * i.BD ** 2 / 8;
-      const JW = i.WA * (i.BP / (2 * Math.PI)) ** 2;
-      const JL = JB + JW;
-      return { JL: JL.toExponential(3), ratio: (JL / i.JM).toFixed(2), TL: ((i.WA * 9.8 * i.mu + i.F) * i.BP / (2 * Math.PI * i.BN)).toFixed(5) };
-    }
   },
   ballscrew_vert: {
     name: "\u6EFE\u73E0\u7D72\u687F\u5782\u76F4\u904B\u52D5",
@@ -328,11 +178,6 @@ const CALCS = {
     ref: "滾珠螺桿垂直驅動轉矩公式（含重力項與摩擦項），參考 THK／NSK 技術資料",
     inputs: [{ key: "WA", label: "\u5DE5\u4EF6\u8CEA\u91CF", unit: "kg", default: 10 }, { key: "BP", label: "\u87BA\u8DDD Lead", unit: "m", default: 0.01 }, { key: "BN", label: "\u6548\u7387 \u03B7", unit: "", default: 0.9 }, { key: "mu", label: "\u6469\u64E6\u4FC2\u6578", unit: "", default: 0.1 }, { key: "F", label: "\u984D\u5916\u5916\u529B", unit: "N", default: 0 }],
     outputs: [{ key: "T_up", label: "\u4E0A\u5347\u8F49\u77E9", unit: "N\xB7m" }, { key: "T_down", label: "\u4E0B\u964D\u8F49\u77E9", unit: "N\xB7m" }],
-    calc(i) {
-      const Fg = i.WA * 9.8;
-      const Ff = Fg * i.mu;
-      return { T_up: ((Fg + Ff + i.F) * i.BP / (2 * Math.PI * i.BN)).toFixed(5), T_down: (Math.max(0, Fg - Ff - i.F) * i.BP * i.BN / (2 * Math.PI)).toFixed(5) };
-    }
   },
   // ══ 齒輪 ══
   gear_rack_motor: {
@@ -341,10 +186,6 @@ const CALCS = {
     ref: "齒輪齒條傳動功率與轉矩計算，參考 JIS B 1701 齒輪標準及機械設計便覽",
     inputs: [{ key: "F", label: "\u79FB\u52D5\u963B\u529B F", unit: "N", default: 200 }, { key: "v", label: "\u79FB\u52D5\u901F\u5EA6 v", unit: "m/s", default: 0.5 }, { key: "m", label: "\u9F52\u8F2A\u6A21\u6578", unit: "mm", default: 2 }, { key: "z", label: "\u9F52\u8F2A\u9F52\u6578", unit: "", default: 20 }, { key: "eta", label: "\u50B3\u52D5\u6548\u7387 \u03B7", unit: "", default: 0.85 }],
     outputs: [{ key: "D", label: "\u7BC0\u5713\u76F4\u5F91", unit: "mm" }, { key: "n", label: "\u6240\u9700\u8F49\u901F", unit: "rpm" }, { key: "T", label: "\u6240\u9700\u8F49\u77E9", unit: "N\xB7m" }, { key: "P", label: "\u6240\u9700\u529F\u7387", unit: "W" }],
-    calc(i) {
-      const D = i.m * i.z;
-      return { D: D.toFixed(1), n: (i.v * 1e3 * 60 / (Math.PI * D)).toFixed(1), T: (i.F * (D / 2) / 1e3 / i.eta).toFixed(3), P: (i.F * i.v / i.eta).toFixed(1) };
-    }
   },
   gear_rack_design: {
     name: "\u9F52\u8F2A\u9F52\u689D\u5E7E\u4F55\u5C3A\u5BF8",
@@ -352,10 +193,6 @@ const CALCS = {
     ref: "標準齒輪幾何尺寸公式（齒頂圓 da=d+2m、齒根圓 df=d-2.5m、全齒高 h=2.25m），參考 JIS B 1701 標準齒輪",
     inputs: [{ key: "m", label: "\u6A21\u6578 m", unit: "mm", default: 2 }, { key: "z", label: "\u9F52\u6578 z", unit: "", default: 20 }, { key: "alpha", label: "\u58D3\u529B\u89D2 \u03B1", unit: "\xB0", default: 20 }],
     outputs: [{ key: "d", label: "\u7BC0\u5713\u76F4\u5F91", unit: "mm" }, { key: "da", label: "\u9F52\u9802\u5713", unit: "mm" }, { key: "df", label: "\u9F52\u6839\u5713", unit: "mm" }, { key: "p", label: "\u9F52\u8DDD", unit: "mm" }, { key: "h", label: "\u5168\u9F52\u9AD8", unit: "mm" }],
-    calc(i) {
-      const d = i.m * i.z;
-      return { d: d.toFixed(2), da: (d + 2 * i.m).toFixed(2), df: (d - 2.5 * i.m).toFixed(2), p: (Math.PI * i.m).toFixed(3), h: (2.25 * i.m).toFixed(2) };
-    }
   },
   worm_gear: {
     name: "\u5713\u67F1\u8778\u6746\u50B3\u52D5\u5E7E\u4F55\u5C3A\u5BF8",
@@ -363,11 +200,6 @@ const CALCS = {
     ref: "圓柱蝸桿傳動幾何尺寸與導程角公式，參考 JIS B 1741 蝸桿蝸輪標準",
     inputs: [{ key: "Mdu", label: "\u6A21\u6578 m", unit: "mm", default: 2 }, { key: "Z1", label: "\u8778\u6746\u982D\u6578", unit: "", default: 1 }, { key: "Z2", label: "\u8778\u8F2A\u9F52\u6578", unit: "", default: 40 }, { key: "q", label: "\u7279\u6027\u4FC2\u6578 q", unit: "", default: 10 }, { key: "xi", label: "\u8B8A\u4F4D\u4FC2\u6578 \u03BE", unit: "", default: 0 }],
     outputs: [{ key: "A", label: "\u4E2D\u5FC3\u8DDD A", unit: "mm" }, { key: "d1", label: "\u8778\u6746\u5206\u5EA6\u5713", unit: "mm" }, { key: "d2", label: "\u8778\u8F2A\u5206\u5EA6\u5713", unit: "mm" }, { key: "da1", label: "\u8778\u6746\u9F52\u9802\u5713", unit: "mm" }, { key: "da2", label: "\u8778\u8F2A\u9F52\u9802\u5713", unit: "mm" }, { key: "i", label: "\u50B3\u52D5\u6BD4", unit: "" }, { key: "lam", label: "\u5C0E\u89D2 \u03BB", unit: "\xB0" }],
-    calc(inp) {
-      const { Mdu, Z1, Z2, q, xi } = inp;
-      const d1 = q * Mdu, d2 = Mdu * Z2, A = 0.5 * Mdu * (Z2 + q + 2 * xi);
-      return { A: A.toFixed(2), d1: d1.toFixed(2), d2: d2.toFixed(2), da1: (Mdu * (q + 2)).toFixed(2), da2: (Mdu * (Z2 + 2 + 2 * xi)).toFixed(2), i: (Z2 / Z1).toFixed(0), lam: (Math.atan(Z1 / q) * 180 / Math.PI).toFixed(3) };
-    }
   },
   bevel_gear: {
     name: "\u76F4\u9F52\u9310\u9F52\u8F2A\u5E7E\u4F55\u5C3A\u5BF8",
@@ -375,15 +207,6 @@ const CALCS = {
     ref: "直齒傘齒輪節錐角與幾何尺寸計算，參考 JIS B 1704 傘齒輪標準及機械設計便覽",
     inputs: [{ key: "m", label: "\u5927\u7AEF\u6A21\u6578 m", unit: "mm", default: 3 }, { key: "z1", label: "\u5C0F\u9F52\u8F2A\u9F52\u6578 z\u2081", unit: "", default: 15 }, { key: "z2", label: "\u5927\u9F52\u8F2A\u9F52\u6578 z\u2082", unit: "", default: 30 }, { key: "alpha", label: "\u58D3\u529B\u89D2 \u03B1", unit: "\xB0", default: 20 }, { key: "b", label: "\u9F52\u5BEC b", unit: "mm", default: 20 }],
     outputs: [{ key: "delta1", label: "\u5C0F\u8F2A\u7BC0\u9310\u89D2 \u03B4\u2081", unit: "\xB0" }, { key: "delta2", label: "\u5927\u8F2A\u7BC0\u9310\u89D2 \u03B4\u2082", unit: "\xB0" }, { key: "R", label: "\u80CC\u9310\u8DDD R", unit: "mm" }, { key: "d1", label: "\u5C0F\u8F2A\u5206\u5EA6\u5713\u5F91", unit: "mm" }, { key: "d2", label: "\u5927\u8F2A\u5206\u5EA6\u5713\u5F91", unit: "mm" }, { key: "da1", label: "\u5C0F\u8F2A\u9F52\u9802\u5713", unit: "mm" }, { key: "da2", label: "\u5927\u8F2A\u9F52\u9802\u5713", unit: "mm" }],
-    calc(i) {
-      const d1 = Math.atan(i.z1 / i.z2) * 180 / Math.PI;
-      const d2 = 90 - d1;
-      const R = Math.sqrt((i.m * i.z1) ** 2 + (i.m * i.z2) ** 2) / 2;
-      const D1 = i.m * i.z1, D2 = i.m * i.z2;
-      const ha = 1 * i.m;
-      const da1 = D1 + 2 * ha * Math.cos(d1 * Math.PI / 180), da2 = D2 + 2 * ha * Math.cos(d2 * Math.PI / 180);
-      return { delta1: d1.toFixed(3), delta2: d2.toFixed(3), R: R.toFixed(2), d1: D1.toFixed(2), d2: D2.toFixed(2), da1: da1.toFixed(2), da2: da2.toFixed(2) };
-    }
   },
   coupler_universal: {
     name: "\u842C\u5411\u806F\u8EF8\u5668\u8A08\u7B97",
@@ -391,11 +214,6 @@ const CALCS = {
     ref: "聯軸器傳遞轉矩 T=9.55P/n 與工況係數選用，參考聯軸器廠商技術手冊（如 NBK、協育）",
     inputs: [{ key: "P", label: "\u50B3\u52D5\u529F\u7387 P", unit: "kW", default: 5.5 }, { key: "n", label: "\u8F49\u901F n", unit: "rpm", default: 73 }, { key: "K", label: "\u5DE5\u6CC1\u4FC2\u6578 K", unit: "", default: 5, hint: "\u8F15\u5FAE\u885D\u64CA:3~4 / \u4E2D\u7B49\u885D\u64CA:5~6 / \u56B4\u91CD\u885D\u64CA:7~8" }, { key: "Tn", label: "\u9078\u7528\u806F\u8EF8\u5668\u516C\u7A31\u8F49\u77E9 Tn", unit: "kN\xB7m", default: 12.5 }],
     outputs: [{ key: "T", label: "\u7406\u8AD6\u8F49\u77E9 T", unit: "kN\xB7m" }, { key: "Tc", label: "\u8A08\u7B97\u8F49\u77E9 Tc", unit: "kN\xB7m" }, { key: "verdict", label: "\u9A57\u7B97 Tn\u2265Tc", unit: "" }],
-    calc(i) {
-      const T = 9.55 * i.P / i.n;
-      const Tc = T * i.K;
-      return { T: T.toFixed(3), Tc: Tc.toFixed(3), verdict: i.Tn >= Tc ? "\u2705 \u7B26\u5408" : "\u274C \u4E0D\u7B26\u5408\uFF0C\u9700\u5347\u7D1A" };
-    }
   },
   coupler_gear: {
     name: "\u9F52\u5F0F\u806F\u8EF8\u5668\u8A08\u7B97",
@@ -403,10 +221,6 @@ const CALCS = {
     ref: "齒式聯軸器計算轉矩公式（含溫度、啟動、工況修正係數），參考聯軸器技術手冊",
     inputs: [{ key: "T", label: "\u7406\u8AD6\u8F49\u77E9 T", unit: "N\xB7m", default: 2387.5 }, { key: "Kw", label: "\u52D5\u529B\u6A5F\u4FC2\u6578 Kw", unit: "", default: 1 }, { key: "K", label: "\u5DE5\u6CC1\u4FC2\u6578 K", unit: "", default: 2 }, { key: "Kt", label: "\u6EAB\u5EA6\u4FC2\u6578 Kt", unit: "", default: 1 }, { key: "Kz", label: "\u555F\u52D5\u4FC2\u6578 Kz", unit: "", default: 1 }, { key: "Tn", label: "\u9078\u7528\u806F\u8EF8\u5668\u516C\u7A31\u8F49\u77E9 Tn", unit: "N\xB7m", default: 14e3 }],
     outputs: [{ key: "Tc", label: "\u8A08\u7B97\u8F49\u77E9 Tc", unit: "N\xB7m" }, { key: "verdict", label: "\u9A57\u7B97 Tn\u2265Tc", unit: "" }],
-    calc(i) {
-      const Tc = i.T * i.Kw * i.K * i.Kt * i.Kz;
-      return { Tc: Tc.toFixed(0), verdict: i.Tn >= Tc ? "\u2705 \u7B26\u5408" : "\u274C \u4E0D\u7B26\u5408\uFF0C\u9700\u5347\u7D1A" };
-    }
   },
   // ══ 彈簧 ══
   spring_calc: {
@@ -415,10 +229,6 @@ const CALCS = {
     ref: "圓柱螺旋彈簧設計公式（Wahl 應力修正係數 K），參考 JIS B 2704 彈簧標準及 Shigley《機械設計》",
     inputs: [{ key: "P1", label: "\u6700\u5C0F\u8F09\u8377 P1", unit: "N", default: 0 }, { key: "Pn", label: "\u6700\u5927\u8F09\u8377 Pn", unit: "N", default: 500 }, { key: "h", label: "\u5DE5\u4F5C\u884C\u7A0B h", unit: "mm", default: 20 }, { key: "D", label: "\u5F48\u7C27\u4E2D\u5F91 D", unit: "mm", default: 25 }, { key: "d", label: "\u92FC\u7D72\u76F4\u5F91 d", unit: "mm", default: 3 }, { key: "G", label: "\u5207\u8B8A\u6A21\u91CF G", unit: "MPa", default: 79e3 }],
     outputs: [{ key: "C", label: "\u65CB\u7E5E\u6BD4 C", unit: "" }, { key: "K", label: "\u66F2\u5EA6\u4FC2\u6578 K", unit: "" }, { key: "tau", label: "\u6700\u5927\u526A\u61C9\u529B \u03C4", unit: "MPa" }, { key: "k", label: "\u5F48\u7C27\u525B\u5EA6 k", unit: "N/mm" }, { key: "n", label: "\u6709\u6548\u5708\u6578 n", unit: "\u5708" }],
-    calc(i) {
-      const C = i.D / i.d, K = (4 * C - 1) / (4 * C - 4) + 0.615 / C;
-      return { C: C.toFixed(2), K: K.toFixed(4), tau: (8 * K * i.Pn * i.D / (Math.PI * i.d ** 3)).toFixed(1), k: ((i.Pn - i.P1) / i.h).toFixed(2), n: (i.G * i.d ** 4 / (8 * i.D ** 3 * ((i.Pn - i.P1) / i.h))).toFixed(2) };
-    }
   },
   spring_stiffness: {
     name: "\u5F48\u7C27\u525B\u5EA6\uFF08\u5DF2\u77E5\u5E7E\u4F55\uFF09",
@@ -426,12 +236,6 @@ const CALCS = {
     ref: "彈簧剛度公式 k=Gd^4/(8D^3n)，參考 JIS B 2704 壓縮／拉伸彈簧標準",
     inputs: [{ key: "G", label: "\u5207\u8B8A\u6A21\u91CF G", unit: "MPa", default: 79e3 }, { key: "d", label: "\u92FC\u7D72\u76F4\u5F91 d", unit: "mm", default: 2.2 }, { key: "D2", label: "\u5F48\u7C27\u4E2D\u5F91 D\u2082", unit: "mm", default: 24.5 }, { key: "n", label: "\u6709\u6548\u5708\u6578 n", unit: "\u5708", default: 30 }, { key: "tau_allow", label: "\u8A31\u7528\u526A\u61C9\u529B [\u03C4]", unit: "MPa", default: 600, hint: "\u7434\u92FC\u7DDA\u7D04600 / \u6CB9\u56DE\u706B\u7DDA\u7D04500\uFF0C\u4F9D\u6750\u6599\u8ABF\u6574" }],
     outputs: [{ key: "k", label: "\u5F48\u7C27\u525B\u5EA6 k", unit: "N/mm" }, { key: "C", label: "\u65CB\u7E5E\u6BD4 C", unit: "" }, { key: "Pmax", label: "\u8A31\u7528\u6975\u9650\u8F09\u8377", unit: "N" }],
-    calc(i) {
-      const k = i.G * i.d ** 4 / (8 * i.D2 ** 3 * i.n);
-      const C = i.D2 / i.d;
-      const K = (4 * C - 1) / (4 * C - 4) + 0.615 / C;
-      return { k: k.toFixed(4), C: C.toFixed(2), Pmax: (i.tau_allow * Math.PI * i.d ** 3 / (8 * K * i.D2)).toFixed(1) };
-    }
   },
   // ══ 鏈條 ══
   chain_length: {
@@ -440,16 +244,6 @@ const CALCS = {
     ref: "滾子鏈節數與實際中心距公式，參考 JIS B 1801 滾子鏈標準／ISO 606",
     inputs: [{ key: "z1", label: "\u5C0F\u93C8\u8F2A\u9F52\u6578 z\u2081", unit: "", default: 17 }, { key: "z2", label: "\u5927\u93C8\u8F2A\u9F52\u6578 z\u2082", unit: "", default: 34 }, { key: "a0", label: "\u521D\u5B9A\u4E2D\u5FC3\u8DDD a\u2080", unit: "mm", default: 400 }, { key: "p", label: "\u93C8\u689D\u7BC0\u8DDD P", unit: "mm", default: 12.7 }],
     outputs: [{ key: "Lp", label: "\u8A08\u7B97\u7BC0\u6578", unit: "\u7BC0" }, { key: "Lp0", label: "\u9078\u7528\u7BC0\u6578\uFF08\u5076\u6578\uFF09", unit: "\u7BC0" }, { key: "L", label: "\u93C8\u689D\u9577\u5EA6", unit: "mm" }, { key: "a", label: "\u5BE6\u969B\u4E2D\u5FC3\u8DDD", unit: "mm" }],
-    calc(i) {
-      const a0p = i.a0 / i.p;
-      const Lp = 2 * a0p + (i.z1 + i.z2) / 2 + ((i.z2 - i.z1) / (2 * Math.PI)) ** 2 / a0p;
-      let Lp0 = Math.ceil(Lp);
-      if (Lp0 % 2 !== 0) Lp0++;
-      const A = Lp0 - (i.z1 + i.z2) / 2;
-      const disc = A ** 2 - 8 * ((i.z2 - i.z1) / (2 * Math.PI)) ** 2;
-      if (disc < 0) throw new Error("\u4E2D\u5FC3\u8DDD\u904E\u5C0F\uFF0C\u7121\u6CD5\u5BB9\u7D0D\u5169\u93C8\u8F2A\uFF0C\u8ACB\u52A0\u5927 a\u2080");
-      return { Lp: Lp.toFixed(3), Lp0, L: (Lp0 * i.p).toFixed(1), a: (i.p / 4 * (A + Math.sqrt(disc))).toFixed(1) };
-    }
   },
   sprocket_basic: {
     name: "\u93C8\u8F2A\u57FA\u672C\u5C3A\u5BF8",
@@ -457,10 +251,6 @@ const CALCS = {
     ref: "鏈輪分度圓、齒頂圓、齒根圓公式，參考 JIS B 1802 鏈輪標準",
     inputs: [{ key: "z", label: "\u9F52\u6578 z", unit: "", default: 17 }, { key: "p", label: "\u7BC0\u8DDD P", unit: "mm", default: 12.7 }, { key: "d1", label: "\u6EFE\u5B50\u5916\u5F91 d\u2081", unit: "mm", default: 7.95 }],
     outputs: [{ key: "d", label: "\u5206\u5EA6\u5713\u76F4\u5F91", unit: "mm" }, { key: "da_max", label: "\u9F52\u9802\u5713\uFF08\u6700\u5927\uFF09", unit: "mm" }, { key: "da_min", label: "\u9F52\u9802\u5713\uFF08\u6700\u5C0F\uFF09", unit: "mm" }, { key: "df", label: "\u9F52\u6839\u5713\u76F4\u5F91", unit: "mm" }],
-    calc(i) {
-      const d = i.p / Math.sin(Math.PI / i.z);
-      return { d: d.toFixed(3), da_max: (d + 1.25 * i.p - i.d1).toFixed(3), da_min: (d + (1 - 1.6 / i.z) * i.p - i.d1).toFixed(3), df: (d - i.d1).toFixed(3) };
-    }
   },
   // ══ 同步帶 ══
   sync_belt: {
@@ -469,12 +259,6 @@ const CALCS = {
     ref: "同步帶傳動節徑與帶長計算公式，參考 JIS B 1856 同步帶標準",
     inputs: [{ key: "p", label: "\u7BC0\u8DDD P", unit: "mm", default: 5 }, { key: "z1", label: "\u4E3B\u52D5\u8F2A\u9F52\u6578 z\u2081", unit: "", default: 24 }, { key: "z2", label: "\u5F9E\u52D5\u8F2A\u9F52\u6578 z\u2082", unit: "", default: 48 }, { key: "a0", label: "\u8A2D\u8A08\u4E2D\u5FC3\u8DDD a\u2080", unit: "mm", default: 200 }],
     outputs: [{ key: "d1", label: "\u4E3B\u52D5\u8F2A\u7BC0\u5F91", unit: "mm" }, { key: "d2", label: "\u5F9E\u52D5\u8F2A\u7BC0\u5F91", unit: "mm" }, { key: "i", label: "\u50B3\u52D5\u6BD4", unit: "" }, { key: "Lp", label: "\u5E36\u7BC0\u7DDA\u9577", unit: "mm" }, { key: "Lp0", label: "\u5EFA\u8B70\u5E36\u9577\uFF08\u53D6\u6574\uFF09", unit: "mm" }],
-    calc(i) {
-      const d1 = i.p * i.z1 / Math.PI, d2 = i.p * i.z2 / Math.PI;
-      const Lp = 2 * i.a0 + Math.PI * (d1 + d2) / 2 + (d2 - d1) ** 2 / (4 * i.a0);
-      const Lp0 = Math.round(Lp / i.p) * i.p;
-      return { d1: d1.toFixed(3), d2: d2.toFixed(3), i: (i.z2 / i.z1).toFixed(3), Lp: Lp.toFixed(1), Lp0: Lp0.toFixed(1) };
-    }
   },
   // ══ 截面 ══
   section_circle: {
@@ -483,10 +267,6 @@ const CALCS = {
     ref: "實心圓截面慣性矩標準公式，參考材料力學教材，如 Beer & Johnston《材料力學》",
     inputs: [{ key: "D", label: "\u76F4\u5F91 D", unit: "mm", default: 30 }],
     outputs: [{ key: "A", label: "\u622A\u9762\u7A4D", unit: "mm\xB2" }, { key: "I", label: "\u6163\u6027\u77E9", unit: "mm\u2074" }, { key: "W", label: "\u622A\u9762\u6A21\u6578", unit: "mm\xB3" }, { key: "i_r", label: "\u8FF4\u8F49\u534A\u5F91", unit: "mm" }],
-    calc(inp) {
-      const r = inp.D / 2, A = Math.PI * r ** 2, I = Math.PI * r ** 4 / 4;
-      return { A: A.toFixed(2), I: I.toFixed(2), W: (I / r).toFixed(2), i_r: Math.sqrt(I / A).toFixed(3) };
-    }
   },
   section_hollow_circle: {
     name: "\u7A7A\u5FC3\u5713\u622A\u9762\u6163\u6027\u77E9",
@@ -494,10 +274,6 @@ const CALCS = {
     ref: "空心圓（圓管）截面慣性矩標準公式，參考材料力學教材",
     inputs: [{ key: "D", label: "\u5916\u5F91 D", unit: "mm", default: 50 }, { key: "d", label: "\u5167\u5F91 d", unit: "mm", default: 40 }],
     outputs: [{ key: "A", label: "\u622A\u9762\u7A4D", unit: "mm\xB2" }, { key: "I", label: "\u6163\u6027\u77E9", unit: "mm\u2074" }, { key: "W", label: "\u622A\u9762\u6A21\u6578", unit: "mm\xB3" }, { key: "i_r", label: "\u8FF4\u8F49\u534A\u5F91", unit: "mm" }],
-    calc(inp) {
-      const A = Math.PI / 4 * (inp.D ** 2 - inp.d ** 2), I = Math.PI / 64 * (inp.D ** 4 - inp.d ** 4);
-      return { A: A.toFixed(2), I: I.toFixed(2), W: (I / (inp.D / 2)).toFixed(2), i_r: Math.sqrt(I / A).toFixed(3) };
-    }
   },
   section_rect: {
     name: "\u77E9\u5F62\u622A\u9762\u6163\u6027\u77E9",
@@ -505,10 +281,6 @@ const CALCS = {
     ref: "矩形截面慣性矩標準公式，參考材料力學教材",
     inputs: [{ key: "b", label: "\u5BEC\u5EA6 b", unit: "mm", default: 40 }, { key: "h", label: "\u9AD8\u5EA6 h", unit: "mm", default: 60 }],
     outputs: [{ key: "A", label: "\u622A\u9762\u7A4D", unit: "mm\xB2" }, { key: "Ix", label: "Ix\uFF08\u5F37\u8EF8\uFF09", unit: "mm\u2074" }, { key: "Wx", label: "\u622A\u9762\u6A21\u6578 Wx", unit: "mm\xB3" }, { key: "Iy", label: "Iy\uFF08\u5F31\u8EF8\uFF09", unit: "mm\u2074" }, { key: "i_r", label: "x\u8EF8\u8FF4\u8F49\u534A\u5F91", unit: "mm" }],
-    calc(inp) {
-      const A = inp.b * inp.h, Ix = inp.b * inp.h ** 3 / 12, Iy = inp.h * inp.b ** 3 / 12;
-      return { A: A.toFixed(2), Ix: Ix.toFixed(2), Wx: (Ix / (inp.h / 2)).toFixed(2), Iy: Iy.toFixed(2), i_r: Math.sqrt(Ix / A).toFixed(3) };
-    }
   },
   section_hollow_rect: {
     name: "\u7A7A\u5FC3\u77E9\u5F62\u622A\u9762\u6163\u6027\u77E9",
@@ -516,11 +288,6 @@ const CALCS = {
     ref: "空心矩形（方管）截面慣性矩標準公式，參考材料力學教材",
     inputs: [{ key: "B", label: "\u5916\u5BEC B", unit: "mm", default: 60 }, { key: "H", label: "\u5916\u9AD8 H", unit: "mm", default: 80 }, { key: "t", label: "\u58C1\u539A t", unit: "mm", default: 4 }],
     outputs: [{ key: "A", label: "\u622A\u9762\u7A4D", unit: "mm\xB2" }, { key: "Ix", label: "Ix", unit: "mm\u2074" }, { key: "Wx", label: "\u622A\u9762\u6A21\u6578", unit: "mm\xB3" }],
-    calc(inp) {
-      const b = inp.B - 2 * inp.t, h = inp.H - 2 * inp.t;
-      const A = inp.B * inp.H - b * h, Ix = (inp.B * inp.H ** 3 - b * h ** 3) / 12;
-      return { A: A.toFixed(2), Ix: Ix.toFixed(2), Wx: (Ix / (inp.H / 2)).toFixed(2) };
-    }
   },
   // ══ 沖壓 ══
   blank_force: {
@@ -529,10 +296,6 @@ const CALCS = {
     ref: "沖裁力計算公式（含修正係數法），參考沖壓模具設計手冊",
     inputs: [{ key: "L", label: "\u6C96\u88C1\u5468\u9577 L", unit: "mm", default: 100 }, { key: "t", label: "\u6599\u539A t", unit: "mm", default: 2 }, { key: "tau", label: "\u6297\u526A\u5F37\u5EA6 \u03C4", unit: "MPa", default: 300 }, { key: "k", label: "\u4FEE\u6B63\u4FC2\u6578 k", unit: "", default: 1.3, hint: "\u4E00\u822C\u53D61.3" }],
     outputs: [{ key: "F", label: "\u7406\u8AD6\u6C96\u88C1\u529B", unit: "N" }, { key: "F_cor", label: "\u4FEE\u6B63\u6C96\u88C1\u529B", unit: "N" }, { key: "F_kN", label: "\u4FEE\u6B63\u6C96\u88C1\u529B", unit: "kN" }],
-    calc(i) {
-      const F = i.L * i.t * i.tau, Fc = F * i.k;
-      return { F: F.toFixed(0), F_cor: Fc.toFixed(0), F_kN: (Fc / 1e3).toFixed(2) };
-    }
   },
   bend_v: {
     name: "V\u578B\u5F4E\u66F2\u529B\u8A08\u7B97",
@@ -540,9 +303,6 @@ const CALCS = {
     ref: "V 型彎曲力計算公式，參考沖壓模具設計手冊",
     inputs: [{ key: "b", label: "\u5F4E\u66F2\u5BEC\u5EA6 b", unit: "mm", default: 50 }, { key: "t", label: "\u6599\u539A t", unit: "mm", default: 2 }, { key: "r", label: "\u5F4E\u66F2\u534A\u5F91 r", unit: "mm", default: 3 }, { key: "sigma", label: "\u6297\u62C9\u5F37\u5EA6 \u03C3", unit: "MPa", default: 400 }],
     outputs: [{ key: "F", label: "V\u578B\u5F4E\u66F2\u529B", unit: "N" }],
-    calc(i) {
-      return { F: (0.6 * i.b * i.t ** 2 * i.sigma / (i.r + i.t)).toFixed(0) };
-    }
   },
   bend_u: {
     name: "U\u578B\u5F4E\u66F2\u529B\u8A08\u7B97",
@@ -550,9 +310,6 @@ const CALCS = {
     ref: "U 型彎曲力計算公式，參考沖壓模具設計手冊",
     inputs: [{ key: "b", label: "\u5F4E\u66F2\u5BEC\u5EA6 b", unit: "mm", default: 50 }, { key: "t", label: "\u6599\u539A t", unit: "mm", default: 2 }, { key: "r", label: "\u5F4E\u66F2\u534A\u5F91 r", unit: "mm", default: 3 }, { key: "sigma", label: "\u6297\u62C9\u5F37\u5EA6 \u03C3", unit: "MPa", default: 400 }],
     outputs: [{ key: "F", label: "U\u578B\u5F4E\u66F2\u529B", unit: "N" }],
-    calc(i) {
-      return { F: (0.7 * i.b * i.t ** 2 * i.sigma / (i.r + i.t)).toFixed(0) };
-    }
   },
   // ══ 鍵銷強度 ══
   key_strength: {
@@ -561,11 +318,6 @@ const CALCS = {
     ref: "平鍵擠壓應力與剪切應力驗算公式，參考 JIS B 1301 平鍵標準及機械設計便覽",
     inputs: [{ key: "T", label: "\u50B3\u905E\u8F49\u77E9 T", unit: "N\xB7m", default: 50 }, { key: "D", label: "\u8EF8\u5F91 D", unit: "mm", default: 30 }, { key: "L", label: "\u9375\u9577 L", unit: "mm", default: 50 }, { key: "b", label: "\u9375\u5BEC b", unit: "mm", default: 10 }, { key: "h", label: "\u9375\u9AD8 h", unit: "mm", default: 8 }, { key: "Ppp", label: "\u8A31\u7528\u64E0\u58D3\u61C9\u529B [\u03C3]", unit: "MPa", default: 80, hint: "\u975C\u8F09\u8F15\u885D:100~120 / \u885D\u64CA:60~70" }, { key: "tp", label: "\u8A31\u7528\u526A\u5207\u61C9\u529B [\u03C4]", unit: "MPa", default: 40 }],
     outputs: [{ key: "l", label: "\u6709\u6548\u9375\u9577 l", unit: "mm" }, { key: "sigma", label: "\u64E0\u58D3\u61C9\u529B \u03C3", unit: "MPa" }, { key: "tau", label: "\u526A\u5207\u61C9\u529B \u03C4", unit: "MPa" }, { key: "v_sigma", label: "\u64E0\u58D3\u9A57\u7B97", unit: "" }, { key: "v_tau", label: "\u526A\u5207\u9A57\u7B97", unit: "" }],
-    calc(i) {
-      const T_Nmm = i.T * 1e3;
-      const l = i.L - i.b, k = i.h / 2, sigma = 2 * T_Nmm / (i.D * k * l), tau = 2 * T_Nmm / (i.D * i.b * l);
-      return { l: l.toFixed(0), sigma: sigma.toFixed(2), tau: tau.toFixed(2), v_sigma: sigma <= i.Ppp ? "\u2705 \u5408\u683C" : "\u274C \u8D85\u9650", v_tau: tau <= i.tp ? "\u2705 \u5408\u683C" : "\u274C \u8D85\u9650" };
-    }
   },
   pin_strength: {
     name: "\u5713\u67F1\u92B7\u5F37\u5EA6\u8A08\u7B97",
@@ -573,10 +325,6 @@ const CALCS = {
     ref: "圓柱銷剪切應力驗算公式，參考機械設計便覽",
     inputs: [{ key: "F", label: "\u6A6B\u5411\u529B F", unit: "N", default: 5e3 }, { key: "d", label: "\u92B7\u76F4\u5F91 d", unit: "mm", default: 10 }, { key: "Z", label: "\u92B7\u6578\u91CF Z", unit: "\u500B", default: 2 }, { key: "Tp", label: "\u8A31\u7528\u526A\u5207 [\u03C4]", unit: "MPa", default: 80 }],
     outputs: [{ key: "tau", label: "\u526A\u5207\u61C9\u529B \u03C4", unit: "MPa" }, { key: "verdict", label: "\u9A57\u7B97\u7D50\u679C", unit: "" }],
-    calc(i) {
-      const tau = 4 * i.F / (Math.PI * i.d ** 2 * i.Z);
-      return { tau: tau.toFixed(2), verdict: tau <= i.Tp ? "\u2705 \u5408\u683C" : "\u274C \u8D85\u9650" };
-    }
   },
   press_fit: {
     name: "\u904E\u76C8\u914D\u5408\u8A08\u7B97",
@@ -584,17 +332,6 @@ const CALCS = {
     ref: "過盈配合最小／最大過盈量計算（Lamé 厚壁圓筒公式），參考機械設計便覽及 Shigley《機械設計》",
     inputs: [{ key: "da", label: "\u5305\u5BB9\u4EF6\u5916\u5F91 da", unit: "mm", default: 100 }, { key: "df", label: "\u7D50\u5408\u76F4\u5F91 df", unit: "mm", default: 50 }, { key: "di", label: "\u88AB\u5305\u5BB9\u4EF6\u5167\u5F91 di", unit: "mm", default: 0 }, { key: "lf", label: "\u7D50\u5408\u9577\u5EA6 lf", unit: "mm", default: 60 }, { key: "mu", label: "\u6469\u64E6\u4FC2\u6578 \u03BC", unit: "", default: 0.14 }, { key: "T", label: "\u50B3\u905E\u8F49\u77E9 T", unit: "N\xB7m", default: 500 }, { key: "Ea", label: "\u5305\u5BB9\u4EF6\u5F48\u6027\u6A21\u91CF", unit: "MPa", default: 2e5 }, { key: "Ei", label: "\u88AB\u5305\u5BB9\u4EF6\u5F48\u6027\u6A21\u91CF", unit: "MPa", default: 2e5 }, { key: "va", label: "\u5305\u5BB9\u4EF6\u6CCA\u677E\u6BD4", unit: "", default: 0.3 }, { key: "vi", label: "\u88AB\u5305\u5BB9\u4EF6\u6CCA\u677E\u6BD4", unit: "", default: 0.3 }, { key: "ssa", label: "\u5305\u5BB9\u4EF6\u5C48\u670D\u5F37\u5EA6", unit: "MPa", default: 295 }, { key: "ssi", label: "\u88AB\u5305\u5BB9\u4EF6\u5C48\u670D\u5F37\u5EA6", unit: "MPa", default: 275 }],
     outputs: [{ key: "Pfmin", label: "\u6700\u5C0F\u63A5\u5408\u58D3\u5F37", unit: "MPa" }, { key: "delta_min", label: "\u6700\u5C0F\u6709\u6548\u904E\u76C8\u91CF", unit: "\u03BCm" }, { key: "Pfmax", label: "\u6700\u5927\u5141\u8A31\u58D3\u5F37", unit: "MPa" }, { key: "delta_max", label: "\u6700\u5927\u5141\u8A31\u904E\u76C8\u91CF", unit: "\u03BCm" }],
-    calc(i) {
-      const T_Nmm = i.T * 1e3;
-      const Pfmin = 2 * T_Nmm / (Math.PI * i.df ** 2 * i.lf * i.mu);
-      const qa = i.df / i.da, qi = i.di / i.df;
-      if (qa >= 1) throw new Error("\u7D50\u5408\u76F4\u5F91 df \u5FC5\u9808\u5C0F\u65BC\u5305\u5BB9\u4EF6\u5916\u5F91 da");
-      const Ca = (1 + qa ** 2) / (1 - qa ** 2) + i.va, Ci = qi > 0 ? (1 + qi ** 2) / (1 - qi ** 2) - i.vi : 1 - i.vi;
-      const dmin = (Pfmin * i.df * Ca / i.Ea + Pfmin * i.df * Ci / i.Ei) * 1e3;
-      const Pfmax = Math.min(0.58 * i.ssa * (1 - qa ** 2), qi > 0 ? 0.58 * i.ssi * (1 - qi ** 2) : 0.58 * i.ssi);
-      const dmax = (Pfmax * i.df * Ca / i.Ea + Pfmax * i.df * Ci / i.Ei) * 1e3;
-      return { Pfmin: Pfmin.toFixed(2), delta_min: dmin.toFixed(1), Pfmax: Pfmax.toFixed(1), delta_max: dmax.toFixed(1) };
-    }
   },
   thread_dims: {
     name: "\u516C\u5236\u87BA\u7D0B\u4E2D\u5C0F\u5F91\u8A08\u7B97",
@@ -602,13 +339,6 @@ const CALCS = {
     ref: "公制螺紋中徑／小徑計算公式 D2=D-0.6495P、D1=D-1.0825P，參考 JIS B 0205／ISO 724 公制螺紋標準",
     inputs: [{ key: "D", label: "\u516C\u7A31\u76F4\u5F91 D", unit: "mm", default: 20 }, { key: "P", label: "\u87BA\u8DDD P", unit: "mm", default: 2.5 }],
     outputs: [{ key: "D1", label: "\u5C0F\u5F91 D\u2081", unit: "mm" }, { key: "D2", label: "\u4E2D\u5F91 D\u2082", unit: "mm" }, { key: "da_min", label: "\u5916\u87BA\u7D0B\u5927\u5F91\u6700\u5C0F d_min", unit: "mm" }, { key: "pitch_remark", label: "\u5E38\u7528\u87BA\u8DDD\u5099\u8A3B", unit: "" }],
-    calc(i) {
-      const D1 = i.D - 1.0825 * i.P;
-      const D2 = i.D - 0.6495 * i.P;
-      const pitch_map = { 1: 0.25, 1.2: 0.25, 1.6: 0.35, 2: 0.4, 2.5: 0.45, 3: 0.5, 4: 0.7, 5: 0.8, 6: 1, 8: 1.25, 10: 1.5, 12: 1.75, 16: 2, 20: 2.5, 24: 3, 30: 3.5, 36: 4, 42: 4.5, 48: 5 };
-      const std = pitch_map[i.D];
-      return { D1: D1.toFixed(5), D2: D2.toFixed(5), da_min: (i.D - 0.1).toFixed(2), pitch_remark: std ? `M${i.D} \u6A19\u6E96\u87BA\u8DDD ${std}mm` : "\u975E\u6A19\u6E96\u5C3A\u5BF8" };
-    }
   },
   // ══ 軸承 ══
   bearing_life: {
@@ -617,10 +347,6 @@ const CALCS = {
     ref: "滾動軸承基本額定壽命公式 L10=(Cr/P)^p，參考 ISO 281／JIS B 1518 軸承壽命標準",
     inputs: [{ key: "Cr", label: "\u984D\u5B9A\u52D5\u8CA0\u8377 Cr", unit: "N", default: 5590 }, { key: "P", label: "\u7576\u91CF\u52D5\u8CA0\u8377 P", unit: "N", default: 800 }, { key: "n", label: "\u8F49\u901F n", unit: "rpm", default: 1450 }, { key: "p", label: "\u6307\u6578 p\uFF08\u7403:3 \u6EFE:3.33\uFF09", unit: "", default: 3 }],
     outputs: [{ key: "L10", label: "L\u2081\u2080", unit: "\xD710\u2076\u8F49" }, { key: "L10h", label: "L\u2081\u2080h \u58FD\u547D", unit: "hr" }],
-    calc(i) {
-      const L10 = (i.Cr / i.P) ** i.p;
-      return { L10: L10.toFixed(3), L10h: (L10 * 1e6 / (60 * i.n)).toFixed(0) };
-    }
   },
   // ══ 立柱 & 棘輪 ══
   column_buckling: {
@@ -629,11 +355,6 @@ const CALCS = {
     ref: "尤拉（Euler）柱挫曲臨界力公式，參考材料力學教材",
     inputs: [{ key: "N", label: "\u8EF8\u5411\u58D3\u529B N", unit: "N", default: 5e4 }, { key: "L", label: "\u7ACB\u67F1\u9577\u5EA6 L", unit: "mm", default: 1e3 }, { key: "I", label: "\u622A\u9762\u6163\u6027\u77E9", unit: "mm\u2074", default: 25e4 }, { key: "A", label: "\u622A\u9762\u7A4D A", unit: "mm\xB2", default: 500 }, { key: "E", label: "\u5F48\u6027\u6A21\u91CF E", unit: "MPa", default: 206e3 }, { key: "mu1", label: "\u7D04\u675F\u4FC2\u6578 \u03BC\u2081", unit: "", default: 2, hint: "\u5169\u7AEF\u56FA\u5B9A:0.5 / \u4E00\u56FA\u4E00\u9278:0.7 / \u5169\u7AEF\u9278:1 / \u4E00\u56FA\u4E00\u81EA\u7531:2" }],
     outputs: [{ key: "i_r", label: "\u8FF4\u8F49\u534A\u5F91", unit: "mm" }, { key: "lam", label: "\u9577\u7D30\u6BD4 \u03BB", unit: "" }, { key: "Fcr", label: "\u6B50\u62C9\u81E8\u754C\u529B", unit: "N" }, { key: "safety", label: "\u7A69\u5B9A\u5B89\u5168\u4FC2\u6578", unit: "" }],
-    calc(i) {
-      const i_r = Math.sqrt(i.I / i.A);
-      const Fcr = Math.PI ** 2 * i.E * i.I / (i.mu1 * i.L) ** 2;
-      return { i_r: i_r.toFixed(2), lam: (i.mu1 * i.L / i_r).toFixed(1), Fcr: Fcr.toFixed(0), safety: (Fcr / i.N).toFixed(2) };
-    }
   },
   // ══ 新增計算器模組 ══
   // ── 凸輪（正弦加速度曲線）──
@@ -653,18 +374,6 @@ const CALCS = {
       { key: "a_coef", label: "\u52A0\u901F\u5EA6\u4FC2\u6578 d\xB2s/d\u03C6\xB2", unit: "mm/rad\xB2" },
       { key: "r", label: "\u51F8\u8F2A\u5411\u5F91 r", unit: "mm" }
     ],
-    calc(i) {
-      const phi_o_r = i.phi_o * Math.PI / 180;
-      const phi_r = i.phi * Math.PI / 180;
-      const tau = Math.max(0, Math.min(1, phi_r / phi_o_r));   // \u593E\u5728 0~1\uFF0C\u907F\u514D\u8D85\u51FA\u63A8\u7A0B\u89D2
-      const TWO_PI = 2 * Math.PI;
-      // \u64FA\u7DDA\uFF08Cycloidal\uFF09\u6B63\u5F26\u52A0\u901F\u5EA6\u898F\u5F8B\uFF0C\u95C9\u503C\u5DF2\u9A57\u8B49\uFF1A\u8D77\u8A16\u9EDE s,v,a \u5747\u70BA 0
-      const s = i.h * (tau - Math.sin(TWO_PI * tau) / TWO_PI);
-      const v = (i.h / phi_o_r) * (1 - Math.cos(TWO_PI * tau));          // ds/d\u03C6
-      const a = (i.h / phi_o_r ** 2) * (TWO_PI * Math.sin(TWO_PI * tau)); // d\xB2s/d\u03C6\xB2
-      const r = Math.sqrt((i.rb + s) ** 2 + v ** 2);
-      return { s: s.toFixed(4), v_coef: v.toFixed(5), a_coef: a.toFixed(5), r: r.toFixed(3) };
-    }
   },
   // ── 分割器選型 ──
   indexer_select: {
@@ -691,24 +400,6 @@ const CALCS = {
       { key: "JT", label: "\u7CFB\u7D71\u7E3D\u6163\u91CF JT", unit: "kg\xB7cm\xB2" },
       { key: "P_min", label: "\u96FB\u6A5F\u6700\u5C0F\u529F\u7387", unit: "kW" }
     ],
-    calc(i) {
-      const phi_h = 360 * i.t2 / (i.t1 + i.t2);          // \u9A45\u52D5\u89D2\uFF08\u51F8\u8F2A\u689D\u4EF6\uFF09
-      // \u8F49\u76E4\u8CEA\u91CF\uFF1A\u9AD4\u7A4D \u03C0/4\xB7D\xB2\xB7T (cm\xB3) \u2192 dm\xB3 \u2192 \xD7M(kg/dm\xB3)
-      const W1 = Math.PI / 4 * i.D ** 2 * i.T * i.M / 1e3; // kg
-      const W2 = i.M1 * i.N, W3 = i.M2 * i.N;
-      // \u8F49\u52D5\u6163\u91CF\u5168\u90E8\u63DB\u7B97\u70BA SI (kg\xB7m\xB2)\uFF1A\u534A\u5F91 cm \u2192 m
-      const J_disk = 0.5 * W1 * (i.D / 2 / 100) ** 2;      // kg\xB7m\xB2
-      const J_fix = (W2 + W3) * (i.Re / 100) ** 2;         // kg\xB7m\xB2
-      const J_SI = J_disk + J_fix;
-      const JT = J_SI * 1e4;                               // \u986F\u793A\u7528 kg\xB7cm\xB2
-      // \u51FA\u529B\u7AEF\u6BCF\u6B21\u5206\u5272\u89D2\u5EA6 \u0394\u03B8 = 2\u03C0/N\uFF0C\u5728 t2 \u5167\u4EE5\u64FA\u7DDA\u5B8C\u6210
-      const dtheta = 2 * Math.PI / i.N;                    // rad
-      const alpha_max = 2 * Math.PI * dtheta / i.t2 ** 2;  // \u64FA\u7DDA\u5CF0\u503C\u89D2\u52A0\u901F\u5EA6 rad/s\xB2
-      const omega_peak = 2 * dtheta / i.t2;                // \u64FA\u7DDA\u5CF0\u503C\u89D2\u901F\u5EA6 rad/s
-      const T_index = J_SI * alpha_max * i.fe;             // N\xB7m\uFF08\u542B\u5B89\u5168\u4FC2\u6578\uFF09
-      const P_min = T_index * omega_peak / i.z / 1e3;      // kW\uFF08\u542B\u96FB\u6A5F\u6548\u7387\uFF09
-      return { phi_h: phi_h.toFixed(1), W1: W1.toFixed(2), JT: JT.toFixed(1), P_min: P_min.toFixed(4) };
-    }
   },
   // ── 液壓：泵與電機 ──
   hydraulic_pump: {
@@ -727,12 +418,6 @@ const CALCS = {
       { key: "P_kW", label: "\u96FB\u6A5F\u529F\u7387", unit: "kW" },
       { key: "T_motor", label: "\u96FB\u6A5F\u8F49\u77E9", unit: "N\xB7m" }
     ],
-    calc(i) {
-      const Vg = i.Q * 1e3 / (i.n * i.eta_v);
-      const P_kW = i.Q * i.P / (600 * i.eta_v * i.eta_m);
-      const T_motor = P_kW * 1e3 * 60 / (2 * Math.PI * i.n);
-      return { Vg: Vg.toFixed(2), P_kW: P_kW.toFixed(2), T_motor: T_motor.toFixed(2) };
-    }
   },
   // ── 液壓：管路壓損 ──
   hydraulic_pipe: {
@@ -752,18 +437,6 @@ const CALCS = {
       { key: "type", label: "\u6D41\u614B", unit: "" },
       { key: "dp", label: "\u7BA1\u8DEF\u58D3\u640D \u0394p", unit: "bar" }
     ],
-    calc(i) {
-      const A = Math.PI / 4 * (i.d / 1e3) ** 2;
-      const v = i.Q / 6e4 / A;
-      const Re = v * (i.d / 1e3) / (i.nu * 1e-6);
-      const laminar = Re < 2300;
-      let lambda, note = "";
-      if (laminar) lambda = 64 / Re;
-      else if (Re <= 1e5) lambda = 0.316 / Math.pow(Re, 0.25);        // Blasius (Re \u2264 1e5)
-      else { lambda = 0.0032 + 0.221 / Math.pow(Re, 0.237); note = " (Nikuradse Re>1e5)"; } // \u9AD8\u96F7\u8AFE\u6578\u5340
-      const dp = lambda * (i.L / (i.d / 1e3)) * (i.rho * v ** 2 / 2) / 1e5;
-      return { v: v.toFixed(3), Re: Re.toFixed(0), type: (laminar ? "\u5C64\u6D41 (Re<2300)" : "\u7D0A\u6D41 (Re\u22652300)") + note, dp: dp.toFixed(4) };
-    }
   },
   // ── 液壓衝擊 ──
   hydraulic_shock: {
@@ -788,16 +461,6 @@ const CALCS = {
       { key: "dp_indirect", label: "\u9593\u63A5\u885D\u64CA\u58D3\u5347 \u0394p", unit: "MPa" },
       { key: "type", label: "\u885D\u64CA\u985E\u578B", unit: "" }
     ],
-    calc(i) {
-      const E0_Pa = i.E0 * 1e9, E_Pa = i.E * 1e9;
-      const K = 1 / (1 / E0_Pa + i.d / 1e3 / (E_Pa * (i.delta / 1e3)));
-      const alpha = Math.sqrt(K / i.rho);
-      const T_wave = 2 * i.L / alpha;
-      const dp_direct = alpha * i.rho * (i.v1 - i.v2) / 1e6;
-      const dp_indirect = alpha * i.rho * (i.v1 - i.v2) * T_wave / i.t_close / 1e6;
-      const isDirect = i.t_close <= T_wave;
-      return { alpha: alpha.toFixed(1), T_wave: T_wave.toFixed(4), dp_direct: dp_direct.toFixed(3), dp_indirect: dp_indirect.toFixed(3), type: isDirect ? "\u76F4\u63A5\u885D\u64CA\uFF08t\u2264T\uFF09" : "\u9593\u63A5\u885D\u64CA\uFF08t\uFF1ET\uFF09" };
-    }
   },
   // ── 蓄能器容積 ──
   accumulator: {
@@ -816,12 +479,6 @@ const CALCS = {
       { key: "ratio", label: "\u58D3\u529B\u6BD4 P\u2082/P\u2081", unit: "" },
       { key: "check", label: "P\u2080 \u9A57\u7B97", unit: "" }
     ],
-    calc(i) {
-      const ratio = i.P2 / i.P1;
-      const V0 = i.Vw / ((i.P0 / i.P1) ** (1 / i.n) - (i.P0 / i.P2) ** (1 / i.n));
-      const ok = i.P0 >= 0.6 * i.P1 && i.P0 <= 0.9 * i.P1;
-      return { V0: V0.toFixed(2), ratio: ratio.toFixed(3), check: ok ? "\u2705 P\u2080 \u8A2D\u5B9A\u5408\u7406" : "\u26A0\uFE0F \u5EFA\u8B70 P\u2080=0.6~0.9\xD7P\u2081" };
-    }
   },
   // ── 耗氣量計算 ──
   air_consumption: {
@@ -840,13 +497,6 @@ const CALCS = {
       { key: "Cv", label: "\u6240\u9700\u96FB\u78C1\u95A5 Cv \u503C", unit: "" },
       { key: "Q_avg", label: "\u5E73\u5747\u8017\u6C23\u91CF", unit: "L/min" }
     ],
-    calc(i) {
-      const A = Math.PI / 4 * (i.D / 1e3) ** 2;
-      const Q_max = A * i.Vmax / 1e3 * (i.P / 0.1013 + 1) * 1e3 * 60;
-      const Cv = Q_max / 984;
-      const Q_avg = 2 * A * (i.L / 1e3) * (i.P / 0.1013 + 1) * 1e3 * i.freq;
-      return { Q_max: Q_max.toFixed(2), Cv: Cv.toFixed(4), Q_avg: Q_avg.toFixed(2) };
-    }
   },
   // ── 倍速鏈電機功率 ──
   conveyor_chain: {
@@ -871,17 +521,6 @@ const CALCS = {
       { key: "Te", label: "\u9A45\u52D5\u8EF8\u6700\u5C0F\u626D\u77E9", unit: "N\xB7m" },
       { key: "P_kW", label: "\u96FB\u6A5F\u529F\u7387", unit: "kW" }
     ],
-    calc(i) {
-      const Va = i.V / i.A;
-      const a = Va / (60 * i.t);
-      const T1 = (i.M1 + i.M2) * a * i.D / 2;
-      const T2 = i.M3 * a * i.D / 2 * 0.1;
-      const T3 = (i.M1 + i.M2) * 9.8 * i.mu2 * i.D / 2;
-      const Te = T1 + T2 + T3;
-      const omega = Va / 60 / (i.D / 2);
-      const P_kW = Te * omega / (i.eta1 * i.eta2 * 1e3);
-      return { Va: Va.toFixed(2), T3: T3.toFixed(1), Te: Te.toFixed(1), P_kW: P_kW.toFixed(3) };
-    }
   },
   // ── 油箱熱平衡 ──
   tank_thermal: {
@@ -901,13 +540,6 @@ const CALCS = {
       { key: "T_balance", label: "\u71B1\u5E73\u8861\u6EAB\u5EA6", unit: "\xB0C" },
       { key: "verdict", label: "\u6563\u71B1\u5224\u5B9A", unit: "" }
     ],
-    calc(i) {
-      const dT = i.T_set - i.T0;
-      const P_radiate = i.k * i.A * dT / 1e3;
-      const Pcool_need = Math.max(0, i.Pheat - P_radiate);
-      const T_balance = i.Pheat * 1e3 / (i.k * i.A) + i.T0;
-      return { Pcool_need: Pcool_need.toFixed(2), P_radiate: P_radiate.toFixed(2), T_balance: T_balance.toFixed(1), verdict: T_balance <= i.T_set ? "\u2705 \u81EA\u7136\u6563\u71B1\u8DB3\u5920" : "\u274C \u9700\u52A0\u88DD\u51B7\u537B\u5668" };
-    }
   },
   ratchet_calc: {
     name: "\u68D8\u8F2A\u8A08\u7B97\uFF08CONTACT\u578B\uFF09",
@@ -915,10 +547,6 @@ const CALCS = {
     ref: "棘輪／料帶傳動幾何尺寸計算（依 Pitch 孔距推算），參考精密傳動機構設計手冊",
     inputs: [{ key: "P", label: "\u6599\u5E36PITCH\u5B54\u8DDD P", unit: "mm", default: 5.3 }, { key: "T", label: "\u6599\u539A T", unit: "mm", default: 0.12 }, { key: "D", label: "PITCH\u5B54\u5F91 D", unit: "mm", default: 1 }, { key: "N", label: "\u68D8\u8F2A\u9F52\u6578 N", unit: "", default: 25 }],
     outputs: [{ key: "S", label: "\u7406\u8AD6\u5468\u9577 S", unit: "mm" }, { key: "D1", label: "\u7406\u8AD6\u76F4\u5F91 D\u2081", unit: "mm" }, { key: "D2", label: "\u5BE6\u969B\u76F4\u5F91 D\u2082", unit: "mm" }, { key: "D3", label: "\u8170\u9AD8 D\u2083", unit: "mm" }],
-    calc(i) {
-      const S = i.P * i.N, D1 = S / Math.PI;
-      return { S: S.toFixed(3), D1: D1.toFixed(5), D2: (D1 - 2 * i.T).toFixed(5), D3: (2.25 * i.T).toFixed(3) };
-    }
   },
   // ══ 單位換算 ══
   unit_pressure: { _type: "unit_pressure", name: "\u58D3\u529B\u55AE\u4F4D\u63DB\u7B97", desc: "Pa/kPa/MPa/bar/atm/psi \u4E92\u63DB", ref: "壓力單位換算係數，參考 NIST SP811 國際單位制使用指南" },
@@ -928,11 +556,6 @@ const CALCS = {
     ref: "功率單位換算係數（W／kW／hp／PS），參考 NIST SP811 國際單位制使用指南",
     inputs: [{ key: "val", label: "\u8F38\u5165\u503C", unit: "", default: 1 }, { key: "from", label: "\u55AE\u4F4D (1=W 2=kW 3=hp 4=PS)", unit: "", default: 2 }],
     outputs: [{ key: "W", label: "W" }, { key: "kW", label: "kW" }, { key: "hp", label: "hp\uFF08\u82F1\u5236\uFF09" }, { key: "PS", label: "PS\uFF08\u516C\u5236\u99AC\u529B\uFF09" }],
-    calc(i) {
-      const f = [1, 1e3, 745.7, 735.5][Math.round(i.from) - 1] || 1;
-      const w = i.val * f;
-      return { W: w.toFixed(2), kW: (w / 1e3).toFixed(4), hp: (w / 745.7).toFixed(4), PS: (w / 735.5).toFixed(4) };
-    }
   },
   unit_torque: {
     name: "\u8F49\u77E9\u55AE\u4F4D\u63DB\u7B97",
@@ -940,11 +563,6 @@ const CALCS = {
     ref: "轉矩單位換算係數，參考 NIST SP811 國際單位制使用指南",
     inputs: [{ key: "val", label: "\u8F38\u5165\u503C", unit: "", default: 10 }, { key: "from", label: "\u55AE\u4F4D (1=N\xB7m 2=kN\xB7m 3=kgf\xB7m 4=lbf\xB7ft)", unit: "", default: 1 }],
     outputs: [{ key: "Nm", label: "N\xB7m" }, { key: "kNm", label: "kN\xB7m" }, { key: "kgfm", label: "kgf\xB7m" }, { key: "lbft", label: "lbf\xB7ft" }],
-    calc(i) {
-      const f = [1, 1e3, 9.807, 1.35582][Math.round(i.from) - 1] || 1;
-      const nm = i.val * f;
-      return { Nm: nm.toFixed(4), kNm: (nm / 1e3).toFixed(6), kgfm: (nm / 9.807).toFixed(4), lbft: (nm / 1.35582).toFixed(4) };
-    }
   },
   unit_length: {
     name: "\u9577\u5EA6\u55AE\u4F4D\u63DB\u7B97",
@@ -952,11 +570,6 @@ const CALCS = {
     ref: "長度單位換算係數，參考 NIST SP811 國際單位制使用指南",
     inputs: [{ key: "val", label: "\u8F38\u5165\u503C", unit: "", default: 100 }, { key: "from", label: "\u55AE\u4F4D (1=mm 2=cm 3=m 4=in 5=ft)", unit: "", default: 1 }],
     outputs: [{ key: "mm", label: "mm" }, { key: "cm", label: "cm" }, { key: "m", label: "m" }, { key: "inch", label: "inch" }, { key: "ft", label: "ft" }],
-    calc(i) {
-      const f = [1, 10, 1e3, 25.4, 304.8][Math.round(i.from) - 1] || 1;
-      const mm = i.val * f;
-      return { mm: mm.toFixed(4), cm: (mm / 10).toFixed(4), m: (mm / 1e3).toFixed(6), inch: (mm / 25.4).toFixed(5), ft: (mm / 304.8).toFixed(6) };
-    }
   },
   // ══ 查詢型（特殊 _type） ══
   bearing_lookup: { _type: "bearing_lookup", name: "\u6DF1\u6E9D\u7403\u8EF8\u627F\u67E5\u8A62", desc: "\u4F9D\u5167\u5F91\u6216\u578B\u865F\u641C\u5C0B", ref: "深溝球軸承尺寸與基本額定負荷數據，參考 JIS B 1521／ISO 15 軸承標準及 NSK／NTN 型錄" },
@@ -1065,22 +678,61 @@ body{font-family:var(--sans);font-weight:300;color:var(--primary);background:var
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:2px}
 @media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.content,.home-grid{padding:16px}}
+.api-status{position:fixed;bottom:14px;right:14px;font-size:12px;padding:6px 12px;border-radius:20px;background:var(--bg-light);color:var(--secondary);z-index:999;box-shadow:0 2px 6px rgba(0,0,0,.1);border:0.5px solid var(--border-color)}
+.api-status.loading{background:#fdfae6;color:#d35400}
+.api-status.error{background:#fdf3f2;color:#c0392b}
+@media(prefers-color-scheme:dark){.api-status.loading{background:#2e2a12;color:#f0a050}.api-status.error{background:#331512;color:#ef5350}}
 `;
-function LookupPanel({ title, desc, data, columns, filterFn }) {
-  const [q, setQ] = useState("");
-  const rows = useMemo(() => q ? data.filter((r) => filterFn(r, q)) : data, [q, data, filterFn]);
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, title), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, desc), /* @__PURE__ */ React.createElement("div", { className: "lookup-input" }, /* @__PURE__ */ React.createElement("input", { placeholder: "\u641C\u5C0B\u2026", value: q, onChange: (e) => setQ(e.target.value) })), /* @__PURE__ */ React.createElement("div", { style: { overflowX: "auto", maxHeight: 340, overflowY: "auto" } }, /* @__PURE__ */ React.createElement("table", { className: "data-table" }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, columns.map((c) => /* @__PURE__ */ React.createElement("th", { key: c.key }, c.label)))), /* @__PURE__ */ React.createElement("tbody", null, rows.map((r, i) => /* @__PURE__ */ React.createElement("tr", { key: i }, columns.map((c) => /* @__PURE__ */ React.createElement("td", { key: c.key }, r[c.key] != null ? r[c.key] : "\u2014"))))))));
-}
 function ITTolerance() {
   const [dim, setDim] = useState(30);
-  const row = useMemo(() => IT_TABLE.find((r) => dim > r.from && dim <= r.to) || IT_TABLE[0], [dim]);
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "IT\u516C\u5DEE\u7B49\u7D1A\u67E5\u8A62"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "\u4F9D\u57FA\u672C\u5C3A\u5BF8\u67E5 IT5~IT11 \u516C\u5DEE\u503C\uFF08\u03BCm\uFF09"), CALCS.it_tolerance?.ref && /* @__PURE__ */ React.createElement("div", { className: "ref-note" }, /* @__PURE__ */ React.createElement("b", null, "\u4F86\u6E90\uFF1A"), CALCS.it_tolerance.ref), /* @__PURE__ */ React.createElement("div", { className: "field" }, /* @__PURE__ */ React.createElement("label", null, "\u57FA\u672C\u5C3A\u5BF8 (mm)"), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: dim, onChange: (e) => setDim(parseFloat(e.target.value) || 0) }), /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, "mm"))), row && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "var(--muted)", marginBottom: 6 } }, "\u5C3A\u5BF8\u6BB5\uFF1A", row.from, " \uFF1C d \u2264 ", row.to, " mm"), /* @__PURE__ */ React.createElement("table", { className: "it-table" }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("th", { key: g }, g)))), /* @__PURE__ */ React.createElement("tbody", null, /* @__PURE__ */ React.createElement("tr", { className: "hl" }, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => /* @__PURE__ */ React.createElement("td", { key: g }, row[g]))))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: "var(--muted)" } }, ["IT6", "IT7", "IT8", "IT9", "IT10"].map((g) => /* @__PURE__ */ React.createElement("span", { key: g, className: "it-badge" }, g, "=", row[g], "\u03BCm")))));
+  const [row, setRow] = useState(null);
+  const [err, setErr] = useState(null);
+  React.useEffect(() => {
+    const t = setTimeout(() => {
+      apiCalc("it_tolerance", { dim }).then((r) => { setRow(r); setErr(null); }).catch((e) => { setRow(null); setErr(e.message); });
+    }, 400);
+    return () => clearTimeout(t);
+  }, [dim]);
+  return React.createElement("div", null,
+    React.createElement("div", { className: "card-title" }, "IT公差等級查詢"),
+    React.createElement("div", { className: "card-desc" }, "依基本尺寸查 IT5~IT11 公差值（μm）"),
+    CALCS.it_tolerance?.ref && React.createElement("div", { className: "ref-note" }, React.createElement("b", null, "來源："), CALCS.it_tolerance.ref),
+    React.createElement("div", { className: "field" },
+      React.createElement("label", null, "基本尺寸 (mm)"),
+      React.createElement("div", { className: "field-row" },
+        React.createElement("input", { type: "number", value: dim, onChange: (e) => setDim(parseFloat(e.target.value) || 0) }),
+        React.createElement("span", { className: "unit-tag" }, "mm"))),
+    err && React.createElement("div", { style: { margin: "0 16px 12px", color: "var(--warn)", fontSize: 12 } }, err),
+    !row && !err && React.createElement("div", { style: { margin: "0 16px 12px", color: "var(--muted)", fontSize: 12 } }, "查詢中…"),
+    row && React.createElement("div", null,
+      React.createElement("div", { style: { fontSize: 11, color: "var(--muted)", marginBottom: 6, padding: "0 16px" } }, "尺寸段：", row.from, " ＜ d ≤ ", row.to, " mm"),
+      React.createElement("table", { className: "it-table" },
+        React.createElement("thead", null, React.createElement("tr", null, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => React.createElement("th", { key: g }, g)))),
+        React.createElement("tbody", null, React.createElement("tr", { className: "hl" }, ["IT5", "IT6", "IT7", "IT8", "IT9", "IT10", "IT11"].map((g) => React.createElement("td", { key: g }, row[g]))))),
+      React.createElement("div", { style: { margin: "10px 16px 14px", fontSize: 11, color: "var(--muted)" } }, ["IT6", "IT7", "IT8", "IT9", "IT10"].map((g) => React.createElement("span", { key: g, className: "it-badge" }, g, "=", row[g], "μm")))));
 }
 function PressureConv() {
   const [val, setVal] = useState(0.5);
   const [fi, setFi] = useState(2);
-  const pa = useMemo(() => val * PRESSURE_TO_PA[fi], [val, fi]);
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "\u58D3\u529B\u55AE\u4F4D\u63DB\u7B97"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "Pa/kPa/MPa/bar/atm/kgf/cm\xB2/psi \u4E92\u63DB"), CALCS.unit_pressure?.ref && /* @__PURE__ */ React.createElement("div", { className: "ref-note" }, /* @__PURE__ */ React.createElement("b", null, "\u4F86\u6E90\uFF1A"), CALCS.unit_pressure.ref), /* @__PURE__ */ React.createElement("div", { className: "lookup-input" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: val, onChange: (e) => setVal(parseFloat(e.target.value) || 0) }), /* @__PURE__ */ React.createElement("select", { value: fi, onChange: (e) => setFi(+e.target.value) }, PRESSURE_UNITS.map((u, i) => /* @__PURE__ */ React.createElement("option", { key: u, value: i }, u)))), /* @__PURE__ */ React.createElement("div", { className: "conv-grid" }, PRESSURE_UNITS.map((u, i) => /* @__PURE__ */ React.createElement("div", { className: "conv-item", key: u }, /* @__PURE__ */ React.createElement("label", null, u), /* @__PURE__ */ React.createElement("div", { className: "val" }, (pa / PRESSURE_TO_PA[i]).toPrecision(5))))));
+  const [data, setData] = useState(null);
+  React.useEffect(() => {
+    const t = setTimeout(() => {
+      apiCalc("unit_pressure", { val, from: fi }).then(setData).catch(() => setData(null));
+    }, 400);
+    return () => clearTimeout(t);
+  }, [val, fi]);
+  return React.createElement("div", null,
+    React.createElement("div", { className: "card-title" }, "壓力單位換算"),
+    React.createElement("div", { className: "card-desc" }, "Pa/kPa/MPa/bar/atm/kgf/cm²/psi 互換"),
+    CALCS.unit_pressure?.ref && React.createElement("div", { className: "ref-note" }, React.createElement("b", null, "來源："), CALCS.unit_pressure.ref),
+    React.createElement("div", { className: "lookup-input" },
+      React.createElement("input", { type: "number", value: val, onChange: (e) => setVal(parseFloat(e.target.value) || 0) }),
+      React.createElement("select", { value: fi, onChange: (e) => setFi(+e.target.value) },
+        PRESSURE_UNITS.map((u, i) => React.createElement("option", { key: u, value: i }, u)))),
+    React.createElement("div", { className: "conv-grid" },
+      PRESSURE_UNITS.map((u, i) => React.createElement("div", { className: "conv-item", key: u },
+        React.createElement("label", null, u),
+        React.createElement("div", { className: "val" }, data ? Number(data.values[i]).toPrecision(5) : "—")))));
 }
 function SectionSVG({ type, vals }) {
   const W = 180, H = 160, cx = 90, cy = 85, sc = 2.2;
@@ -1109,92 +761,71 @@ function CamCurvePanel() {
   const [phi_o, setPhi_o] = useState(120);
   const [phi_r, setPhi_r] = useState(60);
   const [phi_s, setPhi_s] = useState(60);
-  function msDisp(tau) {
-    // \u64FA\u7DDA\uFF08Cycloidal\uFF09\u6B63\u5F26\u52A0\u901F\u5EA6\u898F\u5F8B\u4E4B\u6B78\u4E00\u5316\u4F4D\u79FB S(\u03C4) = \u03C4 - sin(2\u03C0\u03C4)/(2\u03C0)
-    if (tau <= 0) return 0;
-    if (tau >= 1) return 1;
-    return tau - Math.sin(2 * Math.PI * tau) / (2 * Math.PI);
-  }
-  
-  // =========== 修正的部分在這裡 ===========
+  const [profile, setProfile] = useState(null); // 後端回傳 0°~360° 每 1° 位移 s(mm)
+  React.useEffect(() => {
+    const t = setTimeout(() => {
+      apiCalc("cam_profile", { h, phi_o, phi_r, phi_s }).then((r) => setProfile(r.s)).catch(() => setProfile(null));
+    }, 350);
+    return () => clearTimeout(t);
+  }, [h, phi_o, phi_r, phi_s]);
   const W = 340, H = 260, cx = 170, cy = 130;
-  // 動態計算縮放比例：確保最大半徑不會超過 110，保留邊緣留白，並以 0.85 為預設最大值
   const scale = Math.min(0.85, 110 / (rb + h));
   const maxR = (rb + h) * scale;
   const rbS = rb * scale;
-  // ======================================
-
-  const pts = [];
-  const N = 360;
-  for (let deg = 0; deg < N; deg++) {
-    const phi = deg * Math.PI / 180;
-    const phi_o_r = phi_o * Math.PI / 180;
-    const phi_r_r = phi_r * Math.PI / 180;
-    const phi_s_r = phi_s * Math.PI / 180;
-    const phi_end_dwell1 = phi_o_r;
-    const phi_end_return = phi_end_dwell1 + phi_r_r;
-    const phi_end_stroke = phi_end_return + phi_s_r;
-    let s;
-    if (phi <= phi_o_r) {
-      s = h * msDisp(phi / phi_o_r);
-    } else if (phi <= phi_end_return) {
-      s = h;
-    } else if (phi <= phi_end_stroke) {
-      s = h * (1 - msDisp((phi - phi_end_return) / phi_s_r));
-    } else {
-      s = 0;
+  let pathD = null, dispPath = null;
+  if (profile) {
+    const pts = [];
+    for (let deg = 0; deg < 360; deg++) {
+      const phi = deg * Math.PI / 180;
+      const r = (rb + profile[deg]) * scale;
+      pts.push([cx + r * Math.cos(phi - Math.PI / 2), cy + r * Math.sin(phi - Math.PI / 2)]);
     }
-    const r = (rb + s) * scale;
-    pts.push([cx + r * Math.cos(phi - Math.PI / 2), cy + r * Math.sin(phi - Math.PI / 2)]);
-  }
-  const pathD = "M" + pts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join("L") + "Z";
-  const chartX = 10, chartY = 10, chartW = 100, chartH = 80;
-  const dispPts = [];
-  for (let i = 0; i <= 72; i++) {
-    const deg = i * 5;
-    const phi = deg * Math.PI / 180;
-    const phi_o_r = phi_o * Math.PI / 180;
-    let s = 0;
-    if (phi <= phi_o_r) s = h * msDisp(phi / phi_o_r);
-    else if (phi <= (phi_o + phi_r) * Math.PI / 180) s = h;
-    else if (phi <= (phi_o + phi_r + phi_s) * Math.PI / 180) s = h * (1 - msDisp((phi - (phi_o + phi_r) * Math.PI / 180) / (phi_s * Math.PI / 180)));
-    dispPts.push([chartX + i / 72 * chartW, chartY + chartH - s / h * chartH]);
-  }
-  const dispPath = "M" + dispPts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join("L");
-  return /* @__PURE__ */ React.createElement("div", { className: "card", style: { gridColumn: "1 / -1" } }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, "\u51F8\u8F2A\u8F2A\u5ED3\u66F2\u7DDA\u8996\u89BA\u5316"), /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, "\u64FA\u7DDA\u904B\u52D5\u898F\u5F8B\uFF08Cycloidal\uFF09\uFF0C\u5373\u6642\u6E32\u67D3\u51F8\u8F2A\u8F2A\u5ED3"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 12 } }, [
-    { label: "\u57FA\u5713\u534A\u5F91 rb (mm)", val: rb, set: setRb, min: 20, max: 200 },
-    { label: "\u884C\u7A0B h (mm)", val: h, set: setH, min: 5, max: 100 },
-    { label: "\u5347\u7A0B\u89D2 \u03C6\u2080 (\xB0)", val: phi_o, set: setPhi_o, min: 30, max: 180 },
-    { label: "\u9060\u4F11\u6B62\u89D2 \u03C6\u1D63 (\xB0)", val: phi_r, set: setPhi_r, min: 0, max: 120 },
-    { label: "\u56DE\u7A0B\u89D2 \u03C6\u209B (\xB0)", val: phi_s, set: setPhi_s, min: 30, max: 180 }
-  ].map((f) => /* @__PURE__ */ React.createElement("div", { className: "field", key: f.label }, /* @__PURE__ */ React.createElement("label", null, f.label), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "range",
-      min: f.min,
-      max: f.max,
-      value: f.val,
-      onChange: (e) => f.set(+e.target.value),
-      style: { flex: 1, accentColor: "var(--accent)" }
+    pathD = "M" + pts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join("L") + "Z";
+    const chartX = 10, chartY = 10, chartW = 100, chartH = 80;
+    const dispPts = [];
+    for (let i = 0; i <= 72; i++) {
+      const s = profile[Math.min(i * 5, 360)];
+      dispPts.push([chartX + i / 72 * chartW, chartY + chartH - s / h * chartH]);
     }
-  ), /* @__PURE__ */ React.createElement("span", { className: "unit-tag", style: { minWidth: 36 } }, f.val))))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 24, alignItems: "stretch", maxWidth: 1200 } },
-    React.createElement("svg", { style: { flex: "0 0 38%", background: "#f5f5f5", borderRadius: 8, border: "0.5px solid var(--border-color)" }, viewBox: "0 0 120 110" },
-      React.createElement("text", { x: 60, y: 5, fill: "#999", fontSize: "5", textAnchor: "middle", fontWeight: "400" }, "位移曲線"),
-      React.createElement("line", { x1: 10, y1: 95, x2: 110, y2: 95, stroke: "#ccc", strokeWidth: "1" }),
-      React.createElement("line", { x1: 10, y1: 18, x2: 10, y2: 95, stroke: "#ccc", strokeWidth: "1" }),
-      React.createElement("path", { d: dispPath, fill: "none", stroke: "var(--accent2)", strokeWidth: "1.5" }),
-      React.createElement("text", { x: 60, y: 108, fill: "#555", fontSize: "6", textAnchor: "middle" }, "φ₀=", phi_o, "° 遠休止角=", phi_r, "° 回程角=", phi_s, "°")
-    ),
-    React.createElement("svg", { style: { flex: "1", background: "#f8f8f8", borderRadius: 8, border: "0.5px solid var(--border-color)", overflow: "hidden" }, viewBox: `0 0 ${W} ${H}` },
-      React.createElement("circle", { cx, cy, r: rbS, fill: "none", stroke: "#ccc", strokeWidth: "1", strokeDasharray: "4,3" }),
-      React.createElement("circle", { cx, cy, r: maxR, fill: "none", stroke: "#ccc", strokeWidth: "1", strokeDasharray: "2,4" }),
-      React.createElement(React.Fragment, null, ...[0,45,90,135,180,225,270,315].map(function(a){ var ar=a*Math.PI/180; return React.createElement("line",{key:a,x1:cx,y1:cy,x2:cx+maxR*Math.cos(ar-Math.PI/2),y2:cy+maxR*Math.sin(ar-Math.PI/2),stroke:"#ddd",strokeWidth:"0.5"}); })),
-      React.createElement("text", { x: cx+rbS+4, y: cy-4, fill: "#333", fontSize: "9" }, "rb=", rb),
-      React.createElement("path", { d: pathD, fill: "rgba(74,124,255,.15)", stroke: "var(--accent)", strokeWidth: "2" }),
-      React.createElement("circle", { cx, cy, r: 3, fill: "var(--accent)" }),
-      React.createElement("text", { x: W/2, y: H-6, fill: "#333", fontSize: "9", textAnchor: "middle" }, "φ=", phi_o, "° 遠休止角=", phi_r, "° 回程角=", phi_s, "° 近休=", 360-phi_o-phi_r-phi_s, "°")
+    dispPath = "M" + dispPts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join("L");
+  }
+  return React.createElement("div", { className: "card", style: { gridColumn: "1 / -1" } },
+    React.createElement("div", { className: "card-title" }, "凸輪輪廓曲線視覺化"),
+    React.createElement("div", { className: "card-desc" }, "擺線運動規律（Cycloidal），曲線由計算伺服器產生"),
+    React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 12 } }, [
+      { label: "基圓半徑 rb (mm)", val: rb, set: setRb, min: 20, max: 200 },
+      { label: "行程 h (mm)", val: h, set: setH, min: 5, max: 100 },
+      { label: "升程角 φ₀ (°)", val: phi_o, set: setPhi_o, min: 30, max: 180 },
+      { label: "遠休止角 φᵣ (°)", val: phi_r, set: setPhi_r, min: 0, max: 120 },
+      { label: "回程角 φₛ (°)", val: phi_s, set: setPhi_s, min: 30, max: 180 }
+    ].map((f) => React.createElement("div", { className: "field", key: f.label },
+      React.createElement("label", null, f.label),
+      React.createElement("div", { className: "field-row" },
+        React.createElement("input", {
+          type: "range", min: f.min, max: f.max, value: f.val,
+          onChange: (e) => f.set(+e.target.value),
+          style: { flex: 1, accentColor: "var(--accent)" }
+        }),
+        React.createElement("span", { className: "unit-tag", style: { minWidth: 36 } }, f.val))))),
+    !profile && React.createElement("div", { style: { padding: "0 16px 16px", color: "var(--muted)", fontSize: 12 } }, "曲線計算中…"),
+    profile && React.createElement("div", { style: { display: "flex", gap: 24, alignItems: "stretch", maxWidth: 1200 } },
+      React.createElement("svg", { style: { flex: "0 0 38%", background: "#f5f5f5", borderRadius: 8, border: "0.5px solid var(--border-color)" }, viewBox: "0 0 120 110" },
+        React.createElement("text", { x: 60, y: 5, fill: "#999", fontSize: "5", textAnchor: "middle", fontWeight: "400" }, "位移曲線"),
+        React.createElement("line", { x1: 10, y1: 95, x2: 110, y2: 95, stroke: "#ccc", strokeWidth: "1" }),
+        React.createElement("line", { x1: 10, y1: 18, x2: 10, y2: 95, stroke: "#ccc", strokeWidth: "1" }),
+        React.createElement("path", { d: dispPath, fill: "none", stroke: "var(--accent2)", strokeWidth: "1.5" }),
+        React.createElement("text", { x: 60, y: 108, fill: "#555", fontSize: "6", textAnchor: "middle" }, "φ₀=", phi_o, "° 遠休止角=", phi_r, "° 回程角=", phi_s, "°")
+      ),
+      React.createElement("svg", { style: { flex: "1", background: "#f8f8f8", borderRadius: 8, border: "0.5px solid var(--border-color)", overflow: "hidden" }, viewBox: `0 0 ${W} ${H}` },
+        React.createElement("circle", { cx, cy, r: rbS, fill: "none", stroke: "#ccc", strokeWidth: "1", strokeDasharray: "4,3" }),
+        React.createElement("circle", { cx, cy, r: maxR, fill: "none", stroke: "#ccc", strokeWidth: "1", strokeDasharray: "2,4" }),
+        React.createElement(React.Fragment, null, ...[0, 45, 90, 135, 180, 225, 270, 315].map(function(a) { var ar = a * Math.PI / 180; return React.createElement("line", { key: a, x1: cx, y1: cy, x2: cx + maxR * Math.cos(ar - Math.PI / 2), y2: cy + maxR * Math.sin(ar - Math.PI / 2), stroke: "#ddd", strokeWidth: "0.5" }); })),
+        React.createElement("text", { x: cx + rbS + 4, y: cy - 4, fill: "#333", fontSize: "9" }, "rb=", rb),
+        React.createElement("path", { d: pathD, fill: "rgba(74,124,255,.15)", stroke: "var(--accent)", strokeWidth: "2" }),
+        React.createElement("circle", { cx, cy, r: 3, fill: "var(--accent)" }),
+        React.createElement("text", { x: W / 2, y: H - 6, fill: "#333", fontSize: "9", textAnchor: "middle" }, "φ=", phi_o, "° 遠休止角=", phi_r, "° 回程角=", phi_s, "° 近休=", 360 - phi_o - phi_r - phi_s, "°")
+      )
     )
-  )
   );
 }
 function useExport() {
@@ -1247,73 +878,93 @@ function useExport() {
   return { exportPDF };
 }
 
-function MaterialDropdown({ title, desc, data, cols, refText }) {
+function MaterialDropdown({ title, desc, table, cols, refText }) {
+  const [data, setData] = React.useState(null);
+  const [err, setErr] = React.useState(null);
   const [sel, setSel] = React.useState(0);
+  React.useEffect(() => { getTable(table).then(setData).catch(() => setErr("資料表載入失敗，請稍候重試")); }, [table]);
+  if (err) return React.createElement("div", { className: "card" },
+    React.createElement("div", { className: "card-title" }, title),
+    React.createElement("div", { style: { padding: "0 16px 16px", color: "var(--warn)", fontSize: 12 } }, err));
+  if (!data) return React.createElement("div", { className: "card" },
+    React.createElement("div", { className: "card-title" }, title),
+    React.createElement("div", { style: { padding: "0 16px 16px", color: "var(--muted)", fontSize: 12 } }, "資料表載入中…"));
   const row = data[sel] || data[0];
-  return React.createElement("div", { className: "card", style:{padding:0} },
+  return React.createElement("div", { className: "card", style: { padding: 0 } },
     React.createElement("div", { className: "card-title" }, title),
     React.createElement("div", { className: "card-desc" }, desc),
     refText && React.createElement("div", { className: "ref-note" }, React.createElement("b", null, "來源："), refText),
     React.createElement("div", { className: "field" },
-      React.createElement("label", null, "\u9078\u64C7"),
+      React.createElement("label", null, "選擇"),
       React.createElement("select", {
-        value: sel, onChange: function(e){ setSel(+e.target.value); },
-        style: { width:"100%", padding:"8px 10px", border:"0.5px solid var(--border-color)",
-                 borderRadius:"var(--radius-sm)", background:"var(--bg-white)",
-                 font:"inherit", color:"var(--primary)", outline:"none" }
-      }, data.map(function(r,i){ return React.createElement("option",{key:i,value:i},r[cols[0].key]); }))
+        value: sel, onChange: function(e) { setSel(+e.target.value); },
+        style: { width: "100%", padding: "8px 10px", border: "0.5px solid var(--border-color)",
+                 borderRadius: "var(--radius-sm)", background: "var(--bg-white)",
+                 font: "inherit", color: "var(--primary)", outline: "none" }
+      }, data.map(function(r, i) { return React.createElement("option", { key: i, value: i }, r[cols[0].key]); }))
     ),
-    React.createElement("div", { style:{margin:"0 16px 14px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:8} },
-      cols.slice(1).map(function(c,i){
-        return React.createElement("div", { key:i,
-          style:{background:"var(--bg-light)",border:"0.5px solid var(--border-color)",
-                 borderRadius:"var(--radius-sm)",padding:"10px 12px"} },
-          React.createElement("div",{style:{fontSize:11,color:"var(--secondary)",fontWeight:600,marginBottom:4}}, c.label),
-          React.createElement("div",{style:{fontFamily:"var(--mono)",fontSize:16,fontWeight:700,color:"var(--primary)"}},
+    React.createElement("div", { style: { margin: "0 16px 14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } },
+      cols.slice(1).map(function(c, i) {
+        return React.createElement("div", { key: i,
+          style: { background: "var(--bg-light)", border: "0.5px solid var(--border-color)",
+                   borderRadius: "var(--radius-sm)", padding: "10px 12px" } },
+          React.createElement("div", { style: { fontSize: 11, color: "var(--secondary)", fontWeight: 600, marginBottom: 4 } }, c.label),
+          React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 16, fontWeight: 700, color: "var(--primary)" } },
             row[c.key] != null ? String(row[c.key]) : "—")
         );
       })
     )
   );
 }
-function BearingDropdown({ title, desc, data, cols, refText }) {
-  const dOptions = React.useMemo(function(){
-    var ds = Array.from(new Set(data.map(function(r){return r.d;}))).sort(function(a,b){return a-b;}).map(String);
+function BearingDropdown({ title, desc, table, cols, refText }) {
+  const [data, setData] = React.useState(null);
+  const [err, setErr] = React.useState(null);
+  React.useEffect(() => { getTable(table).then(setData).catch(() => setErr("資料表載入失敗，請稍候重試")); }, [table]);
+  const dOptions = React.useMemo(function() {
+    if (!data) return ["全部"];
+    var ds = Array.from(new Set(data.map(function(r) { return r.d; }))).sort(function(a, b) { return a - b; }).map(String);
     return ["全部"].concat(ds);
   }, [data]);
   const [selD, setSelD] = React.useState("全部");
-  const filtered = React.useMemo(function(){
-    return selD === "全部" ? data : data.filter(function(r){ return String(r.d) === selD; });
+  const filtered = React.useMemo(function() {
+    if (!data) return [];
+    return selD === "全部" ? data : data.filter(function(r) { return String(r.d) === selD; });
   }, [selD, data]);
   const [selIdx, setSelIdx] = React.useState(0);
-  React.useEffect(function(){ setSelIdx(0); }, [selD]);
+  React.useEffect(function() { setSelIdx(0); }, [selD]);
+  if (err) return React.createElement("div", { className: "card" },
+    React.createElement("div", { className: "card-title" }, title),
+    React.createElement("div", { style: { padding: "0 16px 16px", color: "var(--warn)", fontSize: 12 } }, err));
+  if (!data) return React.createElement("div", { className: "card" },
+    React.createElement("div", { className: "card-title" }, title),
+    React.createElement("div", { style: { padding: "0 16px 16px", color: "var(--muted)", fontSize: 12 } }, "資料表載入中…"));
   const row = filtered[selIdx] || filtered[0];
-  const SEL_STYLE = { width:"100%", padding:"8px 10px", border:"0.5px solid var(--border-color)",
-    borderRadius:"var(--radius-sm)", background:"var(--bg-white)",
-    font:"inherit", color:"var(--primary)", outline:"none" };
-  return React.createElement("div", { className: "card", style:{padding:0} },
+  const SEL_STYLE = { width: "100%", padding: "8px 10px", border: "0.5px solid var(--border-color)",
+    borderRadius: "var(--radius-sm)", background: "var(--bg-white)",
+    font: "inherit", color: "var(--primary)", outline: "none" };
+  return React.createElement("div", { className: "card", style: { padding: 0 } },
     React.createElement("div", { className: "card-title" }, title),
     React.createElement("div", { className: "card-desc" }, desc),
     refText && React.createElement("div", { className: "ref-note" }, React.createElement("b", null, "來源："), refText),
     React.createElement("div", { className: "field" },
       React.createElement("label", null, "內徑 d (mm)"),
-      React.createElement("select", { value: selD, onChange: function(e){ setSelD(e.target.value); }, style: SEL_STYLE },
-        dOptions.map(function(v){ return React.createElement("option", { key: v, value: v }, v === "全部" ? "全部" : v + " mm"); })
+      React.createElement("select", { value: selD, onChange: function(e) { setSelD(e.target.value); }, style: SEL_STYLE },
+        dOptions.map(function(v) { return React.createElement("option", { key: v, value: v }, v === "全部" ? "全部" : v + " mm"); })
       )
     ),
     React.createElement("div", { className: "field" },
       React.createElement("label", null, "型號"),
-      React.createElement("select", { value: selIdx, onChange: function(e){ setSelIdx(+e.target.value); }, style: SEL_STYLE },
-        filtered.map(function(r, i){ return React.createElement("option", { key: i, value: i }, r.model); })
+      React.createElement("select", { value: selIdx, onChange: function(e) { setSelIdx(+e.target.value); }, style: SEL_STYLE },
+        filtered.map(function(r, i) { return React.createElement("option", { key: i, value: i }, r.model); })
       )
     ),
-    row && React.createElement("div", { style:{margin:"0 16px 14px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:8} },
-      cols.slice(1).map(function(c){
+    row && React.createElement("div", { style: { margin: "0 16px 14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } },
+      cols.slice(1).map(function(c) {
         return React.createElement("div", { key: c.key,
-          style:{background:"var(--bg-light)",border:"0.5px solid var(--border-color)",
-                 borderRadius:"var(--radius-sm)",padding:"10px 12px"} },
-          React.createElement("div",{style:{fontSize:11,color:"var(--secondary)",fontWeight:600,marginBottom:4}}, c.label),
-          React.createElement("div",{style:{fontFamily:"var(--mono)",fontSize:16,fontWeight:700,color:"var(--primary)"}},
+          style: { background: "var(--bg-light)", border: "0.5px solid var(--border-color)",
+                   borderRadius: "var(--radius-sm)", padding: "10px 12px" } },
+          React.createElement("div", { style: { fontSize: 11, color: "var(--secondary)", fontWeight: 600, marginBottom: 4 } }, c.label),
+          React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 16, fontWeight: 700, color: "var(--primary)" } },
             row[c.key] != null ? String(row[c.key]) : "—")
         );
       })
@@ -1330,45 +981,63 @@ function ReferenceList() {
 function CalcCard({ calcId, onLink }) {
   const def = CALCS[calcId];
   if (!def) return null;
-  if (def._type === "bearing_lookup") return React.createElement(BearingDropdown, { title: "深溝球軸承查詢", desc: "依內徑(d)篩選後選取型號", data: BEARINGS_DEEP, refText: def.ref, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "B", label: "B (mm)" }, { key: "Cr", label: "Cr (N)" }, { key: "Cor", label: "Cor (N)" }, { key: "nmax", label: "nmax ×10³" }] });
-  if (def._type === "bearing_thrust_lookup") return React.createElement(BearingDropdown, { title: "推力球軸承查詢", desc: "依內徑(d)篩選後選取型號", data: BEARINGS_THRUST, refText: def.ref, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "T", label: "T (mm)" }] });
+  if (def._type === "bearing_lookup") return React.createElement(BearingDropdown, { title: "深溝球軸承查詢", desc: "依內徑(d)篩選後選取型號", table: "deep", refText: def.ref, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "B", label: "B (mm)" }, { key: "Cr", label: "Cr (N)" }, { key: "Cor", label: "Cor (N)" }, { key: "nmax", label: "nmax ×10³" }] });
+  if (def._type === "bearing_thrust_lookup") return React.createElement(BearingDropdown, { title: "推力球軸承查詢", desc: "依內徑(d)篩選後選取型號", table: "thrust", refText: def.ref, cols: [{ key: "model", label: "型號" }, { key: "d", label: "d (mm)" }, { key: "D", label: "D (mm)" }, { key: "T", label: "T (mm)" }] });
   if (def._type === "it_tolerance") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(ITTolerance, null));
   if (def._type === "unit_pressure") return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement(PressureConv, null));
-  if (def._type === "material_elastic") return React.createElement(MaterialDropdown, { title: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u5DE5\u7A0B\u6750\u6599", data: ELASTIC_TABLE, refText: def.ref, cols: [{key:"name",label:"\u6750\u6599"},{key:"E",label:"E (GPa)"},{key:"nu",label:"\u6CCA\u677E\u6BD4 \u03BD"},{key:"alpha",label:"\u7DDA\u81A8\u81A8 \u03B1"}] });
-  if (def._type === "material_density") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u5BC6\u5EA6\u67E5\u8A62", desc: "\u5E38\u7528\u91D1\u5C6C\u8207\u5DE5\u7A0B\u6750\u6599", data: DENSITY_TABLE, refText: def.ref, cols: [{key:"name",label:"\u6750\u6599"},{key:"rho",label:"\u5BC6\u5EA6 kg/m\xB3"}] });
-  if (def._type === "material_friction") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u6469\u64E6\u4FC2\u6578", desc: "\u7121\u6F64\u6ED1 / \u6709\u6F64\u6ED1", data: FRICTION_TABLE, refText: def.ref, cols: [{key:"pair",label:"\u6750\u6599\u526F"},{key:"dry",label:"\u7121\u6F64\u6ED1"},{key:"wet",label:"\u6709\u6F64\u6ED1"}] });
-  if (def._type === "bolt_torque_lookup") return React.createElement(MaterialDropdown, { title: "\u87BA\u6813\u9396\u7DCA\u626D\u77E9\u6A19\u6E96", desc: "\u55AE\u4F4D: kgf\xB7m\uFF0C4.8\u7D1A", data: BOLT_TORQUE, refText: def.ref, cols: [{key:"size",label:"\u898F\u683C"},{key:"jp",label:"\u65E5\u672C\u6A19\u6E96"},{key:"din",label:"DIN\u6A19\u6E96"}] });
+  if (def._type === "material_elastic") return React.createElement(MaterialDropdown, { title: "\u5F48\u6027\u6A21\u91CF & \u6CCA\u677E\u6BD4", desc: "\u5E38\u7528\u5DE5\u7A0B\u6750\u6599", table: "elastic", refText: def.ref, cols: [{key:"name",label:"\u6750\u6599"},{key:"E",label:"E (GPa)"},{key:"nu",label:"\u6CCA\u677E\u6BD4 \u03BD"},{key:"alpha",label:"\u7DDA\u81A8\u81A8 \u03B1"}] });
+  if (def._type === "material_density") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u5BC6\u5EA6\u67E5\u8A62", desc: "\u5E38\u7528\u91D1\u5C6C\u8207\u5DE5\u7A0B\u6750\u6599", table: "density", refText: def.ref, cols: [{key:"name",label:"\u6750\u6599"},{key:"rho",label:"\u5BC6\u5EA6 kg/m\xB3"}] });
+  if (def._type === "material_friction") return React.createElement(MaterialDropdown, { title: "\u6750\u6599\u6469\u64E6\u4FC2\u6578", desc: "\u7121\u6F64\u6ED1 / \u6709\u6F64\u6ED1", table: "friction", refText: def.ref, cols: [{key:"pair",label:"\u6750\u6599\u526F"},{key:"dry",label:"\u7121\u6F64\u6ED1"},{key:"wet",label:"\u6709\u6F64\u6ED1"}] });
+  if (def._type === "bolt_torque_lookup") return React.createElement(MaterialDropdown, { title: "\u87BA\u6813\u9396\u7DCA\u626D\u77E9\u6A19\u6E96", desc: "\u55AE\u4F4D: kgf\xB7m\uFF0C4.8\u7D1A", table: "bolt_torque", refText: def.ref, cols: [{key:"size",label:"\u898F\u683C"},{key:"jp",label:"\u65E5\u672C\u6A19\u6E96"},{key:"din",label:"DIN\u6A19\u6E96"}] });
   const { exportPDF } = useExport();
   const init = () => Object.fromEntries(def.inputs.map((i) => [i.key, i.default]));
   const [vals, setVals] = useState(init);
   const [results, setResults] = useState(null);
-  const run = useCallback(() => {
+  const [busy, setBusy] = useState(false);
+  const run = useCallback(async () => {
+    const nv = {};
+    for (const [k, v] of Object.entries(vals)) {
+      const n = parseFloat(v);
+      if (!Number.isFinite(n)) { setResults({ error: `輸入「${k}」不是有效數值` }); return; }
+      nv[k] = n;
+    }
+    setBusy(true);
     try {
-      const nv = {};
-      for (const [k, v] of Object.entries(vals)) {
-        const n = parseFloat(v);
-        if (!Number.isFinite(n)) { setResults({ error: `\u8F38\u5165\u300C${k}\u300D\u4E0D\u662F\u6709\u6548\u6578\u503C` }); return; }
-        nv[k] = n;
-      }
-      const out = def.calc(nv);
-      // \u9632\u6B62 NaN / Infinity \u88AB .toFixed() \u6E32\u67D3\u70BA "NaN"\uFF1A\u6383\u63CF\u6240\u6709\u8F38\u51FA
-      for (const [k, v] of Object.entries(out)) {
-        if (typeof v === "string" && (v === "NaN" || v === "Infinity" || v === "-Infinity")) {
-          out[k] = "\u2014 (\u8F38\u5165\u8D85\u51FA\u6709\u6548\u7BC4\u570D)";
-        }
-      }
-      setResults(out);
+      setResults(await apiCalc(calcId, nv));
     } catch (e) {
       setResults({ error: e.message });
+    } finally {
+      setBusy(false);
     }
-  }, [vals, def]);
+  }, [vals, calcId]);
   const svgType = calcId === "section_circle" ? "circle" : calcId === "section_hollow_circle" ? "hollow_circle" : calcId === "section_rect" ? "rect" : calcId === "section_hollow_rect" ? "hollow_rect" : null;
-  return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, def.name), def.desc && /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, def.desc), def.ref && /* @__PURE__ */ React.createElement("div", { className: "ref-note" }, /* @__PURE__ */ React.createElement("b", null, "來源："), def.ref), def.inputs.map((inp) => /* @__PURE__ */ React.createElement("div", { className: "field", key: inp.key }, /* @__PURE__ */ React.createElement("label", null, inp.label), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: vals[inp.key], onChange: (e) => setVals((v) => ({ ...v, [inp.key]: e.target.value })) }), inp.unit && /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, inp.unit)), inp.hint && /* @__PURE__ */ React.createElement("div", { className: "hint" }, inp.hint))), /* @__PURE__ */ React.createElement("button", { className: "calc-btn", onClick: run }, "\u8A08\u7B97"), svgType && /* @__PURE__ */ React.createElement(SectionSVG, { type: svgType, vals }), results && /* @__PURE__ */ React.createElement("div", { className: "results-divider" }, results.error ? /* @__PURE__ */ React.createElement("div", { style: { color: "var(--warn)", fontSize: 12 } }, "\u932F\u8AA4\uFF1A", results.error) : def.outputs.map((o) => /* @__PURE__ */ React.createElement("div", { className: "result-row", key: o.key }, /* @__PURE__ */ React.createElement("span", { className: "result-label" }, o.label), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("span", { className: `result-val${String(results[o.key]).includes("\u2705") ? " verdict-ok" : String(results[o.key]).includes("\u274C") ? " verdict-ng" : ""}` }, results[o.key] ?? "\u2014"), o.unit && /* @__PURE__ */ React.createElement("span", { className: "result-unit" }, o.unit))))), results && !results.error && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 8 } }, /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => exportPDF(def.name, def.inputs.map((i) => ({ ...i, val: vals[i.key] })), def.outputs, results) }, "\u{1F4C4} \u532F\u51FA\u8A08\u7B97\u5831\u544A"), ["section_circle", "section_hollow_circle", "section_rect", "section_hollow_rect"].includes(calcId) && onLink && /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => onLink(calcId, results) }, "\u{1F517} \u5E36\u5165\u7ACB\u67F1\u8A08\u7B97")));
+  return /* @__PURE__ */ React.createElement("div", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-title" }, def.name), def.desc && /* @__PURE__ */ React.createElement("div", { className: "card-desc" }, def.desc), def.ref && /* @__PURE__ */ React.createElement("div", { className: "ref-note" }, /* @__PURE__ */ React.createElement("b", null, "來源："), def.ref), def.inputs.map((inp) => /* @__PURE__ */ React.createElement("div", { className: "field", key: inp.key }, /* @__PURE__ */ React.createElement("label", null, inp.label), /* @__PURE__ */ React.createElement("div", { className: "field-row" }, /* @__PURE__ */ React.createElement("input", { type: "number", value: vals[inp.key], onChange: (e) => setVals((v) => ({ ...v, [inp.key]: e.target.value })) }), inp.unit && /* @__PURE__ */ React.createElement("span", { className: "unit-tag" }, inp.unit)), inp.hint && /* @__PURE__ */ React.createElement("div", { className: "hint" }, inp.hint))), /* @__PURE__ */ React.createElement("button", { className: "calc-btn", onClick: run, disabled: busy }, busy ? "計算中…" : "計算"), svgType && /* @__PURE__ */ React.createElement(SectionSVG, { type: svgType, vals }), results && /* @__PURE__ */ React.createElement("div", { className: "results-divider" }, results.error ? /* @__PURE__ */ React.createElement("div", { style: { color: "var(--warn)", fontSize: 12 } }, "\u932F\u8AA4\uFF1A", results.error) : def.outputs.map((o) => /* @__PURE__ */ React.createElement("div", { className: "result-row", key: o.key }, /* @__PURE__ */ React.createElement("span", { className: "result-label" }, o.label), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("span", { className: `result-val${String(results[o.key]).includes("\u2705") ? " verdict-ok" : String(results[o.key]).includes("\u274C") ? " verdict-ng" : ""}` }, results[o.key] ?? "\u2014"), o.unit && /* @__PURE__ */ React.createElement("span", { className: "result-unit" }, o.unit))))), results && !results.error && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 8 } }, /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => exportPDF(def.name, def.inputs.map((i) => ({ ...i, val: vals[i.key] })), def.outputs, results) }, "\u{1F4C4} \u532F\u51FA\u8A08\u7B97\u5831\u544A"), ["section_circle", "section_hollow_circle", "section_rect", "section_hollow_rect"].includes(calcId) && onLink && /* @__PURE__ */ React.createElement("button", { className: "link-btn", style: { flex: 1 }, onClick: () => onLink(calcId, results) }, "\u{1F517} \u5E36\u5165\u7ACB\u67F1\u8A08\u7B97")));
 }
 function App() {
   const [activeCat, setActiveCat] = useState(null);
   const [search, setSearch] = useState("");
   const [linkedSection, setLinkedSection] = useState(null);
+  // 進入子選項時 push 一筆 history：header 的 history.back() 會先回到總覽，而非直接離開本頁
+  const openCat = useCallback((id) => {
+    setActiveCat(id);
+    history.pushState({ cat: id }, "", "#" + id);
+  }, []);
+  const goHome = useCallback(() => {
+    setActiveCat(null);
+    setSearch("");
+    if (location.hash) history.pushState({ cat: null }, "", location.pathname + location.search);
+  }, []);
+  React.useEffect(() => {
+    const valid = (id) => id === "_refs" || CATEGORIES.some((c) => c.id === id) ? id : null;
+    const onPop = (e) => setActiveCat(e.state ? valid(e.state.cat) : valid(location.hash.slice(1)));
+    window.addEventListener("popstate", onPop);
+    if (location.hash) setActiveCat(valid(location.hash.slice(1)));
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+  React.useEffect(() => {
+    const el = document.getElementById("back-link");
+    if (el) el.textContent = activeCat != null ? "← 返回上一頁" : "← 返回工具選單";
+  }, [activeCat]);
   const filteredCats = useMemo(() => {
     if (!search) return CATEGORIES;
     const q = search.toLowerCase();
@@ -1387,14 +1056,11 @@ function App() {
     const I = parseFloat(results.Ix || results.I || 0);
     const A = parseFloat(results.A || 0);
     setLinkedSection({ I, A, from: calcId });
-    setActiveCat("other");
+    openCat("other");
     alert(`\u622A\u9762\u8CC7\u6599\u5DF2\u5E36\u5165\u7ACB\u67F1\u8A08\u7B97\uFF1AI=${I} mm\u2074, A=${A} mm\xB2
 \u8ACB\u81F3\u300C\u5176\u4ED6\u8A08\u7B97 \u2192 \u7ACB\u67F1\u7A69\u5B9A\u6027\u300D\u4F7F\u7528\u3002`);
   }, []);
-  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("style", null, CSS), /* @__PURE__ */ React.createElement("div", { className: "app" }, /* @__PURE__ */ React.createElement("nav", { className: "sidebar" }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-header" }, /* @__PURE__ */ React.createElement("h1", null, "常用機械"), /* @__PURE__ */ React.createElement("p", null, "\u81EA\u52D5\u8A08\u7B97\u5927\u5168")), /* @__PURE__ */ React.createElement("input", { className: "search-box", placeholder: "\u641C\u5C0B\u8A08\u7B97\u5668\u2026", value: search, onChange: (e) => setSearch(e.target.value) }), /* @__PURE__ */ React.createElement("div", { className: `nav-item${activeCat == null && !search ? " active" : ""}`, style: { marginTop: 4 }, onClick: () => {
-    setActiveCat(null);
-    setSearch("");
-  } }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, "\u{1F3E0}"), "\u7E3D\u89BD"), filteredCats.map((cat) => /* @__PURE__ */ React.createElement("div", { key: cat.id, className: `nav-item${activeCat === cat.id ? " active" : ""}`, onClick: () => setActiveCat(cat.id) }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, cat.icon), cat.label)), /* @__PURE__ */ React.createElement("div", { className: `nav-item${activeCat === "_refs" ? " active" : ""}`, style: { marginTop: 4 }, onClick: () => { setActiveCat("_refs"); setSearch(""); } }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, "\u{1F4DA}"), "公式來源")), /* @__PURE__ */ React.createElement("div", { className: "main" }, /* @__PURE__ */ React.createElement("div", { className: "topbar" }, activeCat == null ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, "常用機械自動計算工具"), /* @__PURE__ */ React.createElement("p", null, "163 \u500B\u539F\u59CB\u5DE5\u4F5C\u8868 \xB7 ", CATEGORIES.length, " \u500B\u5206\u985E \xB7 ", totalCalcs, " \u500B\u8A08\u7B97\u5668")) : activeCat === "_refs" ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, "\u{1F4DA} \u516C\u5F0F\u4F86\u6E90"), /* @__PURE__ */ React.createElement("p", null, "\u6A19\u6E96\u898F\u7BC4\u8207\u6587\u737B\u51FA\u8655\u4E00\u89BD")) : /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, activeCategory?.icon, " ", activeCategory?.label), /* @__PURE__ */ React.createElement("p", null, visibleCalcs.length, " \u500B\u8A08\u7B97\u5668"))), activeCat == null ? /* @__PURE__ */ React.createElement("div", { className: "home-grid" }, CATEGORIES.map((cat) => /* @__PURE__ */ React.createElement("div", { className: "home-card", key: cat.id, onClick: () => setActiveCat(cat.id) }, /* @__PURE__ */ React.createElement("div", { className: "icon" }, cat.icon), /* @__PURE__ */ React.createElement("div", { className: "name" }, cat.label), /* @__PURE__ */ React.createElement("div", { className: "count" }, cat.calcs.length, " \u500B")))) : activeCat === "_refs" ? /* @__PURE__ */ React.createElement(ReferenceList, null) : /* @__PURE__ */ React.createElement("div", { className: "content" }, activeCat === "cam" && /* @__PURE__ */ React.createElement(CamCurvePanel, null), visibleCalcs.map((id) => /* @__PURE__ */ React.createElement("div", { key: id, style: { position: "relative" } }, id === "column_buckling" && linkedSection && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "var(--accent2)", marginBottom: 6 } }, "\u{1F517} \u5DF2\u5F9E\u622A\u9762\u8A08\u7B97\u5E36\u5165\uFF1AI=", linkedSection.I.toFixed(0), " mm\u2074 / A=", linkedSection.A.toFixed(0), " mm\xB2"), /* @__PURE__ */ React.createElement(CalcCard, { calcId: id, onLink: handleLink })))))));
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("style", null, CSS), /* @__PURE__ */ React.createElement("div", { className: "app" }, /* @__PURE__ */ React.createElement("nav", { className: "sidebar" }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-header" }, /* @__PURE__ */ React.createElement("h1", null, "常用機械"), /* @__PURE__ */ React.createElement("p", null, "\u81EA\u52D5\u8A08\u7B97\u5927\u5168")), /* @__PURE__ */ React.createElement("input", { className: "search-box", placeholder: "\u641C\u5C0B\u8A08\u7B97\u5668\u2026", value: search, onChange: (e) => setSearch(e.target.value) }), /* @__PURE__ */ React.createElement("div", { className: `nav-item${activeCat == null && !search ? " active" : ""}`, style: { marginTop: 4 }, onClick: goHome }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, "\u{1F3E0}"), "\u7E3D\u89BD"), filteredCats.map((cat) => /* @__PURE__ */ React.createElement("div", { key: cat.id, className: `nav-item${activeCat === cat.id ? " active" : ""}`, onClick: () => openCat(cat.id) }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, cat.icon), cat.label)), /* @__PURE__ */ React.createElement("div", { className: `nav-item${activeCat === "_refs" ? " active" : ""}`, style: { marginTop: 4 }, onClick: () => { openCat("_refs"); setSearch(""); } }, /* @__PURE__ */ React.createElement("span", { className: "nav-icon" }, "\u{1F4DA}"), "公式來源")), /* @__PURE__ */ React.createElement("div", { className: "main" }, /* @__PURE__ */ React.createElement("div", { className: "topbar" }, activeCat == null ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, "常用機械自動計算工具"), /* @__PURE__ */ React.createElement("p", null, "163 \u500B\u539F\u59CB\u5DE5\u4F5C\u8868 \xB7 ", CATEGORIES.length, " \u500B\u5206\u985E \xB7 ", totalCalcs, " \u500B\u8A08\u7B97\u5668")) : activeCat === "_refs" ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, "\u{1F4DA} \u516C\u5F0F\u4F86\u6E90"), /* @__PURE__ */ React.createElement("p", null, "\u6A19\u6E96\u898F\u7BC4\u8207\u6587\u737B\u51FA\u8655\u4E00\u89BD")) : /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", null, activeCategory?.icon, " ", activeCategory?.label), /* @__PURE__ */ React.createElement("p", null, visibleCalcs.length, " \u500B\u8A08\u7B97\u5668"))), activeCat == null ? /* @__PURE__ */ React.createElement("div", { className: "home-grid" }, CATEGORIES.map((cat) => /* @__PURE__ */ React.createElement("div", { className: "home-card", key: cat.id, onClick: () => openCat(cat.id) }, /* @__PURE__ */ React.createElement("div", { className: "icon" }, cat.icon), /* @__PURE__ */ React.createElement("div", { className: "name" }, cat.label), /* @__PURE__ */ React.createElement("div", { className: "count" }, cat.calcs.length, " \u500B")))) : activeCat === "_refs" ? /* @__PURE__ */ React.createElement(ReferenceList, null) : /* @__PURE__ */ React.createElement("div", { className: "content" }, activeCat === "cam" && /* @__PURE__ */ React.createElement(CamCurvePanel, null), visibleCalcs.map((id) => /* @__PURE__ */ React.createElement("div", { key: id, style: { position: "relative" } }, id === "column_buckling" && linkedSection && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "var(--accent2)", marginBottom: 6 } }, "\u{1F517} \u5DF2\u5F9E\u622A\u9762\u8A08\u7B97\u5E36\u5165\uFF1AI=", linkedSection.I.toFixed(0), " mm\u2074 / A=", linkedSection.A.toFixed(0), " mm\xB2"), /* @__PURE__ */ React.createElement(CalcCard, { calcId: id, onLink: handleLink })))))));
 }
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(React.createElement(App));
