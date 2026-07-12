@@ -5,6 +5,21 @@
         <meta name="google-site-verification" content="GW9PUgaXNOMGcGzNERgJUT91uk81KsFBnugNzM6Q1WM" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+    /* 語言判斷（早於畫面渲染）：?lang= 參數 > localStorage > 瀏覽器語言 > 預設 en */
+    (function(){
+      try{
+        var p = new URLSearchParams(location.search).get('lang');
+        var l = p || localStorage.getItem('lang') ||
+                ((navigator.language||'').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en');
+        window.__lang = (l === 'zh') ? 'zh' : 'en';
+      }catch(e){ window.__lang = 'en'; }
+      document.documentElement.lang = (window.__lang === 'zh') ? 'zh-TW' : 'en';
+    })();
+    </script>
+    <link rel="alternate" hreflang="en" href="https://andrewsu90-hub.github.io/">
+    <link rel="alternate" hreflang="zh-Hant" href="https://andrewsu90-hub.github.io/?lang=zh">
+    <link rel="alternate" hreflang="x-default" href="https://andrewsu90-hub.github.io/">
     <meta name="description" content="Andrew — Product Design & Mechanical Engineering — Creo 3D Modeling, Mechanism Design & DFM">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -546,7 +561,7 @@
                 <a onclick="smoothScroll('services'); return false;">Services</a>
                 <a onclick="smoothScroll('portfolio'); return false;">Portfolio</a>
                 <a onclick="smoothScroll('contact'); return false;">Contact</a>
-                <a href="zh/index.html" style="color: var(--accent); margin-left: 8px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; text-transform: none; letter-spacing: normal;">CH</a>
+                <a id="langToggle" href="#" onclick="toggleLang(); return false;" style="color: var(--accent); margin-left: 8px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; text-transform: none; letter-spacing: normal;">中文</a>
             </nav>
         </div>
     </header>
@@ -1061,7 +1076,7 @@
             const ta = document.getElementById('formFallbackText');
             navigator.clipboard.writeText(ta.value).then(() => {
                 const msg = document.getElementById('copyFallbackMsg');
-                msg.textContent = 'Copied';
+                msg.textContent = (window.__t ? window.__t('Copied') : 'Copied');
                 setTimeout(() => { msg.textContent = ''; }, 2000);
             });
         }
@@ -1225,9 +1240,177 @@
   const DEST = "tools/engineering-calculators.html";
   window.openCalcGate = function(e){ e.preventDefault(); const gate = document.getElementById("calcGate"); gate.style.display = "flex"; document.body.style.overflow = "hidden"; const input = document.getElementById("calcPwInput"); input.value = ""; document.getElementById("calcPwMsg").textContent = ""; setTimeout(()=>input.focus(), 50); };
   window.closeCalcGate = function(){ document.getElementById("calcGate").style.display = "none"; document.body.style.overflow = ""; };
-  window.checkCalcPw = async function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); const hash = await sha256Hex(input.value); if(hash === PW_HASH){ closeCalcGate(); location.href = DEST + "?lang=en"; } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
+  window.checkCalcPw = async function(){ const input = document.getElementById("calcPwInput"); const msg = document.getElementById("calcPwMsg"); const card = document.getElementById("calcGateCard"); const hash = await sha256Hex(input.value); if(hash === PW_HASH){ closeCalcGate(); location.href = DEST + "?lang=" + (window.__lang || "en"); } else { msg.textContent = "密碼錯誤，請重新輸入"; card.style.animation = "none"; void card.offsetWidth; card.style.animation = "calcShake 0.4s"; input.value = ""; input.focus(); } };
   document.getElementById("calcGate").addEventListener("click", function(e){ if(e.target === this) closeCalcGate(); });
   document.addEventListener("keydown", function(e){ if(document.getElementById("calcGate").style.display === "flex"){ if(e.key === "Enter") checkCalcPw(); if(e.key === "Escape") closeCalcGate(); } });
+})();
+</script>
+
+<script>
+/* ────────────────────────────────────────────────────────────
+   雙語系統 (i18n) — 英文為原文，此表僅列中文對照。
+   新增文字時：只要在下方 ZH 物件加一行 "英文原文": "中文譯文" 即可。
+   ──────────────────────────────────────────────────────────── */
+(function(){
+  var ZH = {
+    // ── SEO / 標題 ──
+    "Anzû | Product & Mechanical Design": "Anzû | 產品設計與機械工程",
+    "Andrew — Product Design & Mechanical Engineering — Creo 3D Modeling, Mechanism Design & DFM": "Andrew — 產品設計與機械工程 — Creo 3D 建模、機構設計與製造設計優化",
+    // ── 導覽列 ──
+    "Services": "服務項目",
+    "Portfolio": "作品集",
+    "Contact": "聯絡我們",
+    // ── Hero ──
+    "Product Design & Mechanical Engineering": "產品設計與機械工程",
+    "A solid mechanical engineering background focused on advanced surface modeling, complex mechanism design, and manufacturing feasibility assessment. Combining Creo 3D modeling expertise with Python-based engineering tools to deliver end-to-end solutions — from concept to production.": "紮實的機械工程背景，專注於進階曲面建模、複雜機構設計與製造可行性評估。結合 Creo 3D 建模專業與 Python 工程工具，提供從概念到量產的端對端解決方案。",
+    "Bridging design and manufacturing — solving engineering challenges to build market-ready hardware products.": "串聯設計與製造——解決工程挑戰，打造符合市場需求的硬體產品。",
+    // ── 核心能力 ──
+    "Core Capabilities": "核心能力",
+    "Creo Mechanism Design": "Creo 機構設計",
+    "Precise 3D solid and advanced surface modeling, complex internal mechanism breakdown, and systematic kinematic analysis using Creo Mechanism.": "精確的 3D 實體與進階曲面建模、複雜內部機構拆解，以及使用 Creo Mechanism 進行系統性運動學分析。",
+    "Design for Manufacturing (DFM)": "製造設計優化（DFM）",
+    "Material stress evaluation, interference checking, and draft angle analysis — ensuring designs are fully production-ready for tooling and mass manufacturing.": "材料應力評估、干涉檢查與拔模角分析——確保設計完全符合模具製作與量產要求。",
+    "Photorealistic Rendering & Visual Proposals": "寫實渲染與視覺提案",
+    "From early concept ideation to final high-fidelity product renders — delivering commercially compelling visuals for crowdfunding, catalogs, and brand presentations.": "從早期概念發想到最終高擬真產品渲染——為募資平台、型錄與品牌簡報提供具商業說服力的視覺內容。",
+    "Python Engineering Tools": "Python 工程工具",
+    "Custom Python scripts for engineering calculations and automated data processing — significantly reducing design validation time and boosting development efficiency.": "客製化 Python 腳本，用於工程計算與自動化資料處理——大幅縮短設計驗證時間，提升開發效率。",
+    // ── 精選工程作品 ──
+    "Selected Engineering Work": "精選工程作品",
+    "Creo kinematic simulation of a mechanism design showing stroke and motion analysis": "Creo 機構運動模擬，顯示行程與動作分析",
+    "Simulation-Driven Mechanism Design": "模擬驅動機構設計",
+    "Motion simulation using Creo's kinematic module — precise stroke calculation and interference elimination for smooth mechanism operation.": "使用 Creo 運動學模組進行動態模擬——精確計算行程並消除干涉，確保機構順暢運作。",
+    "Watch Creo Demo": "觀看Creo示範",
+    "Watch Kinematic Analysis Demo": "觀看運動學分析示範",
+    "Kinematic Analysis": "運動學分析",
+    "Watch Mechanism Design Demo": "觀看機構設計示範",
+    "Mechanism Design": "機構設計",
+    "Advanced surface modeling of a consumer electronics product shell": "消費性電子產品外殼的進階曲面建模",
+    "Consumer Electronics Surface Modeling": "消費性電子曲面建模",
+    "Advanced surface techniques used to build ergonomic, flowing forms — with full consideration of part split lines and assembly logic.": "運用進階曲面技術打造符合人體工學的流線造型——完整考量分模線與組裝邏輯。",
+    "Watch Surface Modeling Demo": "觀看曲面建模示範",
+    "Surface Modeling": "曲面建模",
+    "Watch Industrial Design Demo": "觀看工業設計示範",
+    "Industrial Design": "工業設計",
+    "DFM stress analysis of an injection-molded part with snap hook reinforcement": "射出成型零件的 DFM 應力分析與卡勾結構強化",
+    "Structural Stress & DFM Optimization": "結構應力與 DFM 優化",
+    "Structural reinforcement of snap hooks and load-bearing parts, wall thickness optimization to minimize sink marks and warping in injection-molded components.": "強化卡扣與承載件結構，優化壁厚設計以降低射出成型件縮水與翹曲問題。",
+    "Watch DFM Demo": "觀看DFM示範",
+    "Watch Stress Analysis Demo": "觀看應力分析示範",
+    "Stress Analysis": "應力分析",
+    "Watch Injection Molding Demo": "觀看射出成型示範",
+    "Injection Molding": "射出成型",
+    "Python script automating engineering calculations": "Python 腳本自動化工程計算",
+    "Python Automated Engineering Calc": "Python 自動化工程計算",
+    "Python scripts replacing tedious Excel manual calculations — dramatically cutting down parametric design verification time.": "以 Python 腳本取代繁瑣的 Excel 手動計算——大幅縮短參數化設計驗證時間。",
+    "Open Engineering Calculator Tools": "開啟工程計算工具",
+    "Engineering Calc": "工程計算",
+    "Precision metal component design for die-cast and sheet metal parts": "壓鑄與沖壓金屬零件的精密結構設計",
+    "Precision Metal Component Design": "精密金屬零件設計",
+    "Dedicated structural design for die-cast and sheet metal parts — accounting for machining tolerances and surface treatment process requirements.": "專為壓鑄與鈑金件量身設計的結構方案——充分考量加工公差與表面處理製程需求。",
+    "Watch Metal Fabrication Demo": "觀看金屬加工示範",
+    "Metal Fabrication": "金屬加工",
+    "Open Tolerance Analysis Tool": "進入公差分析工具",
+    "Tolerance Analysis": "公差分析",
+    "Photorealistic product rendering for commercial presentation": "商業用途寫實渲染圖",
+    "Commercial Photorealistic Rendering": "商業寫實渲染",
+    "High-fidelity material and lighting setups producing photorealistic product images ready for crowdfunding platforms or commercial catalogs.": "高擬真材質與燈光設定，產出適用於募資平台或商業型錄的產品級寫實影像。",
+    "View Visual Proposal Portfolio": "查看視覺提案作品集",
+    "Visual Proposals": "視覺提案",
+    // ── 聯絡 ──
+    "Start a Project": "開始一個專案",
+    "Have a mechanism design, 3D modeling, or product development need? Let's discuss your concept and specifications.": "有機構設計、3D 建模或產品開發需求？讓我們一起討論您的概念與規格。",
+    "Project Inquiry": "專案詢問",
+    "Send an Email": "發送電子郵件",
+    "Name / Contact Person *": "姓名／聯絡人 *",
+    "Email Address *": "電子郵件 *",
+    "Company / Organization": "公司／組織",
+    "Phone Number": "聯絡電話",
+    "Project Description *": "專案描述 *",
+    "Briefly describe your project requirements...": "請簡述您的專案需求...",
+    "Submit Inquiry": "送出詢問",
+    "If your email app didn't open automatically, copy the message below and send it to": "如果你的郵件軟體沒有自動開啟，請複製以下內容寄到",
+    "Copy message": "複製內容",
+    "© 2026 Anzû Mechanical & Product Design Studio. All rights reserved.": "© 2026 Anzû 機械與產品設計工作室。保留所有權利。",
+    // ── 影片彈窗 ──
+    "Back to Home": "回到首頁",
+    "Mechanism Demo": "機構設計示範",
+    "Stress Analysis Demo": "應力分析示範",
+    "Surface Modeling Demo": "曲面建模示範",
+    "Industrial Design Demo": "工業設計示範",
+    "Creo Demo": "Creo示範",
+    "Kinematic Analysis Demo": "運動學分析示範",
+    "DFM Demo": "DFM示範",
+    "Injection Molding Demo": "射出成型示範",
+    "Metal Fabrication Demo": "金屬加工示範",
+    // ── JS 動態字串 ──
+    "Copied": "已複製"
+  };
+
+  var ATTRS = ["title","alt","placeholder","data-title","content"];
+  var textNodes = null;   // 快取：所有可翻譯文字節點 + 其英文原文
+  var attrNodes = null;   // 快取：所有可翻譯屬性 + 其英文原文
+
+  function collect(){
+    textNodes = [];
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(n){
+        var p = n.parentNode;
+        if(!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if(tag === "SCRIPT" || tag === "STYLE" || tag === "NOSCRIPT") return NodeFilter.FILTER_REJECT;
+        return n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    var n;
+    while((n = walker.nextNode())) textNodes.push({ node: n, en: n.nodeValue });
+
+    attrNodes = [];
+    var els = document.querySelectorAll("[title],[alt],[placeholder],[data-title],meta[content]");
+    els.forEach(function(el){
+      ATTRS.forEach(function(a){
+        if(el.hasAttribute(a)) attrNodes.push({ el: el, attr: a, en: el.getAttribute(a) });
+      });
+    });
+  }
+
+  function tr(en){                       // 依 trim 後原文查表，保留前後空白
+    var key = en.trim();
+    if(ZH[key]) return en.replace(key, ZH[key]);
+    return en;
+  }
+
+  function applyLang(lang){
+    window.__lang = (lang === "zh") ? "zh" : "en";
+    var zh = window.__lang === "zh";
+    if(!textNodes) collect();
+
+    textNodes.forEach(function(t){ t.node.nodeValue = zh ? tr(t.en) : t.en; });
+    attrNodes.forEach(function(a){ a.el.setAttribute(a.attr, zh ? tr(a.en) : a.en); });
+
+    // <title>（不在 body walk 範圍內）
+    if(!applyLang._enTitle) applyLang._enTitle = document.title;
+    document.title = zh ? tr(applyLang._enTitle) : applyLang._enTitle;
+
+    // 站內帶 ?lang= 的連結，跟隨當前語言
+    document.querySelectorAll('a[href*="lang="]').forEach(function(a){
+      a.setAttribute("href", a.getAttribute("href").replace(/([?&]lang=)(en|zh)/, "$1" + window.__lang));
+    });
+
+    document.documentElement.lang = zh ? "zh-TW" : "en";
+    var tg = document.getElementById("langToggle");
+    if(tg) tg.textContent = zh ? "EN" : "中文";
+  }
+
+  window.__t = function(s){ return (window.__lang === "zh" && ZH[s]) ? ZH[s] : s; };
+
+  window.toggleLang = function(){
+    var next = (window.__lang === "zh") ? "en" : "zh";
+    try{ localStorage.setItem("lang", next); }catch(e){}
+    applyLang(next);
+    try{ var u = new URL(location.href); u.searchParams.set("lang", next); history.replaceState(null, "", u); }catch(e){}
+  };
+
+  applyLang(window.__lang || "en");   // 依 head 已判斷的語言首次套用
 })();
 </script>
 
