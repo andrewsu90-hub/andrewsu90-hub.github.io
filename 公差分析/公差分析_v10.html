@@ -488,10 +488,10 @@
         return `
             <tr>
                 <td class="row-index"></td>
-                <td><input type="text" class="table-input desc" value="${data.desc || ''}"></td>
-                <td><input type="number" class="table-input plus" value="${data.plus || ''}" step="0.1"></td>
-                <td><input type="number" class="table-input minus" value="${data.minus || ''}" step="0.1"></td>
-                <td><input type="number" class="table-input tol" value="${data.tol || ''}" step="0.01"></td>
+                <td><input type="text" class="table-input desc" value="${escapeXml(data.desc || '')}"></td>
+                <td><input type="number" class="table-input plus" value="${escapeXml(data.plus || '')}" step="0.1"></td>
+                <td><input type="number" class="table-input minus" value="${escapeXml(data.minus || '')}" step="0.1"></td>
+                <td><input type="number" class="table-input tol" value="${escapeXml(data.tol || '')}" step="0.01"></td>
                 <td>
                     <select class="dist">
                         <option value="常態" ${data.dist === '常態' ? 'selected' : ''}>常態</option>
