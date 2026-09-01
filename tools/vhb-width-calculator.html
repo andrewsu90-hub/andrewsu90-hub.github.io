@@ -150,14 +150,14 @@
                     </svg>
                 </div>
                 <h3>最小寬度公式</h3>
-                <span class="formula-note">設計重量(kg) = 實際面板重量(kg) × 安全係數</span>
+                <span class="formula-note">設計重量(kg) = 實際面板重量(kg) × 額外安全係數</span>
                 <span class="formula-note">最小寬度 = 設計重量(N) ÷ ( 膠帶設計應力(N/m²) × 邊框總長度(m) )</span>
                 <span class="formula-note">設計重量(N) = 設計重量(kg) × 9.8　　邊框總長度(m) = 2 × (長邊 + 短邊) ÷ 1000</span>
                 <div style="margin-top:0.85rem; padding:0.65rem 1rem; background:var(--bg-white); border-radius:var(--radius-md); border:0.5px solid var(--border-color); font-size:12px; color:var(--secondary-color); line-height:1.8;">
-                    <strong style="color:var(--primary-color);">安全係數 ~10：</strong>3M VHB Suggestion 簡報「依靜態負重計算貼合面積」頁標註，靜態負載設計時建議套用約 10 倍安全係數，假設條件為「最佳之有效貼合狀況（雙面良好沾濕）」。預設值可依實際貼合條件與風險評估調整。
+                    <strong style="color:var(--primary-color);">1.7kPa 已內含約 10 倍安全係數：</strong>3M VHB Suggestion 簡報「依靜態負重計算貼合面積」頁指出，多數 VHB 產品的設計靜態剪切力建議抓在 0.25 psi (1.7 kPa)，換算膠帶用量即「每磅負重使用 4 平方英吋（每公斤 55 平方公分）」的黃金經驗法則。這個 0.25psi 是對照簡報中「恆定負載－潛變破壞時間」曲線圖、已經抓了約 10 倍安全係數後的允許使用值，前提為最佳之有效貼合狀況（雙面良好沾濕）。也就是說，<strong>直接使用 1.7kPa 計算就已經是保守設計</strong>，不需要再自行乘上 10 倍；懸掛物、垂直面等長期承重設計仍務必嚴格遵守此上限，以避免長期潛變（creep）導致脫落。
                 </div>
                 <div style="margin-top:0.65rem; padding:0.65rem 1rem; background:var(--bg-white); border-radius:var(--radius-md); border-left: 3px solid var(--primary-color); font-size:12px; color:var(--secondary-color); line-height:1.8;">
-                    <strong style="color:var(--primary-color);">1.7kPa 的由來（3M 黃金經驗法則）：</strong>每 1 磅（lb）靜態負載，需使用 4 平方英吋（in²）背膠，即 1lb ÷ 4in² = 0.25 psi ≈ 1.7 kPa，這就是本頁預設膠帶設計應力的依據。<strong>懸掛物、垂直面等長期承重設計務必嚴格遵守此上限</strong>，以避免長期潛變（creep）導致脫落。
+                    <strong style="color:var(--primary-color);">「額外安全係數」欄位：</strong>是給您在 3M 已內含的 ~10 倍之外，視需求（動態負載、貼合品質不確定、高風險應用等）再額外疊加的保守係數，<strong>預設為 1（＝不額外加碼，採用 3M 建議值原樣）</strong>。請勿在此輸入 10，否則會與簡報已內含的安全係數重複疊加，變成實質約 100 倍、過度保守。
                 </div>
             </div>
             <div class="selector-card">
@@ -168,8 +168,8 @@
                         <input type="number" id="min-actual-weight" step="0.01" min="0" value="4" oninput="calcMin()">
                     </div>
                     <div class="field-group">
-                        <label>安全係數（3M 建議 ≈10）</label>
-                        <input type="number" id="min-safety-factor" step="0.5" min="0" value="10" oninput="calcMin()">
+                        <label>額外安全係數（預設 1）</label>
+                        <input type="number" id="min-safety-factor" step="0.5" min="0" value="1" oninput="calcMin()">
                     </div>
                     <div class="field-group">
                         <label>邊框長邊 L (mm)</label>
@@ -302,7 +302,7 @@
         const designStressKpa = parseFloat(document.getElementById('min-stress').value) || 0;
 
         if (!actualPanelWeightKg || !safetyFactor || !frameLongMm || !frameShortMm || !designStressKpa) {
-            document.getElementById('min-status').innerHTML = `<div class="status-bar neutral">請輸入實際面板重量、安全係數、邊框長短邊與膠帶設計應力</div>`;
+            document.getElementById('min-status').innerHTML = `<div class="status-bar neutral">請輸入實際面板重量、額外安全係數、邊框長短邊與膠帶設計應力</div>`;
             document.getElementById('min-result').innerHTML = '';
             document.getElementById('min-tip').innerHTML = '';
             return;
@@ -336,7 +336,7 @@
 
         document.getElementById('min-result').innerHTML = `
             <div class="result-item"><div class="label">實際面板重量</div><div class="value">${data.actualPanelWeightKg}</div><div class="unit">kg</div></div>
-            <div class="result-item"><div class="label">安全係數</div><div class="value">${data.safetyFactor}</div><div class="unit">×</div></div>
+            <div class="result-item"><div class="label">額外安全係數</div><div class="value">${data.safetyFactor}</div><div class="unit">×</div></div>
             <div class="result-item"><div class="label">設計重量</div><div class="value">${data.effectivePanelWeightKg}</div><div class="unit">kg（${data.panelWeightN} N）</div></div>
             <div class="result-item"><div class="label">邊框總長度</div><div class="value">${data.framePerimeterMm}</div><div class="unit">mm</div></div>
             <div class="result-item"><div class="label">建議貼合總面積</div><div class="value">${data.minBondingAreaCm2}</div><div class="unit">cm²</div></div>
@@ -344,7 +344,7 @@
         `;
 
         document.getElementById('min-tip').innerHTML = `
-            <strong>📌 公式</strong>　設計重量 = 實際面板重量 × 安全係數 = ${data.actualPanelWeightKg}kg × ${data.safetyFactor} = <strong>${data.effectivePanelWeightKg} kg</strong>（${data.panelWeightN} N）<br>
+            <strong>📌 公式</strong>　設計重量 = 實際面板重量 × 額外安全係數 = ${data.actualPanelWeightKg}kg × ${data.safetyFactor} = <strong>${data.effectivePanelWeightKg} kg</strong>（${data.panelWeightN} N）<br>
             最小寬度 = 設計重量(N) ÷ (膠帶設計應力(N/m²) × 邊框總長度(m)) = ${data.panelWeightN}N ÷ (${data.designStressNM2}N/m² × ${data.framePerimeterM}m) = <strong>${data.minWidthMm} mm</strong><br>
             實務選用時建議取市售規格中「大於等於」此計算值的寬度（例如算出 9.1mm 就選 10mm 或 12mm 規格）。Excel 原始資料另有「10% tolerance」備註但未接在任何公式上，如需額外安全餘裕請自行加乘。
         `;
