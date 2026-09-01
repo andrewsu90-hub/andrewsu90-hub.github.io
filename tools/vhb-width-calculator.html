@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VHB 背膠寬度計算工具 | Anzû Design Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-color: #000; --secondary-color: #666; --border-color: #e0e0e0;
+            --bg-light: #f9f9f9; --bg-white: #ffffff;
+            --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+            --accent: #1a1a2e; --warn: #c62828; --ok: #2e7d32;
+            --tape: rgba(0,0,0,0.32);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root { --primary-color: #fff; --secondary-color: #aaa; --border-color: #333; --bg-light: #1a1a1a; --bg-white: #0d0d0d; --warn: #ef5350; --ok: #66bb6a; --tape: rgba(255,255,255,0.32); }
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--primary-color); background-color: var(--bg-white); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        header { position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 5%; border-bottom: 0.5px solid var(--border-color); background-color: rgba(255,255,255,0.92); backdrop-filter: blur(8px); }
+        @media (prefers-color-scheme: dark) { header { background-color: rgba(13,13,13,0.92); } }
+        .logo { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; text-decoration: none; color: var(--primary-color); }
+        .back-link { font-size: 14px; color: var(--secondary-color); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+        .back-link:hover { color: var(--primary-color); }
+        .hero { padding: 4rem 5% 2rem; max-width: 1000px; margin: 0 auto; animation: fadeInDown 0.6s ease; }
+        .hero-label { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--secondary-color); margin-bottom: 0.75rem; }
+        .hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+        .hero p { font-size: 15px; color: var(--secondary-color); line-height: 1.8; }
+        .source-note { display: inline-block; margin-top: 0.75rem; font-size: 12px; color: var(--secondary-color); background-color: var(--bg-light); border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 4px 12px; }
+
+        .calc-section { padding: 1rem 5% 5rem; max-width: 1000px; margin: 0 auto; animation: fadeInUp 0.7s ease; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 4px; margin-bottom: 1rem; border-bottom: 0.5px solid var(--border-color); overflow-x: auto; scrollbar-width: thin; }
+        .tab { padding: 10px 20px; border: none; background: transparent; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--secondary-color); border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
+        .tab:hover { color: var(--primary-color); }
+        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
+
+        /* Cards */
+        .selector-card { background-color: var(--bg-light); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); padding: 1.75rem; margin-bottom: 1rem; }
+        .selector-card h2 { font-size: 15px; font-weight: 700; margin-bottom: 1.25rem; color: var(--primary-color); letter-spacing: 0.5px; }
+        .selector-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
+        .field-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        .field-group label { font-size: 12px; font-weight: 600; color: var(--secondary-color); letter-spacing: 0.3px; }
+        .field-group select, .field-group input { padding: 9px 12px; border: 0.5px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; color: var(--primary-color); background-color: var(--bg-white); cursor: pointer; transition: border-color 0.2s; }
+        .field-group select:focus, .field-group input:focus { outline: none; border-color: var(--primary-color); }
+        .method-card { background-color: var(--bg-light); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); padding: 1.75rem; margin-bottom: 1rem; }
+        .method-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 1rem; color: var(--primary-color); }
+        .formula-note { display: block; font-size: 12px; color: var(--secondary-color); font-weight: 400; margin-top: 0.35rem; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .result-card { background-color: var(--bg-white); border-radius: var(--radius-lg); border: 0.5px solid var(--border-color); padding: 1.75rem; margin-bottom: 1rem; }
+        .result-card h2 { font-size: 13px; font-weight: 700; color: var(--secondary-color); margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 1px; }
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.85rem; margin-bottom: 1rem; }
+        .result-item { background-color: var(--bg-light); border-radius: var(--radius-md); border: 0.5px solid var(--border-color); padding: 1.1rem 1rem; text-align: center; }
+        .result-item .label { font-size: 11.5px; color: var(--secondary-color); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.3px; }
+        .result-item .value { font-size: 22px; font-weight: 700; color: var(--primary-color); line-height: 1; }
+        .result-item .unit { font-size: 12px; color: var(--secondary-color); margin-top: 4px; }
+        .result-item.highlight { border-color: var(--primary-color); background-color: var(--primary-color); }
+        .result-item.highlight .label, .result-item.highlight .value, .result-item.highlight .unit { color: var(--bg-white); }
+        .result-item.warn { border-color: var(--warn); }
+        .result-item.warn .value { color: var(--warn); }
+        .status-bar { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 0.75rem; }
+        .status-bar.ok { background-color: rgba(46,125,50,0.1); color: var(--ok); border: 0.5px solid var(--ok); }
+        .status-bar.warn { background-color: rgba(198,40,40,0.1); color: var(--warn); border: 0.5px solid var(--warn); }
+        .status-bar.neutral { background-color: var(--bg-light); color: var(--secondary-color); border: 0.5px solid var(--border-color); }
+        .tip-box { background-color: var(--bg-light); border-radius: var(--radius-md); border-left: 3px solid var(--primary-color); padding: 0.85rem 1.1rem; font-size: 12.5px; color: var(--secondary-color); line-height: 1.75; }
+        .tip-box strong { color: var(--primary-color); }
+
+        /* Diagram */
+        .diagram-wrap { display: flex; justify-content: center; margin-bottom: 1rem; }
+        .diagram-wrap svg { width: 100%; max-width: 420px; height: auto; display: block; }
+        .diagram-svg text { font-family: 'Noto Sans TC', -apple-system, sans-serif; }
+
+        footer { padding: 1.5rem 5%; border-top: 0.5px solid var(--border-color); text-align: center; font-size: 13px; color: var(--secondary-color); }
+
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (max-width: 600px) {
+            .selector-grid { grid-template-columns: 1fr 1fr; }
+            .result-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .api-status.loading { background: #fdfae6; color: #d35400; }
+        .api-status.error { background: #fdf3f2; color: #c0392b; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../index.html" class="logo">Anzû Design Studio</a>
+        <a href="engineering-calculators.html" class="back-link">← 返回工具選單</a>
+    </header>
+
+    <section class="hero">
+        <div class="hero-label">工程計算工具</div>
+        <h1>📏 VHB 背膠寬度計算工具</h1>
+        <p>依 3M VHB 設計應力反推面板貼合所需的最小背膠寬度，並可反向驗算已選寬度下的可承受重量，取代人工 Excel 查表。</p>
+        <span class="source-note">資料來源：3M VHB 寬度計算 Excel（面板重量 ÷ 設計應力 × 邊框總長度）</span>
+    </section>
+
+    <section class="calc-section">
+
+        <!-- Sub-tabs -->
+        <div class="tabs" role="tablist">
+            <button class="tab active" data-tab="t-min" onclick="switchTab('t-min')">最小寬度設計</button>
+            <button class="tab" data-tab="t-cap" onclick="switchTab('t-cap')">可承受重量驗算</button>
+        </div>
+
+        <!-- TAB 1: 最小寬度設計 -->
+        <div class="tab-panel active" id="t-min">
+            <div class="method-card">
+                <h3>示意圖：面板邊框與 VHB 背膠貼合範圍</h3>
+                <div class="diagram-wrap">
+                    <svg class="diagram-svg" viewBox="0 0 460 270" role="img" aria-label="面板邊框與VHB背膠寬度示意圖">
+                        <defs>
+                            <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                                <path d="M0,0 L8,4 L0,8 Z" fill="var(--secondary-color)"/>
+                            </marker>
+                            <marker id="arrow-r" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse">
+                                <path d="M0,0 L8,4 L0,8 Z" fill="var(--secondary-color)"/>
+                            </marker>
+                        </defs>
+                        <!-- 面板外框 -->
+                        <rect x="70" y="46" width="280" height="150" fill="none" stroke="var(--primary-color)" stroke-width="2"/>
+                        <!-- VHB 背膠帶：沿四周內緣貼合 -->
+                        <rect x="70" y="46" width="280" height="150" fill="none" stroke="var(--tape)" stroke-width="13"/>
+                        <text x="210" y="128" text-anchor="middle" font-size="12" fill="var(--secondary-color)">面板</text>
+
+                        <!-- 長邊標註 -->
+                        <line x1="70" y1="28" x2="350" y2="28" stroke="var(--secondary-color)" stroke-width="1" marker-start="url(#arrow-r)" marker-end="url(#arrow)"/>
+                        <text x="210" y="20" text-anchor="middle" font-size="12" fill="var(--secondary-color)">長邊 L (mm)</text>
+
+                        <!-- 短邊標註 -->
+                        <line x1="372" y1="46" x2="372" y2="196" stroke="var(--secondary-color)" stroke-width="1" marker-start="url(#arrow-r)" marker-end="url(#arrow)"/>
+                        <text x="416" y="125" text-anchor="middle" font-size="12" fill="var(--secondary-color)" transform="rotate(90 416 125)">短邊 S (mm)</text>
+
+                        <!-- 背膠寬度放大標註 -->
+                        <line x1="90" y1="224" x2="90" y2="238" stroke="var(--secondary-color)" stroke-width="1"/>
+                        <line x1="103" y1="224" x2="103" y2="238" stroke="var(--secondary-color)" stroke-width="1"/>
+                        <line x1="90" y1="231" x2="103" y2="231" stroke="var(--secondary-color)" stroke-width="1" marker-start="url(#arrow-r)" marker-end="url(#arrow)"/>
+                        <rect x="83" y="224" width="27" height="14" fill="var(--tape)"/>
+                        <text x="118" y="235" font-size="12" fill="var(--secondary-color)">背膠寬度（沿四周貼合）</text>
+                    </svg>
+                </div>
+                <h3>最小寬度公式</h3>
+                <span class="formula-note">最小寬度 = 面板重量(N) ÷ ( 膠帶設計應力(N/m²) × 邊框總長度(m) )</span>
+                <span class="formula-note">面板重量(N) = 面板重量(kg) × 9.8　　邊框總長度(m) = 2 × (長邊 + 短邊) ÷ 1000</span>
+            </div>
+            <div class="selector-card">
+                <h2>輸入參數</h2>
+                <div class="selector-grid">
+                    <div class="field-group">
+                        <label>面板重量 (kg)</label>
+                        <input type="number" id="min-weight" step="0.01" min="0" value="4" oninput="calcMin()">
+                    </div>
+                    <div class="field-group">
+                        <label>邊框長邊 L (mm)</label>
+                        <input type="number" id="min-long" step="0.1" min="0" value="536" oninput="calcMin()">
+                    </div>
+                    <div class="field-group">
+                        <label>邊框短邊 S (mm)</label>
+                        <input type="number" id="min-short" step="0.1" min="0" value="327" oninput="calcMin()">
+                    </div>
+                    <div class="field-group">
+                        <label>膠帶設計應力 (kPa)</label>
+                        <input type="number" id="min-stress" step="0.01" min="0" value="1.7" oninput="calcMin()">
+                    </div>
+                </div>
+            </div>
+            <div class="result-card">
+                <h2>最小寬度計算結果</h2>
+                <div id="min-status"></div>
+                <div class="result-grid" id="min-result"></div>
+                <div class="tip-box" id="min-tip"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: 可承受重量驗算 -->
+        <div class="tab-panel" id="t-cap">
+            <div class="method-card">
+                <h3>可承受重量公式</h3>
+                <span class="formula-note">可承受重量(kg) = 總貼合面積(cm²) ÷ 設計比值(cm²/kg)</span>
+                <span class="formula-note">總貼合面積(cm²) = (長邊 × 背膠寬度 × 2) / 100 + (短邊 × 背膠寬度 × 2) / 100　　（四周皆貼，兩長邊 + 兩短邊）</span>
+                <div style="margin-top:0.85rem; padding:0.65rem 1rem; background:var(--bg-white); border-radius:var(--radius-md); border:0.5px solid var(--border-color); font-size:12px; color:var(--secondary-color); line-height:1.8;">
+                    用於驗算「已選定」的背膠寬度是否能承受面板重量，與「最小寬度設計」互為正反算：先用左側分頁算出最小寬度，實際選用寬度（含裁切/庫存規格修整後的值）再回這裡驗算可承受重量。
+                </div>
+            </div>
+            <div class="selector-card">
+                <h2>輸入參數</h2>
+                <div class="selector-grid">
+                    <div class="field-group">
+                        <label>背膠寬度（已選定，mm）</label>
+                        <input type="number" id="cap-width" step="0.1" min="0" value="13" oninput="calcCap()">
+                    </div>
+                    <div class="field-group">
+                        <label>邊框長邊 L (mm)</label>
+                        <input type="number" id="cap-long" step="0.1" min="0" value="536" oninput="calcCap()">
+                    </div>
+                    <div class="field-group">
+                        <label>邊框短邊 S (mm)</label>
+                        <input type="number" id="cap-short" step="0.1" min="0" value="327" oninput="calcCap()">
+                    </div>
+                    <div class="field-group">
+                        <label>設計比值 (cm²/kg)</label>
+                        <input type="number" id="cap-ratio" step="0.1" min="0" value="55" oninput="calcCap()">
+                    </div>
+                </div>
+            </div>
+            <div class="result-card">
+                <h2>可承受重量計算結果</h2>
+                <div id="cap-status"></div>
+                <div class="result-grid" id="cap-result"></div>
+                <div class="tip-box" id="cap-tip"></div>
+            </div>
+        </div>
+
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Anzû Mechanical &amp; Product Design Studio. All rights reserved.</p>
+    </footer>
+
+    <div class="api-status" id="api-status" style="display:none;">計算中...</div>
+
+    <script>
+    /* =========================================================
+       計算邏輯已搬到伺服器端，前端只送輸入、收結果並渲染
+       ========================================================= */
+    const API_BASE_URL = "https://anzu-calc-api.onrender.com";
+
+    function setApiStatus(state, msg) {
+        const el = document.getElementById('api-status');
+        el.style.display = 'block';
+        el.className = 'api-status' + (state ? ' ' + state : '');
+        el.textContent = msg || (state === 'loading' ? '計算中...' : state === 'error' ? '⚠ API 連線失敗' : '✓ 已連線');
+        if (state === 'ok') setTimeout(() => { el.style.display = 'none'; }, 1200);
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelector(`.tab[data-tab="${id}"]`).classList.add('active');
+        document.getElementById(id).classList.add('active');
+    }
+
+    // ============================================================
+    // 模式一：最小寬度設計
+    // ============================================================
+    async function calcMin() {
+        const panelWeightKg = parseFloat(document.getElementById('min-weight').value) || 0;
+        const frameLongMm = parseFloat(document.getElementById('min-long').value) || 0;
+        const frameShortMm = parseFloat(document.getElementById('min-short').value) || 0;
+        const designStressKpa = parseFloat(document.getElementById('min-stress').value) || 0;
+
+        if (!panelWeightKg || !frameLongMm || !frameShortMm || !designStressKpa) {
+            document.getElementById('min-status').innerHTML = `<div class="status-bar neutral">請輸入面板重量、邊框長短邊與膠帶設計應力</div>`;
+            document.getElementById('min-result').innerHTML = '';
+            document.getElementById('min-tip').innerHTML = '';
+            return;
+        }
+
+        let data;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(`${API_BASE_URL}/api/vhb-width/min-width`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ panelWeightKg, frameLongMm, frameShortMm, designStressKpa })
+            });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            data = await res.json();
+            setApiStatus('ok');
+        } catch (err) {
+            console.error('vhb-width/min-width API 失敗', err);
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+            return;
+        }
+
+        if (!data.valid) {
+            document.getElementById('min-status').innerHTML = `<div class="status-bar warn">${data.message}</div>`;
+            document.getElementById('min-result').innerHTML = '';
+            document.getElementById('min-tip').innerHTML = '';
+            return;
+        }
+
+        document.getElementById('min-status').innerHTML = `<div class="status-bar ok">✓ 已算出最小背膠寬度</div>`;
+
+        document.getElementById('min-result').innerHTML = `
+            <div class="result-item"><div class="label">面板重量</div><div class="value">${data.panelWeightN}</div><div class="unit">N</div></div>
+            <div class="result-item"><div class="label">邊框總長度</div><div class="value">${data.framePerimeterMm}</div><div class="unit">mm</div></div>
+            <div class="result-item"><div class="label">膠帶設計應力</div><div class="value">${data.designStressNM2}</div><div class="unit">N/m²</div></div>
+            <div class="result-item"><div class="label">建議貼合總面積</div><div class="value">${data.minBondingAreaCm2}</div><div class="unit">cm²</div></div>
+            <div class="result-item highlight"><div class="label">最小背膠寬度</div><div class="value">${data.minWidthMm}</div><div class="unit">mm</div></div>
+        `;
+
+        document.getElementById('min-tip').innerHTML = `
+            <strong>📌 公式</strong>　最小寬度 = 面板重量(N) ÷ (膠帶設計應力(N/m²) × 邊框總長度(m))<br>
+            = ${data.panelWeightN}N ÷ (${data.designStressNM2}N/m² × ${data.framePerimeterM}m) = <strong>${data.minWidthMm} mm</strong><br>
+            實務選用時建議取市售規格中「大於等於」此計算值的寬度（例如算出 9.1mm 就選 10mm 或 12mm 規格）。Excel 原始資料另有「10% tolerance」備註但未接在任何公式上，如需額外安全餘裕請自行加乘。
+        `;
+    }
+
+    // ============================================================
+    // 模式二：可承受重量驗算
+    // ============================================================
+    async function calcCap() {
+        const tapeWidthMm = parseFloat(document.getElementById('cap-width').value) || 0;
+        const frameLongMm = parseFloat(document.getElementById('cap-long').value) || 0;
+        const frameShortMm = parseFloat(document.getElementById('cap-short').value) || 0;
+        const areaPerKgCm2 = parseFloat(document.getElementById('cap-ratio').value) || 0;
+
+        if (!tapeWidthMm || !frameLongMm || !frameShortMm || !areaPerKgCm2) {
+            document.getElementById('cap-status').innerHTML = `<div class="status-bar neutral">請輸入背膠寬度、邊框長短邊與設計比值</div>`;
+            document.getElementById('cap-result').innerHTML = '';
+            document.getElementById('cap-tip').innerHTML = '';
+            return;
+        }
+
+        let data;
+        try {
+            setApiStatus('loading');
+            const res = await fetch(`${API_BASE_URL}/api/vhb-width/capacity`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tapeWidthMm, frameLongMm, frameShortMm, areaPerKgCm2 })
+            });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            data = await res.json();
+            setApiStatus('ok');
+        } catch (err) {
+            console.error('vhb-width/capacity API 失敗', err);
+            setApiStatus('error', '⚠ 無法連線到計算伺服器，請確認 API_BASE_URL 設定');
+            return;
+        }
+
+        if (!data.valid) {
+            document.getElementById('cap-status').innerHTML = `<div class="status-bar warn">${data.message}</div>`;
+            document.getElementById('cap-result').innerHTML = '';
+            document.getElementById('cap-tip').innerHTML = '';
+            return;
+        }
+
+        document.getElementById('cap-status').innerHTML = `<div class="status-bar ok">✓ 已算出可承受重量</div>`;
+
+        document.getElementById('cap-result').innerHTML = `
+            <div class="result-item"><div class="label">兩長邊貼合面積</div><div class="value">${data.longEdgeAreaCm2}</div><div class="unit">cm²</div></div>
+            <div class="result-item"><div class="label">兩短邊貼合面積</div><div class="value">${data.shortEdgeAreaCm2}</div><div class="unit">cm²</div></div>
+            <div class="result-item"><div class="label">總貼合面積</div><div class="value">${data.totalAreaCm2}</div><div class="unit">cm²</div></div>
+            <div class="result-item highlight"><div class="label">可承受重量</div><div class="value">${data.capacityKg}</div><div class="unit">kg</div></div>
+        `;
+
+        document.getElementById('cap-tip').innerHTML = `
+            <strong>📌 公式</strong>　總貼合面積 = 長邊×寬度×2/100 + 短邊×寬度×2/100 = <strong>${data.totalAreaCm2} cm²</strong><br>
+            可承受重量 = ${data.totalAreaCm2}cm² ÷ ${document.getElementById('cap-ratio').value}cm²/kg = <strong>${data.capacityKg} kg</strong><br>
+            設計比值 55 cm²/kg 為 3M 建議值，與左側分頁 1.7kPa 換算值（≈57.8 cm²/kg）略有差異，此處採 Excel 原始設計依據之 55。
+        `;
+    }
+
+    // 初始化：載入即以預設值算一次
+    calcMin();
+    calcCap();
+    </script>
+</body>
+</html>
