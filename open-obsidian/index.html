@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>開啟 Obsidian</title>
+</head>
+<body>
+  <h2>正在開啟 Obsidian…</h2>
+  <p>如果沒有自動開啟，請按下面的按鈕。</p>
+  <button id="open">開啟 Obsidian 筆記</button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const vault = params.get("vault");
+    const file = params.get("file");
+    const button = document.getElementById("open");
+
+    if (!vault || !file) {
+      document.body.innerHTML = "<p>缺少 vault 或 file 參數。</p>";
+    } else {
+      const obsidianUrl =
+        "obsidian://open?vault=" + encodeURIComponent(vault) +
+        "&file=" + encodeURIComponent(file);
+
+      button.addEventListener("click", () => {
+        window.location.href = obsidianUrl;
+      });
+
+      setTimeout(() => {
+        window.location.href = obsidianUrl;
+      }, 300);
+    }
+  </script>
+</body>
+</html>
