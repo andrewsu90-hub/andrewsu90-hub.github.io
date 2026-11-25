@@ -20,5 +20,16 @@
     ],
     "href": "teardown/axis-spcel02/index.html",
     "thumb": "image/teardown-axis-spcel02.webp"
+  },
+  {
+    "id": "spcel02",
+    "title": "SPCEL02 3D Teardown",
+    "desc": "Interactive 3D explode / teardown simulator: exploded views, section cuts, subsystem isolation and guided tour.",
+    "tags": [
+      "3D Teardown",
+      "Explode View"
+    ],
+    "href": "teardown/spcel02/index.html",
+    "thumb": "image/teardown-spcel02.webp"
   }
 ]
