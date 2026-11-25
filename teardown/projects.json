@@ -10,5 +10,16 @@
     ],
     "href": "teardown/spcel02/index.html",
     "thumb": "image/teardown-spcel02.webp"
+  },
+  {
+    "id": "alio-asm",
+    "title": "ALIO ASM 3D Teardown",
+    "desc": "Interactive 3D explode / teardown simulator.",
+    "tags": [
+      "3D Teardown",
+      "Explode View"
+    ],
+    "href": "teardown/alio-asm/index.html",
+    "thumb": "image/teardown-alio-asm.webp"
   }
 ]
