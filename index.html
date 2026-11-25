@@ -1021,7 +1021,7 @@
                             <p style="font-size:12px;color:var(--secondary-color);margin:0;">dfm.mp4</p>
                         </div>
                     </div>
-                    <a href="tools/ecn_generator.html" target="_blank" rel="noopener" class="dfm-tool-card">
+                    <a href="tools/ecn_generator.html" class="dfm-tool-card">
                         <div class="dfm-status-dot" title="Online"></div>
                         <div class="dfm-tool-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14,3 14,8 19,8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
@@ -1124,7 +1124,12 @@
         function openKinematicVideoModal(e) { e.preventDefault(); document.getElementById('kinematicVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
         function closeKinematicVideoModal() { document.getElementById('kinematicVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
         function openDfmVideoModal(e) { e.preventDefault(); document.getElementById('dfmVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-        if (location.hash === '#dfm') { window.addEventListener('DOMContentLoaded', function () { openDfmVideoModal({ preventDefault: function () {} }); }); }
+        (function () {
+            function openFromHash() { if (location.hash === '#dfm') openDfmVideoModal({ preventDefault: function () {} }); }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', openFromHash); else openFromHash();
+            window.addEventListener('hashchange', openFromHash);
+            window.addEventListener('pageshow', function (e) { if (e.persisted) openFromHash(); });
+        })();
         function closeDfmVideoModal() { document.getElementById('dfmVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
         function openInjectionVideoModal(e) { e.preventDefault(); document.getElementById('injectionVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
         function closeInjectionVideoModal() { document.getElementById('injectionVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
