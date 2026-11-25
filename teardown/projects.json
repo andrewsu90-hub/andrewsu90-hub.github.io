@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "alio-asm",
+    "title": "ALIO ASM 3D Teardown",
+    "desc": "Interactive 3D explode / teardown simulator: exploded views, section cuts, subsystem isolation and guided tour.",
+    "tags": [
+      "3D Teardown",
+      "Explode View"
+    ],
+    "href": "teardown/alio-asm/index.html",
+    "thumb": "image/teardown-alio-asm.webp"
+  }
+]
