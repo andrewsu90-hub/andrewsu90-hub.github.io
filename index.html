@@ -1032,6 +1032,13 @@
                         <div class="dfm-tool-tags"><span>ECN</span><span>Change Control</span><span>PDF / DOCX</span></div>
                         <div class="dfm-tool-link">Open Tool <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></div>
                     </a>
+                    <a href="teardown/index.html" class="dfm-tool-card">
+                        <img class="dfm-thumb" src="image/teardown-spcel02.webp" alt="3D teardown simulator" loading="lazy">
+                        <h3>Teardown</h3>
+                        <p>Interactive 3D explode / teardown simulators generated from STEP assemblies: exploded views, section cuts, subsystem isolation, guided tour.</p>
+                        <div class="dfm-tool-tags"><span>3D Teardown</span><span>Explode View</span><span>STEP Assembly</span></div>
+                        <div class="dfm-tool-link">Open <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -1125,21 +1132,6 @@
         function openKinematicVideoModal(e) { e.preventDefault(); document.getElementById('kinematicVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
         function closeKinematicVideoModal() { document.getElementById('kinematicVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
         function openDfmVideoModal(e) { e.preventDefault(); document.getElementById('dfmVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-        (function () {
-            fetch('teardown/projects.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : []; }).then(function (list) {
-                var grid = document.getElementById('dfmVideoGrid'); if (!grid || !Array.isArray(list)) return;
-                list.forEach(function (it) {
-                    var a = document.createElement('a'); a.className = 'dfm-tool-card'; a.href = it.href;
-                    if (it.thumb) { var im = document.createElement('img'); im.className = 'dfm-thumb'; im.src = it.thumb; im.alt = it.title; im.loading = 'lazy'; a.appendChild(im); }
-                    var h = document.createElement('h3'); h.textContent = it.title; a.appendChild(h);
-                    var p = document.createElement('p'); p.textContent = it.desc || ''; a.appendChild(p);
-                    var t = document.createElement('div'); t.className = 'dfm-tool-tags';
-                    (it.tags || []).forEach(function (x) { var sp = document.createElement('span'); sp.textContent = x; t.appendChild(sp); }); a.appendChild(t);
-                    var l = document.createElement('div'); l.className = 'dfm-tool-link'; l.innerHTML = 'Open Tool <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg>'; a.appendChild(l);
-                    grid.appendChild(a);
-                });
-            }).catch(function () {});
-        })();
         (function () {
             function openFromHash() { if (location.hash === '#dfm') openDfmVideoModal({ preventDefault: function () {} }); }
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', openFromHash); else openFromHash();
