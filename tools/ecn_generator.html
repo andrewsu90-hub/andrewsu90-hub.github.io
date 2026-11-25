@@ -1,7 +1,15 @@
 <!DOCTYPE html>
+<!--
+  ECN 設計變更通知書產生器 / ECN Generator
+  © 2026 Anzû Design Studio (ANZU). All rights reserved. 保留所有權利。
+  未經書面同意，不得複製、修改、散布或用於商業用途。
+  Unauthorized copying, modification, distribution or commercial use is prohibited.
+-->
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<meta name="author" content="ANZU">
+<meta name="copyright" content="© 2026 Anzû Design Studio. All rights reserved.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ECN 設計變更通知書產生器</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,6 +35,8 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:14px;line-height:1.5}
 .sticky-top{position:sticky;top:0;z-index:30}
+.sitefoot{padding:18px 16px 26px;text-align:center;font-size:12px;color:var(--muted)}
+.printmark{display:none}
 header.site{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 3%;border-bottom:.5px solid var(--line);background:var(--panel);backdrop-filter:blur(14px)}
 header.site .logo{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;color:var(--ink);text-decoration:none}
 header.site .back{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:var(--ink);text-decoration:none;transition:color .2s}
@@ -81,7 +91,8 @@ textarea{resize:vertical;min-height:50px}
 @media print{
   @page{size:A4;margin:12mm}
   html,body{background:#fff !important}
-  .sticky-top,.form,.toast,#pv{display:none !important}
+  .sticky-top,.form,.toast,#pv,.sitefoot{display:none !important}
+  .printmark{display:block;position:fixed;bottom:-9mm;left:0;right:0;text-align:center;font-size:8pt;color:#8a8a8a}
   main{display:block;padding:0}
   .previewwrap{position:static}
   .previewbox{overflow:visible;max-height:none;border:0;background:#fff;padding:0}
@@ -179,6 +190,8 @@ textarea{resize:vertical;min-height:50px}
     <div class="previewbox" id="pbox"><div id="zoomer"><div id="paper"></div></div></div>
   </div>
 </main>
+<footer class="sitefoot">© 2026 Anzû Design Studio · ANZU. All rights reserved.</footer>
+<div class="printmark">© 2026 Anzû Design Studio · ANZU</div>
 <div id="pv" hidden role="dialog" aria-label="預覽列印">
   <div class="pvbar"><b>預覽列印（A4）</b><button id="pvPdf" class="primary">匯出 PDF</button><button id="pvClose">關閉</button></div>
   <div id="pvPages"></div>
@@ -468,7 +481,9 @@ async function renderPages(){
 }
 function pagesToPdf(pages){
   var pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4"});
-  pages.forEach(function(p,i){if(i>0)pdf.addPage();pdf.addImage(p.url,"JPEG",0,p.y,210,p.h);});
+  pdf.setProperties({title:"ECN",author:"ANZU",creator:"Anzû Design Studio ECN Generator",subject:"© 2026 Anzû Design Studio. All rights reserved."});
+  pages.forEach(function(p,i){if(i>0)pdf.addPage();pdf.addImage(p.url,"JPEG",0,p.y,210,p.h);
+    pdf.setFontSize(7);pdf.setTextColor(140,140,140);pdf.text("© 2026 Anzû Design Studio · ANZU  |  "+(i+1)+" / "+pages.length,105,291,{align:"center"});});
   return pdf.output("blob");
 }
 async function busy(btn,label,fn){
@@ -573,7 +588,8 @@ async function exportDocx(){
     var arows=[new D.TableRow({children:["部門／職稱","會簽意見","簽名","日期"].map(function(t,i){return cell([para(t,{bold:true,align:D.AlignmentType.CENTER})],{fill:HF,w:[24,44,16,16][i]});})})];
     S.approvals.forEach(function(a){arows.push(new D.TableRow({cantSplit:true,children:[cell([para(a.role,{bold:true})]),cell([para(a.opinion)]),cell(a.people.map(function(p){return para(p.sign||" ");})),cell(a.people.map(function(p){return para(p.date||" ");}))]}));});
     kids.push(tbl(arows));
-    var doc=new D.Document({creator:"ANZU",title:S.docNo,sections:[{properties:{page:{margin:{top:900,bottom:900,left:900,right:900}}},children:kids}]});
+    var foot=new D.Footer({children:[new D.Paragraph({alignment:D.AlignmentType.CENTER,children:[new D.TextRun({text:"© 2026 Anzû Design Studio · ANZU",size:14,color:"8C8C8C"})]})]});
+    var doc=new D.Document({creator:"ANZU",title:S.docNo,description:"© 2026 Anzû Design Studio. All rights reserved.",sections:[{footers:{default:foot},properties:{page:{margin:{top:900,bottom:900,left:900,right:900}}},children:kids}]});
     var blob=await D.Packer.toBlob(doc);
     await saveFile(fname("docx"),blob);
   }catch(e){toast("Word 產生失敗，請重試。");}
