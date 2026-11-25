@@ -89,10 +89,10 @@ textarea{resize:vertical;min-height:50px}
 
 
 @media print{
-  @page{size:A4;margin:12mm}
+  @page{size:A4;margin:12mm;@bottom-center{content:"© 2026 Anzû Design Studio · ANZU";font-size:8pt;color:#8a8a8a}}
   html,body{background:#fff !important}
   .sticky-top,.form,.toast,#pv,.sitefoot{display:none !important}
-  .printmark{display:block;position:fixed;bottom:-9mm;left:0;right:0;text-align:center;font-size:8pt;color:#8a8a8a}
+  .printmark{display:none !important}
   main{display:block;padding:0}
   .previewwrap{position:static}
   .previewbox{overflow:visible;max-height:none;border:0;background:#fff;padding:0}
