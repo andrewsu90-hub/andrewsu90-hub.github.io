@@ -1124,6 +1124,7 @@
         function openKinematicVideoModal(e) { e.preventDefault(); document.getElementById('kinematicVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
         function closeKinematicVideoModal() { document.getElementById('kinematicVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
         function openDfmVideoModal(e) { e.preventDefault(); document.getElementById('dfmVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        if (location.hash === '#dfm') { window.addEventListener('DOMContentLoaded', function () { openDfmVideoModal({ preventDefault: function () {} }); }); }
         function closeDfmVideoModal() { document.getElementById('dfmVideoModal').style.display = 'none'; document.body.style.overflow = ''; }
         function openInjectionVideoModal(e) { e.preventDefault(); document.getElementById('injectionVideoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
         function closeInjectionVideoModal() { document.getElementById('injectionVideoModal').style.display = 'none'; document.body.style.overflow = ''; }

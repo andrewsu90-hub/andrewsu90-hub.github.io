@@ -5,28 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ECN 設計變更通知書產生器</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&family=Montserrat:wght@700&display=swap" rel="stylesheet">
 <style>
 /* layout: left = input form, right = live A4 preview; work-bench feel, one steel-blue accent */
 :root{
-  --bg:#f2f4f6; --panel:#ffffff; --ink:#1c2630; --muted:#5d6b78; --line:#d5dbe1;
-  --accent:#1f5f8b; --accent-ink:#ffffff; --warn:#b4531a; --field:#f8fafb;
+  --bg:#f9f9f9; --panel:#ffffff; --ink:#111111; --muted:#666666; --line:#e0e0e0;
+  --accent:#E67E22; --accent-ink:#1a0f05; --warn:#b4531a; --field:#f9f9f9;
   --font-ui:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; --font-mono:"IBM Plex Mono",ui-monospace,monospace;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#141a20; --panel:#1c242c; --ink:#e6ebf0; --muted:#97a4b0; --line:#2f3b46;
-    --accent:#5aa7d6; --accent-ink:#0c1a24; --warn:#e08a52; --field:#121920; color-scheme:dark;
+    --bg:#0d0d0d; --panel:#181818; --ink:#f0f0f0; --muted:#a3a3a3; --line:#333333;
+    --accent:#E67E22; --accent-ink:#1a0f05; --warn:#e08a52; --field:#121212; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#141a20; --panel:#1c242c; --ink:#e6ebf0; --muted:#97a4b0; --line:#2f3b46;
-  --accent:#5aa7d6; --accent-ink:#0c1a24; --warn:#e08a52; --field:#121920; color-scheme:dark;
+  --bg:#0d0d0d; --panel:#181818; --ink:#f0f0f0; --muted:#a3a3a3; --line:#333333;
+  --accent:#E67E22; --accent-ink:#1a0f05; --warn:#e08a52; --field:#121212; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:14px;line-height:1.5}
-header.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.sticky-top{position:sticky;top:0;z-index:30}
+header.site{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 3%;border-bottom:.5px solid var(--line);background:var(--panel);backdrop-filter:blur(14px)}
+header.site .logo{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;color:var(--ink);text-decoration:none}
+header.site .back{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:var(--ink);text-decoration:none;transition:color .2s}
+header.site .back:hover{color:var(--accent)}
+header.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
 header.bar h1{font-size:16px;margin:0;font-weight:700;text-wrap:balance}
 .mark{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;color:var(--accent);border:1px solid var(--accent);padding:1px 7px;border-radius:3px}
 .spacer{flex:1}
@@ -56,9 +61,9 @@ textarea{resize:vertical;min-height:50px}
 .imgrow{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
 .imgrow img{max-height:54px;max-width:96px;border:1px solid var(--line);border-radius:3px;background:#fff}
 .hint{color:var(--muted);font-size:12px;margin:4px 0 0}
-.previewwrap{min-width:0;position:sticky;top:64px}
+.previewwrap{min-width:0;position:sticky;top:calc(var(--top,120px) + 8px)}
 @media (max-width:900px){.previewwrap{position:static}}
-.previewbox{overflow:auto;border:1px solid var(--line);border-radius:8px;background:#8d98a3;padding:12px;max-height:calc(100vh - 100px)}
+.previewbox{overflow:auto;border:1px solid var(--line);border-radius:8px;background:#8d98a3;padding:12px;max-height:calc(100vh - var(--top,120px) - 32px)}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:13px;display:none;z-index:9;max-width:90vw}
 
 
@@ -76,7 +81,7 @@ textarea{resize:vertical;min-height:50px}
 @media print{
   @page{size:A4;margin:12mm}
   html,body{background:#fff !important}
-  header.bar,.form,.toast,#pv{display:none !important}
+  .sticky-top,.form,.toast,#pv{display:none !important}
   main{display:block;padding:0}
   .previewwrap{position:static}
   .previewbox{overflow:visible;max-height:none;border:0;background:#fff;padding:0}
@@ -109,6 +114,11 @@ textarea{resize:vertical;min-height:50px}
 </style>
 </head>
 <body>
+<div class="sticky-top">
+<header class="site">
+  <a class="logo" href="../index.html">Anzû Design Studio</a>
+  <a class="back" href="../index.html#dfm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>回到工具選單</a>
+</header>
 <header class="bar">
   <h1>ECN 設計變更通知書產生器</h1><span class="mark">ANZU</span>
   <span class="spacer"></span>
@@ -122,6 +132,10 @@ textarea{resize:vertical;min-height:50px}
   <button id="btnPdf" class="primary">匯出 PDF</button>
   <button id="btnDocx" class="primary">匯出 Word</button>
 </header>
+</div>
+<script>
+(function(){var w=document.querySelector('.sticky-top');function f(){document.documentElement.style.setProperty('--top',w.offsetHeight+'px')}f();addEventListener('resize',f);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(f)})();
+</script>
 <main>
   <div class="form">
     <fieldset><legend>基本資訊</legend>
