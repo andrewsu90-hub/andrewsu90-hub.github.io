@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECN 設計變更通知書產生器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* layout: left = input form, right = live A4 preview; work-bench feel, one steel-blue accent */
+:root{
+  --bg:#f2f4f6; --panel:#ffffff; --ink:#1c2630; --muted:#5d6b78; --line:#d5dbe1;
+  --accent:#1f5f8b; --accent-ink:#ffffff; --warn:#b4531a; --field:#f8fafb;
+  --font-ui:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; --font-mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141a20; --panel:#1c242c; --ink:#e6ebf0; --muted:#97a4b0; --line:#2f3b46;
+    --accent:#5aa7d6; --accent-ink:#0c1a24; --warn:#e08a52; --field:#121920; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141a20; --panel:#1c242c; --ink:#e6ebf0; --muted:#97a4b0; --line:#2f3b46;
+  --accent:#5aa7d6; --accent-ink:#0c1a24; --warn:#e08a52; --field:#121920; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:14px;line-height:1.5}
+header.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header.bar h1{font-size:16px;margin:0;font-weight:700;text-wrap:balance}
+.mark{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;color:var(--accent);border:1px solid var(--accent);padding:1px 7px;border-radius:3px}
+.spacer{flex:1}
+button{font:inherit;cursor:pointer;border-radius:5px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:500}
+button.small{padding:2px 8px;font-size:12px}
+button.danger{color:var(--warn)}
+button:disabled{opacity:.55;cursor:wait}
+main{display:grid;grid-template-columns:minmax(340px,460px) minmax(0,1fr);gap:16px;padding:16px;align-items:start}
+@media (max-width:900px){main{grid-template-columns:minmax(0,1fr)}}
+.form{display:flex;flex-direction:column;gap:14px;min-width:0}
+fieldset{margin:0;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:10px 14px 14px;min-width:0}
+legend{font-weight:700;padding:0 6px;font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+label.f{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted);min-width:0}
+input[type=text],input[type=date],textarea{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:4px;padding:5px 7px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:50px}
+.checks{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.checks label{display:flex;gap:8px;align-items:center}
+.row{display:flex;gap:6px;align-items:flex-start;margin-bottom:6px}
+.row .grow{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.item{border:1px solid var(--line);border-radius:6px;padding:8px;margin-bottom:10px;background:var(--field)}
+.item h3{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
+.item h3 span.sp{flex:1}
+.imgrow{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.imgrow img{max-height:54px;max-width:96px;border:1px solid var(--line);border-radius:3px;background:#fff}
+.hint{color:var(--muted);font-size:12px;margin:4px 0 0}
+.previewwrap{min-width:0;position:sticky;top:64px}
+@media (max-width:900px){.previewwrap{position:static}}
+.previewbox{overflow:auto;border:1px solid var(--line);border-radius:8px;background:#8d98a3;padding:12px;max-height:calc(100vh - 100px)}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:13px;display:none;z-index:9;max-width:90vw}
+
+
+#pv{position:fixed;inset:0;background:rgba(20,26,32,.88);z-index:20;display:flex;flex-direction:column}
+#pv[hidden]{display:none}
+#pv .pvbar{display:flex;gap:10px;align-items:center;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+#pv .pvbar b{flex:1}
+#pvPages{flex:1;overflow:auto;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.pvwrap{width:min(794px,94%)}
+.pvlab{color:#d5dbe1;font-size:12px;margin-bottom:4px;text-align:center}
+.pvpage{position:relative;width:100%;aspect-ratio:210/297;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.45);overflow:hidden}
+.pvpage img{position:absolute;left:0;width:100%}
+
+
+@media print{
+  @page{size:A4;margin:12mm}
+  html,body{background:#fff !important}
+  header.bar,.form,.toast,#pv{display:none !important}
+  main{display:block;padding:0}
+  .previewwrap{position:static}
+  .previewbox{overflow:visible;max-height:none;border:0;background:#fff;padding:0}
+  #zoomer{zoom:1 !important}
+  #paper{width:auto;padding:0;margin:0}
+  #paper tr,#paper .fig,#paper li{break-inside:avoid}
+  #paper h2{break-after:avoid}
+  #paper .ph{visibility:hidden}
+  #paper{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* ---- the paper (always light, independent of theme) ---- */
+#paper{width:794px;background:#fff;color:#111;padding:44px 48px 52px;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:12.5px;line-height:1.55;margin:0 auto}
+#paper h1.t{font-size:19px;text-align:center;margin:0 0 18px;font-weight:700}
+#paper h2{font-size:14.5px;margin:20px 0 8px;font-weight:700;border-left:4px solid #1f5f8b;padding-left:8px}
+#paper table{border-collapse:collapse;width:100%;table-layout:fixed}
+#paper td,#paper th{border:1px solid #8b96a1;padding:5px 7px;vertical-align:top;word-break:break-word;font-weight:400;text-align:left}
+#paper th{background:#e6edf3;font-weight:700;text-align:center}
+#paper td.lab{background:#e6edf3;font-weight:700;width:17%}
+#paper .opt{white-space:pre-wrap}
+#paper .off.st{text-decoration:line-through;color:#6b7680}
+#paper ul{margin:4px 0 0;padding-left:20px}
+#paper .figs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#paper .fig{border:1px solid #8b96a1;padding:6px;text-align:center;break-inside:avoid}
+#paper .fig b{display:block;margin-bottom:5px}
+#paper .fig img{max-width:100%;max-height:260px}
+#paper .fig .empty{color:#8b96a1;padding:22px 0}
+#paper .nums td:first-child{text-align:center}
+#paper .ph{color:#9aa5af;font-weight:400}
+</style>
+</head>
+<body>
+<header class="bar">
+  <h1>ECN 設計變更通知書產生器</h1><span class="mark">ANZU</span>
+  <span class="spacer"></span>
+  <button id="btnDraft" class="small" hidden>還原上次草稿</button>
+  <button id="btnReset" class="small">清空表單</button>
+  <button id="btnOpen">開啟專案</button>
+  <button id="btnSaveProj">儲存專案</button>
+  <input type="file" id="projFile" accept=".json,application/json" hidden>
+  <button id="btnPrint" title="用瀏覽器列印視窗存成文字可選取的向量 PDF">列印 / 向量 PDF</button>
+  <button id="btnPrev">預覽列印</button>
+  <button id="btnPdf" class="primary">匯出 PDF</button>
+  <button id="btnDocx" class="primary">匯出 Word</button>
+</header>
+<main>
+  <div class="form">
+    <fieldset><legend>基本資訊</legend>
+      <div class="grid2">
+        <label class="f">文件編號<input type="text" data-k="docNo" placeholder="例如：ECN-20261125-01"></label>
+        <label class="f">發行日期<input type="date" data-k="date"></label>
+        <label class="f">專案 / 機種名稱<input type="text" data-k="project" placeholder="例如：ALIO"></label>
+        <label class="f">申請部門 / 申請人<input type="text" data-k="applicant" placeholder="例如：機構設計 / 姓名"></label>
+        <label class="f" style="grid-column:1 / -1">另存檔名（不含副檔名，留空則用文件編號）<input type="text" data-k="fileName" placeholder="例如：ECN-20261125-01_ALIO"></label>
+      </div>
+    </fieldset>
+
+    <fieldset><legend>變更類別與緊急程度</legend>
+      <div class="grid2">
+        <div><b style="font-size:12px;color:var(--muted)">變更類別</b><div class="checks" id="cats"></div>
+          <label class="f" style="margin-top:6px">「其他」內容<input type="text" data-k="otherText"></label></div>
+        <div><b style="font-size:12px;color:var(--muted)">緊急程度</b><div class="checks" id="urgs"></div></div>
+      </div>
+      <div class="checks"><label><input type="checkbox" id="strike"> 未勾選項目加刪除線</label></div>
+    </fieldset>
+
+    <fieldset><legend>一、變更原因與目的</legend>
+      <label class="f">前言<textarea data-k="intro" placeholder="例如：本次設計變更主要針對…，具體說明如下："></textarea></label>
+      <div id="reasons" style="margin-top:8px"></div>
+      <button id="addReason" class="small">＋ 新增原因</button>
+    </fieldset>
+
+    <fieldset><legend>二、設計變更明細（含 CAD 圖）</legend>
+      <div id="items"></div>
+      <button id="addItem" class="small">＋ 新增一筆變更項目</button>
+      <p class="hint">上傳圖片的項目，會自動出現在「三、變更位置 CAD 參考圖示」。</p>
+    </fieldset>
+
+    <fieldset><legend>四、會簽與核准</legend>
+      <div id="approvals"></div>
+      <button id="addAppr" class="small">＋ 新增會簽</button>
+    </fieldset>
+  </div>
+
+  <div class="previewwrap">
+    <div class="previewbox" id="pbox"><div id="zoomer"><div id="paper"></div></div></div>
+  </div>
+</main>
+<div id="pv" hidden role="dialog" aria-label="預覽列印">
+  <div class="pvbar"><b>預覽列印（A4）</b><button id="pvPdf" class="primary">匯出 PDF</button><button id="pvClose">關閉</button></div>
+  <div id="pvPages"></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script>
+(function(){
+"use strict";
+var CATS=["尺寸修改","結構補強","模具修正","成本優化","其他"];
+var URGS=["立即導入","試產驗證"];
+var KEY="anzu-ecn-v1";
+
+function today(){var d=new Date();var m=String(d.getMonth()+1).padStart(2,"0"),dd=String(d.getDate()).padStart(2,"0");return d.getFullYear()+"-"+m+"-"+dd;}
+function defaults(){
+  var t=today();
+  return {
+    docNo:"", date:t, project:"", applicant:"",
+    cats:{"尺寸修改":false,"結構補強":false,"模具修正":false,"成本優化":false,"其他":false}, otherText:"",
+    urgs:{"立即導入":false,"試產驗證":false}, strike:true,
+    intro:"",
+    reasons:[],
+    items:[{name:"",part:"",file:"",before:"",after:"",note:"",img:null}],
+    approvals:[
+      {role:"機構設計（申請人）",opinion:"",people:[{sign:"",date:""}],multi:true},
+      {role:"研發主管",opinion:"",people:[{sign:"",date:""}],multi:false}
+    ]
+  };
+}
+var S=defaults(),DRAFT=null;
+/* 每次開啟都是空白範本；上次的內容存成「草稿」，按按鈕才還原 */
+try{var raw=localStorage.getItem(KEY);if(raw){var dd=JSON.parse(raw);if(dd&&Array.isArray(dd.items)&&Array.isArray(dd.approvals)){DRAFT=dd;}}}catch(e){DRAFT=null;}
+function migrate(st){
+  st.urgs=st.urgs||{};
+  if(Object.prototype.hasOwnProperty.call(st.urgs,"立即導入（停線切換）")){
+    st.urgs["立即導入"]=!!st.urgs["立即導入（停線切換）"]||!!st.urgs["立即導入"];
+    delete st.urgs["立即導入（停線切換）"];
+  }
+  st.approvals=(st.approvals||[]).map(function(a){
+    var people=Array.isArray(a.people)&&a.people.length?a.people.map(function(p){return {sign:String(p.sign||""),date:String(p.date||"")};}):[{sign:String(a.sign||""),date:String(a.date||"")}];
+    var multi=typeof a.multi==="boolean"?a.multi:String(a.role||"").indexOf("研發主管")<0;
+    return {role:String(a.role||""),opinion:String(a.opinion||""),people:people,multi:multi};
+  });
+}
+migrate(S);
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}var b=$("btnDraft");if(b)b.hidden=true;}
+function ph(v,t){return v?esc(v):'<span class="ph">'+esc(t)+"</span>";}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function $(id){return document.getElementById(id);}
+function toast(msg){var t=$("toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display="none";},3500);}
+
+/* ---------- paper preview ---------- */
+function optLines(list,map,otherText){
+  return list.map(function(n){
+    var on=!!map[n];var label=n;
+    if(n==="其他"){label="其他："+(otherText||"________");}
+    var cls="opt"+(on?"":(S.strike?" off st":" off"));
+    return '<div class="'+cls+'">'+(on?"☑":"☐")+" "+esc(label)+"</div>";
+  }).join("");
+}
+function renderPaper(){
+  var h="";
+  h+='<h1 class="t">'+ph(S.project,"機種名稱")+' POC樣品設計變更通知書 (Engineering Change Notice / ECN)</h1>';
+  h+='<table><tr><td class="lab">文件編號</td><td>'+ph(S.docNo,"請輸入文件編號")+'</td><td class="lab">發行日期</td><td>'+ph(S.date,"請選擇日期")+'</td></tr>';
+  h+='<tr><td class="lab">專案 / 機種名稱</td><td>'+ph(S.project,"請輸入機種名稱")+'</td><td class="lab">申請部門 / 申請人</td><td>'+ph(S.applicant,"請輸入申請部門 / 申請人")+'</td></tr>';
+  h+='<tr><td class="lab">變更類別</td><td>'+optLines(CATS,S.cats,S.otherText)+'</td><td class="lab">緊急程度</td><td>'+optLines(URGS,S.urgs)+'</td></tr></table>';
+  h+='<h2>一、變更原因與目的</h2><div>'+ph(S.intro,"請輸入變更原因與目的（前言）")+'</div>';
+  if(S.reasons.length){h+="<ul>"+S.reasons.map(function(r){return "<li><b>"+ph(r.title,"原因標題")+"</b>："+ph(r.text,"原因說明")+"</li>";}).join("")+"</ul>";}
+  else{h+='<ul><li><span class="ph">請按「＋ 新增原因」輸入變更原因</span></li></ul>';}
+  h+='<h2>二、設計變更明細表</h2><table class="nums"><tr><th style="width:6%">項次</th><th style="width:13%">變更項目</th><th style="width:12%">零件名稱</th><th style="width:13%">3D檔名</th><th style="width:15%">變更前規格（原設計）</th><th style="width:15%">變更後規格（新設計）</th><th>變更說明與影響評估</th></tr>';
+  S.items.forEach(function(it,i){
+    var ref=it.img?"（參考圖 "+(i+1)+"）":"";
+    h+="<tr><td>"+(i+1)+"</td><td>"+ph(it.name,"變更項目")+ref+"</td><td>"+ph(it.part,"零件名稱")+"</td><td>"+ph(it.file,"3D檔名")+"</td><td>"+ph(it.before,"變更前")+"</td><td>"+ph(it.after,"變更後")+"</td><td>"+ph(it.note,"說明與影響評估")+"</td></tr>";
+  });
+  h+="</table>";
+  var figs=S.items.map(function(it,i){return {it:it,i:i};}).filter(function(x){return x.it.img;});
+  h+='<h2>三、變更位置 CAD 參考圖示</h2>';
+  if(figs.length){
+    h+='<div class="figs">'+figs.map(function(x){return '<div class="fig"><b>圖 '+(x.i+1)+"：變更項目 "+(x.i+1)+(x.it.name?" — "+esc(x.it.name):"")+'</b><img src="'+x.it.img.url+'" alt=""></div>';}).join("")+"</div>";
+  }else{h+='<div style="color:#8b96a1">（尚未上傳圖片）</div>';}
+  h+='<h2>四、相關部門會簽與核准</h2><table><tr><th style="width:24%">部門／職稱</th><th>會簽意見</th><th style="width:16%">簽名</th><th style="width:16%">日期</th></tr>';
+  S.approvals.forEach(function(a){
+    var sg=a.people.map(function(p){return "<div>"+ph(p.sign,"簽名")+"</div>";}).join("");
+    var dt=a.people.map(function(p){return "<div>"+ph(p.date,"日期")+"</div>";}).join("");
+    h+="<tr><td><b>"+esc(a.role)+"</b></td><td>"+ph(a.opinion,"請輸入會簽意見")+"</td><td>"+sg+"</td><td>"+dt+"</td></tr>";
+  });
+  h+="</table>";
+  $("paper").innerHTML=h;
+  fit();
+}
+function fit(){
+  var box=$("pbox");var avail=box.clientWidth-24;var z=Math.min(1,avail/794);
+  $("zoomer").style.zoom=z>0?z:1;
+}
+window.addEventListener("resize",fit);
+
+/* ---------- form ---------- */
+function bindStatic(){
+  document.querySelectorAll("[data-k]").forEach(function(el){
+    el.value=S[el.dataset.k]||"";
+    el.addEventListener("input",function(){S[el.dataset.k]=el.value;save();renderPaper();});
+  });
+  $("cats").innerHTML="";$("urgs").innerHTML="";
+  CATS.forEach(function(n){$("cats").appendChild(chk(n,S.cats));});
+  URGS.forEach(function(n){$("urgs").appendChild(chk(n,S.urgs));});
+  $("strike").checked=!!S.strike;
+}
+function chk(n,map){
+  var l=document.createElement("label");var c=document.createElement("input");c.type="checkbox";c.checked=!!map[n];
+  c.addEventListener("change",function(){map[n]=c.checked;save();renderPaper();});
+  l.appendChild(c);l.appendChild(document.createTextNode(" "+n));return l;
+}
+$("strike").addEventListener("change",function(){S.strike=$("strike").checked;save();renderPaper();});
+
+function mkInput(val,ph,cb,tag){
+  var el=document.createElement(tag||"input");if(!tag)el.type="text";el.value=val||"";el.placeholder=ph||"";
+  el.addEventListener("input",function(){cb(el.value);save();renderPaper();});return el;
+}
+function labeled(text,el){var l=document.createElement("label");l.className="f";l.appendChild(document.createTextNode(text));l.appendChild(el);return l;}
+function delBtn(fn){var b=document.createElement("button");b.className="small danger";b.textContent="刪除";b.type="button";b.addEventListener("click",fn);return b;}
+
+function renderReasons(){
+  var box=$("reasons");box.innerHTML="";
+  S.reasons.forEach(function(r,i){
+    var row=document.createElement("div");row.className="row";var g=document.createElement("div");g.className="grow";
+    g.appendChild(mkInput(r.title,"標題，例如：修改長度設計考量",function(v){r.title=v;}));
+    g.appendChild(mkInput(r.text,"說明",function(v){r.text=v;}));
+    row.appendChild(g);row.appendChild(delBtn(function(){S.reasons.splice(i,1);save();renderReasons();renderPaper();}));
+    box.appendChild(row);
+  });
+}
+function renderItems(){
+  var box=$("items");box.innerHTML="";
+  S.items.forEach(function(it,i){
+    var d=document.createElement("div");d.className="item";
+    var h=document.createElement("h3");h.innerHTML="項次 "+(i+1)+'<span class="sp"></span>';
+    h.appendChild(delBtn(function(){S.items.splice(i,1);save();renderItems();renderPaper();}));d.appendChild(h);
+    var g=document.createElement("div");g.className="grid2";
+    g.appendChild(labeled("變更項目",mkInput(it.name,"例如：修改孔位",function(v){it.name=v;})));
+    g.appendChild(labeled("零件名稱",mkInput(it.part,"例如：M04-BASE",function(v){it.part=v;})));
+    g.appendChild(labeled("3D 檔名",mkInput(it.file,"例如：PR_WS_PLATE",function(v){it.file=v;})));
+    g.appendChild(document.createElement("div"));
+    g.appendChild(labeled("變更前規格",mkInput(it.before,"例如：肉厚 4 mm",function(v){it.before=v;})));
+    g.appendChild(labeled("變更後規格",mkInput(it.after,"例如：肉厚 2 mm",function(v){it.after=v;})));
+    d.appendChild(g);
+    d.appendChild(labeled("變更說明與影響評估",mkInput(it.note,"調整內容與影響評估",function(v){it.note=v;},"textarea")));
+    var ir=document.createElement("div");ir.className="imgrow";
+    if(it.img){var im=document.createElement("img");im.src=it.img.url;im.alt="";ir.appendChild(im);}
+    var fi=document.createElement("input");fi.type="file";fi.accept="image/*";fi.id="file"+i;
+    fi.addEventListener("change",function(){if(fi.files[0])loadImg(fi.files[0],it);});
+    ir.appendChild(fi);
+    if(it.img){ir.appendChild(delBtn(function(){it.img=null;save();renderItems();renderPaper();}));}
+    d.appendChild(ir);
+    box.appendChild(d);
+  });
+}
+function loadImg(file,it){
+  var fr=new FileReader();
+  fr.onload=function(){
+    var im=new Image();
+    im.onload=function(){
+      var max=2400,w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,max/Math.max(w,h));
+      var cw=Math.round(w*k),ch=Math.round(h*k);var c=document.createElement("canvas");c.width=cw;c.height=ch;
+      var ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,cw,ch);ctx.drawImage(im,0,0,cw,ch);
+      it.img={url:c.toDataURL("image/jpeg",0.95),w:cw,h:ch};
+      save();renderItems();renderPaper();
+    };
+    im.onerror=function(){toast("無法讀取這張圖片，請改用 PNG 或 JPG。");};
+    im.src=fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+function renderApprovals(){
+  var box=$("approvals");box.innerHTML="";
+  S.approvals.forEach(function(a,i){
+    var d=document.createElement("div");d.className="item";
+    d.appendChild(labeled("部門／職稱",mkInput(a.role,"",function(v){a.role=v;})));
+    d.appendChild(labeled("會簽意見",mkInput(a.opinion,"請輸入會簽意見",function(v){a.opinion=v;},"textarea")));
+    var pl=document.createElement("div");pl.style.marginTop="6px";
+    var cap=document.createElement("div");cap.className="hint";cap.textContent=a.multi?"簽核人員（可多人）":"簽核人員";pl.appendChild(cap);
+    a.people.forEach(function(p,j){
+      var g=document.createElement("div");g.className="grid2";g.style.marginTop="4px";
+      g.appendChild(labeled("簽名",mkInput(p.sign,"請輸入姓名",function(v){p.sign=v;})));
+      var di=mkInput(p.date,"",function(v){p.date=v;});di.type="date";
+      var dl=labeled("日期",di);
+      var w=document.createElement("div");w.style.display="flex";w.style.gap="6px";w.style.alignItems="end";
+      dl.style.flex="1";w.appendChild(dl);
+      if(a.multi&&a.people.length>1){var x=delBtn(function(){a.people.splice(j,1);save();renderApprovals();renderPaper();});x.style.marginBottom="2px";w.appendChild(x);}
+      g.appendChild(w);pl.appendChild(g);
+    });
+    d.appendChild(pl);
+    var bar=document.createElement("div");bar.className="imgrow";
+    if(a.multi){var add=document.createElement("button");add.type="button";add.className="small";add.textContent="＋ 新增人員";
+      add.addEventListener("click",function(){a.people.push({sign:"",date:""});save();renderApprovals();renderPaper();});bar.appendChild(add);}
+    var sp=document.createElement("span");sp.style.flex="1";bar.appendChild(sp);
+    bar.appendChild(delBtn(function(){S.approvals.splice(i,1);save();renderApprovals();renderPaper();}));
+    d.appendChild(bar);box.appendChild(d);
+  });
+}
+$("addReason").addEventListener("click",function(){S.reasons.push({title:"",text:""});save();renderReasons();renderPaper();});
+$("addItem").addEventListener("click",function(){S.items.push({name:"",part:"",file:"",before:"",after:"",note:"",img:null});save();renderItems();renderPaper();});
+$("addAppr").addEventListener("click",function(){S.approvals.push({role:"",opinion:"",people:[{sign:"",date:""}],multi:true});save();renderApprovals();renderPaper();});
+$("btnReset").addEventListener("click",function(){
+  if(!$("btnReset").dataset.arm){$("btnReset").dataset.arm="1";$("btnReset").textContent="再按一次確認清空";
+    setTimeout(function(){delete $("btnReset").dataset.arm;$("btnReset").textContent="清空表單";},3000);return;}
+  delete $("btnReset").dataset.arm;$("btnReset").textContent="清空表單";
+  S=defaults();save();initAll();toast("已清空表單。");
+});
+function initAll(){bindStatic();renderReasons();renderItems();renderApprovals();renderPaper();}
+
+/* ---------- export ---------- */
+var downloads=null;
+function fname(ext){return (S.fileName||S.docNo||"ECN").replace(/[\\/:*?"<>|]/g,"_").replace(/\.(pdf|docx|json)$/i,"")+"."+ext;}
+async function saveFile(name,blob){
+  var inClaude=!!(window.claude&&window.claude.use);
+  if(!downloads&&inClaude){downloads=await window.claude.use("downloads");}
+  if(!downloads){
+    if(inClaude){toast("這個檢視環境無法下載檔案，請在瀏覽器開啟此頁面。");return;}
+    /* 本機直接開啟 index.html：優先用「另存新檔」視窗，不支援時改用一般下載 */
+    if(window.showSaveFilePicker){
+      try{
+        var ext=name.split(".").pop().toLowerCase();
+        var mime={pdf:"application/pdf",json:"application/json",docx:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"}[ext]||"application/octet-stream";
+        var acc={};acc[mime]=["."+ext];
+        var fh=await window.showSaveFilePicker({suggestedName:name,types:[{description:ext.toUpperCase()+" 檔案",accept:acc}]});
+        var wr=await fh.createWritable();await wr.write(blob);await wr.close();
+        toast("已儲存 "+fh.name);return;
+      }catch(err){
+        if(err&&err.name==="AbortError"){toast("已取消另存新檔。");return;}
+      }
+    }
+    var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
+    toast("已下載 "+name);return;
+  }
+  try{await downloads.save({filename:name,data:blob});toast("已儲存 "+name);}
+  catch(e){
+    var c=e&&e.code;
+    if(c==="declined"){toast("已取消下載。");}
+    else if(c==="host_unavailable"){toast("此裝置不支援存檔，請改用電腦瀏覽器開啟。");}
+    else{toast("下載失敗（"+(c||"未知錯誤")+"）。");}
+  }
+}
+async function renderPages(){
+  var host=document.createElement("div");
+  try{
+    host.style.cssText="position:fixed;left:-10000px;top:0;width:794px;background:#fff";
+    var clone=$("paper").cloneNode(true);clone.style.margin="0";host.appendChild(clone);document.body.appendChild(host);
+    if(document.fonts&&document.fonts.ready){await document.fonts.ready;}
+    [].slice.call(clone.querySelectorAll(".ph")).forEach(function(e){e.style.visibility="hidden";});
+    var imgs=[].slice.call(clone.querySelectorAll("img"));
+    await Promise.all(imgs.map(function(i){return i.decode?i.decode().catch(function(){}):Promise.resolve();}));
+    /* 換頁位置：不切到表格列、圖框、清單項；標題不單獨留在頁尾 */
+    var top0=clone.getBoundingClientRect().top;var total=clone.scrollHeight;
+    var blocks=[].slice.call(clone.querySelectorAll("tr,.fig,li,h2")).map(function(el){
+      var r=el.getBoundingClientRect();var t=r.top-top0,b=r.bottom-top0;
+      if(el.tagName==="H2"){b+=70;}
+      return {t:t,b:b};
+    });
+    var PAGE=Math.round(794*297/210),MARGIN=Math.round(794*12/210);
+    var cuts=[],y0=0,firstPage=true;
+    while(y0<total){
+      var cap=firstPage?PAGE-MARGIN:PAGE-2*MARGIN;var end=y0+cap;
+      if(end>=total){cuts.push([y0,total]);break;}
+      var m=end;
+      blocks.forEach(function(bk){if(bk.t>y0+20&&bk.t<end&&bk.b>end&&bk.t<m){m=bk.t;}});
+      cuts.push([y0,m]);y0=m;firstPage=false;
+    }
+    var sc=Math.min(4,Math.max(1.5,14000/Math.max(total,1)));
+    var canvas=await html2canvas(clone,{scale:sc,backgroundColor:"#ffffff",useCORS:true,logging:false});
+    var k=canvas.width/794;var pages=[];
+    cuts.forEach(function(c,idx){
+      var sy=Math.round(c[0]*k),sh=Math.min(Math.round((c[1]-c[0])*k),canvas.height-sy);
+      if(sh<=0)return;
+      var part=document.createElement("canvas");part.width=canvas.width;part.height=sh;
+      var ctx=part.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,part.width,part.height);
+      ctx.drawImage(canvas,0,sy,canvas.width,sh,0,0,canvas.width,sh);
+      pages.push({url:part.toDataURL("image/jpeg",0.93),h:sh/canvas.width*210,y:idx===0?0:12});
+    });
+    return pages;
+  }finally{if(host.parentNode)host.parentNode.removeChild(host);}
+}
+function pagesToPdf(pages){
+  var pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4"});
+  pages.forEach(function(p,i){if(i>0)pdf.addPage();pdf.addImage(p.url,"JPEG",0,p.y,210,p.h);});
+  return pdf.output("blob");
+}
+async function busy(btn,label,fn){
+  var old=btn.textContent;btn.disabled=true;btn.textContent=label;
+  try{await fn();}finally{btn.disabled=false;btn.textContent=old;}
+}
+async function exportPDF(){
+  await busy($("btnPdf"),"產生中…",async function(){
+    try{var pages=await renderPages();await saveFile(fname("pdf"),pagesToPdf(pages));}
+    catch(e){toast("PDF 產生失敗，請重試。");}
+  });
+}
+var curPages=null;
+async function previewPrint(){
+  await busy($("btnPrev"),"產生預覽…",async function(){
+    try{
+      curPages=await renderPages();
+      var box=$("pvPages");box.innerHTML="";
+      curPages.forEach(function(p,i){
+        var wrap=document.createElement("div");wrap.className="pvwrap";
+        var lab=document.createElement("div");lab.className="pvlab";lab.textContent="第 "+(i+1)+" / "+curPages.length+" 頁";
+        var pg=document.createElement("div");pg.className="pvpage";
+        var im=document.createElement("img");im.src=p.url;im.alt="第 "+(i+1)+" 頁";
+        im.style.top=(p.y/297*100)+"%";im.style.height=(p.h/297*100)+"%";
+        pg.appendChild(im);wrap.appendChild(lab);wrap.appendChild(pg);box.appendChild(wrap);
+      });
+      $("pv").hidden=false;document.body.style.overflow="hidden";$("pvClose").focus();
+    }catch(e){toast("預覽產生失敗，請重試。");}
+  });
+}
+function closePreview(){$("pv").hidden=true;document.body.style.overflow="";curPages=null;$("pvPages").innerHTML="";}
+$("btnPrev").addEventListener("click",previewPrint);
+$("btnPrint").addEventListener("click",function(){
+  if(window.claude&&window.claude.use){toast("線上檢視無法列印，請用本機檔案開啟。");return;}
+  /* Chrome 的「另存為 PDF」預設檔名取自網頁標題，所以列印前暫時改成與匯出相同的檔名 */
+  var oldTitle=document.title;
+  document.title=fname("pdf").replace(/\.pdf$/i,"");
+  var restore=function(){document.title=oldTitle;window.removeEventListener("afterprint",restore);};
+  window.addEventListener("afterprint",restore);
+  try{window.print();}catch(e){restore();toast("無法開啟列印視窗。");}
+});
+$("pvClose").addEventListener("click",closePreview);
+$("pvPdf").addEventListener("click",async function(){
+  if(!curPages)return;var b=$("pvPdf");b.disabled=true;
+  try{await saveFile(fname("pdf"),pagesToPdf(curPages));}catch(e){toast("PDF 產生失敗，請重試。");}
+  b.disabled=false;
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("pv").hidden)closePreview();});
+function dataToBytes(url){var b=atob(url.split(",")[1]);var u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+async function exportDocx(){
+  var btn=$("btnDocx");btn.disabled=true;var old=btn.textContent;btn.textContent="產生中…";
+  try{
+    var D=window.docx;var FONT="Microsoft JhengHei";
+    function run(t,o){o=o||{};return new D.TextRun({text:t,font:FONT,size:o.size||21,bold:!!o.bold,strike:!!o.strike,color:o.color});}
+    function para(t,o){o=o||{};return new D.Paragraph({children:[run(t,o)],alignment:o.align,spacing:{after:o.after==null?40:o.after}});}
+    var B={style:D.BorderStyle.SINGLE,size:4,color:"8B96A1"};var borders={top:B,bottom:B,left:B,right:B};
+    function cell(children,o){o=o||{};return new D.TableCell({children:children,borders:borders,shading:o.fill?{type:D.ShadingType.CLEAR,fill:o.fill,color:"auto"}:undefined,width:o.w?{size:o.w,type:D.WidthType.PERCENTAGE}:undefined,margins:{top:60,bottom:60,left:90,right:90}});}
+    function tbl(rows,widths){return new D.Table({width:{size:100,type:D.WidthType.PERCENTAGE},rows:rows});}
+    function opts(list,map,other){
+      return list.map(function(n){var on=!!map[n];var label=n==="其他"?"其他："+(other||"________"):n;
+        return para((on?"☑ ":"☐ ")+label,{strike:!on&&S.strike,color:on?undefined:"6B7680",after:20});});
+    }
+    var HF="E6EDF3";
+    var kids=[];
+    kids.push(new D.Paragraph({children:[run((S.project?S.project+" ":"")+"POC樣品設計變更通知書 (Engineering Change Notice / ECN)",{bold:true,size:32})],alignment:D.AlignmentType.CENTER,spacing:{after:240}}));
+    kids.push(tbl([
+      new D.TableRow({children:[cell([para("文件編號",{bold:true})],{fill:HF,w:17}),cell([para(S.docNo)],{w:33}),cell([para("發行日期",{bold:true})],{fill:HF,w:17}),cell([para(S.date)],{w:33})]}),
+      new D.TableRow({children:[cell([para("專案 / 機種名稱",{bold:true})],{fill:HF}),cell([para(S.project)]),cell([para("申請部門 / 申請人",{bold:true})],{fill:HF}),cell([para(S.applicant)])]}),
+      new D.TableRow({children:[cell([para("變更類別",{bold:true})],{fill:HF}),cell(opts(CATS,S.cats,S.otherText)),cell([para("緊急程度",{bold:true})],{fill:HF}),cell(opts(URGS,S.urgs))]})
+    ]));
+    function h1(t){return new D.Paragraph({children:[run(t,{bold:true,size:27})],spacing:{before:300,after:120}});}
+    kids.push(h1("一、變更原因與目的"));
+    kids.push(para(S.intro,{after:80}));
+    S.reasons.forEach(function(r){kids.push(new D.Paragraph({bullet:{level:0},children:[run(r.title,{bold:true}),run("："+r.text)],spacing:{after:40}}));});
+    kids.push(h1("二、設計變更明細表"));
+    var hdr=["項次","變更項目","零件名稱","3D檔名","變更前規格（原設計）","變更後規格（新設計）","變更說明與影響評估"];
+    var wd=[6,13,12,13,15,15,26];
+    var rows=[new D.TableRow({tableHeader:true,children:hdr.map(function(t,i){return cell([para(t,{bold:true,align:D.AlignmentType.CENTER,size:19})],{fill:HF,w:wd[i]});})})];
+    S.items.forEach(function(it,i){
+      var vals=[String(i+1),it.name+(it.img?"（參考圖 "+(i+1)+"）":""),it.part,it.file,it.before,it.after,it.note];
+      rows.push(new D.TableRow({cantSplit:true,children:vals.map(function(v,j){return cell([para(v,{size:19,align:j===0?D.AlignmentType.CENTER:undefined})],{w:wd[j]});})}));
+    });
+    kids.push(tbl(rows));
+    kids.push(h1("三、變更位置 CAD 參考圖示"));
+    var figs=S.items.map(function(it,i){return {it:it,i:i};}).filter(function(x){return x.it.img;});
+    if(!figs.length){kids.push(para("（尚未上傳圖片）",{color:"8B96A1"}));}
+    else{
+      var frows=[];
+      for(var k=0;k<figs.length;k+=2){
+        var cells=[figs[k],figs[k+1]].map(function(f){
+          if(!f)return cell([para("")],{w:50});
+          var maxW=270,sc=Math.min(1,maxW/f.it.img.w,300/f.it.img.h);
+          var ch=[para("圖 "+(f.i+1)+"：變更項目 "+(f.i+1)+(f.it.name?" — "+f.it.name:""),{bold:true,align:D.AlignmentType.CENTER})];
+          ch.push(new D.Paragraph({alignment:D.AlignmentType.CENTER,children:[new D.ImageRun({data:dataToBytes(f.it.img.url),transformation:{width:Math.round(f.it.img.w*sc),height:Math.round(f.it.img.h*sc)}})]}));
+          return cell(ch,{w:50});
+        });
+        frows.push(new D.TableRow({cantSplit:true,children:cells}));
+      }
+      kids.push(tbl(frows));
+    }
+    kids.push(h1("四、相關部門會簽與核准"));
+    var arows=[new D.TableRow({children:["部門／職稱","會簽意見","簽名","日期"].map(function(t,i){return cell([para(t,{bold:true,align:D.AlignmentType.CENTER})],{fill:HF,w:[24,44,16,16][i]});})})];
+    S.approvals.forEach(function(a){arows.push(new D.TableRow({cantSplit:true,children:[cell([para(a.role,{bold:true})]),cell([para(a.opinion)]),cell(a.people.map(function(p){return para(p.sign||" ");})),cell(a.people.map(function(p){return para(p.date||" ");}))]}));});
+    kids.push(tbl(arows));
+    var doc=new D.Document({creator:"ANZU",title:S.docNo,sections:[{properties:{page:{margin:{top:900,bottom:900,left:900,right:900}}},children:kids}]});
+    var blob=await D.Packer.toBlob(doc);
+    await saveFile(fname("docx"),blob);
+  }catch(e){toast("Word 產生失敗，請重試。");}
+  finally{btn.disabled=false;btn.textContent=old;}
+}
+$("btnPdf").addEventListener("click",exportPDF);
+$("btnDocx").addEventListener("click",exportDocx);
+
+
+/* ---------- 專案檔：儲存 / 開啟 ---------- */
+$("btnSaveProj").addEventListener("click",async function(){
+  try{
+    var blob=new Blob([JSON.stringify({app:"anzu-ecn",version:1,data:S})],{type:"application/json"});
+    await saveFile(fname("json"),blob);
+  }catch(e){toast("儲存專案失敗，請重試。");}
+});
+$("btnOpen").addEventListener("click",function(){$("projFile").value="";$("projFile").click();});
+$("projFile").addEventListener("change",function(){
+  var f=$("projFile").files[0];if(!f)return;
+  var fr=new FileReader();
+  fr.onload=function(){
+    try{
+      var o=JSON.parse(fr.result);var d=(o&&o.app==="anzu-ecn")?o.data:null;
+      if(!d||!Array.isArray(d.items)||!Array.isArray(d.approvals)||!Array.isArray(d.reasons)){toast("這不是本工具儲存的專案檔。");return;}
+      var base=defaults();
+      var n=Object.assign({},base,d);
+      n.cats=Object.assign({},base.cats,d.cats||{});n.urgs=Object.assign({},base.urgs,d.urgs||{});
+      n.items=d.items.map(function(it){
+        var img=it&&it.img&&typeof it.img.url==="string"&&it.img.url.indexOf("data:image/")===0?{url:it.img.url,w:+it.img.w||1,h:+it.img.h||1}:null;
+        return {name:String(it.name||""),part:String(it.part||""),file:String(it.file||""),before:String(it.before||""),after:String(it.after||""),note:String(it.note||""),img:img};
+      });
+      migrate(n);S=n;save();initAll();toast("已開啟專案：「"+f.name+"」");
+    }catch(e){toast("無法讀取這個檔案，請確認是 .json 專案檔。");}
+  };
+  fr.onerror=function(){toast("無法讀取這個檔案。");};
+  fr.readAsText(f);
+});
+initAll();
+if(DRAFT){
+  $("btnDraft").hidden=false;
+  $("btnDraft").addEventListener("click",function(){
+    var base=defaults();var n=Object.assign({},base,DRAFT);
+    n.cats=Object.assign({},base.cats,DRAFT.cats||{});n.urgs=Object.assign({},base.urgs,DRAFT.urgs||{});
+    migrate(n);S=n;save();initAll();toast("已還原上次草稿。");
+  });
+}
+(async function(){try{downloads=await window.claude.use("downloads");}catch(e){downloads=null;}
+  if(!downloads){$("btnPdf").title="此環境可能無法下載";$("btnDocx").title="此環境可能無法下載";}})();
+})();
+</script>
+</body>
+</html>
