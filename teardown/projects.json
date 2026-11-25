@@ -9,5 +9,16 @@
     ],
     "href": "teardown/alio-asm/index.html",
     "thumb": "image/teardown-alio-asm.webp"
+  },
+  {
+    "id": "axis-spcel02",
+    "title": "AXIS SPCEL02 3D Teardown",
+    "desc": "Interactive 3D explode / teardown simulator: exploded views, section cuts, subsystem isolation and guided tour.",
+    "tags": [
+      "3D Teardown",
+      "Explode View"
+    ],
+    "href": "teardown/axis-spcel02/index.html",
+    "thumb": "image/teardown-axis-spcel02.webp"
   }
 ]
