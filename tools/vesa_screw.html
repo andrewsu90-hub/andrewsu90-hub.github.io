@@ -134,6 +134,40 @@
   .api-status { position: fixed; bottom: 14px; right: 14px; font-size: 12px; padding: 6px 12px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
   .api-status.loading { background: #fdfae6; color: #d35400; }
   .api-status.error { background: #fdf3f2; color: #c0392b; }
+
+  /* ---------- Export toolbar ---------- */
+  .toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+  .btn-export { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border: 0.5px solid var(--primary-color); border-radius: var(--radius-sm); background: var(--primary-color); color: var(--bg-white); font: inherit; font-size: 13px; font-weight: 600; letter-spacing: .3px; cursor: pointer; transition: opacity .15s; }
+  .btn-export:hover { opacity: .8; }
+
+  /* ---------- PDF report (僅列印 / 另存 PDF 時顯示；文字與 SVG 皆為向量) ---------- */
+  #printReport { display: none; }
+  @media print {
+    @page { size: A4; margin: 14mm 14mm 16mm; }
+    html, body { background: #fff !important; }
+    body > *:not(#printReport) { display: none !important; }
+    #printReport { display: block; color: #111; font-family: 'Noto Sans TC','DM Sans',sans-serif; font-size: 10.5pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rp-head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1.5pt solid #1a1a2e; padding-bottom: 6pt; margin-bottom: 10pt; }
+    .rp-brand { font-family: 'Montserrat',sans-serif; font-weight: 800; font-size: 15pt; letter-spacing: 1pt; }
+    .rp-meta { font-size: 8.5pt; color: #555; text-align: right; }
+    #printReport h1 { font-size: 16pt; font-weight: 700; margin-bottom: 2pt; }
+    .rp-sub { font-size: 9pt; color: #555; margin-bottom: 10pt; }
+    #printReport h2 { font-size: 12pt; font-weight: 700; margin: 14pt 0 5pt; padding-left: 6pt; border-left: 3pt solid #1a1a2e; break-after: avoid; }
+    .rp-formula { font-family: Consolas,Menlo,monospace; font-size: 9pt; background: #f3f3f7; border: 0.5pt dashed #999; padding: 2pt 6pt; display: inline-block; margin-bottom: 5pt; }
+    .rp-sec { break-inside: avoid; }
+    .rp-card { margin-bottom: 8pt; break-inside: avoid; }
+    .rp-card h3 { font-size: 10pt; font-weight: 600; color: #333; margin-bottom: 2pt; }
+    .rp-card table { width: 100%; border-collapse: collapse; }
+    .rp-card th, .rp-card td { border: 0.5pt solid #bbb; padding: 3pt 7pt; font-size: 9.5pt; text-align: left; vertical-align: top; }
+    .rp-card th { width: 58%; font-weight: 400; background: #f6f6f9; color: #333; }
+    .rp-card td { font-weight: 600; }
+    .rp-card tr.out.ok td { color: #2e7d32; }
+    .rp-card tr.out.warn td { color: #c62828; }
+    .rp-card tr.in th::after { content: '  [輸入]'; color: #999; font-size: 8pt; }
+    .rp-diagram { text-align: center; margin: 4pt 0 8pt; break-inside: avoid; }
+    .rp-diagram svg { width: 100%; max-width: 420pt; height: auto; }
+    .rp-foot { margin-top: 14pt; padding-top: 5pt; border-top: 0.5pt solid #999; font-size: 8pt; color: #666; display: flex; justify-content: space-between; }
+  }
 </style>
 </head>
 <body>
@@ -151,6 +185,10 @@
 </section>
 
 <section class="calc-section">
+
+<div class="toolbar">
+  <button type="button" class="btn-export" id="btnExportPdf">⬇ 匯出 PDF 報告</button>
+</div>
 
 <div class="tabs">
   <div class="tab active" data-tab="t1">方法 1：合力與剪力計算</div>
@@ -415,6 +453,8 @@
 
 </section>
 
+<div id="printReport" aria-hidden="true"></div>
+
 <div class="api-status" id="api-status" style="display:none;">計算中...</div>
 
 <script>
@@ -589,6 +629,117 @@ document.querySelectorAll("input, select, textarea").forEach(el => {
   el.addEventListener("input", debouncedCalc);
   el.addEventListener("change", debouncedCalc);
 });
+
+/* ========================= 匯出 PDF 報告 =========================
+   做法：把目前畫面上的輸入值與 API 回傳結果整理成報告版面，
+   呼叫瀏覽器列印 → 目的地選「另存為 PDF」，文字與 SVG 圖皆為向量。
+   前端只搬運已顯示的數值，不含任何計算公式。 */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const txt = el => el ? el.textContent.replace(/\s+/g,' ').trim() : '';
+
+function fieldValue(f){
+  const c = f.querySelector('select,input,textarea');
+  if (!c) return '';
+  if (c.tagName === 'SELECT') return (c.options[c.selectedIndex] || {}).text || '';
+  return c.value;
+}
+function statValue(v){
+  return [...v.childNodes].map(n => n.textContent.trim()).filter(Boolean).join(' ');
+}
+function cardRows(card){
+  const rows = [];
+  card.querySelectorAll('.field, .stat').forEach(el => {
+    if (el.classList.contains('field')) {
+      const v = fieldValue(el);
+      if (el.querySelector('textarea') && !v.trim()) return;
+      rows.push({ cls: 'in', k: txt(el.querySelector('label')), v });
+    } else {
+      const st = el.classList.contains('warn') ? 'warn' : (el.classList.contains('final') ? 'ok' : '');
+      rows.push({ cls: 'out ' + st, k: txt(el.querySelector('.k')), v: statValue(el.querySelector('.v')) });
+    }
+  });
+  return rows;
+}
+function cardHtml(card){
+  const title = txt(card.querySelector('.card-head h3'));
+  const rows = cardRows(card);
+  if (!rows.length) return '';
+  return `<div class="rp-card"><h3>${esc(title)}</h3><table>` +
+    rows.map(r => `<tr class="${r.cls}"><th>${esc(r.k)}</th><td>${esc(r.v).replace(/\n/g,'<br>')}</td></tr>`).join('') +
+    `</table></div>`;
+}
+
+function layoutSvg(n, a, b){
+  let pts;
+  if (n === 4) pts = [[-a/2,-b/2],[a/2,-b/2],[-a/2,b/2],[a/2,b/2]];
+  else if (n === 2 && (a > 0 || b > 0)) pts = [[-a/2,-b/2],[a/2,b/2]];
+  else return '';
+  const W = 420, half = Math.max(a/2, b/2, 1);
+  const k = 85 / half;
+  const cx = W/2, cy = 34 + b/2*k, H = cy + b/2*k + 62;
+  const P = pts.map(([x,y]) => [cx + x*k, cy + y*k]);
+  const x0 = cx - a/2*k, x1 = cx + a/2*k, yb = cy + b/2*k;
+  let g = `<line x1="${cx-14}" y1="${cy}" x2="${cx+14}" y2="${cy}" stroke="#888" stroke-width="0.8"/>` +
+          `<line x1="${cx}" y1="${cy-14}" x2="${cx}" y2="${cy+14}" stroke="#888" stroke-width="0.8"/>`;
+  if (n === 4) g += `<rect x="${x0}" y="${cy-b/2*k}" width="${x1-x0}" height="${b*k}" fill="none" stroke="#bbb" stroke-dasharray="4 3"/>`;
+  P.forEach(([x,y]) => { g += `<circle cx="${x}" cy="${y}" r="7" fill="#fff" stroke="#1a1a2e" stroke-width="1.4"/><circle cx="${x}" cy="${y}" r="1.6" fill="#1a1a2e"/>`; });
+  g += `<line x1="${cx}" y1="${cy}" x2="${P[P.length-1][0]}" y2="${P[P.length-1][1]}" stroke="#c62828" stroke-width="1" stroke-dasharray="3 2"/>`;
+  if (a > 0) {
+    const yd = yb + 26;
+    g += `<line x1="${x0}" y1="${yd}" x2="${x1}" y2="${yd}" stroke="#1a1a2e" stroke-width="0.8"/>` +
+         `<line x1="${x0}" y1="${yd-5}" x2="${x0}" y2="${yd+5}" stroke="#1a1a2e" stroke-width="0.8"/>` +
+         `<line x1="${x1}" y1="${yd-5}" x2="${x1}" y2="${yd+5}" stroke="#1a1a2e" stroke-width="0.8"/>` +
+         `<text x="${cx}" y="${yd+15}" text-anchor="middle" font-size="11" fill="#1a1a2e">a = ${a} mm</text>`;
+  }
+  if (b > 0) {
+    const xd = x1 + 28;
+    g += `<line x1="${xd}" y1="${cy-b/2*k}" x2="${xd}" y2="${yb}" stroke="#1a1a2e" stroke-width="0.8"/>` +
+         `<line x1="${xd-5}" y1="${cy-b/2*k}" x2="${xd+5}" y2="${cy-b/2*k}" stroke="#1a1a2e" stroke-width="0.8"/>` +
+         `<line x1="${xd-5}" y1="${yb}" x2="${xd+5}" y2="${yb}" stroke="#1a1a2e" stroke-width="0.8"/>` +
+         `<text x="${xd+8}" y="${cy+4}" font-size="11" fill="#1a1a2e">b = ${b} mm</text>`;
+  }
+  g += `<text x="${cx+6}" y="${cy-8}" font-size="10" fill="#c62828">r = ${esc(statValue($("valR")))}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="'Noto Sans TC','DM Sans',sans-serif">${g}</svg>`;
+}
+
+function buildReport(){
+  const n = Number($("inptBolts").value) || 0;
+  const a = Number($("inptSpaceA").value) || 0;
+  const b = Number($("inptSpaceB").value) || 0;
+  const now = new Date().toLocaleString('zh-TW', { hour12: false });
+  const sysCard = document.querySelector('.calc-section > div > .card');
+
+  let html = `<div class="rp-head"><div class="rp-brand">Anzû Design Studio</div><div class="rp-meta">ANZU 製作<br>${esc(now)}</div></div>` +
+             `<h1>VESA 螺絲受力計算報告</h1>` +
+             `<div class="rp-sub">依機械設計手冊 (新版) 第2卷、Shigley's 標準力學 · 螺栓 ${n} 顆 · ${esc($("inptSpec").value)}</div>`;
+
+  html += `<h2>系統與負載參數</h2>` + cardHtml(sysCard).replace(/<h3>.*?<\/h3>/, '');
+  const diagram = layoutSvg(n, a, b);
+  if (diagram) html += `<div class="rp-diagram">${diagram}</div>`;
+
+  document.querySelectorAll('section.panel').forEach(p => {
+    const cards = [...p.querySelectorAll('.card')].filter(c => !c.querySelector('img'));
+    const f = p.querySelector('.banner .formula');
+    html += `<div class="rp-sec"><h2>${esc(txt(p.querySelector('.page-title h2')))}</h2>` +
+            (f ? `<div class="rp-formula">${esc(txt(f))}</div>` : '') + cardHtml(cards[0]) + `</div>`;
+    cards.slice(1).forEach(c => { html += cardHtml(c); });
+  });
+
+  html += `<div class="rp-foot"><span>依機械設計手冊與實務設計經驗實作 · 僅供參考，實際應用請依規範驗證</span><span>andrewsu90-hub.github.io</span></div>`;
+  $("printReport").innerHTML = html;
+}
+
+async function exportPdf(){
+  await calc();
+  if (txt($("valP")) === NA) { setApiStatus('error', '⚠ 尚無計算結果，無法匯出'); return; }
+  buildReport();
+  const old = document.title;
+  const d = new Date(), ds = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  document.title = `VESA螺絲受力報告_${$("inptSpec").value}_${$("inptBolts").value}pcs_${ds}`;
+  window.addEventListener('afterprint', () => { document.title = old; }, { once: true });
+  window.print();
+}
+$("btnExportPdf").addEventListener("click", exportPdf);
 
 // 初始化
 initSelect().then(calc);
