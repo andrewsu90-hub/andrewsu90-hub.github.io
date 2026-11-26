@@ -143,10 +143,15 @@
   /* ---------- PDF report (僅列印 / 另存 PDF 時顯示；文字與 SVG 皆為向量) ---------- */
   #printReport { display: none; }
   @media print {
-    @page { size: A4; margin: 14mm 14mm 16mm; }
+    @page { size: A4; margin: 0; } /* 邊界設 0 → 瀏覽器不會印日期、網址、頁碼；實際留白由下方 .rp-wrap 的 thead/tfoot 墊高提供 */
     html, body { background: #fff !important; }
     body > *:not(#printReport) { display: none !important; }
     #printReport { display: block; color: #111; font-family: 'Noto Sans TC','DM Sans',sans-serif; font-size: 10.5pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rp-wrap { width: 100%; border-collapse: collapse; }
+    .rp-wrap > thead { display: table-header-group; }
+    .rp-wrap > tfoot { display: table-footer-group; }
+    .rp-wrap > tbody > tr > td { padding: 0 14mm; }
+    .rp-sp { height: 14mm; }
     .rp-head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1.5pt solid #1a1a2e; padding-bottom: 6pt; margin-bottom: 10pt; }
     .rp-brand { font-family: 'Montserrat',sans-serif; font-weight: 800; font-size: 15pt; letter-spacing: 1pt; }
     .rp-meta { font-size: 8.5pt; color: #555; text-align: right; }
@@ -725,8 +730,8 @@ function buildReport(){
     cards.slice(1).forEach(c => { html += cardHtml(c); });
   });
 
-  html += `<div class="rp-foot"><span>依機械設計手冊與實務設計經驗實作 · 僅供參考，實際應用請依規範驗證</span><span>andrewsu90-hub.github.io</span></div>`;
-  $("printReport").innerHTML = html;
+  html += `<div class="rp-foot"><span>依機械設計手冊與實務設計經驗實作 · 僅供參考，實際應用請依規範驗證</span><span>ANZU</span></div>`;
+  $("printReport").innerHTML = `<table class="rp-wrap"><thead><tr><td><div class="rp-sp"></div></td></tr></thead><tfoot><tr><td><div class="rp-sp"></div></td></tr></tfoot><tbody><tr><td>${html}</td></tr></tbody></table>`;
 }
 
 async function exportPdf(){
